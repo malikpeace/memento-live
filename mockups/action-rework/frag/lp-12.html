@@ -3,16 +3,29 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-12">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. It may carry this week's plan, because that
+     is the plan Action owns, but it may not tell them where they stand in it.
+     CUT: "2 done" in the header, "session 3 of 3" under the move, "One session
+     left in the week", and "the week is whole" on the finished button. Four
+     week-position claims saying one fact four times, and that fact belongs to
+     Consistency's face.
+     LEFT: the channels, which are the lengths they logged standing at their
+     own size with nothing read off them, today as the wide one, the three
+     lengths for it, and the plan's own estimate of what today costs. The foot
+     keeps a plain sum of the minutes logged this week, with no target beside
+     it to read it against. -->
 <style>
 [data-k=lp-12] .ph{font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;
+/* clears the Dynamic Island: at top:22 the goal line ran under it */
+[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:38px;display:flex;justify-content:space-between;
   align-items:baseline;gap:10px;font-size:12.5px;line-height:1;color:rgba(var(--ink),.90)}
 [data-k=lp-12] .hd span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 [data-k=lp-12] .hd span:last-child{flex:none;color:rgba(var(--ink),.90)}
-[data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:46px;margin:0;font-size:26px;font-weight:700;
+[data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:58px;margin:0;font-size:26px;font-weight:700;
   letter-spacing:-.03em;line-height:1.08;color:rgba(var(--ink),.97)}
 [data-k=lp-12] .one b{font-weight:700;color:#3fd94e}
-[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:86px;font-size:12px;line-height:1.4;
+[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:94px;font-size:12px;line-height:1.4;
   color:rgba(var(--ink),.90)}
 
 /* ---- seven channels: one floor, seven lanes, today is the wide one ---- */
@@ -123,14 +136,14 @@
 </div>
 <div class="ph" id="l12ph">
   <div class="grid"></div>
-  <div class="hd"><span id="l12g">Train 3 times a week</span><span id="l12c">2 done</span></div>
+  <div class="hd"><span id="l12g">Train 3 times a week</span></div>
   <p class="one" id="l12one">Lower body, <b id="l12n">40</b> min</p>
-  <div class="hint" id="l12hint">Thursday, session 3 of 3.</div>
+  <div class="hint" id="l12hint">About 40 min, the plan’s estimate.</div>
 
   <div class="cols" id="l12cols"></div>
 
   <div class="days" id="l12days"></div>
-  <p class="week"><span id="l12x">One session left in the week</span><b id="l12t">2h 15m</b></p>
+  <p class="week"><span id="l12x">Logged this week</span><b id="l12t">2h 15m</b></p>
 
   <div class="sizes" id="l12sz" role="group" aria-label="how long today is"></div>
   <button class="more" id="l12more" type="button">any length</button>
@@ -141,21 +154,21 @@
 /* Channel heights are the lengths they chose and logged. The rhythm (how many a week,
    which days) is their own plan from intake. Nothing is measured for them. */
 var B={
- gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,unit:'session',units:'sessions',
-   rest:'rest',week:[40,null,55,'now',null,null,null],per:3,whole:'Three sessions, the week is whole',
+ gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,
+   rest:'rest',week:[40,null,55,'now',null,null,null],
    sizes:[25,40,55],pick:1,lo:15,hi:75},
- school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,unit:'session',units:'sessions',
-   rest:'off',week:[60,45,60,30,'now',null,null],per:5,whole:'Five sessions, the week is whole',
+ school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,
+   rest:'off',week:[60,45,60,30,'now',null,null],
    sizes:[30,60,90],pick:1,lo:20,hi:120},
- audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,unit:'post',units:'posts',
-   rest:'off',week:[50,null,40,'now',null,null,null],per:3,whole:'Three posts, the week is whole',
+ audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,
+   rest:'off',week:[50,null,40,'now',null,null,null],
    sizes:[30,45,75],pick:1,lo:20,hi:100}};
 var ph=r.querySelector('#l12ph'),cols=r.querySelector('#l12cols'),days=r.querySelector('#l12days'),
-    gEl=r.querySelector('#l12g'),cEl=r.querySelector('#l12c'),one=r.querySelector('#l12one'),
-    hint=r.querySelector('#l12hint'),x=r.querySelector('#l12x'),tot=r.querySelector('#l12t'),
+    gEl=r.querySelector('#l12g'),one=r.querySelector('#l12one'),
+    hint=r.querySelector('#l12hint'),tot=r.querySelector('#l12t'),
     sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),fin=r.querySelector('#l12b'),
     finT=r.querySelector('#l12bt'),
-    D=['M','T','W','T','F','S','S'],c,mins,base,done,logged,free;
+    D=['M','T','W','T','F','S','S'],c,mins,base,logged,free;
 function fmt(t){return (t/60|0)+'h '+('0'+(t%60)).slice(-2)+'m';}
 function pct(m){return ((m-c.lo)/(c.hi-c.lo)*80+11).toFixed(1);}
 function chHTML(){return c.week.map(function(m){
@@ -177,20 +190,19 @@ function paint(){
     var on=!free&&+b.dataset.m===mins;
     b.classList.toggle('on',on);
     if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
-  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else.
+  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else,
+     and it is never set against a number of sessions the week wants.
      today's length is the plan's estimate until it is finished, so it only
      joins the total when the day is logged. */
   tot.textContent=fmt(base+(logged?mins:0));
-  x.textContent=logged?c.whole:('One '+c.unit+' left in the week');
-  cEl.textContent=(logged?done+1:done)+' done';}
+  if(!logged&&!free)hint.textContent='About '+mins+' min, the plan’s estimate.';}
 function render(k){
   c=B[k];mins=c.sizes[c.pick];logged=false;free=false;
-  done=c.week.filter(function(m){return typeof m==='number';}).length;
   base=c.week.reduce(function(s,m){return s+(typeof m==='number'?m:0);},0);
   ph.classList.remove('free','logged');
   gEl.textContent=c.goal;
   one.innerHTML=c.task+', <b id="l12n">'+mins+'</b> min';
-  hint.textContent=c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.';
+  hint.textContent='About '+mins+' min, the plan’s estimate.';
   cols.innerHTML=chHTML();
   days.innerHTML=D.map(function(d,i){return '<div'+(i===c.dayIdx?' class="n"':'')+'>'+d+'</div>';}).join('');
   sz.innerHTML=szHTML();
@@ -206,8 +218,8 @@ more.addEventListener('click',function(){
   if(!free){var b=c.sizes[0];c.sizes.forEach(function(m){if(Math.abs(m-mins)<Math.abs(b-mins))b=m;});mins=b;}
   more.textContent=free?'three lengths':'any length';
   more.classList.toggle('on',free);
-  hint.textContent=free?(c.day+'. Drag the green channel to any length.')
-    :(c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.');
+  hint.textContent=free?'Drag the green channel to any length.'
+    :('About '+mins+' min, the plan’s estimate.');
   paint();});
 function set(e){var ch=r.querySelector('#l12ch');if(!ch)return;
   var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;
@@ -223,8 +235,8 @@ function finish(){
   logged=true;ph.classList.add('logged');
   var ch=r.querySelector('#l12ch');ch.classList.add('set','ok');
   r.querySelector('#l12cap').textContent='done';paint();
-  hint.textContent=c.day+', logged at '+mins+' minutes.';
-  fin.className='fin ok';finT.textContent=c.day+' logged. The week is whole.';}
+  hint.textContent='Nothing else is asked of you today.';
+  fin.className='fin ok';finT.textContent=c.day+' logged, '+mins+' minutes.';}
 function holdOn(){if(logged)return;fin.classList.add('go');ht=setTimeout(finish,1050);}
 function holdOff(){if(logged)return;clearTimeout(ht);fin.classList.remove('go');}
 fin.addEventListener('pointerdown',function(e){

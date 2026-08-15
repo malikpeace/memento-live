@@ -639,8 +639,10 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=ld-4] .head.gone h4{opacity:0}
 [data-k=ld-4] .clk{margin:0;font-size:13px;line-height:1.25;font-weight:500;color:rgba(var(--ink),.78);
   font-variant-numeric:tabular-nums;letter-spacing:.01em}
-[data-k=ld-4] .state{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.9);
-  transition:opacity .45s ease}
+/* the box is reserved at two lines so the longer wait line can arrive without
+   shoving the fact under it up the screen mid-fade */
+[data-k=ld-4] .state{margin:8px 0 0;min-height:37px;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.9);transition:opacity .45s ease}
 [data-k=ld-4] .state.swap,[data-k=ld-4] .state.gone{opacity:0}
 
 /* the fact: one at a time, held, never crowded */
@@ -742,8 +744,8 @@ mx-11 is the deliberate counter-example: the same design carrying five.
      t:'You message past customers. You said it is not consistent.'}
   ];
   var HOLD=6000, STATES=['This usually takes about 30 seconds.',
-                         'Still writing. This one is taking longer.',
-                         'Still writing.'];
+                         'Still creating. This one is taking longer. You have big plans lol',
+                         'Still creating.'];
 
   var timers=[], t0=0, tick=null, pass=0, idx=0, longer=false, done=false;
   function clear(){ timers.forEach(clearTimeout); timers=[]; }
@@ -1105,13 +1107,22 @@ mx-11 is the deliberate counter-example: the same design carrying five.
         now SPLIT by two weighted spacers (1.35 above, 1 below), so the
         statement sits just above centre with real air under it and the button
         stops crowding the last line.
-     b. THE BAR. 4px on a full pill radius, and the ghost is separated from the
-        solid by a 3px transparent gutter (background-clip:padding-box) so
-        today's chunk reads as its own segment instead of a second colour on
-        one bar. Ghost alpha up to .34 to survive next to the accent.
-     c. THE POPOVER. Two shadow layers, a tight contact shadow plus a wide
+     b. THE POPOVER. Two shadow layers, a tight contact shadow plus a wide
         ambient one, so it lifts off the statement instead of sitting on a
-        single soft blur. -->
+        single soft blur.
+     MALIK ROUND 5 (2026-08-15):
+     1. THE BAR IS ONE LINE. The round 4 gutter (a 3px transparent border on
+        the ghost) made it read as two separate lines. Gutter gone, interior
+        caps gone, and the ghost is now the SAME accent at .30 drawn under the
+        solid from zero to where today lands, so the line simply grows into
+        what today adds. Only the outer ends are round, from the track itself.
+     2. A DEEP WORK DOOR. One quiet 30px glass pill under the sentence opens
+        the timer already carrying this move and the plan's own estimate for
+        the size chosen. It is a door, not a decision: the 58px hold stays the
+        only focal point.
+     3. NO JOURNEY. The days-left chip is gone. An Action screen says what to
+        do today; where you stand and how the pattern is going belong to
+        Clarity and Consistency. -->
 
 <style>
 [data-k=lp-1] .s{position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 22px 20px;
@@ -1123,10 +1134,10 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 
 /* --- OUTPUT BAR (provenance law) ---------------------------------------
    The literal sum of the messages they logged, counted against a countable
-   target their own plan named (100 clients). The GHOST segment is today's
-   chosen size laid on top of that sum, so the top line reads where today
-   lands before it is done. If the star were money only, with no countable
-   target, this row would not exist at all. */
+   target their own plan named (100 clients). The GHOST is the same line
+   carried on to where today's chosen size lands, so the top row reads where
+   today ends before it is done. If the star were money only, with no
+   countable target, this row would not exist at all. */
 [data-k=lp-1] .goal{display:flex;align-items:baseline;gap:5px;font-size:12.5px;letter-spacing:-.005em;
   white-space:nowrap;color:rgba(var(--ink),.92)}
 [data-k=lp-1] .goal b{font-weight:700;font-variant-numeric:tabular-nums}
@@ -1134,22 +1145,29 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lp-1] .goal u{text-decoration:none;font-weight:400;min-width:0;overflow:hidden;text-overflow:ellipsis}
 [data-k=lp-1] .s.done .goal em,[data-k=lp-1] .s.done .goal .from{display:none}
 
+/* ONE LINE (Malik, round 5): it was reading as two separate lines. The old
+   ghost carried a 3px transparent gutter on its left, a deliberate split, which
+   was exactly backwards. Now both segments are square edged and only the
+   track's own pill radius rounds the OUTER ends, so the line has no interior
+   caps. The ghost is the same accent at a lower alpha and is drawn UNDER the
+   solid, running from zero to where today lands: the solid paints over its own
+   share, which also makes a subpixel seam between them impossible. */
 [data-k=lp-1] .bar{position:relative;margin-top:10px;height:4px;border-radius:999px;
   background:rgba(var(--ink),.10);overflow:hidden}
-[data-k=lp-1] .bar i{position:absolute;left:0;top:0;bottom:0;width:47%;border-radius:999px;
+[data-k=lp-1] .bar i{position:absolute;z-index:1;left:0;top:0;bottom:0;width:47%;border-radius:0;
   background:rgb(var(--acc));transition:width .32s cubic-bezier(.2,.7,.2,1)}
-/* the ghost: today's size, not yet banked. The 3px transparent gutter on its
-   left lets the track show through, so the two segments never fuse. */
-[data-k=lp-1] .bar u{position:absolute;top:0;bottom:0;left:47%;width:5%;border-radius:999px;
-  border-left:3px solid transparent;background-clip:padding-box;
-  background:rgba(var(--ink),.34);
-  transition:left .32s cubic-bezier(.2,.7,.2,1),width .32s cubic-bezier(.2,.7,.2,1),opacity .2s ease-out}
+/* the ghost: the same line continuing into today's size, not yet banked */
+[data-k=lp-1] .bar u{position:absolute;z-index:0;top:0;bottom:0;left:0;width:52%;border-radius:0;
+  background:rgba(var(--acc),.38);
+  transition:width .32s cubic-bezier(.2,.7,.2,1),opacity .2s ease-out}
 [data-k=lp-1] .s.done .bar u{opacity:0}
 
-/* quiet layer: where the number came from, and the deadline from their star */
+/* quiet layer: where the number came from. The days-left chip is gone (Malik,
+   round 5: an Action screen says what to do today and never where you are in
+   the journey, so no countdown to the date either). */
 [data-k=lp-1] .src{display:flex;gap:10px;margin:7px 0 0;font-size:11px;line-height:1.35;
   color:rgba(var(--ink),.90)}
-[data-k=lp-1] .src span:last-child{margin-left:auto;flex:none}
+[data-k=lp-1] .src span+span{margin-left:auto;flex:none}
 
 /* --- the statement: the whole screen ------------------------------------ */
 /* the void is split, not dumped above the statement: 1.35 up, 1 down */
@@ -1211,6 +1229,43 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lp-1] .pmore:active{color:rgba(var(--ink),.96)}
 [data-k=lp-1] .pmore:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:-2px}
 
+/* --- DEEP WORK ENTRY (Malik, round 5) -----------------------------------
+   A door, not a decision: one small glass pill under the sentence that opens
+   the deep work timer already carrying this move and the plan's own estimate
+   for the size chosen. It is deliberately quiet, 30px against the 58px hold,
+   so the screen keeps ONE focal point. */
+[data-k=lp-1] .dwgo{align-self:flex-start;margin-top:17px;
+  display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px 0 10px;
+  border:0;border-radius:999px;background:rgba(22,25,31,.94);
+  backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  font:400 12px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;
+  font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;
+  transition:opacity .2s ease-out,transform .1s ease-out,visibility 0s linear 0s}
+[data-k=lp-1] .dwgo b{font-weight:500}
+[data-k=lp-1] .dwgo em{font-style:normal;font-weight:400}
+[data-k=lp-1] .dwgo em::before{content:'\00b7';margin-right:7px;color:rgba(var(--ink),.45)}
+[data-k=lp-1] .dwgo svg{flex:none;opacity:.82}
+[data-k=lp-1] .dwgo:active{transform:translateY(1px)}
+[data-k=lp-1] .dwgo:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:3px}
+/* once the move is banked the door steps out, and it stops being reachable by
+   keyboard too. The space stays reserved so nothing jumps. */
+[data-k=lp-1] .s.done .dwgo{opacity:0;visibility:hidden;pointer-events:none;transition-delay:0s,0s,.2s}
+
+/* where the pill goes: the timer room itself, carrying the move */
+[data-k=lp-1] .dw{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:64px 26px 46px;text-align:center;
+  background:rgba(5,6,8,.965);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  opacity:0;visibility:hidden;transition:opacity .26s ease-out,visibility 0s linear .26s}
+[data-k=lp-1] .dw.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=lp-1] .dw p{margin:0;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-1] .dw .clk{margin-top:14px;font-size:46px;font-weight:700;line-height:1;
+  letter-spacing:-.04em;color:rgba(var(--ink),.96);font-variant-numeric:tabular-nums}
+[data-k=lp-1] .dw .out{position:absolute;left:0;right:0;bottom:34px;margin:0 auto;border:0;background:none;
+  font:500 13px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;padding:10px;
+  -webkit-tap-highlight-color:transparent}
+[data-k=lp-1] .dw .out:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
+
 /* --- the completion gesture: HOLD (the set's pattern) ------------------- */
 [data-k=lp-1] .hold{position:relative;height:58px;border-radius:14px;overflow:hidden;
   background:rgba(22,25,31,.94);
@@ -1245,8 +1300,8 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       <b class="from" data-from>47</b><em aria-hidden="true">&#8594;</em><b data-to>52</b>
       <u data-tail>of 100 clients</u>
     </div>
-    <div class="bar"><i></i><u></u></div>
-    <p class="src"><span data-src>From your logged messages</span><span data-left>19 days left</span></p>
+    <div class="bar"><u></u><i></i></div>
+    <p class="src"><span data-src>From your logged messages</span></p>
 
     <span class="sp a"></span>
     <div class="say"><span class="vb">Message</span>
@@ -1258,6 +1313,15 @@ mx-11 is the deliberate counter-example: the same design carrying five.
         </div>
       </span>
       <span class="obj">potential clients.</span></div>
+
+    <button type="button" class="dwgo">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <circle cx="6.5" cy="7.2" r="5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M6.5 4.4V7.2H8.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M4.9 1.3h3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <b>Deep work</b><em data-dwmin>about 25 min</em>
+    </button>
     <span class="sp b"></span>
 
     <div class="hold" role="button" tabindex="0">
@@ -1265,6 +1329,12 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       <div class="lab">Hold to confirm</div>
       <button type="button" class="undo" tabindex="-1">Undo</button>
     </div>
+  </div>
+
+  <div class="dw" aria-hidden="true">
+    <p data-dwmove>Message 5 potential clients.</p>
+    <p class="clk" data-dwclk>25:00</p>
+    <button type="button" class="out" tabindex="-1">End</button>
   </div>
 </div>
 <script>(function(){
@@ -1275,8 +1345,11 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       solid=r.querySelector('.bar i'),ghost=r.querySelector('.bar u'),
       goal=r.querySelector('.goal'),from=r.querySelector('[data-from]'),to=r.querySelector('[data-to]'),
       tail=r.querySelector('[data-tail]'),
-      srcEl=r.querySelector('[data-src]'),leftEl=r.querySelector('[data-left]'),
+      srcEl=r.querySelector('[data-src]'),
       obj=r.querySelector('.obj'),vb=r.querySelector('.vb'),
+      dwgo=r.querySelector('.dwgo'),dwmin=r.querySelector('[data-dwmin]'),
+      dw=r.querySelector('.dw'),dwmove=r.querySelector('[data-dwmove]'),
+      dwclk=r.querySelector('[data-dwclk]'),dwout=r.querySelector('.dw .out'),
       hold=r.querySelector('.hold'),fill=r.querySelector('.hold .fill'),
       lab=r.querySelector('.hold .lab'),undo=r.querySelector('.undo');
 
@@ -1287,21 +1360,21 @@ mx-11 is the deliberate counter-example: the same design carrying five.
      measured fact). The verb and the source line change, the provenance does
      not. */
   var B={
-    money:{reached:47,target:100,tail:'of 100 clients',left:'19 days left',
+    money:{reached:47,target:100,tail:'of 100 clients',
       src:'From your logged messages',acc:'43,212,212',
       vb:'Message',one:'potential client.',many:'potential clients.',
       pick:5,min:5,
       three:[{n:3,role:'lighter'},{n:5,role:'today’s'},{n:8,role:'heavier'}],
       all:[1,2,3,5,8,12,16,20],
       did:function(v){return v+(v===1?' message sent':' messages sent')}},
-    audience:{reached:12,target:100,tail:'of 100 videos',left:'22 weeks left',
+    audience:{reached:12,target:100,tail:'of 100 videos',
       src:'From the videos you logged',acc:'255,107,157',
       vb:'Post',one:'video.',many:'videos.',
       pick:2,min:20,
       three:[{n:1,role:'lighter'},{n:2,role:'today’s'},{n:3,role:'heavier'}],
       all:[1,2,3,4,5,6],
       did:function(v){return v+(v===1?' video posted':' videos posted')}},
-    ship:{reached:9,target:14,tail:'of 14 blockers',left:'19 days left',
+    ship:{reached:9,target:14,tail:'of 14 blockers',
       src:'From your own blocker list',acc:'79,140,255',
       vb:'Clear',one:'blocker.',many:'blockers.',
       pick:2,min:40,
@@ -1370,8 +1443,11 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     var base=done?C.reached+pick:C.reached,land=C.reached+pick;
     from.textContent=C.reached;to.textContent=land;
     solid.style.width=(base/C.target*100)+'%';
-    ghost.style.left=(C.reached/C.target*100)+'%';
-    ghost.style.width=(pick/C.target*100)+'%';
+    /* the ghost runs the WHOLE landing width under the solid, so the two never
+       leave a subpixel seam and the line reads as one thing growing */
+    ghost.style.width=(land/C.target*100)+'%';
+    dwmin.textContent=cost(pick);
+    dwmove.textContent=C.vb+' '+pick+' '+(pick===1?C.one:C.many);
     goal.setAttribute('aria-label',done
       ?land+' '+C.tail+'.'
       :pick+' today, '+C.reached+' to '+land+' '+C.tail+'.');
@@ -1392,6 +1468,36 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     say(false);
   }
   undo.addEventListener('click',function(e){e.stopPropagation();reset();});
+
+  /* --- the deep work door ------------------------------------------------
+     The pill opens the timer already set to the plan's own estimate for the
+     size chosen, with today's move as the one thing at the top. Nothing here
+     is measured: the length is the same hedged estimate the picker shows. */
+  var dwTick=null,dwLeft=0;
+  function dwFmt(s){
+    var h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+    return (h?h+':'+('0'+m).slice(-2):m)+':'+('0'+ss).slice(-2);
+  }
+  function dwOpen(){
+    if(dwTick)clearInterval(dwTick);
+    dwLeft=C.min*pick*60;
+    dwclk.textContent=dwFmt(dwLeft);
+    dw.classList.add('open');dw.setAttribute('aria-hidden','false');
+    dwout.tabIndex=0;try{dwout.focus({preventScroll:true});}catch(e){}
+    dwTick=setInterval(function(){
+      if(dwLeft<=0){clearInterval(dwTick);dwTick=null;return;}
+      dwLeft--;dwclk.textContent=dwFmt(dwLeft);
+    },1000);
+  }
+  function dwClose(){
+    if(dwTick){clearInterval(dwTick);dwTick=null;}
+    var was=dw.classList.contains('open');
+    dw.classList.remove('open');dw.setAttribute('aria-hidden','true');
+    dwout.tabIndex=-1;
+    if(was&&!done)try{dwgo.focus({preventScroll:true});}catch(e){}
+  }
+  dwgo.addEventListener('click',function(e){e.stopPropagation();if(!done)dwOpen();});
+  dwout.addEventListener('click',function(e){e.stopPropagation();dwClose();});
 
   /* HOLD to complete, early release aborts */
   function start(e){
@@ -1414,10 +1520,10 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   /* swapping the bucket: the whole screen re-reads for that goal */
   function render(key){
     C=B[key];pick=C.pick;fine=false;done=false;
-    s.classList.remove('done');setOpen(false);
+    s.classList.remove('done');setOpen(false);dwClose();
     fill.style.transition='none';fill.style.width='0';
     ph.style.setProperty('--acc',C.acc);
-    tail.textContent=C.tail;leftEl.textContent=C.left;srcEl.textContent=C.src;vb.textContent=C.vb;
+    tail.textContent=C.tail;srcEl.textContent=C.src;vb.textContent=C.vb;
     say(false);
   }
   r.querySelectorAll('.bk button').forEach(function(b){
@@ -1431,74 +1537,85 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 })();</script>
 </section>
 
-<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
+<!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 number on an open writing line | lp-7 poster ceiling number |
      lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-6" data-k="lp-6">
-<!-- PURITY: this is Action, so the screen carries today and the pen, nothing
-     goal-relative. No start, no goal tick, no delta, no distance to a floor.
-     The rail is an abstract vertical guide holding the person's own recent
-     typed numbers, and the marker sits on the latest one.
-     PROVENANCE: every mark is a number they typed. The pen is the number
-     itself: tap it to write today's, undo puts it back. A slow number (a card
-     balance) is written at the weekly confirm instead, so that bucket's number
-     is not tappable and its quiet line says where it came from.
-     GLANCE: no title, no legend, no explainer. Rail, one number, the action. -->
+<!-- THE STRIP (Malik, 2026-08-13, twice): "it is showing where someone is along
+     their overall path. it is literally just supposed to be action." The descent
+     rail was a journey rail: start, marks, a marker, a distance being closed. It
+     is GONE, in the Body context and in the Money one. Nothing on this screen can
+     tell you how close you are to anything.
+     WHAT IS LEFT, composed rather than gutted: the number they last wrote, and
+     today's move. The pen stays because writing today's number IS this goal's
+     daily ritual, and the contract keeps it in Action with only what writing
+     needs: the current value, tap to correct, the stale mark, undo.
+     ARCHITECTURE: the number sits ON a full-width writing line, alone in open
+     grid, with the move waiting on a glass slab underneath. Two objects, one
+     horizon between them. lp-9 hides the number and gives you a ruled book to
+     write it into; this one shows the number as the whole upper screen and the
+     line under it is the field.
+     PROVENANCE: the number is theirs, typed. A slow number (a card balance) is
+     written at the weekly confirm, so in that context the line is not a field
+     and the quiet slot says where the number came from.
+     GLANCE: no title, no legend, no explainer. One number, one line, one move. -->
 <style>
 [data-k=lp-6] .ph{font-variant-numeric:tabular-nums}
 
-/* --- the rail: an abstract guide, and their own recent marks on it -------
-   it stands at the right margin so the number can hold the one type column
-   the card below it also uses. The line fades out at both ends: a hairline
-   that stops dead reads like a cut, not like a guide. */
-[data-k=lp-6] .rail{position:absolute;left:273px;top:62px;width:1px;height:286px;
-  background:linear-gradient(180deg,transparent,rgba(var(--ink),.20) 13%,rgba(var(--ink),.20) 87%,transparent)}
-[data-k=lp-6] .rail .old{position:absolute;left:-8px;width:9px;height:1px;background:rgba(var(--ink),.40);transform:translateY(-50%)}
-[data-k=lp-6] .rail .mk{position:absolute;left:-13px;top:0;width:14px;height:3px;border-radius:2px;
-  background:#e9eefb;transform:translateY(-50%);box-shadow:0 0 18px rgba(233,238,251,.42);
-  transition:top .5s cubic-bezier(.2,.7,.2,1)}
-
-/* --- the pen: the current number, and nothing measured against it -------- */
-[data-k=lp-6] .stack{position:absolute;left:27px;right:48px;top:169px;transition:top .5s cubic-bezier(.2,.7,.2,1)}
-[data-k=lp-6] .num{display:block;padding:0 8px 0 0;border:0;background:none;position:relative;
-  font:700 44px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+/* --- THE PEN: the number they last wrote, sitting on the line -------------
+   the line runs the full width of the plate, so the screen has a horizon and
+   the empty grid above it reads as room rather than as something missing. */
+/* the plate's left edge is the card's TEXT edge (14 + 15 padding), so the
+   number, the line and today's move all hang off one column */
+[data-k=lp-6] .pen{position:absolute;left:29px;right:29px;top:154px}
+[data-k=lp-6] .row{display:flex;align-items:baseline;gap:9px;min-height:66px}
+[data-k=lp-6] .num{display:block;margin:0;padding:0;border:0;background:none;
+  font:700 62px/1.06 var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.97);text-align:left;-webkit-tap-highlight-color:transparent;
   transition:opacity .16s ease-out}
-[data-k=lp-6] .num em{font-style:normal;font-size:16px;font-weight:500;color:rgba(var(--ink),.90);margin-left:6px}
-[data-k=lp-6] .num[data-pen]{cursor:pointer}
-[data-k=lp-6] .num[data-pen]::after{content:'';position:absolute;left:0;right:8px;bottom:-6px;height:1px;
-  background:rgba(var(--ink),.20)}
-[data-k=lp-6] .num[data-pen]:active{opacity:.55}
-[data-k=lp-6] .num:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:4px;border-radius:6px}
-[data-k=lp-6] .num.swap{opacity:.35}
-[data-k=lp-6] .ed{display:none;width:158px;height:54px;margin:-5px 0 0 -9px;border:0;border-radius:10px;padding:0 9px;
-  background:rgba(var(--ink),.07);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
-  font:700 40px/1 var(--font);letter-spacing:-.03em;font-variant-numeric:tabular-nums;
-  color:rgba(var(--ink),.97);-webkit-appearance:none;appearance:none}
-[data-k=lp-6] .ed:focus{outline:2px solid rgba(var(--ink),.45);outline-offset:1px}
+[data-k=lp-6] .u{font:500 16px/1 var(--font);color:rgba(var(--ink),.90)}
+[data-k=lp-6] .u:empty{display:none}
+[data-k=lp-6] .num.swap{opacity:.3}
+[data-k=lp-6] .ph.write .num{cursor:pointer}
+[data-k=lp-6] .ph.write .pen:active .num{opacity:.55}
+[data-k=lp-6] .num:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:5px;border-radius:8px}
+
+/* the field is the line itself: typing happens where the number was, no box */
+[data-k=lp-6] .ed{display:none;width:150px;height:66px;margin:0;padding:0;border:0;background:transparent;
+  font:700 62px/66px var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.98);caret-color:rgba(var(--ink),.9);-webkit-appearance:none;appearance:none}
+[data-k=lp-6] .ed:focus{outline:none}
+/* the browser's own selection blue is a hue this set does not use */
+[data-k=lp-6] .ed::selection{background:rgba(var(--ink),.20);color:rgba(var(--ink),1)}
 [data-k=lp-6] .ph.pen .num{display:none}
 [data-k=lp-6] .ph.pen .ed{display:block}
 
-/* --- the quiet layer: ONE line, no footnote glyph, no second sentence ---- */
-[data-k=lp-6] .stack .as{margin:13px 0 0;font-size:11.5px;line-height:1.35;color:rgba(var(--ink),.90)}
-[data-k=lp-6] .ph.fresh .as{display:none}
+/* the writing line. brighter where it is a field, quiet where the number is
+   only being carried (a balance written at the weekly confirm) */
+[data-k=lp-6] .ln{height:1px;margin:12px 0 0;background:rgba(var(--ink),.13);
+  transition:background .2s ease-out}
+[data-k=lp-6] .ph.write .ln{background:rgba(var(--ink),.30)}
+[data-k=lp-6] .ph.pen .ln{background:rgba(var(--ink),.55)}
 
-/* --- undo the entry they just wrote ------------------------------------- */
-[data-k=lp-6] .undo{visibility:hidden;margin:10px 0 0;border:0;border-radius:8px;padding:7px 12px;
+/* --- ONE quiet slot under the line: the stale mark, or the undo ---------- */
+[data-k=lp-6] .qt{display:flex;align-items:center;min-height:30px;margin:10px 0 0}
+[data-k=lp-6] .as{margin:0;font-size:11.5px;line-height:1.35;color:rgba(var(--ink),.90)}
+[data-k=lp-6] .ph.fresh .as{display:none}
+[data-k=lp-6] .undo{display:none;border:0;border-radius:8px;padding:8px 12px;
   background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
   font:500 11.5px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;
   -webkit-tap-highlight-color:transparent;transition:background .16s ease-out}
 [data-k=lp-6] .undo:active{background:rgba(var(--ink),.11)}
 [data-k=lp-6] .undo:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-6] .ph.wrote .undo{visibility:visible}
+[data-k=lp-6] .ph.wrote .undo{display:block}
 
-/* --- the action, logged on its own ------------------------------------- */
-[data-k=lp-6] .card{position:absolute;left:14px;right:14px;top:396px;bottom:14px;border-radius:16px;padding:13px;
+/* --- THE MOVE: today's action on its own slab --------------------------- */
+[data-k=lp-6] .card{position:absolute;left:14px;right:14px;top:378px;bottom:14px;border-radius:16px;padding:15px;
   background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 20px 44px rgba(0,0,0,.55);display:flex;flex-direction:column}
-[data-k=lp-6] .card .act{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.24;margin:0;color:rgba(var(--ink),.97)}
-[data-k=lp-6] .chips{display:flex;gap:6px;margin:12px 0 0}
+[data-k=lp-6] .act{font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.26;margin:0;color:rgba(var(--ink),.97)}
+[data-k=lp-6] .chips{display:flex;gap:6px;margin:13px 0 0}
 [data-k=lp-6] .chips button{flex:1;font:500 12.5px/1 var(--font);font-variant-numeric:tabular-nums;
   color:rgba(var(--ink),.90);background:rgba(var(--ink),.06);border:0;border-radius:10px;padding:11px 0;cursor:pointer;
   box-shadow:inset 0 1px 0 rgba(var(--ink),.06);-webkit-tap-highlight-color:transparent;
@@ -1506,22 +1623,30 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lp-6] .chips button:active{transform:translateY(1px)}
 [data-k=lp-6] .chips button.on{background:rgba(var(--ink),.17);color:rgba(var(--ink),.97);font-weight:700}
 [data-k=lp-6] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-6] .cons{font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90);margin:10px 0 0;font-variant-numeric:tabular-nums}
+[data-k=lp-6] .cons{font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.90);margin:11px 0 0;
+  font-variant-numeric:tabular-nums;min-height:33px}
 
-/* --- hold to log, with a quiet amend ----------------------------------- */
-[data-k=lp-6] .hold{position:relative;margin-top:auto;width:100%;height:48px;border:0;border-radius:14px;overflow:hidden;
-  cursor:pointer;background:rgba(235,238,248,.94);font:700 15px/1 var(--font);color:#0b0c10;
-  -webkit-tap-highlight-color:transparent;transition:background .28s ease-out,color .28s ease-out,transform .1s ease-out}
-[data-k=lp-6] .hold:active{transform:translateY(1px)}
-[data-k=lp-6] .hold b{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
-[data-k=lp-6] .hold.go b{width:100%;transition:width 1.05s linear}
-[data-k=lp-6] .hold span{position:relative}
+/* --- the completion: the set's one slab, 58px, 1400ms, early release aborts */
+[data-k=lp-6] .hold{position:relative;margin-top:auto;width:100%;height:58px;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(30,34,42,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);cursor:pointer;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:background .28s ease-out,box-shadow .28s ease-out}
+[data-k=lp-6] .hold .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.20)}
+[data-k=lp-6] .hold.go .fl{width:100%;transition:width 1.4s linear}
+[data-k=lp-6] .hold .tx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;
+  font:700 14px/1 var(--font);letter-spacing:-.005em;color:rgba(var(--ink),.97);white-space:nowrap}
+[data-k=lp-6] .hold svg{display:none;width:14px;height:14px;fill:none;stroke:#3fd94e;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round}
 [data-k=lp-6] .hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-[data-k=lp-6] .hold.done{background:rgba(63,217,78,.16);color:rgba(var(--ink),.96);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:default}
-[data-k=lp-6] .hold.done b{width:0}
-[data-k=lp-6] .amend{visibility:hidden;margin:8px auto 0;border:0;background:none;padding:1px 6px;border-radius:6px;
-  font:500 11.5px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;-webkit-tap-highlight-color:transparent}
+[data-k=lp-6] .ph.logged .hold{background:rgba(63,217,78,.14);box-shadow:inset 0 1px 0 rgba(63,217,78,.28);cursor:default}
+[data-k=lp-6] .ph.logged .hold svg{display:block}
+
+/* --- undo the log: the same word AND the same object as the pen's undo ---- */
+[data-k=lp-6] .amend{visibility:hidden;margin:9px auto 0;border:0;border-radius:8px;padding:8px 12px;
+  background:rgba(var(--ink),.06);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
+  font:500 11.5px/1 var(--font);color:rgba(var(--ink),.90);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:background .16s ease-out}
+[data-k=lp-6] .amend:active{background:rgba(var(--ink),.11)}
 [data-k=lp-6] .amend:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lp-6] .ph.logged .amend{visibility:visible}
 [data-k=lp-6] .ph.logged .chips{pointer-events:none}
@@ -1529,7 +1654,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lp-6] .ph.logged .chips button.on{background:rgba(var(--ink),.15);color:rgba(var(--ink),.96)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-6] *{transition:none!important}}
 </style>
-<h3>Descent</h3><p class="reach"><b>6/10</b><span>weight and debt, the alternative book</span></p><p class="cap">A down goal carried by the pen: the current number is the screen, tap it to write today's, undo puts it back, and the rail beside it is only the marks they themselves typed. A slow number is written at the weekly confirm instead, so the same rail carries it without asking.</p>
+<h3>The line</h3><p class="reach"><b>6/10</b><span>weight and debt, the alternative pen</span></p><p class="cap">The number they last wrote, sitting on the line they write it on, alone in open grid with today's move underneath. Nothing is measured against it: no target, no start, no distance. A slow number is written at the weekly confirm instead, so the same line carries it without asking.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="body" aria-pressed="true">Body</button>
   <button type="button" data-b="money" aria-pressed="false">Money</button>
@@ -1537,104 +1662,80 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 <div class="ph">
   <div class="grid"></div>
 
-  <div class="rail"></div>
-
-  <div class="stack">
-    <button type="button" class="num" data-num><span class="v"></span><em></em></button>
-    <input class="ed" type="text" inputmode="decimal" aria-label="today's number">
-    <p class="as" data-as></p>
-    <button type="button" class="undo">Undo</button>
+  <div class="pen">
+    <div class="row">
+      <button type="button" class="num"><span class="v"></span></button>
+      <input class="ed" type="text" inputmode="decimal" aria-label="today's number">
+      <span class="u"></span>
+    </div>
+    <div class="ln"></div>
+    <div class="qt">
+      <p class="as" data-as></p>
+      <button type="button" class="undo">Undo</button>
+    </div>
   </div>
 
   <div class="card">
     <p class="act"></p>
     <div class="chips" role="group" aria-label="how big today"></div>
     <p class="cons"></p>
-    <button type="button" class="hold"><b></b><span>Hold to log the walk</span></button>
-    <button type="button" class="amend">It went differently</button>
+    <button type="button" class="hold"><i class="fl"></i><span class="tx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l5 5L20 7"/></svg><b>Hold to confirm</b></span></button>
+    <button type="button" class="amend">Undo</button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-6"]');if(!r)return;
-var ph=r.querySelector('.ph'),TOP=62,H=286;
+var ph=r.querySelector('.ph'),HOLD_MS=1400;
 
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
    Body: weight down, daily-measured, so the number itself is the pen.
    Money: a card balance down to zero, a slow number, written at the weekly
    confirm, so this screen carries it but never asks for it.
-   recent = the numbers THEY typed, oldest first, the last one is where they
-   are now. Nothing else feeds the rail: no start, no goal, no target. */
+   Nothing here is a target, a start or a distance: one number they typed, and
+   the move for today. */
 var B={
   body:{
-    recent:[246.2,245.0,244.1,243.3,241.4],now:241.4,pen:true,unit:'lb',
+    now:241.4,pen:true,unit:'lb',
     val:function(x){return x.toFixed(1)},
     as:'As of Tuesday, 2 days ago.',stale:true,
     ok:function(x){return x>=150&&x<=400},
     act:function(v){return 'Today, walk '+v+' minutes after dinner.'},
     chips:[{v:25,txt:'25 min'},{v:40,txt:'40 min'},{v:60,txt:'60 min'}],pick:40,
     week:205,
-    cons:function(v,w){return 'About <b>'+v+'</b> min, the plan’s estimate. Makes <b>'+(w+v)+'</b> min walked this week.'},
-    idle:'Hold to log the walk',
+    cons:function(v,w){return 'About <b>'+v+'</b> min by the plan’s estimate, making <b>'+(w+v)+'</b> min walked this week.'},
     did:function(v){return v+' minutes logged'}
   },
   money:{
-    recent:[5240,4980,4620,4180],now:4180,pen:false,unit:'',
+    now:4180,pen:false,unit:'',
     val:function(x){return '$'+Math.round(x).toLocaleString('en-US')},
-    as:'As of Sunday’s confirm.',stale:false,
+    as:'Card balance, as of Sunday’s confirm.',stale:false,
     ok:function(){return false},
     act:function(v){return 'Today, message '+v+' potential clients.'},
     chips:[{v:2,txt:'2 clients'},{v:3,txt:'3 clients'},{v:5,txt:'5 clients'}],pick:3,
     week:11,est:{2:18,3:25,5:40},
-    cons:function(v,w){return 'About <b>'+this.est[v]+'</b> min, the plan’s estimate. Makes <b>'+(w+v)+'</b> messages sent this week.'},
-    idle:'Hold to log the messages',
+    cons:function(v,w){return 'About <b>'+this.est[v]+'</b> min by the plan’s estimate, making <b>'+(w+v)+'</b> messages sent this week.'},
     did:function(v){return v+' messages logged'}
   }
 };
 
 var C=B.body,pick=C.pick,WEEK=C.week,cur=C.now,
-    railEl=r.querySelector('.rail'),chipsEl=r.querySelector('.chips'),
-    act=r.querySelector('.act'),cons=r.querySelector('.cons'),
-    stack=r.querySelector('.stack'),numEl=r.querySelector('.num'),
-    vEl=numEl.querySelector('.v'),uEl=numEl.querySelector('em'),
-    ed=r.querySelector('.ed'),undo=r.querySelector('.undo'),
-    asEl=r.querySelector('[data-as]'),
-    hold=r.querySelector('.hold'),txt=hold.querySelector('span'),am=r.querySelector('.amend'),
-    mk,W={hi:1,lo:0},last=null;
-
-/* the window the rail spans is drawn from their own recent numbers, framed so
-   the latest one sits a little below centre with room to keep moving */
-function makeWin(){
-  var v=C.recent,hi=Math.max.apply(null,v),lo=Math.min.apply(null,v),sp=(hi-lo)||1,
-      top=hi+sp*.2,rng=Math.max((top-C.now)/.58,sp*1.4);
-  W={hi:top,lo:top-rng};
-}
-function pos(v){return Math.max(0,Math.min(H,(W.hi-v)/(W.hi-W.lo)*H))}
-
-/* the rail is drawn from the entries, so nothing survives a bucket swap that
-   the new bucket's own numbers did not put there */
-function drawRail(){
-  var h='';
-  C.recent.slice(0,-1).forEach(function(v){h+='<i class="old" style="top:'+pos(v)+'px"></i>'});
-  h+='<i class="mk"></i>';
-  railEl.innerHTML=h;
-  mk=railEl.querySelector('.mk');
-  mk.style.top=pos(cur)+'px';
-}
-
-/* the number rides the marker: writing a lower one drops it down the rail */
-function place(){stack.style.top=Math.max(70,Math.min(258,Math.round(TOP+pos(cur)-22)))+'px'}
+    chipsEl=r.querySelector('.chips'),act=r.querySelector('.act'),cons=r.querySelector('.cons'),
+    pen=r.querySelector('.pen'),numEl=r.querySelector('.num'),vEl=numEl.querySelector('.v'),
+    uEl=r.querySelector('.u'),ed=r.querySelector('.ed'),undo=r.querySelector('.undo'),
+    asEl=r.querySelector('[data-as]'),hold=r.querySelector('.hold'),
+    lab=hold.querySelector('b'),am=r.querySelector('.amend'),last=null;
 
 function readNumber(x){
   cur=x;
   vEl.textContent=C.val(x);
   uEl.textContent=C.unit;
-  numEl.setAttribute('aria-label',C.pen?C.val(x)+' '+(C.unit||'')+', tap to write today’s number':C.val(x));
-  place();
+  numEl.setAttribute('aria-label',C.pen?C.val(x)+' '+(C.unit||'')+', tap to write today’s number':C.val(x)+' '+(C.unit||''));
 }
 
-function paintCard(){
-  act.textContent=C.act(pick);
-  cons.innerHTML=C.cons(pick,WEEK);
-}
+function paintCard(){act.textContent=C.act(pick);cons.innerHTML=C.cons(pick,WEEK);}
+
+/* the slab's label is also its name: the text sits in an absolutely placed
+   layer, which not every reader picks up */
+function setLab(t){lab.textContent=t;hold.setAttribute('aria-label',t);}
 
 function drawChips(){
   chipsEl.innerHTML='';
@@ -1650,10 +1751,12 @@ function drawChips(){
   });
 }
 
-/* --- the pen IS the number: tap it, type over it ------------------------- */
+/* --- the pen IS the number: tap the line, type over it ------------------- */
 var editing=false;
 function open(){
   if(!C.pen||editing)return;
+  /* the field takes the number's own width so the unit never jumps sideways */
+  ed.style.width=Math.max(120,Math.ceil(numEl.getBoundingClientRect().width))+'px';
   editing=true;ph.classList.add('pen');
   ed.value=C.val(cur);ed.focus();
   try{ed.setSelectionRange(0,ed.value.length)}catch(e){}
@@ -1668,62 +1771,54 @@ function commit(){
   var x=parseFloat(ed.value);
   close();
   if(!C.ok(x)||x===cur)return;
-  /* the number they had before stays as a faint mark: the rail is a stack of entries */
-  var prev=cur,wasStale=ph.classList.contains('stale'),
-      old=document.createElement('i');
-  old.className='old';old.style.top=pos(prev)+'px';
-  railEl.appendChild(old);
-  mk.style.top=pos(x)+'px';
+  last={prev:cur,wasStale:ph.classList.contains('stale')};
   swapTo(x);
   ph.classList.add('fresh','wrote');ph.classList.remove('stale');
-  last={prev:prev,mark:old,wasStale:wasStale};
 }
-numEl.addEventListener('click',open);
+pen.addEventListener('click',function(e){if(e.target===undo||undo.contains(e.target))return;open();});
 ed.addEventListener('keydown',function(e){
   if(e.key==='Enter'){e.preventDefault();commit();}
   else if(e.key==='Escape'){e.preventDefault();close();}
 });
 ed.addEventListener('blur',commit);
 
-/* --- undo: the entry comes off, and so does its mark --------------------- */
+/* --- undo: today's entry comes back off the line ------------------------- */
 undo.addEventListener('click',function(){
   if(!last)return;
-  if(last.mark.parentNode)last.mark.parentNode.removeChild(last.mark);
-  mk.style.top=pos(last.prev)+'px';
   swapTo(last.prev);
   ph.classList.remove('fresh','wrote');
   if(last.wasStale)ph.classList.add('stale');
   last=null;
 });
 
-/* --- logging the action, accept or amend --------------------------------- */
+/* --- logging the move: hold to confirm, early release aborts ------------- */
 var t=null;
 /* logging banks the planned size: the week total the line already promised
    becomes the week total on record, so the number does not jump on the tap */
-function finish(){hold.classList.remove('go');hold.classList.add('done');ph.classList.add('logged');
-  txt.textContent=C.did(pick);WEEK+=pick;}
-function start(){if(hold.classList.contains('done'))return;hold.classList.add('go');t=setTimeout(finish,1050);}
-function stop(){if(hold.classList.contains('done'))return;clearTimeout(t);hold.classList.remove('go');}
+function finish(){t=null;hold.classList.remove('go');ph.classList.add('logged');
+  setLab(C.did(pick));WEEK+=pick;}
+function start(){if(ph.classList.contains('logged')||t)return;hold.classList.add('go');t=setTimeout(finish,HOLD_MS);}
+function stop(){if(!t)return;clearTimeout(t);t=null;hold.classList.remove('go');}
 hold.addEventListener('pointerdown',start);
 ['pointerup','pointerleave','pointercancel'].forEach(function(e){hold.addEventListener(e,stop)});
 hold.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();start();}});
 hold.addEventListener('keyup',stop);
 am.addEventListener('click',function(){
-  WEEK-=pick;hold.classList.remove('done');ph.classList.remove('logged');
-  txt.textContent=C.idle;paintCard();
+  WEEK-=pick;ph.classList.remove('logged');setLab('Hold to confirm');paintCard();
 });
 
-/* --- swapping the bucket: same rail, the goal's own numbers and pen ------- */
+/* --- swapping the bucket: the same line, that goal's own number ---------- */
 function render(key){
   C=B[key];pick=C.pick;WEEK=C.week;cur=C.now;last=null;
   close();
-  ph.classList.remove('logged','fresh','wrote');
+  ph.classList.remove('logged','fresh','wrote','go');
+  hold.classList.remove('go');
   ph.classList.toggle('stale',!!C.stale);
-  hold.classList.remove('go','done');txt.textContent=C.idle;
-  if(C.pen)numEl.setAttribute('data-pen','');else numEl.removeAttribute('data-pen');
+  ph.classList.toggle('write',!!C.pen);
+  setLab('Hold to confirm');
   numEl.disabled=!C.pen;
   asEl.textContent=C.as;
-  makeWin();drawRail();readNumber(C.now);drawChips();paintCard();
+  readNumber(C.now);drawChips();paintCard();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
   b.addEventListener('click',function(){
@@ -1765,20 +1860,35 @@ render('body');
      BEAUTY PASS (2026-08-13). Two things read instantly here, the hour and the
      bars, and they were fighting: eight near-white bars out-shouted the numeral
      that is supposed to be the subject.
-     WEIGHT: the bars drop to .58 ink over the ceiling and .14 under, so the
-     over/under split still reads across the room while the hour keeps the
-     screen. They also grow off a floor now (top corners round, bottom nearly
-     square) instead of floating as capsules.
+     WEIGHT: the bars drop off full ink so the hour keeps the screen (the
+     over/under split that set their weight is gone, see the tightened rule
+     below; they are one weight now). They also grow off a floor (top corners
+     round, bottom nearly square) instead of floating as capsules.
      CUT: the "Pick a time" line. A drag affordance does not need a caption, so
      the chevron moved inline beside the hour, which is where the gesture is,
      and the screen loses one more small phrase.
      HOLD: unified with the rest of the set, 58px glass slab, 1400ms, green
      fill on completion. The mix-blend-mode:difference label is gone with it,
      and the label now SAYS "Hold to confirm" like every other completion in
-     the set instead of reading like a tap. -->
+     the set instead of reading like a tap.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Nothing on it may read the record against
+     the goal.
+     CUT: the over / under split on the bars. A night going bright because
+     their logged put-away was later than the ceiling is a verdict on that
+     night, and seven of them side by side is a verdict on the week, which is
+     Consistency's face wearing Action's clothes. The bars are now one weight,
+     on one scale across the week and nothing else: it is the record of what
+     they typed, at a size you can see, with no line drawn across it.
+     KEPT: the hour, which is today's size and the whole point of the screen,
+     the pen that writes tonight's number, and the tap that reads a bar back
+     in their own words. -->
 <style>
 [data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-7] .w{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
+/* 34px of top padding clears the Dynamic Island: at 26 the statement's box
+   ran under it */
+[data-k=lp-7] .w{position:absolute;inset:0;padding:34px 20px 20px;display:flex;flex-direction:column}
 
 /* --- the action sentence, landing on the hour --------------------------- */
 [data-k=lp-7] .say{margin:0;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.2;
@@ -1813,12 +1923,11 @@ render('body');
   display:flex;flex-direction:column;font-family:var(--font);-webkit-tap-highlight-color:transparent}
 [data-k=lp-7] .chart .c:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:6px}
 [data-k=lp-7] .chart .bw{flex:1 1 auto;min-height:0;display:flex;align-items:flex-end}
-/* bars grow off a floor: round at the top, nearly square where they sit */
-/* under the ceiling reads at .22: at .14 the good nights were nearly invisible
-   on a phone, which made the week look half empty instead of half quiet */
-[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.22);
+/* bars grow off a floor: round at the top, nearly square where they sit.
+   ONE weight for every night: length is the number they typed, on one scale
+   across the week, and no night is judged against the hour */
+[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.40);
   transition:height .34s cubic-bezier(.2,.8,.25,1),background .2s ease-out,box-shadow .2s ease-out}
-[data-k=lp-7] .chart .c.over .b{background:rgba(var(--ink),.58)}
 [data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.13)}
 [data-k=lp-7] .chart .dy{margin:7px 0 0;font-size:9.5px;line-height:1;letter-spacing:-.01em;
   color:rgba(var(--ink),.80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1866,7 +1975,7 @@ render('body');
 [data-k=lp-7] .go.on .tx{font-weight:700;color:rgba(var(--ink),.97)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-7] *{transition:none!important}}
 </style>
-<h3>Ceiling</h3><p class="reach"><b>7/10</b><span>screen time, nightly</span></p><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the week is a bar chart of the minutes they typed off their own Screen Time report: bad nights are simply taller, and the ones past the hour go bright.</p>
+<h3>Ceiling</h3><p class="reach"><b>7/10</b><span>screen time, nightly</span></p><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the nights they typed off their own Screen Time report stand as bars at their own size, one weight, nothing drawn across them: a long night is simply taller.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
@@ -1933,7 +2042,7 @@ function paint(){
     var c=cells[i],b=c.querySelector('.b'),empty=n.m===null;
     c.classList.toggle('empty',empty);
     c.classList.toggle('now',n===today);
-    c.classList.toggle('over',!empty&&n.t!==null&&n.t>v);
+    /* no over / under class: the hour is today's size, not a verdict on the week */
     b.style.height=(empty?100:Math.max(2,Math.round(1000*n.m/mx)/10))+'%';
     c.querySelector('.dy').textContent=n.d;
     c.setAttribute('aria-label',(n===today?'Today':n.d)+', '+(empty?'not entered yet'
@@ -2060,33 +2169,43 @@ paint();})();</script>
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-8" data-k="lp-8">
-<!-- PROVENANCE: every mark is one logged action, nothing else. The field is
-     the count of things they did, drawn at size, so the goal's whole shape is
-     the number of marks: 100 transfers, 120 sessions, 60 study blocks. The
-     field re-rules itself to the goal, it never rescales a mark to make a
-     small goal look big. The finish estimates are arithmetic on the size they
-     picked and the marks still empty, and they say they are estimates. -->
+<!-- PROVENANCE: every mark is one logged action, nothing else. One mark is one
+     graph-paper cell at every size, so the record is drawn at its own scale
+     and a small week is never inflated to look big.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY, never how far along the journey they are.
+     This screen was the worst offender in the set: it drew the whole target as
+     empty cells, so the goal was literally a progress bar you could count.
+     CUT: the empty cells (100, 120, 60 of them), the two bright centre rules
+     that made the target read as four countable blocks, the "37 of 100" and
+     "of 120 this term" readouts, the goal amount in the header, and the finish
+     estimates ("the last mark lights around March"), which were arrival dates.
+     LEFT: the marks they actually made, and blank paper where the record
+     stops. Nothing on the page says how many marks the goal has, so nothing on
+     the page says how close it is. The total under the field is a plain sum of
+     what they logged, with no denominator to read it against.
+     KEPT: today's move, the sizes and what tonight costs at each, the wipe and
+     the hold that light tonight's marks one at a time. -->
 <style>
 [data-k=lp-8] .ph{font-variant-numeric:tabular-nums}
 /* the field IS the grid: every mark sits in one graph-paper cell, at every size */
-[data-k=lp-8] .grid{background-position:20px var(--ftop,96px)}
+[data-k=lp-8] .grid{background-position:20px 84px}
 
-/* header block lands its baseline on the grid line one row above the field */
-[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:var(--htop,23px)}
+/* header block sits a graph row above the field, and clear of the Dynamic
+   Island: at top:24 its box ran under it */
+[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:34px}
 [data-k=lp-8] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
-[data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90);margin-top:5px}
 
-/* --- the marks: as many as the goal has, ruled to the paper -------------- */
-[data-k=lp-8] .field{position:absolute;left:20px;top:var(--ftop,96px);
+/* --- the marks they made, and blank paper where the record stops --------- */
+/* no empty cells are drawn: an outline for every mark the goal still wants is
+   a progress bar, and counting it is exactly what this screen may not offer */
+[data-k=lp-8] .field{position:absolute;left:20px;top:84px;
   width:calc(var(--cols,10) * 26px);height:calc(var(--rows,10) * 26px);
   display:grid;grid-template-columns:repeat(auto-fill,26px);grid-auto-rows:26px;
   touch-action:none;-webkit-tap-highlight-color:transparent}
-/* the two centre grid lines are brightened so the field reads as four blocks */
-[data-k=lp-8] .field:after{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(90deg,transparent calc(var(--cx,130px) - 1px),rgba(var(--ink),.10) calc(var(--cx,130px) - 1px),rgba(var(--ink),.10) var(--cx,130px),transparent var(--cx,130px)),
-    linear-gradient(180deg,transparent calc(var(--cy,130px) - 1px),rgba(var(--ink),.10) calc(var(--cy,130px) - 1px),rgba(var(--ink),.10) var(--cy,130px),transparent var(--cy,130px))}
 [data-k=lp-8] .field i{width:26px;height:26px;background-repeat:no-repeat;background-position:center;
-  background-size:14px 14px;background-image:linear-gradient(rgba(var(--ink),.14),rgba(var(--ink),.14));
+  background-size:14px 14px;background-image:none;
   transition:background-size .22s cubic-bezier(.2,.8,.3,1),background-image .26s ease-out}
 /* the banked marks read at .70, not .88: at full brightness the field
    out-shouted the one instruction on the screen */
@@ -2099,19 +2218,21 @@ paint();})();</script>
   background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95))}
 [data-k=lp-8] .field:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:6px;border-radius:4px}
 
-/* --- where that puts you ------------------------------------------------ */
-/* sits in the graph row directly under the field, same 20px column as everything else */
-[data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:var(--rtop,356px);
+/* --- the sum of the marks, no denominator ------------------------------- */
+/* rides one graph row under the last mark whatever shape the record is, so the
+   header, the marks and their total read as one block and the blank paper
+   between it and the card is the page they have not written on yet */
+[data-k=lp-8] .read{position:absolute;left:20px;right:20px;
+  top:calc(84px + var(--rows,5) * 26px + 10px);
   height:26px;display:flex;align-items:baseline}
 /* the readout is the FIELD's caption, not a second headline: the one big thing
    on this screen is the action in the card, so this reads one step quieter */
 [data-k=lp-8] .read .amt{font-size:19px;line-height:26px;font-weight:700;letter-spacing:-.025em;color:rgba(var(--ink),.97)}
 [data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90)}
-[data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90);white-space:nowrap}
 
 /* --- today -------------------------------------------------------------- */
 /* left:6 + padding:14 puts the card's text on the same 20px column as the header */
-[data-k=lp-8] .card{position:absolute;left:6px;right:6px;top:var(--ctop,408px);bottom:16px;border-radius:16px;
+[data-k=lp-8] .card{position:absolute;left:6px;right:6px;top:408px;bottom:16px;border-radius:16px;
   padding:14px 14px 15px;
   background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column}
@@ -2130,7 +2251,10 @@ paint();})();</script>
 [data-k=lp-8] .chips button.on em{color:rgba(var(--ink),.98)}
 [data-k=lp-8] .chips button.on u{color:rgba(var(--ink),.90)}
 [data-k=lp-8] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+/* the consequence line carries what tonight COSTS at this size, never where
+   that size lands the goal */
 [data-k=lp-8] .cons{margin:11px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .cons:empty{display:none}
 /* the completion is a HOLD (Malik, 2026-08-13): the marks light while the
    press fills, and letting go early puts every one of them back */
 [data-k=lp-8] .fill{position:relative;margin-top:auto;width:100%;height:50px;border:0;border-radius:14px;
@@ -2149,7 +2273,7 @@ paint();})();</script>
 [data-k=lp-8] .ph.logged .chips button.on{background:rgba(var(--ink),.15)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-8] *{transition:none!important}}
 </style>
-<h3>One hundred marks</h3><p class="reach"><b>5/10</b><span>saving and unit milestones</span></p><p class="cap">The milestone cut into marks, one per cell of the graph paper, so the goal is literally drawn on the grid at its own size: tonight's marks are the small green ones, and the hold fills them one at a time.</p>
+<h3>The marks</h3><p class="reach"><b>5/10</b><span>saving and unit milestones</span></p><p class="cap">One logged action, one mark, one cell of the graph paper, and blank paper where the record stops: nothing is drawn for the marks not made yet, so the page shows the work and never the distance. Tonight's marks are the small green ones the hold fills, one at a time.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -2157,12 +2281,12 @@ paint();})();</script>
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd"><b data-title>Save $5,000</b><i data-legend>Each mark is $50.</i></div>
+  <div class="hd"><b data-legend>Every mark is $50 moved.</b></div>
 
   <div class="field" tabindex="0" role="button" aria-label="wipe across tonight's marks to fill them"></div>
 
   <div class="read">
-    <span class="amt"></span><span class="of"></span><span class="ct"></span>
+    <span class="amt"></span><span class="of"></span>
   </div>
 
   <div class="card">
@@ -2175,49 +2299,43 @@ paint();})();</script>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-8"]');if(!r)return;
 var ph=r.querySelector('.ph'),field=r.querySelector('.field'),
-    amt=r.querySelector('.read .amt'),of=r.querySelector('.read .of'),ct=r.querySelector('.read .ct'),
+    amt=r.querySelector('.read .amt'),of=r.querySelector('.read .of'),
     cons=r.querySelector('.cons'),act=r.querySelector('.act'),sub=r.querySelector('.sub'),
     chipsEl=r.querySelector('.chips'),btn=r.querySelector('.fill'),
     bar=btn.querySelector('b'),btnT=btn.querySelector('span'),
-    title=r.querySelector('[data-title]'),legend=r.querySelector('[data-legend]');
+    legend=r.querySelector('[data-legend]');
 
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
    Same field, three goals whose marks mean three different things. cols/rows
-   keep every mark exactly one 26px graph cell, so the field changes SIZE, not
-   scale: 100 transfers is a square, 120 sessions is taller, 60 blocks is a
-   narrow column. base = the marks already logged. Nothing here is measured. */
+   keep every mark exactly one 26px graph cell, so the record changes SIZE, not
+   scale. base = the marks already logged; the block is only ever as big as the
+   marks made plus tonight's, and no goal total is stored on this screen at all. */
 var B={
-  money:{cols:10,rows:10,n:100,base:37,htop:23,ftop:96,rtop:356,ctop:408,cx:130,cy:130,
-    title:'Save $5,000',legend:'Each mark is $50.',
-    amt:function(l){return '$'+(l*50).toLocaleString('en-US')},
-    of:'',ct:function(l){return l+' of 100'},
+  money:{cols:10,rows:5,base:37,
+    legend:'Every mark is $50 moved.',
+    amt:function(l){return '$'+(l*50).toLocaleString('en-US')},of:'moved so far',
     sub:'Friday is the transfer day.',
     chips:[{n:2,em:'$100',u:'2 marks'},{n:4,em:'$200',u:'4 marks'},{n:7,em:'$350',u:'7 marks'}],pick:1,
     act:function(c){return 'Move $'+(c.n*50)+' into savings.'},
-    cons:function(c){return 'At this size the last mark lights around '+
-      ({2:'March',4:'early December',7:'mid October'})[c.n]+'.'},
+    cons:function(){return ''},
     did:function(c){return '$'+(c.n*50)+' moved into savings.'}},
-  /* two more rows of marks than the money field, so the whole block shifts up
-     one row and the card keeps its own height: the goal sets the geometry */
-  body:{cols:10,rows:12,n:120,base:38,htop:14,ftop:70,rtop:382,ctop:434,cx:130,cy:156,
-    title:'Run the half in January',legend:'One mark for each session.',
-    amt:function(l){return ''+l},of:'of 120',ct:function(){return ''},
+  body:{cols:10,rows:4,base:38,
+    legend:'Every mark is one session.',
+    amt:function(l){return ''+l},of:'sessions run',
     sub:'',
     /* length is the dial here, not marks: a session is a session, and the
        screen says so by leaving the mark count alone while the minutes move */
     chips:[{n:1,mins:30,em:'30 min',u:'easy'},{n:1,mins:45,em:'45 min',u:'normal'},{n:1,mins:70,em:'70 min',u:'long'}],pick:1,
-    week:100,
     act:function(c){return 'Run '+c.mins+' minutes, easy pace.'},
-    cons:function(c){return 'About '+c.mins+' min, the plan’s estimate. Makes '+(this.week+c.mins)+' min run this week.'},
+    cons:function(c){return 'About '+c.mins+' min, the plan’s estimate.'},
     did:function(c){return c.mins+' minutes logged.'}},
-  school:{cols:6,rows:10,n:60,base:23,htop:23,ftop:96,rtop:356,ctop:408,cx:78,cy:130,
-    title:'60 study sessions this term',legend:'One mark for each block.',
-    amt:function(l){return ''+l},of:'of 60 this term',ct:function(){return ''},
-    sub:'About 90 min each, phone in another room.',
+  school:{cols:6,rows:5,base:23,
+    legend:'Every mark is one study block.',
+    amt:function(l){return ''+l},of:'blocks this term',
+    sub:'Phone in another room.',
     chips:[{n:1,em:'1 block',u:'1 mark'},{n:2,em:'2 blocks',u:'2 marks'},{n:3,em:'3 blocks',u:'3 marks'}],pick:1,
     act:function(c){return ({1:'One study block.',2:'Two study blocks.',3:'Three study blocks.'})[c.n]},
-    cons:function(c){return 'At this size the last mark lights around '+
-      ({1:'early October',2:'early September',3:'the end of August'})[c.n]+'.'},
+    cons:function(c){return 'About '+({1:'90 min',2:'3 hours',3:'four and a half hours'})[c.n]+' tonight, the plan’s estimate.'},
     did:function(c){return c.n+(c.n===1?' block logged.':' blocks logged.')}}
 };
 
@@ -2226,15 +2344,18 @@ function step(){return chip.n}
 function lit(){return C.base+filled}
 function left(){return step()-filled}
 
+/* the button says what is left to fill TONIGHT, never how many the goal wants */
+function label(){
+  return left()?'Hold to fill '+left()+(left()===1?' mark':' marks')
+    :'Logged, '+step()+(step()===1?' mark':' marks')+' tonight';
+}
 function paint(){
   cells.forEach(function(c,i){
     c.classList.toggle('lit',i<lit());
     c.classList.toggle('pend',!logged&&i>=lit()&&i<C.base+step());
   });
   amt.textContent=C.amt(lit());
-  ct.textContent=C.ct(lit());
-  btnT.textContent=logged?'Logged. '+lit()+' of '+C.n+' marks'
-    :'Hold to fill '+left()+(left()===1?' mark':' marks');
+  btnT.textContent=label();
 }
 function done(){
   logged=true;clearHold();bar.style.transition='none';bar.style.width='0';
@@ -2252,8 +2373,7 @@ function light(upTo){
   })(cells[i],i-from);}
   filled=to-C.base;
   amt.textContent=C.amt(lit());
-  ct.textContent=C.ct(lit());
-  btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+  btnT.textContent=label();
   if(!left())setTimeout(done,220+(to-from)*55);
 }
 
@@ -2267,7 +2387,7 @@ function setLit(n){
     cells[i].classList.toggle('pend',!on);
   }
   filled=n;
-  amt.textContent=C.amt(lit());ct.textContent=C.ct(lit());
+  amt.textContent=C.amt(lit());
 }
 function clearHold(){timers.forEach(clearTimeout);timers=[];}
 function holdStart(e){
@@ -2281,7 +2401,7 @@ function holdStart(e){
   for(var i=1;i<=n;i++)(function(k){
     timers.push(setTimeout(function(){
       setLit(from0+k);
-      btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+      btnT.textContent=label();
       if(k===n)done();
     },Math.round(HOLD*k/n)));
   })(i);
@@ -2329,18 +2449,19 @@ field.addEventListener('pointermove',function(e){
 field.addEventListener('keydown',function(e){
   if(e.key==='Enter'||e.key===' '){e.preventDefault();light(C.base+step()-1);}});
 
-/* --- swapping the bucket: the field re-rules itself to the new goal ------- */
+/* --- swapping the bucket: the block re-rules itself to the record --------- */
 function render(key){
   C=B[key];chip=C.chips[C.pick];filled=0;logged=false;
   clearHold();bar.style.transition='none';bar.style.width='0';from0=0;
   btn.classList.remove('done');ph.classList.remove('logged');
   ['cols','rows'].forEach(function(k){ph.style.setProperty('--'+k,C[k])});
-  ['htop','ftop','rtop','ctop','cx','cy'].forEach(function(k){ph.style.setProperty('--'+k,C[k]+'px')});
-  title.textContent=C.title;legend.textContent=C.legend;
+  legend.textContent=C.legend;
   of.textContent=C.of;sub.textContent=C.sub;
   field.setAttribute('aria-label','wipe across tonight’s marks to fill them, '+
-    C.base+' of '+C.n+' already logged');
-  var h='';for(var i=0;i<C.n;i++)h+='<i></i>';
+    C.base+' already logged');
+  /* cells exist for the marks made plus tonight's, and the tail of the last
+     row is simply blank paper: nothing is drawn for a mark not made */
+  var n=C.cols*C.rows,h='';for(var i=0;i<n;i++)h+='<i></i>';
   field.innerHTML=h;cells=[].slice.call(field.children);
   act.textContent=C.act(chip);cons.textContent=C.cons(chip);
   drawChips();paint();
@@ -2380,7 +2501,20 @@ render('money');
      RULED, NOT BOXED: every number sits ON a hairline rule instead of inside a
      chip, which is what makes it read as a book instead of a spreadsheet.
      GESTURE LAW: writing the day in is a completion, so it is a hold now,
-     1400ms, early release aborts. -->
+     1400ms, early release aborts.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY, never how far along the journey they are.
+     CUT the consequence line under the sizes: "the plan reckons about half a
+     pound a week off" is a projection, which is a reading of the goal, which
+     is Clarity's face. The size chips still make their consequence legible the
+     only way Action is allowed to, by changing the move sentence itself
+     (20 minutes walking / 60 minutes walking, no bread, no late snack).
+     What is left on the page: the row to write today's number on, today's
+     move, and the days already written. No goal, no target, no rate, no
+     distance. The room the projection gave back went to the book, which now
+     runs ten days deep instead of eight, so the ruled pages reach the foot of
+     the page and the open row keeps its air. -->
 <style>
 [data-k=lp-9] .ph{font-variant-numeric:tabular-nums}
 
@@ -2416,7 +2550,9 @@ render('money');
 [data-k=lp-9] .done .open{cursor:default}
 
 /* --- the one instruction sentence, and the dial under it ----------------- */
-[data-k=lp-9] .act{margin:20px 0 0;font-size:16px;font-weight:700;line-height:1.32;letter-spacing:-.018em;
+/* nothing sits under the dial: the move sentence IS the consequence of the
+   size, and a rate ("half a pound a week off") would be a reading of the goal */
+[data-k=lp-9] .act{margin:22px 0 0;font-size:16px;font-weight:700;line-height:1.32;letter-spacing:-.018em;
   color:rgba(var(--ink),.97);min-height:42px}
 [data-k=lp-9] .seg{display:flex;gap:3px;margin:12px 0 0;padding:3px;border-radius:12px;background:rgba(var(--ink),.055)}
 [data-k=lp-9] .seg button{flex:1;font:500 12.5px var(--font);color:rgba(var(--ink),.90);background:transparent;border:0;
@@ -2425,10 +2561,9 @@ render('money');
 [data-k=lp-9] .seg button.on{background:rgba(var(--ink),.13);color:rgba(var(--ink),.97);font-weight:700;
   box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
 [data-k=lp-9] .seg.lock button{cursor:default}
-[data-k=lp-9] .cons{margin:11px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90);min-height:35px}
 
 /* --- the completion: a hold, like every completion in the set ------------ */
-[data-k=lp-9] .hold{position:relative;height:58px;margin:14px 0 0;border-radius:14px;overflow:hidden;
+[data-k=lp-9] .hold{position:relative;height:58px;margin:16px 0 0;border-radius:14px;overflow:hidden;
   background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
   cursor:default;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
   transition:background .28s ease-out,box-shadow .28s ease-out}
@@ -2447,7 +2582,7 @@ render('money');
 /* --- the pages already written: ruled, never boxed ---------------------- */
 [data-k=lp-9] .past{margin:auto 0 0;padding-top:16px}
 /* same 12px inset as the open row, so every column in the book lines up */
-[data-k=lp-9] .past .rw{height:32px;padding:0 12px;align-items:center;
+[data-k=lp-9] .past .rw{height:30px;padding:0 12px;align-items:center;
   box-shadow:inset 0 -1px 0 rgba(var(--ink),.07)}
 [data-k=lp-9] .past .rw:last-child{box-shadow:none}
 [data-k=lp-9] .past .d{font-size:12.5px;color:rgba(var(--ink),.90)}
@@ -2477,7 +2612,6 @@ render('money');
 
     <p class="act" id="l9act"></p>
     <div class="seg" id="l9seg" role="group" aria-label="how big today"></div>
-    <p class="cons" id="l9cons"></p>
 
     <div class="hold" id="l9hold" role="button" tabindex="0" aria-disabled="true">
       <span class="fl"></span>
@@ -2491,34 +2625,29 @@ render('money');
 
 /* Two directions, one book. The days before today are the only raw numbers in
    either context, and the only arithmetic on them is yesterday's change. No
-   target lives here: what the numbers mean against the goal is Clarity's job. */
+   target lives here, and no rate either: what the numbers mean against the
+   goal, and how fast it is going, are both Clarity's face. */
 var CTX={
   down:{
-    H:[244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
+    H:[245.1,244.8,244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
     acts:[
-      {t:'Light',a:'20 minutes walking.',
-       c:'Holds you about where you are. Some days that is the work.'},
-      {t:'Steady',a:'40 minutes walking. No bread with dinner.',
-       c:'At this size the plan reckons about half a pound a week off.'},
-      {t:'Hard',a:'60 minutes walking. No bread, no late snack.',
-       c:'At this size the plan reckons closer to a pound a week off, as long as you sleep tonight.'}
+      {t:'Light',a:'20 minutes walking.'},
+      {t:'Steady',a:'40 minutes walking. No bread with dinner.'},
+      {t:'Hard',a:'60 minutes walking. No bread, no late snack.'}
     ],pick:1
   },
   up:{
-    H:[148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
+    H:[148.2,148.5,148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
     acts:[
-      {t:'Light',a:'Three full meals. No skipped lunch.',
-       c:'Holds you about where you are. Some days that is the work.'},
-      {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.',
-       c:'At this size the plan reckons about half a pound a week on.'},
-      {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.',
-       c:'At this size the plan reckons closer to a pound a week on, as long as you sleep tonight.'}
+      {t:'Light',a:'Three full meals. No skipped lunch.'},
+      {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.'},
+      {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.'}
     ],pick:1
   }
 };
-var DAYS=['Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
+var DAYS=['Sat 1','Sun 2','Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
 
-var act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
+var act=r.querySelector('#l9act'),seg=r.querySelector('#l9seg'),
     book=r.querySelector('#l9book'),slot=r.querySelector('#l9slot'),inp=r.querySelector('#l9in'),
     hold=r.querySelector('#l9hold'),fl=hold.querySelector('.fl'),lab=r.querySelector('#l9lab'),
     past=r.querySelector('#l9past'),
@@ -2539,7 +2668,7 @@ function drawSeg(){
       if(written)return;
       [].forEach.call(seg.children,function(z){z.classList.remove('on');z.setAttribute('aria-pressed','false')});
       b.classList.add('on');b.setAttribute('aria-pressed','true');
-      pick=i;act.textContent=o.a;cons.textContent=o.c;
+      pick=i;act.textContent=o.a;
     });
     seg.appendChild(b);
   });
@@ -2585,7 +2714,6 @@ function write(){
   fl.style.transition='width .24s ease-out';fl.style.width='0';
   var d=v-C.H[C.H.length-1];
   lab.textContent='Written in';
-  cons.textContent='Tomorrow opens a new row at midnight.';
   past.insertBefore(row('Today',r1(v),sgn(d),true),past.firstElementChild);
   past.removeChild(past.lastElementChild);
 }
@@ -2602,7 +2730,7 @@ function render(key){
   clearTimeout(ht);ht=null;fl.style.transition='none';fl.style.width='0';
   hold.classList.remove('rdy');hold.setAttribute('aria-disabled','true');
   lab.textContent="Write today's weight first";
-  act.textContent=C.acts[pick].a;cons.textContent=C.acts[pick].c;
+  act.textContent=C.acts[pick].a;
   drawSeg();drawPast();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
@@ -2622,6 +2750,18 @@ render('down');
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-10" data-k="lp-10">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Nothing on it may say how far along the
+     journey they are.
+     CUT: "20 days left" in the slot (a countdown on their deadline), the
+     target in the title ("100 deep work sessions") and in the line under it
+     ("all 100 before 1 September"), and the "87 of 100" footer. All four were
+     the same distance read four ways, and every one of them belongs to
+     Clarity's face.
+     LEFT: the tape itself, which is the record of the lines they printed with
+     the numbers they earned, today's line sitting at the head, the length they
+     pick for it and what that means for today, and the count of lines already
+     printed with nothing to read it against. -->
 <style>
 [data-k=lp-10] .ph{font-variant-numeric:tabular-nums}
 [data-k=lp-10] .slot{position:absolute;left:0;right:0;top:0;height:34px;background:#05060a;
@@ -2714,10 +2854,10 @@ render('down');
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="slot"><span id="l10who">Deep work</span><em id="l10days">20 days left</em></div>
+  <div class="slot"><span id="l10who">Deep work</span><em id="l10days">Aug 12</em></div>
   <div class="tape">
-    <div class="ttl" id="l10ttl">100 deep work sessions</div>
-    <div class="sub" id="l10sub">One line each, all 100 before 1 September.</div>
+    <div class="ttl" id="l10ttl">Deep work sessions</div>
+    <div class="sub" id="l10sub">One line for each session.</div>
     <div class="hr" style="top:70px"></div>
 
     <div class="vp">
@@ -2730,28 +2870,28 @@ render('down');
     <p class="cons" id="l10cons"></p>
     <div class="hr" style="top:492px"></div>
 
-    <div class="tot"><b id="l10p">87 of 100</b><span>printed</span></div>
+    <div class="tot"><b id="l10p">87</b><span>lines printed</span></div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-10"]');if(!r)return;
 var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
-/* Every number below is arithmetic on two sources only: the lines they logged, and the
-   date they typed at intake. Nothing here is measured for them. */
+/* Every number below is one thing only: the lines they logged. No goal total and no
+   deadline live on this screen, so nothing on it can be read as a distance. */
 var B={
- ship:{who:'Deep work',ttl:'100 deep work sessions',
-   sub:'One line each, all 100 before 1 September.',goal:100,done:87,days:20,pick:1,
+ ship:{who:'Deep work',ttl:'Deep work sessions',
+   sub:'One line for each session.',done:87,pick:1,
    past:[['4 hours','Aug 1'],['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
          ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
    opts:['3 hours','4 hours','5 hours']},
- school:{who:'Study',ttl:'60 study sessions',
-   sub:'One line each, all 60 before finals.',goal:60,done:22,days:122,pick:1,
+ school:{who:'Study',ttl:'Study sessions',
+   sub:'One line for each block.',done:22,pick:1,
    past:[['2 hours','Aug 1'],['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
          ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
    opts:['1 hour','2 hours','3 hours']},
- race:{who:'Training',ttl:'120 training sessions',
-   sub:'One line each, all 120 before 12 April.',goal:120,done:34,days:243,pick:1,
+ race:{who:'Training',ttl:'Training sessions',
+   sub:'One line for each session.',done:34,pick:1,
    past:[['45 min','Aug 1'],['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
          ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
    opts:['45 min','60 min','80 min']}};
@@ -2777,7 +2917,7 @@ function opsHTML(){var L=['under plan','the plan','over plan'];
 function render(k){
   c=B[k];done=c.done;pick=c.pick;printed=false;
   cancelAnimationFrame(raf);cancelAnimationFrame(back);
-  whoEl.textContent=c.who;dEl.textContent=c.days+' days left';
+  whoEl.textContent=c.who;dEl.textContent='Aug 12';
   ttlEl.textContent=c.ttl;subEl.textContent=c.sub;
   var h='',i;
   for(i=0;i<8;i++)h+=row('ok',done-7+i,c.past[i][0],c.past[i][1]);
@@ -2790,7 +2930,7 @@ function render(k){
   ops.innerHTML=opsHTML();
   cons.textContent=consTxt(pick);
   lab.textContent='';
-  pEl.textContent=done+' of '+c.goal;
+  pEl.textContent=done;
   feed.classList.remove('done');cap.textContent='Hold to print the line';fill.style.width='0';}
 ops.addEventListener('click',function(e){var b=e.target.closest('.op');if(!b||printed)return;
   pick=+b.dataset.i;
@@ -2803,7 +2943,7 @@ function finish(){
   var now=rows[idx],len=c.opts[pick];
   now.classList.remove('now');now.classList.add('ok');
   now.querySelector('em').textContent='Aug 12';
-  done++;pEl.textContent=done+' of '+c.goal;
+  done++;pEl.textContent=done;
   idx++;base-=PITCH;draw(0);
   var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
   nx.querySelector('em').textContent='tomorrow';
@@ -2837,16 +2977,29 @@ render('ship');
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-12" data-k="lp-12">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. It may carry this week's plan, because that
+     is the plan Action owns, but it may not tell them where they stand in it.
+     CUT: "2 done" in the header, "session 3 of 3" under the move, "One session
+     left in the week", and "the week is whole" on the finished button. Four
+     week-position claims saying one fact four times, and that fact belongs to
+     Consistency's face.
+     LEFT: the channels, which are the lengths they logged standing at their
+     own size with nothing read off them, today as the wide one, the three
+     lengths for it, and the plan's own estimate of what today costs. The foot
+     keeps a plain sum of the minutes logged this week, with no target beside
+     it to read it against. -->
 <style>
 [data-k=lp-12] .ph{font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;
+/* clears the Dynamic Island: at top:22 the goal line ran under it */
+[data-k=lp-12] .hd{position:absolute;left:16px;right:16px;top:38px;display:flex;justify-content:space-between;
   align-items:baseline;gap:10px;font-size:12.5px;line-height:1;color:rgba(var(--ink),.90)}
 [data-k=lp-12] .hd span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 [data-k=lp-12] .hd span:last-child{flex:none;color:rgba(var(--ink),.90)}
-[data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:46px;margin:0;font-size:26px;font-weight:700;
+[data-k=lp-12] .one{position:absolute;left:16px;right:16px;top:58px;margin:0;font-size:26px;font-weight:700;
   letter-spacing:-.03em;line-height:1.08;color:rgba(var(--ink),.97)}
 [data-k=lp-12] .one b{font-weight:700;color:#3fd94e}
-[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:86px;font-size:12px;line-height:1.4;
+[data-k=lp-12] .hint{position:absolute;left:16px;right:16px;top:94px;font-size:12px;line-height:1.4;
   color:rgba(var(--ink),.90)}
 
 /* ---- seven channels: one floor, seven lanes, today is the wide one ---- */
@@ -2957,14 +3110,14 @@ render('ship');
 </div>
 <div class="ph" id="l12ph">
   <div class="grid"></div>
-  <div class="hd"><span id="l12g">Train 3 times a week</span><span id="l12c">2 done</span></div>
+  <div class="hd"><span id="l12g">Train 3 times a week</span></div>
   <p class="one" id="l12one">Lower body, <b id="l12n">40</b> min</p>
-  <div class="hint" id="l12hint">Thursday, session 3 of 3.</div>
+  <div class="hint" id="l12hint">About 40 min, the plan’s estimate.</div>
 
   <div class="cols" id="l12cols"></div>
 
   <div class="days" id="l12days"></div>
-  <p class="week"><span id="l12x">One session left in the week</span><b id="l12t">2h 15m</b></p>
+  <p class="week"><span id="l12x">Logged this week</span><b id="l12t">2h 15m</b></p>
 
   <div class="sizes" id="l12sz" role="group" aria-label="how long today is"></div>
   <button class="more" id="l12more" type="button">any length</button>
@@ -2975,21 +3128,21 @@ render('ship');
 /* Channel heights are the lengths they chose and logged. The rhythm (how many a week,
    which days) is their own plan from intake. Nothing is measured for them. */
 var B={
- gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,unit:'session',units:'sessions',
-   rest:'rest',week:[40,null,55,'now',null,null,null],per:3,whole:'Three sessions, the week is whole',
+ gym:{goal:'Train 3 times a week',task:'Lower body',day:'Thursday',dayIdx:3,
+   rest:'rest',week:[40,null,55,'now',null,null,null],
    sizes:[25,40,55],pick:1,lo:15,hi:75},
- school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,unit:'session',units:'sessions',
-   rest:'off',week:[60,45,60,30,'now',null,null],per:5,whole:'Five sessions, the week is whole',
+ school:{goal:'Study 5 times a week',task:'Organic chem',day:'Friday',dayIdx:4,
+   rest:'off',week:[60,45,60,30,'now',null,null],
    sizes:[30,60,90],pick:1,lo:20,hi:120},
- audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,unit:'post',units:'posts',
-   rest:'off',week:[50,null,40,'now',null,null,null],per:3,whole:'Three posts, the week is whole',
+ audience:{goal:'Post 3 times a week',task:'Film the video',day:'Thursday',dayIdx:3,
+   rest:'off',week:[50,null,40,'now',null,null,null],
    sizes:[30,45,75],pick:1,lo:20,hi:100}};
 var ph=r.querySelector('#l12ph'),cols=r.querySelector('#l12cols'),days=r.querySelector('#l12days'),
-    gEl=r.querySelector('#l12g'),cEl=r.querySelector('#l12c'),one=r.querySelector('#l12one'),
-    hint=r.querySelector('#l12hint'),x=r.querySelector('#l12x'),tot=r.querySelector('#l12t'),
+    gEl=r.querySelector('#l12g'),one=r.querySelector('#l12one'),
+    hint=r.querySelector('#l12hint'),tot=r.querySelector('#l12t'),
     sz=r.querySelector('#l12sz'),more=r.querySelector('#l12more'),fin=r.querySelector('#l12b'),
     finT=r.querySelector('#l12bt'),
-    D=['M','T','W','T','F','S','S'],c,mins,base,done,logged,free;
+    D=['M','T','W','T','F','S','S'],c,mins,base,logged,free;
 function fmt(t){return (t/60|0)+'h '+('0'+(t%60)).slice(-2)+'m';}
 function pct(m){return ((m-c.lo)/(c.hi-c.lo)*80+11).toFixed(1);}
 function chHTML(){return c.week.map(function(m){
@@ -3011,20 +3164,19 @@ function paint(){
     var on=!free&&+b.dataset.m===mins;
     b.classList.toggle('on',on);
     if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
-  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else.
+  /* the week total is the sum of the sessions ALREADY LOGGED, nothing else,
+     and it is never set against a number of sessions the week wants.
      today's length is the plan's estimate until it is finished, so it only
      joins the total when the day is logged. */
   tot.textContent=fmt(base+(logged?mins:0));
-  x.textContent=logged?c.whole:('One '+c.unit+' left in the week');
-  cEl.textContent=(logged?done+1:done)+' done';}
+  if(!logged&&!free)hint.textContent='About '+mins+' min, the plan’s estimate.';}
 function render(k){
   c=B[k];mins=c.sizes[c.pick];logged=false;free=false;
-  done=c.week.filter(function(m){return typeof m==='number';}).length;
   base=c.week.reduce(function(s,m){return s+(typeof m==='number'?m:0);},0);
   ph.classList.remove('free','logged');
   gEl.textContent=c.goal;
   one.innerHTML=c.task+', <b id="l12n">'+mins+'</b> min';
-  hint.textContent=c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.';
+  hint.textContent='About '+mins+' min, the plan’s estimate.';
   cols.innerHTML=chHTML();
   days.innerHTML=D.map(function(d,i){return '<div'+(i===c.dayIdx?' class="n"':'')+'>'+d+'</div>';}).join('');
   sz.innerHTML=szHTML();
@@ -3040,8 +3192,8 @@ more.addEventListener('click',function(){
   if(!free){var b=c.sizes[0];c.sizes.forEach(function(m){if(Math.abs(m-mins)<Math.abs(b-mins))b=m;});mins=b;}
   more.textContent=free?'three lengths':'any length';
   more.classList.toggle('on',free);
-  hint.textContent=free?(c.day+'. Drag the green channel to any length.')
-    :(c.day+', '+c.unit+' '+(done+1)+' of '+c.per+'.');
+  hint.textContent=free?'Drag the green channel to any length.'
+    :('About '+mins+' min, the plan’s estimate.');
   paint();});
 function set(e){var ch=r.querySelector('#l12ch');if(!ch)return;
   var b=ch.getBoundingClientRect(),p=1-(e.clientY-b.top)/b.height;
@@ -3057,8 +3209,8 @@ function finish(){
   logged=true;ph.classList.add('logged');
   var ch=r.querySelector('#l12ch');ch.classList.add('set','ok');
   r.querySelector('#l12cap').textContent='done';paint();
-  hint.textContent=c.day+', logged at '+mins+' minutes.';
-  fin.className='fin ok';finT.textContent=c.day+' logged. The week is whole.';}
+  hint.textContent='Nothing else is asked of you today.';
+  fin.className='fin ok';finT.textContent=c.day+' logged, '+mins+' minutes.';}
 function holdOn(){if(logged)return;fin.classList.add('go');ht=setTimeout(finish,1050);}
 function holdOff(){if(logged)return;clearTimeout(ht);fin.classList.remove('go');}
 fin.addEventListener('pointerdown',function(e){
@@ -3079,25 +3231,38 @@ render('gym');
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-15" data-k="lp-15">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Where they stand in the week is Consistency's
+     face, one swipe away.
+     CUT: "1 of 3 this week" in the header (it was already hidden, now it is
+     gone), "This week has one run in it so far" under the strip, "Wednesday,
+     run 2 of 3" on the sheet, "Run 2 of 3 logged" on the confirmation, and
+     "All three keep the week at three runs" in the consequence line.
+     CHANGED: the eight week strip drew an empty slot for every session the week
+     still wanted, which is a target rail made of holes: you could count the
+     week off it. It now draws ONLY the sessions they logged, so a week is as
+     tall as the work in it, and the single green slot is today's session
+     waiting. Nothing is outlined ahead of them.
+     KEPT: today's move, the three ways to run it and what each puts in TODAY,
+     accept-or-amend, and the hold that banks it. -->
 <style>
 [data-k=lp-15] .ph{font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;
+/* clears the Dynamic Island: at top:22 the goal line ran under it */
+[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:38px;display:flex;justify-content:space-between;
   align-items:baseline;gap:10px;font-size:13px;color:rgba(var(--ink),.90)}
 [data-k=lp-15] .hd b{font-size:15px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.97)}
-/* the week count lived here AND in the line under the grid AND on the sheet.
-   It is said once now, in the line that also changes when today is banked. */
-[data-k=lp-15] .hd span{display:none}
 
 /* eight weeks of rhythm */
-[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:96px;height:78px;display:flex;gap:9px;align-items:flex-end}
+/* the strip sits optically centred in the room above the sheet, which is
+   where the cut week claim used to sit */
+[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:150px;height:78px;display:flex;gap:9px;align-items:flex-end}
 [data-k=lp-15] .wk div{flex:1;display:flex;flex-direction:column-reverse;gap:5px}
-[data-k=lp-15] .wk i{display:block;height:21px;border-radius:4px;background:rgba(var(--ink),.10)}
-[data-k=lp-15] .wk i.on{background:rgba(var(--ink),.34)}
+/* every block is one logged session. There are no empty blocks: an outline for
+   a session not run is a rail you can count the week off. */
+[data-k=lp-15] .wk i{display:block;height:21px;border-radius:4px;background:rgba(var(--ink),.34)}
 [data-k=lp-15] .wk i.now{background:rgba(63,217,78,.60);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
-[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:182px;display:flex;justify-content:space-between;
+[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:236px;display:flex;justify-content:space-between;
   font-size:10.5px;color:rgba(var(--ink),.62)}
-[data-k=lp-15] .say{position:absolute;left:16px;right:16px;top:210px;margin:0;font-size:13.5px;line-height:1.45;
-  color:rgba(var(--ink),.94)}
 
 /* scrim, so the sheet reads as lifted off the page */
 [data-k=lp-15] .scrim{position:absolute;inset:0;background:rgba(3,4,6,.55);opacity:0;pointer-events:none;
@@ -3186,17 +3351,16 @@ render('gym');
 </div>
 <div class="ph" id="l15ph">
   <div class="grid"></div>
-  <div class="hd"><b id="l15g">Run 3 times a week</b><span id="l15h">1 of 3 this week</span></div>
+  <div class="hd"><b id="l15g">Run 3 times a week</b></div>
 
   <div class="wk" id="l15wk"></div>
   <div class="wl"><span>8 weeks back</span><span>this week</span></div>
-  <p class="say" id="l15say"></p>
 
   <div class="scrim" id="l15sc"></div>
   <div class="stack2"></div>
   <div class="sheet" id="l15sh">
     <div class="drag" id="l15dg"><div class="grab"></div></div>
-    <div class="t" id="l15t">Wednesday, run 2 of 3</div>
+    <div class="t" id="l15t">Wednesday</div>
     <div class="one" id="l15o">Run 5 km, easy pace</div>
     <div class="peek" id="l15pk">Pull up for the other two ways to run it</div>
 
@@ -3222,7 +3386,7 @@ render('gym');
     </div>
 
     <div class="fin" id="l15fin">
-      <div class="row"><i></i><span id="l15dt">Run 2 of 3 logged, 5.0 km</span></div>
+      <div class="row"><i></i><span id="l15dt">Run logged, 5.0 km</span></div>
       <button class="alt" id="l15u" type="button">Put it back, I have not run yet</button>
     </div>
   </div>
@@ -3231,7 +3395,7 @@ render('gym');
 /* The eight weeks are the sessions they logged. The three ways are the plan they accepted.
    The amend row is the only place a number is typed, and it is their own correction. */
 var B={
- run:{goal:'Run 3 times a week',per:3,perWord:'three',unit:'run',units:'runs',bar:21,
+ run:{goal:'Run 3 times a week',unit:'run',bar:21,
    weeks:[3,2,3,3,3,1,3,1],day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to run it',
    step:.1,dec:1,su:'km',min:1,max:300,stepTxt:'Steps of 0.1.',
@@ -3239,7 +3403,7 @@ var B={
    opts:[[30,'Short one, 3 km easy','Run 3 km, easy pace'],
          [50,'The normal one, 5 km easy','Run 5 km, easy pace'],
          [80,'Long one, 8 km, last 2 hard','Run 8 km, last 2 hard']],pick:1},
- school:{goal:'Study 4 times a week',per:4,perWord:'four',unit:'block',units:'blocks',bar:15.7,
+ school:{goal:'Study 4 times a week',unit:'block',bar:15.7,
    weeks:[4,4,3,4,2,4,4,2],day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to do it',
    step:5,dec:0,su:'min',min:1,max:60,stepTxt:'Steps of 5.',
@@ -3249,46 +3413,36 @@ var B={
          [24,'Long block, 2 hours','Study 2 hours, phone away']],pick:1}};
 var ph=r.querySelector('#l15ph'),sh=r.querySelector('#l15sh'),dg=r.querySelector('#l15dg'),
     sc=r.querySelector('#l15sc'),L=r.querySelector('#l15l'),O=r.querySelector('#l15o'),
-    C=r.querySelector('#l15c'),wk=r.querySelector('#l15wk'),say=r.querySelector('#l15say'),
-    hd=r.querySelector('#l15h'),gEl=r.querySelector('#l15g'),tEl=r.querySelector('#l15t'),
+    C=r.querySelector('#l15c'),wk=r.querySelector('#l15wk'),
+    gEl=r.querySelector('#l15g'),tEl=r.querySelector('#l15t'),
     pk=r.querySelector('#l15pk'),log=r.querySelector('#l15log'),am=r.querySelector('#l15am'),
     amv=r.querySelector('#l15km'),amn=r.querySelector('#l15amn'),aq=r.querySelector('#l15aq'),
     bank=r.querySelector('#l15bank'),bankT=r.querySelector('#l15bankt'),
     logT=r.querySelector('#l15logt'),undo=r.querySelector('#l15u'),
-    c,sel,actual,doneN,logged=false,REST=340,UP=206,AMEND=300;
+    c,sel,actual,logged=false,REST=340,UP=206,AMEND=300;
 function val(s){return c.dec?(s*c.step).toFixed(c.dec):String(Math.round(s*c.step));}
 function vu(s){return val(s)+' '+c.su;}
 function vs(s){var t=val(s);return (c.dec?t.replace(/\.0$/,''):t)+' '+c.su;}
+/* one block per session LOGGED, and one green block for today's, waiting */
 function wkHTML(){return c.weeks.map(function(n,w){
   var h='',i,last=(w===c.weeks.length-1);
-  for(i=0;i<c.per;i++){
-    var cl=i<n?'on':'';
-    if(last&&i===n)cl='now';
-    h+='<i class="'+cl+'" style="height:'+c.bar+'px"'+(cl==='now'?' id="l15now"':'')+'></i>';}
+  for(i=0;i<n;i++)h+='<i style="height:'+c.bar+'px"></i>';
+  if(last)h+='<i class="now" id="l15now" style="height:'+c.bar+'px"></i>';
   return '<div>'+h+'</div>';}).join('');}
 function optsHTML(){return c.opts.map(function(o,i){
   return '<button type="button" data-i="'+i+'"'+(i===c.pick?' class="on"':'')+'>'+o[1]+'</button>';}).join('');}
-/* PURITY (2026-08-13): the old line read "You hit three in five of the last seven
-   weeks", which is a pattern claim, Consistency's face wearing Action's clothes.
-   What is left is this week only: the plan Action actually owns. The eight week
-   strip stays, because it is their own logged sessions with nothing read off it. */
-function sayTxt(n){return 'This week has '+
-  (n===1?'one':n===2?'two':n===3?'three':n)+' '+(n===1?c.unit:c.units)+' in it '+(logged?'now.':'so far.');}
 function place(t){sh.style.top=t+'px';r.querySelector('.stack2').style.top=(t-6)+'px';}
 function open(u){ph.classList.toggle('up',u);place(u?UP:REST);}
 function render(k){
   c=B[k];sel=c.opts[c.pick][0];logged=false;
-  doneN=c.weeks[c.weeks.length-1];
   ph.classList.remove('up','amending','logged');place(REST);
   gEl.textContent=c.goal;
   wk.innerHTML=wkHTML();
-  hd.textContent=doneN+' of '+c.per+' this week';
-  say.textContent=sayTxt(doneN);
-  tEl.textContent=c.day+', '+c.unit+' '+(doneN+1)+' of '+c.per;
+  tEl.textContent=c.day;
   O.textContent=c.opts[c.pick][2];
   pk.textContent=c.peek;
   L.innerHTML=optsHTML();
-  C.textContent='All three keep the week at '+c.perWord+' '+c.units+'. This one puts '+vs(sel)+' in it.';
+  C.textContent='This one puts '+vs(sel)+' in today.';
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);
   aq.textContent=c.ask;undo.textContent=c.undo;
   actual=sel;amPaint();}
@@ -3313,7 +3467,7 @@ dg.addEventListener('pointerup',release);dg.addEventListener('pointercancel',rel
 L.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
   [].forEach.call(L.children,function(x){x.classList.toggle('on',x===b);});
   sel=c.opts[+b.dataset.i][0];O.textContent=c.opts[+b.dataset.i][2];
-  C.textContent='All three keep the week at '+c.perWord+' '+c.units+'. This one puts '+vs(sel)+' in it.';
+  C.textContent='This one puts '+vs(sel)+' in today.';
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);});
 
 /* ---- accept or amend ---- */
@@ -3342,24 +3496,20 @@ holdable(bank,function(){done(actual);});
 
 function done(s){logged=true;
   ph.classList.remove('amending');ph.classList.add('logged');
-  r.querySelector('#l15dt').textContent=c.unit.charAt(0).toUpperCase()+c.unit.slice(1)+' '+
-    (doneN+1)+' of '+c.per+' logged, '+vs(s);
-  var n=r.querySelector('#l15now');if(n){n.className='on';n.removeAttribute('id');}
-  hd.textContent=(doneN+1)+' of '+c.per+' this week';
+  r.querySelector('#l15dt').textContent=c.unit.charAt(0).toUpperCase()+c.unit.slice(1)+
+    ' logged, '+vs(s);
+  var n=r.querySelector('#l15now');if(n){n.className='';n.removeAttribute('id');}
   tEl.textContent=c.day+', done';
   O.textContent='Next '+c.unit+' '+c.next;
   pk.textContent='Nothing else is asked of you today';
-  say.textContent=sayTxt(doneN+1);
   open(false);}
 
 undo.addEventListener('click',function(){logged=false;
   ph.classList.remove('logged');
   wk.innerHTML=wkHTML();
-  hd.textContent=doneN+' of '+c.per+' this week';
-  tEl.textContent=c.day+', '+c.unit+' '+(doneN+1)+' of '+c.per;
+  tEl.textContent=c.day;
   O.textContent=c.opts.filter(function(o){return o[0]===sel;})[0][2];
-  pk.textContent=c.peek;
-  say.textContent=sayTxt(doneN);});
+  pk.textContent=c.peek;});
 r.querySelectorAll('#l15bk button').forEach(function(b){b.addEventListener('click',function(){
   r.querySelectorAll('#l15bk button').forEach(function(y){y.classList.toggle('on',y===b);});
   render(b.dataset.b);});});
@@ -3369,56 +3519,100 @@ render('run');
 
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
      lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 low-anchored move over own marks | lp-17 declarative sentence over account rows |
+     lp-15 bottom sheet first | lp-16 wide pen band over the move | lp-17 declarative sentence over own nights |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-16" data-k="lp-16">
-<!-- MALIK, PILLAR PURITY (2026-08-13). Applied exactly:
-     CUT the corridor. The floor line, the cushion lines and their tags, the
-     over/under shading, the pace track ("$240 under the line for this point in
-     the month") and every above/below verdict are gone. That was Clarity's face
-     wearing Action's clothes.
-     The money screen is now the week's move plus the check: nothing on it reads
-     a position against $4,000, so there is no number to read one from.
-     The band SURVIVES only in Body, and only as raw own entries: the Friday
-     weigh-ins they typed, dotted between because nothing was measured in
-     between. No hold line, no band edges, no in/out verdict.
-     The intensity chips were "how much cushion above the floor" (a target rail).
-     They are now the size of TODAY'S move, which is the one intensity Action
-     owns, and the consequence is the move sentence itself changing.
-     PROVENANCE: the pen's home is named once, quietly, above the swipe, so the
-     screen says what logging does NOT do without ever reading a position. -->
+<!-- TIGHTENED RULE (Malik, 2026-08-15): "it is showing too much information."
+     An Action screen shows TODAY, and nothing about how far along the journey
+     they are. If a person could learn how close they are to their goal from
+     this screen, it is wrong.
+
+     THE CORRIDOR IS GONE. Its whole geometry was a position along a track: a
+     band you are somewhere inside, with marks laid left to right. Even stripped
+     of its floor line and its cushion tags, a trace of ten weigh-ins joined by
+     a dotted line is a travelled track, and the last mark on it is a position.
+     Cut: the band, the polyline, the marks, the scale, and the pen readout that
+     sat beside a numbered goal (181.4 lb under "Hold 180 lb" is a distance to a
+     floor with the arithmetic left to the reader).
+
+     WHAT REPLACES IT, same horizontal geometry, opposite job: the band is now
+     THE PEN. It is the writing surface for the number this goal is kept by, the
+     one Memento can only ever know because they typed it. It opens empty, it
+     carries a green line to write on, and writing is a hold with early release
+     aborting, like every other completion in the set. Written, it shows what
+     they wrote, when, and an undo. Nothing else. There is no previous value, no
+     trace, no target, so there is nothing on the screen to read a position off.
+
+     The goal line keeps their words and loses its number for the same reason.
+     Today's move sits under the band at three sizes, and the size's consequence
+     is the move sentence itself changing, which is the only consequence Action
+     owns. Two holds, two different completions: write the number, log the move. -->
 <style>
-[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 0 22px;
+/* the goal line clears the island: at padding-top 30 its ascender started on
+   the island's own bottom edge, which is a safe-area miss on a real phone */
+[data-k=lp-16] .l16{position:absolute;inset:0;display:flex;flex-direction:column;padding:38px 0 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 [data-k=lp-16] .l16 .pad{padding:0 20px}
 
-[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.80)}
+[data-k=lp-16] .l16-goal{font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.88)}
 
-/* the pen, for the goal they write down themselves: the value, and when it was written */
-[data-k=lp-16] .l16-pen{display:flex;align-items:baseline;gap:7px;margin-top:15px}
-[data-k=lp-16] .l16-in{font-size:37px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi)}
-[data-k=lp-16] .l16-of{font-size:13.5px;white-space:nowrap;color:rgba(var(--ink),.80)}
-[data-k=lp-16] .l16-when{margin-left:auto;font-size:12px;white-space:nowrap;color:rgba(var(--ink),.80)}
+/* --- THE BAND: full bleed across the screen, and it is a writing surface --- */
+[data-k=lp-16] .l16-pen{flex:none;margin-top:15px;padding:13px 20px 13px;background:rgba(22,25,31,.955);
+  -webkit-backdrop-filter:blur(28px) saturate(1.4);backdrop-filter:blur(28px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.075),inset 0 -1px 0 rgba(var(--ink),.05)}
+[data-k=lp-16] .l16-hd{display:flex;align-items:baseline;gap:8px;min-height:16px}
+[data-k=lp-16] .l16-lbl{font-size:13px;font-weight:700;letter-spacing:-.012em;color:rgba(var(--ink),.97)}
+[data-k=lp-16] .l16-when{margin-left:auto;display:none;align-items:baseline;gap:9px;
+  font-size:11.5px;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16.wrote .l16-when{display:flex}
+[data-k=lp-16] .l16-undo{border:0;background:none;padding:0;cursor:pointer;font:500 11.5px var(--font);
+  color:rgba(var(--ink),.92);box-shadow:inset 0 -1px 0 rgba(var(--ink),.32)}
 
-/* their own marks, nothing else: no line to hold, no edges, no reading */
-[data-k=lp-16] .l16-band{position:relative;flex:none;height:96px;margin-top:14px;overflow:hidden;
-  background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.07),inset 0 -1px 0 rgba(var(--ink),.05)}
-[data-k=lp-16] .l16-band svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* the line they write on: straight, full width of the band's inner box */
+[data-k=lp-16] .l16-val{position:relative;display:flex;align-items:baseline;gap:7px;padding:7px 0 11px}
+[data-k=lp-16] .l16-val:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;border-radius:2px;
+  background:#3fd94e;transition:background .3s ease-out}
+[data-k=lp-16] .l16.wrote .l16-val:after{background:rgba(var(--ink),.12)}
+[data-k=lp-16] .l16-pre,[data-k=lp-16] .l16-unit{font-size:16.5px;font-weight:500;color:rgba(var(--ink),.90)}
+[data-k=lp-16] .l16-pre:empty,[data-k=lp-16] .l16-unit:empty{display:none}
+[data-k=lp-16] .l16-in{border:0;outline:0;background:transparent;padding:0;width:14px;min-width:0;
+  font:700 40px/1 var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.98);caret-color:#3fd94e}
+[data-k=lp-16] .l16-in::-webkit-outer-spin-button,[data-k=lp-16] .l16-in::-webkit-inner-spin-button{display:none}
+[data-k=lp-16] .l16-fld{position:relative;display:inline-flex;align-items:baseline}
+[data-k=lp-16] .l16-car{position:absolute;left:1px;top:5px;width:2px;height:30px;background:#3fd94e;
+  animation:l16car 1.05s step-end infinite}
+[data-k=lp-16] .l16.filled .l16-car{display:none}
+@keyframes l16car{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 
-/* one skeleton for both goals: the move sits optically centred in the room the
-   top block leaves, the swipe stays anchored to the bottom */
-[data-k=lp-16] .l16-sp{flex:1;min-height:12px}
-[data-k=lp-16] .l16-sp2{flex:.75;min-height:10px}
+/* writing the number in is a completion, so it is a hold */
+[data-k=lp-16] .l16-write{position:relative;height:40px;margin-top:11px;border-radius:11px;overflow:hidden;
+  background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
+  cursor:default;touch-action:none;-webkit-user-select:none;user-select:none;
+  transition:background .26s ease-out,box-shadow .26s ease-out}
+[data-k=lp-16] .l16-write .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.20)}
+[data-k=lp-16] .l16-write .tx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:13px;font-weight:500;color:rgba(var(--ink),.90);white-space:nowrap}
+[data-k=lp-16] .l16-write.rdy{background:rgba(30,34,42,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.10);cursor:pointer}
+[data-k=lp-16] .l16-write.rdy .tx{color:rgba(var(--ink),.97);font-weight:700}
+[data-k=lp-16] .l16.wrote .l16-write{background:rgba(63,217,78,.13);box-shadow:inset 0 1px 0 rgba(63,217,78,.26)}
+[data-k=lp-16] .l16.wrote .l16-write .tx{color:rgba(var(--ink),.97);font-weight:700}
+[data-k=lp-16] .l16-write svg{display:none;width:13px;height:13px;fill:none;stroke:#3fd94e;stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round}
+[data-k=lp-16] .l16.wrote .l16-write svg{display:block}
 
-[data-k=lp-16] .l16-do{flex:none;margin:0 -6px;border-radius:14px;padding:15px 21px 16px;background:rgba(22,25,31,.95);
+/* one skeleton: the move sits optically centred in the room the band leaves,
+   the gesture stays anchored to the bottom */
+[data-k=lp-16] .l16-sp{flex:1;min-height:14px}
+[data-k=lp-16] .l16-sp2{flex:1.15;min-height:12px}
+
+[data-k=lp-16] .l16-do{flex:none;margin:0 -6px;border-radius:14px;padding:17px 21px 18px;background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(26px) saturate(1.35);backdrop-filter:blur(26px) saturate(1.35);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k=lp-16] .l16-do .h{display:flex;align-items:baseline;gap:9px}
 [data-k=lp-16] .l16-do i{display:none;flex:none;width:8px;height:8px;border-radius:3px;background:#3fd94e;transform:translateY(-2px)}
 [data-k=lp-16] .l16-do.sent i{display:block}
-[data-k=lp-16] .l16-do b{display:block;font-size:17.5px;font-weight:700;letter-spacing:-.015em;line-height:1.25;color:var(--text-hi)}
+[data-k=lp-16] .l16-do b{display:block;font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.24;color:var(--text-hi)}
 [data-k=lp-16] .l16-do p{margin:7px 0 0;font-size:12px;line-height:1.5;color:rgba(var(--ink),.90)}
 [data-k=lp-16] .l16-do.sent p{display:none}
 
@@ -3444,15 +3638,11 @@ render('run');
 [data-k=lp-16] .l16-close.done{background:rgba(63,217,78,.16)}
 [data-k=lp-16] .l16-close.done .l16-fill{display:none}
 [data-k=lp-16] .l16-close.done .l16-lab{color:rgba(var(--ink),.96)}
-
-/* where the pen lives, said once and quietly, right above the gesture */
-[data-k=lp-16] .l16-src{margin:0 0 10px;font-size:11.5px;line-height:1.4;color:rgba(var(--ink),.90)}
-/* with no pen block up top there is no mass to balance, so the move sits
-   dead centre of the room instead of low in it */
-[data-k=lp-16] .l16.nopen .l16-sp2{flex:1}
+@media (prefers-reduced-motion:reduce){[data-k=lp-16] .l16-car{animation:none}
+  [data-k=lp-16] *{transition:none!important}}
 </style>
-<h3>The corridor</h3><p class="reach"><b>4/10</b><span>maintenance, the rarest daily shape</span></p>
-<p class="cap">Today's move is the whole screen, sized by three chips and closed with a hold, and for a goal you write down yourself your own typed marks sit above it as a quiet trace with nothing drawn to measure them against.</p>
+<h3>The pen band</h3><p class="reach"><b>4/10</b><span>maintenance, the rarest daily shape</span></p>
+<p class="cap">A band across the top is the pen: the number this goal is kept by gets written on the green line and held in, and today's move sits under it at three sizes. Nothing is drawn against the goal, so there is no position to read.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -3460,21 +3650,22 @@ render('run');
 <div class="ph">
   <div class="grid"></div>
   <div class="l16">
-    <div class="pad">
-      <div class="l16-goal"></div>
-      <div class="l16-pen">
-        <div class="l16-in"></div>
-        <div class="l16-of"></div>
-        <div class="l16-when"></div>
-      </div>
-    </div>
+    <div class="pad"><div class="l16-goal"></div></div>
 
-    <div class="l16-band">
-      <svg viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
-        <polyline class="track" points="" fill="none" stroke="rgba(235,238,248,.34)" stroke-width="1.4"
-          stroke-dasharray="2 3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        <g class="marks"></g>
-      </svg>
+    <div class="l16-pen">
+      <div class="l16-hd">
+        <span class="l16-lbl"></span>
+        <span class="l16-when"><span class="wt"></span><button type="button" class="l16-undo">undo</button></span>
+      </div>
+      <label class="l16-val">
+        <span class="l16-pre"></span>
+        <span class="l16-fld"><input class="l16-in" type="text" inputmode="decimal" autocomplete="off"><span class="l16-car" aria-hidden="true"></span></span>
+        <span class="l16-unit"></span>
+      </label>
+      <div class="l16-write" role="button" tabindex="0" aria-disabled="true">
+        <span class="fl"></span>
+        <span class="tx"><svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg><b class="wl"></b></span>
+      </div>
     </div>
 
     <div class="l16-sp"></div>
@@ -3490,7 +3681,6 @@ render('run');
     <div class="l16-sp2"></div>
 
     <div class="pad">
-      <p class="l16-src"></p>
       <button type="button" class="l16-close">
         <span class="l16-fill"></span>
         <span class="l16-lab"></span>
@@ -3500,63 +3690,92 @@ render('run');
 </div>
 <script>(function(){
   var c=document.currentScript.closest('.cell');
-  var band=c.querySelector('.l16-band'),svg=band.querySelector('svg'),
-      track=svg.querySelector('.track'),marks=svg.querySelector('.marks'),
-      goal=c.querySelector('.l16-goal'),pen=c.querySelector('.l16-pen'),
-      inEl=c.querySelector('.l16-in'),ofEl=c.querySelector('.l16-of'),whenEl=c.querySelector('.l16-when'),
-      src=c.querySelector('.l16-src'),chipsEl=c.querySelector('.l16-chips'),
+  var root=c.querySelector('.l16'),goal=c.querySelector('.l16-goal'),
+      lbl=c.querySelector('.l16-lbl'),whenT=c.querySelector('.l16-when .wt'),undo=c.querySelector('.l16-undo'),
+      pre=c.querySelector('.l16-pre'),unit=c.querySelector('.l16-unit'),inp=c.querySelector('.l16-in'),
+      wr=c.querySelector('.l16-write'),wfl=wr.querySelector('.fl'),wl=c.querySelector('.wl'),
+      chipsEl=c.querySelector('.l16-chips'),
       doBox=c.querySelector('.l16-do'),doB=doBox.querySelector('b'),doP=doBox.querySelector('p'),
-      root=c.querySelector('.l16'),pad=c.querySelector('.l16-close'),lab=c.querySelector('.l16-lab');
+      pad=c.querySelector('.l16-close'),lab=c.querySelector('.l16-lab');
 
-  var W=300,H=96;
-  /* the marks sit inboard of both edges: only the Fridays they wrote, nothing ahead */
-  function xb(i,n){return 26+i*((W-52)/(n-1));}
-
-  /* THE ONLY DATA ON THIS SCREEN: ten Friday weigh-ins they typed at their own
-     check. No hold value, no band, no scale drawn from a target. */
-  var WB=[179.2,180.6,178.9,181.2,180.1,182.3,179.6,180.8,182.0,181.4],WSLOTS=WB.length;
-
+  /* PROVENANCE: every number here is one they typed on this screen, or a word
+     from their own star. Nothing is measured, nothing is remembered from before. */
   var CTX={
     money:{
-      goal:'Hold a $4,000 floor, every month',
-      pen:false,
+      goal:'Hold the floor under the business',
+      lbl:'This week&#8217;s money in',pre:'$',unit:'',idle:'Write the week in first',
+      lo:1,hi:999999,dec:0,
       sizes:[
-        {t:'1 invoice', act:'Send 1 renewal invoice.',   sub:'About 10 min, by the plan.', lab:'Hold to log 1 invoice',  done:'1 invoice sent'},
-        {t:'2 invoices',act:'Send 2 renewal invoices.',  sub:'About 20 min, by the plan.', lab:'Hold to log 2 invoices', done:'2 invoices sent'},
-        {t:'4 invoices',act:'Send 4 renewal invoices.',  sub:'About 40 min, by the plan.', lab:'Hold to log 4 invoices', done:'4 invoices sent'}
-      ],pick:1,
-      src:'Your monthly total goes in at Sunday&#8217;s confirm.'
+        {t:'1 invoice', act:'Send 1 renewal invoice.',  sub:'About 10 min, by the plan.', lab:'Hold to log 1 invoice',  done:'1 invoice sent'},
+        {t:'2 invoices',act:'Send 2 renewal invoices.', sub:'About 20 min, by the plan.', lab:'Hold to log 2 invoices', done:'2 invoices sent'},
+        {t:'4 invoices',act:'Send 4 renewal invoices.', sub:'About 40 min, by the plan.', lab:'Hold to log 4 invoices', done:'4 invoices sent'}
+      ],pick:1
     },
     body:{
-      goal:'Hold 180 lb, after the cut',
-      pen:true,big:'181.4',of:'lb',when:'typed Friday',
+      goal:'Hold the weight you cut to',
+      lbl:'Friday&#8217;s weigh-in',pre:'',unit:'lb',idle:'Write Friday in first',
+      lo:80,hi:700,dec:1,
       sizes:[
         {t:'20 min',act:'Walk 20 minutes today.',sub:'',lab:'Hold to log the walk',done:'20 minute walk logged'},
         {t:'30 min',act:'Walk 30 minutes today.',sub:'',lab:'Hold to log the walk',done:'30 minute walk logged'},
         {t:'45 min',act:'Walk 45 minutes today.',sub:'',lab:'Hold to log the walk',done:'45 minute walk logged'}
-      ],pick:1,
-      src:'Your weight goes in at Friday&#8217;s check.'
+      ],pick:1
     }
   };
 
-  var mode='money',C=CTX.money,size=1,sent=false;
+  var C=CTX.money,size=1,sent=false,wrote=false,ready=false,WHOLD=1300,wt=null;
 
-  /* the trace: their marks, scaled to their own spread, centred on their own
-     middle. Nothing on the band comes from the goal. */
-  function paintBand(){
-    marks.textContent='';
-    var lo=Math.min.apply(null,WB),hi=Math.max.apply(null,WB),mid=(lo+hi)/2,
-        span=Math.max(hi-lo,.1),ppl=58/span,pts=[],i;
-    function y(w){return H/2-(w-mid)*ppl;}
-    for(i=0;i<WB.length;i++)pts.push(xb(i,WSLOTS).toFixed(1)+','+y(WB[i]).toFixed(1));
-    track.setAttribute('points',pts.join(' '));
-    for(i=0;i<WB.length;i++){
-      var m=document.createElementNS('http://www.w3.org/2000/svg','circle'),last=i===WB.length-1;
-      m.setAttribute('cx',xb(i,WSLOTS).toFixed(1));m.setAttribute('cy',y(WB[i]).toFixed(1));
-      m.setAttribute('r',last?'3.2':'2.2');
-      m.setAttribute('fill',last?'rgba(235,238,248,.94)':'rgba(235,238,248,.62)');
-      marks.appendChild(m);
-    }
+  function group(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+  function show(v){return C.dec?v.toFixed(1):group(Math.round(v));}
+  function val(){var v=parseFloat(String(inp.value).replace(/,/g,''));
+    return (isFinite(v)&&v>=C.lo&&v<=C.hi)?v:null;}
+  /* the field is exactly as wide as what they typed, measured in the field's own
+     type, so the unit and the caret always sit right against the number */
+  var sizer=document.createElement('span');
+  sizer.setAttribute('aria-hidden','true');
+  sizer.style.cssText='position:absolute;left:0;top:0;visibility:hidden;white-space:pre;pointer-events:none;'+
+    'font:700 40px/1 var(--font);letter-spacing:-.035em;font-variant-numeric:tabular-nums';
+  c.querySelector('.l16-fld').appendChild(sizer);
+  function fit(){sizer.textContent=inp.value||'';
+    inp.style.width=Math.max(sizer.getBoundingClientRect().width+1,14)+'px';}
+
+  function setReady(v){
+    ready=v;wr.classList.toggle('rdy',v);wr.setAttribute('aria-disabled',v?'false':'true');
+    wl.textContent=v?('Hold to write '+C.pre+show(val())+(C.unit?' '+C.unit:'')+' in'):C.idle;
+  }
+  inp.addEventListener('input',function(){
+    if(wrote)return;
+    root.classList.toggle('filled',inp.value.length>0);
+    fit();setReady(val()!==null);
+  });
+
+  function writeIn(){
+    wt=null;var v=val();if(wrote||v===null)return;
+    wrote=true;root.classList.add('wrote');inp.readOnly=true;inp.value=show(v);fit();
+    wfl.style.transition='width .24s ease-out';wfl.style.width='0';
+    wl.textContent='Written in';whenT.textContent='typed just now';
+  }
+  function wStart(e){
+    if(wrote||!ready)return;if(e&&e.preventDefault)e.preventDefault();
+    wfl.style.transition='width '+WHOLD+'ms linear';wfl.style.width='100%';
+    wt=setTimeout(writeIn,WHOLD);
+  }
+  function wAbort(){
+    if(wrote||!wt)return;clearTimeout(wt);wt=null;
+    wfl.style.transition='width .18s ease-out';wfl.style.width='0';
+  }
+  wr.addEventListener('pointerdown',wStart);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){wr.addEventListener(ev,wAbort)});
+  wr.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&!e.repeat)wStart(e)});
+  wr.addEventListener('keyup',wAbort);
+  undo.addEventListener('click',function(){if(!wrote)return;clearPen();inp.focus();});
+
+  function clearPen(){
+    wrote=false;ready=false;root.classList.remove('wrote','filled');
+    clearTimeout(wt);wt=null;wfl.style.transition='none';wfl.style.width='0';
+    inp.readOnly=false;inp.value='';fit();
+    wr.classList.remove('rdy');wr.setAttribute('aria-disabled','true');
+    wl.textContent=C.idle;whenT.textContent='';
   }
 
   function paintSize(){
@@ -3565,7 +3784,6 @@ render('run');
     doP.textContent=s.sub;doP.style.display=s.sub?'':'none';
     if(!sent)lab.textContent=s.lab;
   }
-
   function drawChips(){
     chipsEl.textContent='';
     C.sizes.forEach(function(o,i){
@@ -3583,8 +3801,7 @@ render('run');
     });
   }
 
-  /* --- the HOLD (Malik, 2026-08-13): logging the ACTION never moves a
-         metric. The number moves when they write it in at their own check. */
+  /* --- the move's own hold: logging the ACTION never moves the number ------ */
   var ht=null;
   function done(){
     sent=true;pad.classList.remove('go');pad.classList.add('done');
@@ -3603,19 +3820,15 @@ render('run');
     if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
   pad.addEventListener('keyup',holdOff);
 
-  /* --- swapping the goal: same skeleton, the goal's own words ------------- */
+  /* --- swapping the goal: same skeleton, the goal's own words -------------- */
   function render(key){
-    mode=key;C=CTX[key];size=C.pick;sent=false;
+    C=CTX[key];size=C.pick;sent=false;
     clearTimeout(ht);pad.classList.remove('done','go');
     doBox.classList.remove('sent');chipsEl.classList.remove('lock');
-    root.classList.toggle('nopen',!C.pen);
-    goal.textContent=C.goal;
-    pen.style.display=C.pen?'':'none';
-    band.style.display=C.pen?'':'none';
-    inEl.textContent=C.pen?C.big:'';ofEl.textContent=C.pen?C.of:'';whenEl.textContent=C.pen?C.when:'';
-    src.innerHTML=C.src;
-    drawChips();paintSize();
-    if(C.pen)paintBand();
+    goal.textContent=C.goal.replace(/&#8217;/g,'’');
+    lbl.innerHTML=C.lbl;pre.textContent=C.pre;unit.textContent=C.unit;
+    inp.setAttribute('aria-label',key==='money'?"write this week's money in":"write Friday's weight in");
+    clearPen();drawChips();paintSize();
   }
   c.querySelectorAll('.bk button').forEach(function(b){
     b.addEventListener('click',function(){
@@ -3631,16 +3844,29 @@ render('run');
 
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 vertical descent rail | lp-7 poster ceiling number |
      lp-8 hundred-mark field | lp-9 ruled ledger book | lp-10 receipt tape | lp-12 full-height week columns |
-     lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
+     lp-15 bottom sheet first | lp-16 wide pen band over the move | lp-17 declarative sentence over own nights |
      lp-18 centered monolith numeral -->
 <section class="cell" id="lp-17" data-k="lp-17">
+<!-- TIGHTENED RULE (Malik, 2026-08-15): "it is showing too much information."
+     An Action screen shows TODAY. Nothing on it may tell them how far along
+     they are.
+     KEPT: the statement, which is the whole screen, and the ceiling inside it
+     they tap to set tonight's size, and the pen for tonight's own total.
+     CUT: the goal line above the statement ("Phone screen time, since 2 June").
+     The statement already names the goal, so the line was the same fact twice,
+     and its start date was a piece of the journey, which is Clarity's.
+     CHANGED: the nights they typed were a column of figures with a heading
+     that read like a bank statement. They are now RAW BARS, one per night,
+     each as long as the number they wrote, scaled to their own longest night
+     and nothing else. There is no ceiling tick across them, no under or over,
+     no colour verdict and no line of best fit, because every one of those is a
+     reading of the goal or of the week. It is only what they typed, at a size
+     you can see. Tonight's entry joins the top of the stack when they save it. -->
 <style>
-[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 18px 22px;
+[data-k=lp-17] .l17{position:absolute;inset:0;display:flex;flex-direction:column;padding:38px 18px 22px;
   font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
 
-[data-k=lp-17] .l17-goal{font-size:12.5px;line-height:1;color:rgba(var(--ink),.80)}
-
-[data-k=lp-17] .l17-say{margin:14px 0 0;font-size:26px;font-weight:700;letter-spacing:-.027em;line-height:1.28;
+[data-k=lp-17] .l17-say{margin:0;font-size:26px;font-weight:700;letter-spacing:-.027em;line-height:1.28;
   color:var(--text-hi)}
 [data-k=lp-17] .l17-say .tail{white-space:nowrap}
 [data-k=lp-17] .l17-tok{display:inline-flex;align-items:center;gap:6px;padding:0 1px 3px;margin:0;
@@ -3724,20 +3950,26 @@ render('run');
 [data-k=lp-17] .l17.entered .l17-slot{display:none}
 [data-k=lp-17] .l17-res .u{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text-hi)}
 
-[data-k=lp-17] .l17-acc{margin-top:14px}
-[data-k=lp-17] .l17-acc h4{margin:0 0 8px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-rows{border-radius:14px;overflow:hidden;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.35);backdrop-filter:blur(24px) saturate(1.35);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
-[data-k=lp-17] .l17-row{display:flex;align-items:center;height:38px;padding:0 14px;font-size:12.5px;
-  color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-row+.l17-row{box-shadow:inset 0 1px 0 rgba(var(--ink),.06)}
-[data-k=lp-17] .l17-row .d{width:86px;color:rgba(var(--ink),.86)}
-[data-k=lp-17] .l17-row .v{font-weight:500;color:var(--text-hi)}
+/* --- the nights they typed, as raw bars ---------------------------------
+   Length is the number they wrote, scaled to their own longest night. There is
+   no ceiling drawn across them and no verdict on any of them: this is the
+   record of what they entered, not a reading of it. */
+[data-k=lp-17] .l17-acc{margin-top:16px}
+[data-k=lp-17] .l17-acc h4{margin:0 0 10px;font-size:12.5px;font-weight:500;line-height:1;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-bars{display:flex;flex-direction:column;gap:9px}
+[data-k=lp-17] .l17-b{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(var(--ink),.86)}
+[data-k=lp-17] .l17-b .d{flex:none;width:46px}
+[data-k=lp-17] .l17-b .t{position:relative;flex:1;height:7px;border-radius:999px;background:rgba(var(--ink),.09)}
+[data-k=lp-17] .l17-b .t i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;
+  background:rgba(var(--ink),.44);transition:width .34s cubic-bezier(.2,.7,.2,1)}
+[data-k=lp-17] .l17-b .v{flex:none;width:48px;text-align:right;font-weight:500;color:var(--text-hi)}
+[data-k=lp-17] .l17-b.new .t i{background:rgba(var(--ink),.88)}
+[data-k=lp-17] .l17-b.new .d{color:var(--text-hi)}
 
+/* the void the cut goal line left is SPLIT, not dumped under the bars: the
+   statement drops off the very top and the gesture keeps its floor */
+[data-k=lp-17] .l17-sp0{flex:.55;min-height:0}
 [data-k=lp-17] .l17-sp{flex:1;min-height:10px}
-/* the ceiling picker borrows the room from the oldest entries, nothing overflows */
-[data-k=lp-17] .l17.editing .l17-row:nth-last-child(-n+1){display:none}
 
 [data-k=lp-17] .l17-cta{position:relative;width:100%;height:50px;border:0;border-radius:14px;overflow:hidden;
   background:rgba(235,238,248,.94);color:#0b0c10;font:700 15.5px var(--font);letter-spacing:-.01em;
@@ -3754,13 +3986,12 @@ render('run');
 [data-k=lp-17] .l17.signed .l17-held{display:flex}
 </style>
 <h3>The statement</h3><p class="reach"><b>6/10</b><span>screen time, the alternative ceiling</span></p>
-<p class="cap">The ceiling is not an object here, it is a sentence you say about today, and the number is a word inside it you tap to swap for one of three proposed ceilings. Underneath, the totals you have typed in yourself read as a statement of account.</p>
+<p class="cap">The ceiling is not an object here, it is a sentence you say about tonight, and the number is a word inside it you tap to swap for one of three proposed ceilings. Under it, the nights you typed in yourself stand as raw bars with nothing drawn across them.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
   <div class="l17">
-    <div class="l17-goal">Phone screen time, since 2 June</div>
-
+    <div class="l17-sp0"></div>
     <p class="l17-say">Today I stay under
       <button class="l17-tok"><span class="tv">2h 00m</span><svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>
       <span class="tail">on my phone.</span></p>
@@ -3794,13 +4025,8 @@ render('run');
     </div>
 
     <div class="l17-acc">
-      <h4>What you entered before</h4>
-      <div class="l17-rows">
-        <div class="l17-row"><div class="d">Mon 11 Aug</div><div class="v">1h 47m</div></div>
-        <div class="l17-row"><div class="d">Sun 10 Aug</div><div class="v">2h 31m</div></div>
-        <div class="l17-row"><div class="d">Sat 9 Aug</div><div class="v">1h 38m</div></div>
-        <div class="l17-row"><div class="d">Fri 8 Aug</div><div class="v">1h 52m</div></div>
-      </div>
+      <h4>Nights you typed</h4>
+      <div class="l17-bars"></div>
     </div>
 
     <div class="l17-sp"></div>
@@ -3813,7 +4039,7 @@ render('run');
   var c=document.currentScript.closest('.cell');
   var root=c.querySelector('.l17'),tok=c.querySelector('.l17-tok'),tv=c.querySelector('.l17-tok .tv'),
       up=c.querySelector('.l17-edit .up'),dn=c.querySelector('.l17-edit .dn'),
-      held=c.querySelector('.l17-held .ht'),rows=c.querySelector('.l17-rows'),
+      held=c.querySelector('.l17-held .ht'),bars=c.querySelector('.l17-bars'),
       cta=c.querySelector('.l17-cta'),
       edit=c.querySelector('.l17-edit'),three=c.querySelector('.l17-three'),more=c.querySelector('.l17-more'),
       slot=c.querySelector('.l17-slot'),stp=c.querySelector('.l17-stp'),sv=c.querySelector('.l17-stp .sv'),
@@ -3821,8 +4047,22 @@ render('run');
       src=c.querySelector('.l17-src');
   var ceil=120,typed=107,signed=false,free=false,entered=false,THREE=[90,120,150];
   var saidAt='';
+  /* the only history on this screen: five nights they read off their own phone
+     and typed in. Nothing is measured, nothing is compared. */
+  var NIGHTS=[{d:'Mon 11',m:107},{d:'Sun 10',m:151},{d:'Sat 9',m:98},{d:'Fri 8',m:112},{d:'Thu 7',m:132}];
 
   function fmt(m){var h=Math.floor(m/60),r=m%60;return h?(h+'h '+String(r).padStart(2,'0')+'m'):(r+'m');}
+  /* bars are scaled to their own longest night, never to the ceiling */
+  function drawBars(){
+    var max=1,i;for(i=0;i<NIGHTS.length;i++)max=Math.max(max,NIGHTS[i].m);
+    bars.textContent='';
+    NIGHTS.forEach(function(n){
+      var el=document.createElement('div');el.className='l17-b'+(n.now?' new':'');
+      el.innerHTML='<span class="d">'+n.d+'</span><span class="t"><i style="width:'+
+        (n.m/max*100).toFixed(1)+'%"></i></span><span class="v">'+fmt(n.m)+'</span>';
+      bars.appendChild(el);
+    });
+  }
   /* any time this screen states is the clock at the moment they tapped, nothing else */
   function stamp(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),ap=h>=12?'pm':'am';
     return (h%12||12)+':'+String(m).padStart(2,'0')+ap;}
@@ -3835,8 +4075,9 @@ render('run');
       if(on)b.setAttribute('aria-pressed','true');else b.removeAttribute('aria-pressed');});
     sv.textContent=fmt(typed);save.textContent='Save '+fmt(typed);
     resU.textContent=fmt(typed);
-    if(signed)held.textContent=entered?('Entered '+fmt(typed)+' for today.')
-      :('Said at '+saidAt+'. The ceiling is '+fmt(ceil)+'.');
+    /* the confirmation says only what the gesture did. The ceiling and the
+       total are both still on the screen, so repeating either is noise. */
+    if(signed)held.textContent='Said at '+saidAt+'.';
   }
   tok.addEventListener('click',function(){if(signed)return;root.classList.toggle('editing');});
   three.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
@@ -3858,12 +4099,9 @@ render('run');
   save.addEventListener('click',function(){
     entered=true;root.classList.remove('typing');root.classList.add('entered');
     src.textContent='Entered at '+stamp()+', from your Screen Time report.';
-    var r=document.createElement('div');r.className='l17-row';
-    r.innerHTML='<div class="d">Tue 12 Aug</div><div class="v">'+fmt(typed)+'</div>';
-    rows.insertBefore(r,rows.firstChild);
-    if(rows.children.length>4)rows.removeChild(rows.lastElementChild);
-    c.querySelector('.l17-acc h4').textContent='What you entered, tonight first';
-    paint();});
+    NIGHTS.unshift({d:'Tonight',m:typed,now:true});
+    if(NIGHTS.length>5)NIGHTS.pop();
+    drawBars();paint();});
 
   /* HOLD to say it: the fill runs, an early release says nothing */
   var ht=null;
@@ -3878,7 +4116,7 @@ render('run');
   cta.addEventListener('keydown',function(e){
     if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();holdOn();}});
   cta.addEventListener('keyup',holdOff);
-  paint();
+  drawBars();paint();
 })();</script>
 </section>
 
@@ -5572,10 +5810,10 @@ render('run');
   <div class="p6">
     <p class="day">Tuesday, day 12</p>
     <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-    <!-- PROVENANCE: the only consequence Memento can state is the count. 47 is the sum of
-         the messages they logged, 100 is the countable target their own plan named. Memento
-         cannot turn a message into money, so no money is projected here. -->
-    <p class="sub">About <b class="t">15 min</b>, and <b class="r">52</b> of the 100 reached by tonight.</p>
+    <!-- PROVENANCE: the only clock here is the real one, and the length is the plan's own
+         estimate at about 3 min a client. Nothing on an Action screen says how the goal
+         is going: that is Clarity's face, one swipe away. -->
+    <p class="sub">About <b class="t">15 min</b>, done about <b class="fin">4:45 pm</b>.</p>
 
     <div class="col">
       <div class="meter">
@@ -5607,7 +5845,7 @@ render('run');
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>, done about <b>4:45 pm</b>.</p>
       <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the three</button>
     </div>
@@ -5639,16 +5877,16 @@ render('run');
       <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, about 6 min</span></div>
       <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, about 15 min</span></div>
       <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, about 27 min</span></div>
-      <p class="tail"><b class="r">52</b> of the 100 reached after today. Yesterday you logged 3.</p>
+      <p class="tail">Today&#8217;s size is done about <b class="fin">4:45 pm</b>. Yesterday you logged 3.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-6"]');
-  /* REACHED = the sum of every message they have logged. TARGET = the countable target
-     their own plan named. Everything priced below is arithmetic on those two numbers. */
-  var REACHED=47, TARGET=100;
+  /* An Action screen prices TODAY and nothing else. The clock is the real one, the length
+     is the plan's own estimate. Where the goal stands lives on Clarity's face. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
   var TIER=[{n:2,nm:'A light day',t:'about 6 min'},
             {n:5,nm:'Your usual day',t:'about 15 min'},
             {n:9,nm:'A heavy day',t:'about 27 min'}];
@@ -5656,7 +5894,9 @@ render('run');
   var i=1, fine=false, fn=5, v=REST[1], timer=null, held=false;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0 ? (m/60)+' hr' : Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  function reached(n){ return Math.min(TARGET,REACHED+n); }
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function unit(n){ return n===1?'client':'clients'; }
 
   var fillEl=root.querySelector('.fill'), hfillEl=root.querySelector('.hfill');
@@ -5680,12 +5920,12 @@ render('run');
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.fin'),function(e){e.textContent=fin(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.fcn'),function(e){e.textContent=fn;});
     Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>, done about <b>'+fin(fn)+'</b>.';
     Array.prototype.forEach.call(root.querySelectorAll('.rung'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.prow'),function(e){
@@ -5872,9 +6112,9 @@ render('run');
         <div class="hub"><div class="n">5</div><div class="u">clients</div></div>
       </div>
       <p class="nm">Your usual day</p>
-      <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-           target their own plan named. A message is never priced in money. -->
-      <p class="cost">About <span class="t">15 min</span>. <span class="r">52 of 100</span> reached after today.</p>
+      <!-- PROVENANCE: the clock is the real one, the length is the plan's own estimate at
+           about 3 min a client. Where the goal stands is Clarity's face, not this one. -->
+      <p class="cost">About <span class="t">15 min</span>, done about <span class="fin">4:45 pm</span>.</p>
     </div>
     <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
     <button class="quiet tog" type="button">Turn between every number</button>
@@ -5894,9 +6134,9 @@ render('run');
     <div class="right">
       <p class="day">Tuesday, day 12</p>
       <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-      <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the target
-           their own plan named. Memento cannot price a message in money, so it does not. -->
-      <p class="then">About <b class="t">15 min</b>. That puts you on <b class="r">52 of 100</b> people reached.</p>
+      <!-- PROVENANCE: the clock is the real one, the length is the plan's own estimate at
+           about 3 min a client. Where the goal stands is Clarity's face, not this one. -->
+      <p class="then">About <b class="t">15 min</b> of writing, done about <b class="fin">4:45 pm</b>.</p>
       <div class="three">
         <div data-i="0"><span class="tn">A light day</span><span class="tv">2, about 6 min</span></div>
         <div data-i="1"><span class="tn">Your usual day</span><span class="tv">5, about 15 min</span></div>
@@ -5917,9 +6157,12 @@ render('run');
   var fine=false, i=1, fn=5;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  var REACHED=47, TARGET=100;
-  function days(n){ var d=Math.ceil((TARGET-REACHED)/n); return d+(d===1?' day':' days'); }
-  function reached(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
+  /* the only clock on this screen is the real one; the finish is that clock plus the plan's
+     own per client estimate, never a measured duration and never a goal projection. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function unit(n){ return n===1?'client':'clients'; }
   function curN(){ return fine?fn:TIER[i].n; }
   function curNm(){ if(!fine) return TIER[i].nm;
@@ -6011,8 +6254,7 @@ render('run');
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){ if(!e.closest('.hub')) e.textContent=n; });
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.fin'),function(e){e.textContent=fin(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.three div'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){
@@ -6176,14 +6418,14 @@ render('run');
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="2">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">About half an hour. 56 of the 100 reached, and it finishes the list about five days sooner.</p>
+        <p class="why">The heaviest Memento proposes. Give it its own block.</p>
       </div>
     </div>
     <div class="foot">
@@ -6199,7 +6441,7 @@ render('run');
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. <b>52</b> of the 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>, done about <b>4:45 pm</b>.</p>
       <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the three sentences</button>
     </div>
@@ -6224,14 +6466,14 @@ render('run');
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="2">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">About half an hour. 56 of the 100 reached, about five days sooner to the end of the list.</p>
+        <p class="why">The heaviest Memento proposes. Give it its own block.</p>
       </div>
     </div>
     <div class="foot">
@@ -6247,11 +6489,12 @@ render('run');
   var i=1, fine=false, fn=5;
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-     target their own plan named. Memento cannot turn a message into money, so nothing here
-     is priced in money. */
-  var REACHED=47, TARGET=100;
-  function reached(n){ return Math.min(TARGET,REACHED+n); }
+  /* PROVENANCE: the clock is the real one, the length is the plan's own estimate at about
+     3 min a client. An Action screen prices TODAY: how the goal is going is Clarity's face. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
 
   function paint(){
     var n=fine?fn:N[i];
@@ -6263,7 +6506,7 @@ render('run');
     Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. <b>'+reached(fn)+'</b> of the '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>, done about <b>'+fin(fn)+'</b>.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
     o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });
@@ -6407,9 +6650,9 @@ render('run');
         <div class="big">5</div>
         <div class="unit">clients today</div>
         <div class="nm">Your usual day</div>
-        <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-             target their own plan named. Times are the plan's own estimate. -->
-        <p class="end">Start 9:00, done about <span class="e">9:15</span>.<br><span class="d">52 of 100</span> reached.</p>
+        <!-- PROVENANCE: the start is the time they set, the length is the plan's own estimate.
+             Nothing here reads the goal: that is Clarity's face, one swipe away. -->
+        <p class="end">Start 9:00, about <span class="t">15 min</span>,<br>done about <span class="e">9:15</span>.</p>
       </div>
       <div class="rail"><span class="ln"></span><span class="dot"></span></div>
     </div>
@@ -6423,7 +6666,7 @@ render('run');
   <div class="grid"></div>
   <div class="d9">
     <p class="dhd">Message clients, Tuesday, day 12</p>
-    <p class="rows">Start 9:00, done about <b class="e">9:15</b>. <b class="d">52 of 100</b> reached.</p>
+    <p class="rows">Start 9:00, about <b class="t">15 min</b>, done about <b class="e">9:15</b>.</p>
     <div class="bandwrap">
       <div class="band"><b>5</b><span class="bu">clients today</span><span class="grab"><s></s><s></s><s></s></span></div>
     </div>
@@ -6445,10 +6688,8 @@ render('run');
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
   function clock(n){ var t=9*60+n*3,h=Math.floor(t/60),m=t%60; return h+':'+(m<10?'0':'')+m; }
-  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-     target their own plan named. A message count is never converted into money. */
-  var REACHED=47, TARGET=100;
-  function days(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
+  /* PROVENANCE: the start is the time they set and every length is the plan's own estimate
+     at about 3 min a client. An Action screen prices TODAY and never reads the goal. */
   function val(){ return fine ? Math.max(1,Math.min(20,Math.round(1+p/2*19))) : TIER[Math.round(p)].n; }
   function name(){ if(!fine) return TIER[Math.round(p)].nm;
     var n=val(); return n<=3?'Lighter than usual':(n<=7?'Around your usual':'Heavier than usual'); }
@@ -6508,7 +6749,7 @@ render('run');
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.e'),function(e){e.textContent=clock(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
     root.querySelector('.htx').textContent = fine
       ? 'Drag the number, every size between 1 and 20'
       : 'Drag the number up to stretch today';
@@ -7010,14 +7251,14 @@ render('run');
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them new to you.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and last week's follow ups.</p>
-        <p class="why">About half an hour. 56 of the 100 reached, five days sooner to the end.</p>
+        <p class="why">Half an hour of writing. Give it its own block.</p>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
@@ -7040,7 +7281,7 @@ render('run');
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. <b>52</b> of the 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>, done about <b>4:45 pm</b>.</p>
       <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the five sentences</button>
     </div>
@@ -7072,14 +7313,14 @@ render('run');
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">56 of the 100 reached, and the list finishes about five days sooner.</p>
+        <p class="why">Half an hour of writing. Give it its own block.</p>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
@@ -7102,10 +7343,12 @@ render('run');
   var i=2, fine=false, fn=5;
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-     target their own plan named. No money is projected from a message count. */
-  var REACHED=47, TARGET=100;
-  function reached(n){ return Math.min(TARGET,REACHED+n); }
+  /* PROVENANCE: the clock is the real one, the length is the plan's own estimate at about
+     3 min a client. An Action screen prices TODAY: how the goal is going is Clarity's face. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function paint(){
     var n=fine?fn:N[i];
     Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
@@ -7116,7 +7359,7 @@ render('run');
     Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. <b>'+reached(fn)+'</b> of the '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>, done about <b>'+fin(fn)+'</b>.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
     o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });

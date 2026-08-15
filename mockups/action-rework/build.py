@@ -28,7 +28,7 @@ REACH = {
     'lp-7': ('7/10',  'screen time, nightly'),
     'lp-12':('7/10',  'gym and posting rhythms, most days'),
     'lp-10':('7/10',  'school, projects, race blocks, daily'),
-    'lp-6': ('6/10',  'weight and debt, the alternative book'),
+    'lp-6': ('6/10',  'weight and debt, the alternative pen'),
     'lp-17':('6/10',  'screen time, the alternative ceiling'),
     'lp-15':('6/10',  'runs and study blocks'),
     'lp-22':('6/10',  'seen once per goal, but it is the best minute: stakes over frequency'),

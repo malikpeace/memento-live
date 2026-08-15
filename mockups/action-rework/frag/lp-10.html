@@ -3,6 +3,18 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-10">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Nothing on it may say how far along the
+     journey they are.
+     CUT: "20 days left" in the slot (a countdown on their deadline), the
+     target in the title ("100 deep work sessions") and in the line under it
+     ("all 100 before 1 September"), and the "87 of 100" footer. All four were
+     the same distance read four ways, and every one of them belongs to
+     Clarity's face.
+     LEFT: the tape itself, which is the record of the lines they printed with
+     the numbers they earned, today's line sitting at the head, the length they
+     pick for it and what that means for today, and the count of lines already
+     printed with nothing to read it against. -->
 <style>
 [data-k=lp-10] .ph{font-variant-numeric:tabular-nums}
 [data-k=lp-10] .slot{position:absolute;left:0;right:0;top:0;height:34px;background:#05060a;
@@ -95,10 +107,10 @@
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="slot"><span id="l10who">Deep work</span><em id="l10days">20 days left</em></div>
+  <div class="slot"><span id="l10who">Deep work</span><em id="l10days">Aug 12</em></div>
   <div class="tape">
-    <div class="ttl" id="l10ttl">100 deep work sessions</div>
-    <div class="sub" id="l10sub">One line each, all 100 before 1 September.</div>
+    <div class="ttl" id="l10ttl">Deep work sessions</div>
+    <div class="sub" id="l10sub">One line for each session.</div>
     <div class="hr" style="top:70px"></div>
 
     <div class="vp">
@@ -111,28 +123,28 @@
     <p class="cons" id="l10cons"></p>
     <div class="hr" style="top:492px"></div>
 
-    <div class="tot"><b id="l10p">87 of 100</b><span>printed</span></div>
+    <div class="tot"><b id="l10p">87</b><span>lines printed</span></div>
 
     <button class="feed" id="l10feed"><span class="fill" id="l10fill"></span><span class="t" id="l10cap">Hold to print the line</span></button>
   </div>
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-10"]');if(!r)return;
 var CHK='<svg viewBox="0 0 24 24"><path d="M4 13l5 5L20 7"/></svg>';
-/* Every number below is arithmetic on two sources only: the lines they logged, and the
-   date they typed at intake. Nothing here is measured for them. */
+/* Every number below is one thing only: the lines they logged. No goal total and no
+   deadline live on this screen, so nothing on it can be read as a distance. */
 var B={
- ship:{who:'Deep work',ttl:'100 deep work sessions',
-   sub:'One line each, all 100 before 1 September.',goal:100,done:87,days:20,pick:1,
+ ship:{who:'Deep work',ttl:'Deep work sessions',
+   sub:'One line for each session.',done:87,pick:1,
    past:[['4 hours','Aug 1'],['4 hours','Aug 3'],['3 hours','Aug 4'],['4 hours','Aug 5'],['5 hours','Aug 6'],
          ['4 hours','Aug 8'],['3 hours','Aug 10'],['4 hours','Aug 11']],
    opts:['3 hours','4 hours','5 hours']},
- school:{who:'Study',ttl:'60 study sessions',
-   sub:'One line each, all 60 before finals.',goal:60,done:22,days:122,pick:1,
+ school:{who:'Study',ttl:'Study sessions',
+   sub:'One line for each block.',done:22,pick:1,
    past:[['2 hours','Aug 1'],['2 hours','Aug 2'],['1 hour','Aug 4'],['2 hours','Aug 5'],['3 hours','Aug 7'],
          ['2 hours','Aug 8'],['2 hours','Aug 10'],['1 hour','Aug 11']],
    opts:['1 hour','2 hours','3 hours']},
- race:{who:'Training',ttl:'120 training sessions',
-   sub:'One line each, all 120 before 12 April.',goal:120,done:34,days:243,pick:1,
+ race:{who:'Training',ttl:'Training sessions',
+   sub:'One line for each session.',done:34,pick:1,
    past:[['45 min','Aug 1'],['60 min','Aug 3'],['45 min','Aug 5'],['80 min','Aug 6'],['60 min','Aug 7'],
          ['45 min','Aug 9'],['60 min','Aug 10'],['80 min','Aug 11']],
    opts:['45 min','60 min','80 min']}};
@@ -158,7 +170,7 @@ function opsHTML(){var L=['under plan','the plan','over plan'];
 function render(k){
   c=B[k];done=c.done;pick=c.pick;printed=false;
   cancelAnimationFrame(raf);cancelAnimationFrame(back);
-  whoEl.textContent=c.who;dEl.textContent=c.days+' days left';
+  whoEl.textContent=c.who;dEl.textContent='Aug 12';
   ttlEl.textContent=c.ttl;subEl.textContent=c.sub;
   var h='',i;
   for(i=0;i<8;i++)h+=row('ok',done-7+i,c.past[i][0],c.past[i][1]);
@@ -171,7 +183,7 @@ function render(k){
   ops.innerHTML=opsHTML();
   cons.textContent=consTxt(pick);
   lab.textContent='';
-  pEl.textContent=done+' of '+c.goal;
+  pEl.textContent=done;
   feed.classList.remove('done');cap.textContent='Hold to print the line';fill.style.width='0';}
 ops.addEventListener('click',function(e){var b=e.target.closest('.op');if(!b||printed)return;
   pick=+b.dataset.i;
@@ -184,7 +196,7 @@ function finish(){
   var now=rows[idx],len=c.opts[pick];
   now.classList.remove('now');now.classList.add('ok');
   now.querySelector('em').textContent='Aug 12';
-  done++;pEl.textContent=done+' of '+c.goal;
+  done++;pEl.textContent=done;
   idx++;base-=PITCH;draw(0);
   var nx=rows[idx];nx.classList.remove('wait');nx.classList.add('now');
   nx.querySelector('em').textContent='tomorrow';

@@ -97,9 +97,9 @@
         <div class="big">5</div>
         <div class="unit">clients today</div>
         <div class="nm">Your usual day</div>
-        <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-             target their own plan named. Times are the plan's own estimate. -->
-        <p class="end">Start 9:00, done about <span class="e">9:15</span>.<br><span class="d">52 of 100</span> reached.</p>
+        <!-- PROVENANCE: the start is the time they set, the length is the plan's own estimate.
+             Nothing here reads the goal: that is Clarity's face, one swipe away. -->
+        <p class="end">Start 9:00, about <span class="t">15 min</span>,<br>done about <span class="e">9:15</span>.</p>
       </div>
       <div class="rail"><span class="ln"></span><span class="dot"></span></div>
     </div>
@@ -113,7 +113,7 @@
   <div class="grid"></div>
   <div class="d9">
     <p class="dhd">Message clients, Tuesday, day 12</p>
-    <p class="rows">Start 9:00, done about <b class="e">9:15</b>. <b class="d">52 of 100</b> reached.</p>
+    <p class="rows">Start 9:00, about <b class="t">15 min</b>, done about <b class="e">9:15</b>.</p>
     <div class="bandwrap">
       <div class="band"><b>5</b><span class="bu">clients today</span><span class="grab"><s></s><s></s><s></s></span></div>
     </div>
@@ -135,10 +135,8 @@
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
   function clock(n){ var t=9*60+n*3,h=Math.floor(t/60),m=t%60; return h+':'+(m<10?'0':'')+m; }
-  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-     target their own plan named. A message count is never converted into money. */
-  var REACHED=47, TARGET=100;
-  function days(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
+  /* PROVENANCE: the start is the time they set and every length is the plan's own estimate
+     at about 3 min a client. An Action screen prices TODAY and never reads the goal. */
   function val(){ return fine ? Math.max(1,Math.min(20,Math.round(1+p/2*19))) : TIER[Math.round(p)].n; }
   function name(){ if(!fine) return TIER[Math.round(p)].nm;
     var n=val(); return n<=3?'Lighter than usual':(n<=7?'Around your usual':'Heavier than usual'); }
@@ -198,7 +196,7 @@
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.e'),function(e){e.textContent=clock(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
     root.querySelector('.htx').textContent = fine
       ? 'Drag the number, every size between 1 and 20'
       : 'Drag the number up to stretch today';

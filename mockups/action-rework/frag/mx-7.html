@@ -85,9 +85,9 @@
         <div class="hub"><div class="n">5</div><div class="u">clients</div></div>
       </div>
       <p class="nm">Your usual day</p>
-      <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-           target their own plan named. A message is never priced in money. -->
-      <p class="cost">About <span class="t">15 min</span>. <span class="r">52 of 100</span> reached after today.</p>
+      <!-- PROVENANCE: the clock is the real one, the length is the plan's own estimate at
+           about 3 min a client. Where the goal stands is Clarity's face, not this one. -->
+      <p class="cost">About <span class="t">15 min</span>, done about <span class="fin">4:45 pm</span>.</p>
     </div>
     <button class="cta" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="n">5</span> <span class="uw">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="n">5</span> <span class="uw">clients</span></span></button>
     <button class="quiet tog" type="button">Turn between every number</button>
@@ -107,9 +107,9 @@
     <div class="right">
       <p class="day">Tuesday, day 12</p>
       <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-      <!-- PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the target
-           their own plan named. Memento cannot price a message in money, so it does not. -->
-      <p class="then">About <b class="t">15 min</b>. That puts you on <b class="r">52 of 100</b> people reached.</p>
+      <!-- PROVENANCE: the clock is the real one, the length is the plan's own estimate at
+           about 3 min a client. Where the goal stands is Clarity's face, not this one. -->
+      <p class="then">About <b class="t">15 min</b> of writing, done about <b class="fin">4:45 pm</b>.</p>
       <div class="three">
         <div data-i="0"><span class="tn">A light day</span><span class="tv">2, about 6 min</span></div>
         <div data-i="1"><span class="tn">Your usual day</span><span class="tv">5, about 15 min</span></div>
@@ -130,9 +130,12 @@
   var fine=false, i=1, fn=5;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  var REACHED=47, TARGET=100;
-  function days(n){ var d=Math.ceil((TARGET-REACHED)/n); return d+(d===1?' day':' days'); }
-  function reached(n){ return Math.min(TARGET,REACHED+n)+' of '+TARGET; }
+  /* the only clock on this screen is the real one; the finish is that clock plus the plan's
+     own per client estimate, never a measured duration and never a goal projection. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function unit(n){ return n===1?'client':'clients'; }
   function curN(){ return fine?fn:TIER[i].n; }
   function curNm(){ if(!fine) return TIER[i].nm;
@@ -224,8 +227,7 @@
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){ if(!e.closest('.hub')) e.textContent=n; });
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.d'),function(e){e.textContent=days(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.fin'),function(e){e.textContent=fin(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.three div'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.tog'),function(b){

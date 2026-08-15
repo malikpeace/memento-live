@@ -3,33 +3,43 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-8">
-<!-- PROVENANCE: every mark is one logged action, nothing else. The field is
-     the count of things they did, drawn at size, so the goal's whole shape is
-     the number of marks: 100 transfers, 120 sessions, 60 study blocks. The
-     field re-rules itself to the goal, it never rescales a mark to make a
-     small goal look big. The finish estimates are arithmetic on the size they
-     picked and the marks still empty, and they say they are estimates. -->
+<!-- PROVENANCE: every mark is one logged action, nothing else. One mark is one
+     graph-paper cell at every size, so the record is drawn at its own scale
+     and a small week is never inflated to look big.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY, never how far along the journey they are.
+     This screen was the worst offender in the set: it drew the whole target as
+     empty cells, so the goal was literally a progress bar you could count.
+     CUT: the empty cells (100, 120, 60 of them), the two bright centre rules
+     that made the target read as four countable blocks, the "37 of 100" and
+     "of 120 this term" readouts, the goal amount in the header, and the finish
+     estimates ("the last mark lights around March"), which were arrival dates.
+     LEFT: the marks they actually made, and blank paper where the record
+     stops. Nothing on the page says how many marks the goal has, so nothing on
+     the page says how close it is. The total under the field is a plain sum of
+     what they logged, with no denominator to read it against.
+     KEPT: today's move, the sizes and what tonight costs at each, the wipe and
+     the hold that light tonight's marks one at a time. -->
 <style>
 [data-k=lp-8] .ph{font-variant-numeric:tabular-nums}
 /* the field IS the grid: every mark sits in one graph-paper cell, at every size */
-[data-k=lp-8] .grid{background-position:20px var(--ftop,96px)}
+[data-k=lp-8] .grid{background-position:20px 84px}
 
-/* header block lands its baseline on the grid line one row above the field */
-[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:var(--htop,23px)}
+/* header block sits a graph row above the field, and clear of the Dynamic
+   Island: at top:24 its box ran under it */
+[data-k=lp-8] .hd{position:absolute;left:20px;right:20px;top:34px}
 [data-k=lp-8] .hd b{display:block;font-size:17px;font-weight:700;letter-spacing:-.015em;color:rgba(var(--ink),.96)}
-[data-k=lp-8] .hd i{display:block;font-style:normal;font-size:12.5px;line-height:1.4;color:rgba(var(--ink),.90);margin-top:5px}
 
-/* --- the marks: as many as the goal has, ruled to the paper -------------- */
-[data-k=lp-8] .field{position:absolute;left:20px;top:var(--ftop,96px);
+/* --- the marks they made, and blank paper where the record stops --------- */
+/* no empty cells are drawn: an outline for every mark the goal still wants is
+   a progress bar, and counting it is exactly what this screen may not offer */
+[data-k=lp-8] .field{position:absolute;left:20px;top:84px;
   width:calc(var(--cols,10) * 26px);height:calc(var(--rows,10) * 26px);
   display:grid;grid-template-columns:repeat(auto-fill,26px);grid-auto-rows:26px;
   touch-action:none;-webkit-tap-highlight-color:transparent}
-/* the two centre grid lines are brightened so the field reads as four blocks */
-[data-k=lp-8] .field:after{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(90deg,transparent calc(var(--cx,130px) - 1px),rgba(var(--ink),.10) calc(var(--cx,130px) - 1px),rgba(var(--ink),.10) var(--cx,130px),transparent var(--cx,130px)),
-    linear-gradient(180deg,transparent calc(var(--cy,130px) - 1px),rgba(var(--ink),.10) calc(var(--cy,130px) - 1px),rgba(var(--ink),.10) var(--cy,130px),transparent var(--cy,130px))}
 [data-k=lp-8] .field i{width:26px;height:26px;background-repeat:no-repeat;background-position:center;
-  background-size:14px 14px;background-image:linear-gradient(rgba(var(--ink),.14),rgba(var(--ink),.14));
+  background-size:14px 14px;background-image:none;
   transition:background-size .22s cubic-bezier(.2,.8,.3,1),background-image .26s ease-out}
 /* the banked marks read at .70, not .88: at full brightness the field
    out-shouted the one instruction on the screen */
@@ -42,19 +52,21 @@
   background-image:linear-gradient(rgba(63,217,78,.95),rgba(63,217,78,.95))}
 [data-k=lp-8] .field:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:6px;border-radius:4px}
 
-/* --- where that puts you ------------------------------------------------ */
-/* sits in the graph row directly under the field, same 20px column as everything else */
-[data-k=lp-8] .read{position:absolute;left:20px;right:20px;top:var(--rtop,356px);
+/* --- the sum of the marks, no denominator ------------------------------- */
+/* rides one graph row under the last mark whatever shape the record is, so the
+   header, the marks and their total read as one block and the blank paper
+   between it and the card is the page they have not written on yet */
+[data-k=lp-8] .read{position:absolute;left:20px;right:20px;
+  top:calc(84px + var(--rows,5) * 26px + 10px);
   height:26px;display:flex;align-items:baseline}
 /* the readout is the FIELD's caption, not a second headline: the one big thing
    on this screen is the action in the card, so this reads one step quieter */
 [data-k=lp-8] .read .amt{font-size:19px;line-height:26px;font-weight:700;letter-spacing:-.025em;color:rgba(var(--ink),.97)}
 [data-k=lp-8] .read .of{margin-left:6px;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90)}
-[data-k=lp-8] .read .ct{margin-left:auto;font-size:12.5px;line-height:26px;color:rgba(var(--ink),.90);white-space:nowrap}
 
 /* --- today -------------------------------------------------------------- */
 /* left:6 + padding:14 puts the card's text on the same 20px column as the header */
-[data-k=lp-8] .card{position:absolute;left:6px;right:6px;top:var(--ctop,408px);bottom:16px;border-radius:16px;
+[data-k=lp-8] .card{position:absolute;left:6px;right:6px;top:408px;bottom:16px;border-radius:16px;
   padding:14px 14px 15px;
   background:rgba(22,25,31,.95);backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.07),0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column}
@@ -73,7 +85,10 @@
 [data-k=lp-8] .chips button.on em{color:rgba(var(--ink),.98)}
 [data-k=lp-8] .chips button.on u{color:rgba(var(--ink),.90)}
 [data-k=lp-8] .chips button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+/* the consequence line carries what tonight COSTS at this size, never where
+   that size lands the goal */
 [data-k=lp-8] .cons{margin:11px 0 0;font-size:12px;line-height:1.4;color:rgba(var(--ink),.90)}
+[data-k=lp-8] .cons:empty{display:none}
 /* the completion is a HOLD (Malik, 2026-08-13): the marks light while the
    press fills, and letting go early puts every one of them back */
 [data-k=lp-8] .fill{position:relative;margin-top:auto;width:100%;height:50px;border:0;border-radius:14px;
@@ -92,7 +107,7 @@
 [data-k=lp-8] .ph.logged .chips button.on{background:rgba(var(--ink),.15)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-8] *{transition:none!important}}
 </style>
-<h3>One hundred marks</h3><p class="cap">The milestone cut into marks, one per cell of the graph paper, so the goal is literally drawn on the grid at its own size: tonight's marks are the small green ones, and the hold fills them one at a time.</p>
+<h3>The marks</h3><p class="cap">One logged action, one mark, one cell of the graph paper, and blank paper where the record stops: nothing is drawn for the marks not made yet, so the page shows the work and never the distance. Tonight's marks are the small green ones the hold fills, one at a time.</p>
 <div class="bk" role="group" aria-label="which goal this screen is carrying">
   <button type="button" class="on" data-b="money" aria-pressed="true">Money</button>
   <button type="button" data-b="body" aria-pressed="false">Body</button>
@@ -100,12 +115,12 @@
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <div class="hd"><b data-title>Save $5,000</b><i data-legend>Each mark is $50.</i></div>
+  <div class="hd"><b data-legend>Every mark is $50 moved.</b></div>
 
   <div class="field" tabindex="0" role="button" aria-label="wipe across tonight's marks to fill them"></div>
 
   <div class="read">
-    <span class="amt"></span><span class="of"></span><span class="ct"></span>
+    <span class="amt"></span><span class="of"></span>
   </div>
 
   <div class="card">
@@ -118,49 +133,43 @@
 </div>
 <script>(function(){var r=document.querySelector('[data-k="lp-8"]');if(!r)return;
 var ph=r.querySelector('.ph'),field=r.querySelector('.field'),
-    amt=r.querySelector('.read .amt'),of=r.querySelector('.read .of'),ct=r.querySelector('.read .ct'),
+    amt=r.querySelector('.read .amt'),of=r.querySelector('.read .of'),
     cons=r.querySelector('.cons'),act=r.querySelector('.act'),sub=r.querySelector('.sub'),
     chipsEl=r.querySelector('.chips'),btn=r.querySelector('.fill'),
     bar=btn.querySelector('b'),btnT=btn.querySelector('span'),
-    title=r.querySelector('[data-title]'),legend=r.querySelector('[data-legend]');
+    legend=r.querySelector('[data-legend]');
 
 /* --- THE BUCKETS (ACTION-BUCKETS.md) -------------------------------------
    Same field, three goals whose marks mean three different things. cols/rows
-   keep every mark exactly one 26px graph cell, so the field changes SIZE, not
-   scale: 100 transfers is a square, 120 sessions is taller, 60 blocks is a
-   narrow column. base = the marks already logged. Nothing here is measured. */
+   keep every mark exactly one 26px graph cell, so the record changes SIZE, not
+   scale. base = the marks already logged; the block is only ever as big as the
+   marks made plus tonight's, and no goal total is stored on this screen at all. */
 var B={
-  money:{cols:10,rows:10,n:100,base:37,htop:23,ftop:96,rtop:356,ctop:408,cx:130,cy:130,
-    title:'Save $5,000',legend:'Each mark is $50.',
-    amt:function(l){return '$'+(l*50).toLocaleString('en-US')},
-    of:'',ct:function(l){return l+' of 100'},
+  money:{cols:10,rows:5,base:37,
+    legend:'Every mark is $50 moved.',
+    amt:function(l){return '$'+(l*50).toLocaleString('en-US')},of:'moved so far',
     sub:'Friday is the transfer day.',
     chips:[{n:2,em:'$100',u:'2 marks'},{n:4,em:'$200',u:'4 marks'},{n:7,em:'$350',u:'7 marks'}],pick:1,
     act:function(c){return 'Move $'+(c.n*50)+' into savings.'},
-    cons:function(c){return 'At this size the last mark lights around '+
-      ({2:'March',4:'early December',7:'mid October'})[c.n]+'.'},
+    cons:function(){return ''},
     did:function(c){return '$'+(c.n*50)+' moved into savings.'}},
-  /* two more rows of marks than the money field, so the whole block shifts up
-     one row and the card keeps its own height: the goal sets the geometry */
-  body:{cols:10,rows:12,n:120,base:38,htop:14,ftop:70,rtop:382,ctop:434,cx:130,cy:156,
-    title:'Run the half in January',legend:'One mark for each session.',
-    amt:function(l){return ''+l},of:'of 120',ct:function(){return ''},
+  body:{cols:10,rows:4,base:38,
+    legend:'Every mark is one session.',
+    amt:function(l){return ''+l},of:'sessions run',
     sub:'',
     /* length is the dial here, not marks: a session is a session, and the
        screen says so by leaving the mark count alone while the minutes move */
     chips:[{n:1,mins:30,em:'30 min',u:'easy'},{n:1,mins:45,em:'45 min',u:'normal'},{n:1,mins:70,em:'70 min',u:'long'}],pick:1,
-    week:100,
     act:function(c){return 'Run '+c.mins+' minutes, easy pace.'},
-    cons:function(c){return 'About '+c.mins+' min, the plan’s estimate. Makes '+(this.week+c.mins)+' min run this week.'},
+    cons:function(c){return 'About '+c.mins+' min, the plan’s estimate.'},
     did:function(c){return c.mins+' minutes logged.'}},
-  school:{cols:6,rows:10,n:60,base:23,htop:23,ftop:96,rtop:356,ctop:408,cx:78,cy:130,
-    title:'60 study sessions this term',legend:'One mark for each block.',
-    amt:function(l){return ''+l},of:'of 60 this term',ct:function(){return ''},
-    sub:'About 90 min each, phone in another room.',
+  school:{cols:6,rows:5,base:23,
+    legend:'Every mark is one study block.',
+    amt:function(l){return ''+l},of:'blocks this term',
+    sub:'Phone in another room.',
     chips:[{n:1,em:'1 block',u:'1 mark'},{n:2,em:'2 blocks',u:'2 marks'},{n:3,em:'3 blocks',u:'3 marks'}],pick:1,
     act:function(c){return ({1:'One study block.',2:'Two study blocks.',3:'Three study blocks.'})[c.n]},
-    cons:function(c){return 'At this size the last mark lights around '+
-      ({1:'early October',2:'early September',3:'the end of August'})[c.n]+'.'},
+    cons:function(c){return 'About '+({1:'90 min',2:'3 hours',3:'four and a half hours'})[c.n]+' tonight, the plan’s estimate.'},
     did:function(c){return c.n+(c.n===1?' block logged.':' blocks logged.')}}
 };
 
@@ -169,15 +178,18 @@ function step(){return chip.n}
 function lit(){return C.base+filled}
 function left(){return step()-filled}
 
+/* the button says what is left to fill TONIGHT, never how many the goal wants */
+function label(){
+  return left()?'Hold to fill '+left()+(left()===1?' mark':' marks')
+    :'Logged, '+step()+(step()===1?' mark':' marks')+' tonight';
+}
 function paint(){
   cells.forEach(function(c,i){
     c.classList.toggle('lit',i<lit());
     c.classList.toggle('pend',!logged&&i>=lit()&&i<C.base+step());
   });
   amt.textContent=C.amt(lit());
-  ct.textContent=C.ct(lit());
-  btnT.textContent=logged?'Logged. '+lit()+' of '+C.n+' marks'
-    :'Hold to fill '+left()+(left()===1?' mark':' marks');
+  btnT.textContent=label();
 }
 function done(){
   logged=true;clearHold();bar.style.transition='none';bar.style.width='0';
@@ -195,8 +207,7 @@ function light(upTo){
   })(cells[i],i-from);}
   filled=to-C.base;
   amt.textContent=C.amt(lit());
-  ct.textContent=C.ct(lit());
-  btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+  btnT.textContent=label();
   if(!left())setTimeout(done,220+(to-from)*55);
 }
 
@@ -210,7 +221,7 @@ function setLit(n){
     cells[i].classList.toggle('pend',!on);
   }
   filled=n;
-  amt.textContent=C.amt(lit());ct.textContent=C.ct(lit());
+  amt.textContent=C.amt(lit());
 }
 function clearHold(){timers.forEach(clearTimeout);timers=[];}
 function holdStart(e){
@@ -224,7 +235,7 @@ function holdStart(e){
   for(var i=1;i<=n;i++)(function(k){
     timers.push(setTimeout(function(){
       setLit(from0+k);
-      btnT.textContent=left()?'Hold to fill '+left()+(left()===1?' mark':' marks'):'Logged. '+lit()+' of '+C.n+' marks';
+      btnT.textContent=label();
       if(k===n)done();
     },Math.round(HOLD*k/n)));
   })(i);
@@ -272,18 +283,19 @@ field.addEventListener('pointermove',function(e){
 field.addEventListener('keydown',function(e){
   if(e.key==='Enter'||e.key===' '){e.preventDefault();light(C.base+step()-1);}});
 
-/* --- swapping the bucket: the field re-rules itself to the new goal ------- */
+/* --- swapping the bucket: the block re-rules itself to the record --------- */
 function render(key){
   C=B[key];chip=C.chips[C.pick];filled=0;logged=false;
   clearHold();bar.style.transition='none';bar.style.width='0';from0=0;
   btn.classList.remove('done');ph.classList.remove('logged');
   ['cols','rows'].forEach(function(k){ph.style.setProperty('--'+k,C[k])});
-  ['htop','ftop','rtop','ctop','cx','cy'].forEach(function(k){ph.style.setProperty('--'+k,C[k]+'px')});
-  title.textContent=C.title;legend.textContent=C.legend;
+  legend.textContent=C.legend;
   of.textContent=C.of;sub.textContent=C.sub;
   field.setAttribute('aria-label','wipe across tonight’s marks to fill them, '+
-    C.base+' of '+C.n+' already logged');
-  var h='';for(var i=0;i<C.n;i++)h+='<i></i>';
+    C.base+' already logged');
+  /* cells exist for the marks made plus tonight's, and the tail of the last
+     row is simply blank paper: nothing is drawn for a mark not made */
+  var n=C.cols*C.rows,h='';for(var i=0;i<n;i++)h+='<i></i>';
   field.innerHTML=h;cells=[].slice.call(field.children);
   act.textContent=C.act(chip);cons.textContent=C.cons(chip);
   drawChips();paint();

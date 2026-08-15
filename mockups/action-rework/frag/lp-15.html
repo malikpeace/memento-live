@@ -3,25 +3,38 @@
      lp-15 bottom sheet first | lp-16 horizontal corridor band | lp-17 declarative sentence over account rows |
      lp-18 centered monolith numeral -->
 <section class="cell" data-k="lp-15">
+<!-- TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Where they stand in the week is Consistency's
+     face, one swipe away.
+     CUT: "1 of 3 this week" in the header (it was already hidden, now it is
+     gone), "This week has one run in it so far" under the strip, "Wednesday,
+     run 2 of 3" on the sheet, "Run 2 of 3 logged" on the confirmation, and
+     "All three keep the week at three runs" in the consequence line.
+     CHANGED: the eight week strip drew an empty slot for every session the week
+     still wanted, which is a target rail made of holes: you could count the
+     week off it. It now draws ONLY the sessions they logged, so a week is as
+     tall as the work in it, and the single green slot is today's session
+     waiting. Nothing is outlined ahead of them.
+     KEPT: today's move, the three ways to run it and what each puts in TODAY,
+     accept-or-amend, and the hold that banks it. -->
 <style>
 [data-k=lp-15] .ph{font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
-[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;
+/* clears the Dynamic Island: at top:22 the goal line ran under it */
+[data-k=lp-15] .hd{position:absolute;left:16px;right:16px;top:38px;display:flex;justify-content:space-between;
   align-items:baseline;gap:10px;font-size:13px;color:rgba(var(--ink),.90)}
 [data-k=lp-15] .hd b{font-size:15px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.97)}
-/* the week count lived here AND in the line under the grid AND on the sheet.
-   It is said once now, in the line that also changes when today is banked. */
-[data-k=lp-15] .hd span{display:none}
 
 /* eight weeks of rhythm */
-[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:96px;height:78px;display:flex;gap:9px;align-items:flex-end}
+/* the strip sits optically centred in the room above the sheet, which is
+   where the cut week claim used to sit */
+[data-k=lp-15] .wk{position:absolute;left:16px;right:16px;top:150px;height:78px;display:flex;gap:9px;align-items:flex-end}
 [data-k=lp-15] .wk div{flex:1;display:flex;flex-direction:column-reverse;gap:5px}
-[data-k=lp-15] .wk i{display:block;height:21px;border-radius:4px;background:rgba(var(--ink),.10)}
-[data-k=lp-15] .wk i.on{background:rgba(var(--ink),.34)}
+/* every block is one logged session. There are no empty blocks: an outline for
+   a session not run is a rail you can count the week off. */
+[data-k=lp-15] .wk i{display:block;height:21px;border-radius:4px;background:rgba(var(--ink),.34)}
 [data-k=lp-15] .wk i.now{background:rgba(63,217,78,.60);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
-[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:182px;display:flex;justify-content:space-between;
+[data-k=lp-15] .wl{position:absolute;left:16px;right:16px;top:236px;display:flex;justify-content:space-between;
   font-size:10.5px;color:rgba(var(--ink),.62)}
-[data-k=lp-15] .say{position:absolute;left:16px;right:16px;top:210px;margin:0;font-size:13.5px;line-height:1.45;
-  color:rgba(var(--ink),.94)}
 
 /* scrim, so the sheet reads as lifted off the page */
 [data-k=lp-15] .scrim{position:absolute;inset:0;background:rgba(3,4,6,.55);opacity:0;pointer-events:none;
@@ -110,17 +123,16 @@
 </div>
 <div class="ph" id="l15ph">
   <div class="grid"></div>
-  <div class="hd"><b id="l15g">Run 3 times a week</b><span id="l15h">1 of 3 this week</span></div>
+  <div class="hd"><b id="l15g">Run 3 times a week</b></div>
 
   <div class="wk" id="l15wk"></div>
   <div class="wl"><span>8 weeks back</span><span>this week</span></div>
-  <p class="say" id="l15say"></p>
 
   <div class="scrim" id="l15sc"></div>
   <div class="stack2"></div>
   <div class="sheet" id="l15sh">
     <div class="drag" id="l15dg"><div class="grab"></div></div>
-    <div class="t" id="l15t">Wednesday, run 2 of 3</div>
+    <div class="t" id="l15t">Wednesday</div>
     <div class="one" id="l15o">Run 5 km, easy pace</div>
     <div class="peek" id="l15pk">Pull up for the other two ways to run it</div>
 
@@ -146,7 +158,7 @@
     </div>
 
     <div class="fin" id="l15fin">
-      <div class="row"><i></i><span id="l15dt">Run 2 of 3 logged, 5.0 km</span></div>
+      <div class="row"><i></i><span id="l15dt">Run logged, 5.0 km</span></div>
       <button class="alt" id="l15u" type="button">Put it back, I have not run yet</button>
     </div>
   </div>
@@ -155,7 +167,7 @@
 /* The eight weeks are the sessions they logged. The three ways are the plan they accepted.
    The amend row is the only place a number is typed, and it is their own correction. */
 var B={
- run:{goal:'Run 3 times a week',per:3,perWord:'three',unit:'run',units:'runs',bar:21,
+ run:{goal:'Run 3 times a week',unit:'run',bar:21,
    weeks:[3,2,3,3,3,1,3,1],day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to run it',
    step:.1,dec:1,su:'km',min:1,max:300,stepTxt:'Steps of 0.1.',
@@ -163,7 +175,7 @@ var B={
    opts:[[30,'Short one, 3 km easy','Run 3 km, easy pace'],
          [50,'The normal one, 5 km easy','Run 5 km, easy pace'],
          [80,'Long one, 8 km, last 2 hard','Run 8 km, last 2 hard']],pick:1},
- school:{goal:'Study 4 times a week',per:4,perWord:'four',unit:'block',units:'blocks',bar:15.7,
+ school:{goal:'Study 4 times a week',unit:'block',bar:15.7,
    weeks:[4,4,3,4,2,4,4,2],day:'Wednesday',next:'Friday',
    peek:'Pull up for the other two ways to do it',
    step:5,dec:0,su:'min',min:1,max:60,stepTxt:'Steps of 5.',
@@ -173,46 +185,36 @@ var B={
          [24,'Long block, 2 hours','Study 2 hours, phone away']],pick:1}};
 var ph=r.querySelector('#l15ph'),sh=r.querySelector('#l15sh'),dg=r.querySelector('#l15dg'),
     sc=r.querySelector('#l15sc'),L=r.querySelector('#l15l'),O=r.querySelector('#l15o'),
-    C=r.querySelector('#l15c'),wk=r.querySelector('#l15wk'),say=r.querySelector('#l15say'),
-    hd=r.querySelector('#l15h'),gEl=r.querySelector('#l15g'),tEl=r.querySelector('#l15t'),
+    C=r.querySelector('#l15c'),wk=r.querySelector('#l15wk'),
+    gEl=r.querySelector('#l15g'),tEl=r.querySelector('#l15t'),
     pk=r.querySelector('#l15pk'),log=r.querySelector('#l15log'),am=r.querySelector('#l15am'),
     amv=r.querySelector('#l15km'),amn=r.querySelector('#l15amn'),aq=r.querySelector('#l15aq'),
     bank=r.querySelector('#l15bank'),bankT=r.querySelector('#l15bankt'),
     logT=r.querySelector('#l15logt'),undo=r.querySelector('#l15u'),
-    c,sel,actual,doneN,logged=false,REST=340,UP=206,AMEND=300;
+    c,sel,actual,logged=false,REST=340,UP=206,AMEND=300;
 function val(s){return c.dec?(s*c.step).toFixed(c.dec):String(Math.round(s*c.step));}
 function vu(s){return val(s)+' '+c.su;}
 function vs(s){var t=val(s);return (c.dec?t.replace(/\.0$/,''):t)+' '+c.su;}
+/* one block per session LOGGED, and one green block for today's, waiting */
 function wkHTML(){return c.weeks.map(function(n,w){
   var h='',i,last=(w===c.weeks.length-1);
-  for(i=0;i<c.per;i++){
-    var cl=i<n?'on':'';
-    if(last&&i===n)cl='now';
-    h+='<i class="'+cl+'" style="height:'+c.bar+'px"'+(cl==='now'?' id="l15now"':'')+'></i>';}
+  for(i=0;i<n;i++)h+='<i style="height:'+c.bar+'px"></i>';
+  if(last)h+='<i class="now" id="l15now" style="height:'+c.bar+'px"></i>';
   return '<div>'+h+'</div>';}).join('');}
 function optsHTML(){return c.opts.map(function(o,i){
   return '<button type="button" data-i="'+i+'"'+(i===c.pick?' class="on"':'')+'>'+o[1]+'</button>';}).join('');}
-/* PURITY (2026-08-13): the old line read "You hit three in five of the last seven
-   weeks", which is a pattern claim, Consistency's face wearing Action's clothes.
-   What is left is this week only: the plan Action actually owns. The eight week
-   strip stays, because it is their own logged sessions with nothing read off it. */
-function sayTxt(n){return 'This week has '+
-  (n===1?'one':n===2?'two':n===3?'three':n)+' '+(n===1?c.unit:c.units)+' in it '+(logged?'now.':'so far.');}
 function place(t){sh.style.top=t+'px';r.querySelector('.stack2').style.top=(t-6)+'px';}
 function open(u){ph.classList.toggle('up',u);place(u?UP:REST);}
 function render(k){
   c=B[k];sel=c.opts[c.pick][0];logged=false;
-  doneN=c.weeks[c.weeks.length-1];
   ph.classList.remove('up','amending','logged');place(REST);
   gEl.textContent=c.goal;
   wk.innerHTML=wkHTML();
-  hd.textContent=doneN+' of '+c.per+' this week';
-  say.textContent=sayTxt(doneN);
-  tEl.textContent=c.day+', '+c.unit+' '+(doneN+1)+' of '+c.per;
+  tEl.textContent=c.day;
   O.textContent=c.opts[c.pick][2];
   pk.textContent=c.peek;
   L.innerHTML=optsHTML();
-  C.textContent='All three keep the week at '+c.perWord+' '+c.units+'. This one puts '+vs(sel)+' in it.';
+  C.textContent='This one puts '+vs(sel)+' in today.';
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);
   aq.textContent=c.ask;undo.textContent=c.undo;
   actual=sel;amPaint();}
@@ -237,7 +239,7 @@ dg.addEventListener('pointerup',release);dg.addEventListener('pointercancel',rel
 L.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||logged)return;
   [].forEach.call(L.children,function(x){x.classList.toggle('on',x===b);});
   sel=c.opts[+b.dataset.i][0];O.textContent=c.opts[+b.dataset.i][2];
-  C.textContent='All three keep the week at '+c.perWord+' '+c.units+'. This one puts '+vs(sel)+' in it.';
+  C.textContent='This one puts '+vs(sel)+' in today.';
   logT.textContent='Hold to log the '+c.unit+', '+vs(sel);});
 
 /* ---- accept or amend ---- */
@@ -266,24 +268,20 @@ holdable(bank,function(){done(actual);});
 
 function done(s){logged=true;
   ph.classList.remove('amending');ph.classList.add('logged');
-  r.querySelector('#l15dt').textContent=c.unit.charAt(0).toUpperCase()+c.unit.slice(1)+' '+
-    (doneN+1)+' of '+c.per+' logged, '+vs(s);
-  var n=r.querySelector('#l15now');if(n){n.className='on';n.removeAttribute('id');}
-  hd.textContent=(doneN+1)+' of '+c.per+' this week';
+  r.querySelector('#l15dt').textContent=c.unit.charAt(0).toUpperCase()+c.unit.slice(1)+
+    ' logged, '+vs(s);
+  var n=r.querySelector('#l15now');if(n){n.className='';n.removeAttribute('id');}
   tEl.textContent=c.day+', done';
   O.textContent='Next '+c.unit+' '+c.next;
   pk.textContent='Nothing else is asked of you today';
-  say.textContent=sayTxt(doneN+1);
   open(false);}
 
 undo.addEventListener('click',function(){logged=false;
   ph.classList.remove('logged');
   wk.innerHTML=wkHTML();
-  hd.textContent=doneN+' of '+c.per+' this week';
-  tEl.textContent=c.day+', '+c.unit+' '+(doneN+1)+' of '+c.per;
+  tEl.textContent=c.day;
   O.textContent=c.opts.filter(function(o){return o[0]===sel;})[0][2];
-  pk.textContent=c.peek;
-  say.textContent=sayTxt(doneN);});
+  pk.textContent=c.peek;});
 r.querySelectorAll('#l15bk button').forEach(function(b){b.addEventListener('click',function(){
   r.querySelectorAll('#l15bk button').forEach(function(y){y.classList.toggle('on',y===b);});
   render(b.dataset.b);});});

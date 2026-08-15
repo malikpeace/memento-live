@@ -146,10 +146,10 @@
   <div class="p6">
     <p class="day">Tuesday, day 12</p>
     <p class="say">Message <b class="n">5</b> <span class="uw">clients</span> today</p>
-    <!-- PROVENANCE: the only consequence Memento can state is the count. 47 is the sum of
-         the messages they logged, 100 is the countable target their own plan named. Memento
-         cannot turn a message into money, so no money is projected here. -->
-    <p class="sub">About <b class="t">15 min</b>, and <b class="r">52</b> of the 100 reached by tonight.</p>
+    <!-- PROVENANCE: the only clock here is the real one, and the length is the plan's own
+         estimate at about 3 min a client. Nothing on an Action screen says how the goal
+         is going: that is Clarity's face, one swipe away. -->
+    <p class="sub">About <b class="t">15 min</b>, done about <b class="fin">4:45 pm</b>.</p>
 
     <div class="col">
       <div class="meter">
@@ -181,7 +181,7 @@
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. Takes you to <b>52</b> of 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>, done about <b>4:45 pm</b>.</p>
       <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the three</button>
     </div>
@@ -213,16 +213,16 @@
       <div class="prow" data-i="0"><span class="pn">A light day</span><span class="pv">2, about 6 min</span></div>
       <div class="prow" data-i="1"><span class="pn">Your usual day</span><span class="pv">5, about 15 min</span></div>
       <div class="prow" data-i="2"><span class="pn">A heavy day</span><span class="pv">9, about 27 min</span></div>
-      <p class="tail"><b class="r">52</b> of the 100 reached after today. Yesterday you logged 3.</p>
+      <p class="tail">Today&#8217;s size is done about <b class="fin">4:45 pm</b>. Yesterday you logged 3.</p>
     </div>
   </div>
 </div>
 
 <script>(function(){
   var root=document.querySelector('[data-k="mx-6"]');
-  /* REACHED = the sum of every message they have logged. TARGET = the countable target
-     their own plan named. Everything priced below is arithmetic on those two numbers. */
-  var REACHED=47, TARGET=100;
+  /* An Action screen prices TODAY and nothing else. The clock is the real one, the length
+     is the plan's own estimate. Where the goal stands lives on Clarity's face. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
   var TIER=[{n:2,nm:'A light day',t:'about 6 min'},
             {n:5,nm:'Your usual day',t:'about 15 min'},
             {n:9,nm:'A heavy day',t:'about 27 min'}];
@@ -230,7 +230,9 @@
   var i=1, fine=false, fn=5, v=REST[1], timer=null, held=false;
 
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0 ? (m/60)+' hr' : Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  function reached(n){ return Math.min(TARGET,REACHED+n); }
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function unit(n){ return n===1?'client':'clients'; }
 
   var fillEl=root.querySelector('.fill'), hfillEl=root.querySelector('.hfill');
@@ -254,12 +256,12 @@
     Array.prototype.forEach.call(root.querySelectorAll('.n'),function(e){e.textContent=n;});
     Array.prototype.forEach.call(root.querySelectorAll('.uw'),function(e){e.textContent=unit(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.t'),function(e){e.textContent=mins(n);});
-    Array.prototype.forEach.call(root.querySelectorAll('.r'),function(e){e.textContent=reached(n);});
+    Array.prototype.forEach.call(root.querySelectorAll('.fin'),function(e){e.textContent=fin(n);});
     Array.prototype.forEach.call(root.querySelectorAll('.fcn'),function(e){e.textContent=fn;});
     Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. Takes you to <b>'+reached(fn)+'</b> of '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>, done about <b>'+fin(fn)+'</b>.';
     Array.prototype.forEach.call(root.querySelectorAll('.rung'),function(e){
       e.classList.toggle('on',!fine&&+e.dataset.i===i); });
     Array.prototype.forEach.call(root.querySelectorAll('.prow'),function(e){

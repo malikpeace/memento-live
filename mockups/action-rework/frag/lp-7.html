@@ -27,20 +27,35 @@
      BEAUTY PASS (2026-08-13). Two things read instantly here, the hour and the
      bars, and they were fighting: eight near-white bars out-shouted the numeral
      that is supposed to be the subject.
-     WEIGHT: the bars drop to .58 ink over the ceiling and .14 under, so the
-     over/under split still reads across the room while the hour keeps the
-     screen. They also grow off a floor now (top corners round, bottom nearly
-     square) instead of floating as capsules.
+     WEIGHT: the bars drop off full ink so the hour keeps the screen (the
+     over/under split that set their weight is gone, see the tightened rule
+     below; they are one weight now). They also grow off a floor (top corners
+     round, bottom nearly square) instead of floating as capsules.
      CUT: the "Pick a time" line. A drag affordance does not need a caption, so
      the chevron moved inline beside the hour, which is where the gesture is,
      and the screen loses one more small phrase.
      HOLD: unified with the rest of the set, 58px glass slab, 1400ms, green
      fill on completion. The mix-blend-mode:difference label is gone with it,
      and the label now SAYS "Hold to confirm" like every other completion in
-     the set instead of reading like a tap. -->
+     the set instead of reading like a tap.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY. Nothing on it may read the record against
+     the goal.
+     CUT: the over / under split on the bars. A night going bright because
+     their logged put-away was later than the ceiling is a verdict on that
+     night, and seven of them side by side is a verdict on the week, which is
+     Consistency's face wearing Action's clothes. The bars are now one weight,
+     on one scale across the week and nothing else: it is the record of what
+     they typed, at a size you can see, with no line drawn across it.
+     KEPT: the hour, which is today's size and the whole point of the screen,
+     the pen that writes tonight's number, and the tap that reads a bar back
+     in their own words. -->
 <style>
 [data-k=lp-7] .ph{font-variant-numeric:tabular-nums}
-[data-k=lp-7] .w{position:absolute;inset:0;padding:26px 20px 20px;display:flex;flex-direction:column}
+/* 34px of top padding clears the Dynamic Island: at 26 the statement's box
+   ran under it */
+[data-k=lp-7] .w{position:absolute;inset:0;padding:34px 20px 20px;display:flex;flex-direction:column}
 
 /* --- the action sentence, landing on the hour --------------------------- */
 [data-k=lp-7] .say{margin:0;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.2;
@@ -75,12 +90,11 @@
   display:flex;flex-direction:column;font-family:var(--font);-webkit-tap-highlight-color:transparent}
 [data-k=lp-7] .chart .c:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:6px}
 [data-k=lp-7] .chart .bw{flex:1 1 auto;min-height:0;display:flex;align-items:flex-end}
-/* bars grow off a floor: round at the top, nearly square where they sit */
-/* under the ceiling reads at .22: at .14 the good nights were nearly invisible
-   on a phone, which made the week look half empty instead of half quiet */
-[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.22);
+/* bars grow off a floor: round at the top, nearly square where they sit.
+   ONE weight for every night: length is the number they typed, on one scale
+   across the week, and no night is judged against the hour */
+[data-k=lp-7] .chart .b{width:100%;min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(var(--ink),.40);
   transition:height .34s cubic-bezier(.2,.8,.25,1),background .2s ease-out,box-shadow .2s ease-out}
-[data-k=lp-7] .chart .c.over .b{background:rgba(var(--ink),.58)}
 [data-k=lp-7] .chart .c.empty .b{background:none;box-shadow:inset 0 0 0 1px rgba(var(--ink),.13)}
 [data-k=lp-7] .chart .dy{margin:7px 0 0;font-size:9.5px;line-height:1;letter-spacing:-.01em;
   color:rgba(var(--ink),.80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -128,7 +142,7 @@
 [data-k=lp-7] .go.on .tx{font-weight:700;color:rgba(var(--ink),.97)}
 @media (prefers-reduced-motion:reduce){[data-k=lp-7] *{transition:none!important}}
 </style>
-<h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the week is a bar chart of the minutes they typed off their own Screen Time report: bad nights are simply taller, and the ones past the hour go bright.</p>
+<h3>Ceiling</h3><p class="cap">One sentence lands on a poster-scale hour you drag like a reel, and under it the nights they typed off their own Screen Time report stand as bars at their own size, one weight, nothing drawn across them: a long night is simply taller.</p>
 <div class="bk"><i>Screen time</i></div>
 <div class="ph">
   <div class="grid"></div>
@@ -195,7 +209,7 @@ function paint(){
     var c=cells[i],b=c.querySelector('.b'),empty=n.m===null;
     c.classList.toggle('empty',empty);
     c.classList.toggle('now',n===today);
-    c.classList.toggle('over',!empty&&n.t!==null&&n.t>v);
+    /* no over / under class: the hour is today's size, not a verdict on the week */
     b.style.height=(empty?100:Math.max(2,Math.round(1000*n.m/mx)/10))+'%';
     c.querySelector('.dy').textContent=n.d;
     c.setAttribute('aria-label',(n===today?'Today':n.d)+', '+(empty?'not entered yet'

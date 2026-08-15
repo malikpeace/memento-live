@@ -22,8 +22,10 @@
 [data-k=ld-4] .head.gone h4{opacity:0}
 [data-k=ld-4] .clk{margin:0;font-size:13px;line-height:1.25;font-weight:500;color:rgba(var(--ink),.78);
   font-variant-numeric:tabular-nums;letter-spacing:.01em}
-[data-k=ld-4] .state{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:rgba(var(--ink),.9);
-  transition:opacity .45s ease}
+/* the box is reserved at two lines so the longer wait line can arrive without
+   shoving the fact under it up the screen mid-fade */
+[data-k=ld-4] .state{margin:8px 0 0;min-height:37px;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.9);transition:opacity .45s ease}
 [data-k=ld-4] .state.swap,[data-k=ld-4] .state.gone{opacity:0}
 
 /* the fact: one at a time, held, never crowded */
@@ -125,8 +127,8 @@
      t:'You message past customers. You said it is not consistent.'}
   ];
   var HOLD=6000, STATES=['This usually takes about 30 seconds.',
-                         'Still writing. This one is taking longer.',
-                         'Still writing.'];
+                         'Still creating. This one is taking longer. You have big plans lol',
+                         'Still creating.'];
 
   var timers=[], t0=0, tick=null, pass=0, idx=0, longer=false, done=false;
   function clear(){ timers.forEach(clearTimeout); timers=[]; }

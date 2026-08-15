@@ -119,14 +119,14 @@
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them new to you.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and last week's follow ups.</p>
-        <p class="why">About half an hour. 56 of the 100 reached, five days sooner to the end.</p>
+        <p class="why">Half an hour of writing. Give it its own block.</p>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
@@ -149,7 +149,7 @@
         <div class="fv"><b class="fn">5</b><span class="funit">clients</span></div>
         <button type="button" class="fup">+</button>
       </div>
-      <p class="fmeta">About <b>15 min</b>. <b>52</b> of the 100 reached.</p>
+      <p class="fmeta">About <b>15 min</b>, done about <b>4:45 pm</b>.</p>
       <button class="cta usefine" type="button"><span class="ink"></span><span class="lb">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span><span class="lb2" aria-hidden="true">Hold to start <span class="fcn">5</span> <span class="fcu">clients</span></span></button>
       <button class="quiet closefine" type="button">Back to the five sentences</button>
     </div>
@@ -181,14 +181,14 @@
         <div class="hd"><span class="nm">Your usual day</span><span class="pr">5 clients, about 15 min</span></div>
         <p class="pre">Message 5 clients.</p>
         <p class="s">Message 5 clients, two of them people you have not written to before.</p>
-        <p class="why">The size you have logged most often. 52 of the 100 people reached by tonight.</p>
+        <p class="why">The size you have logged most often.</p>
       </div>
       <div class="opt" data-i="3">
         <span class="edge"></span>
         <div class="hd"><span class="nm">A heavy day</span><span class="pr">9 clients, about 27 min</span></div>
         <p class="pre">Message 9 clients.</p>
         <p class="s">Message 9 clients, and follow up on last week's.</p>
-        <p class="why">56 of the 100 reached, and the list finishes about five days sooner.</p>
+        <p class="why">Half an hour of writing. Give it its own block.</p>
       </div>
       <div class="opt" data-i="4">
         <span class="edge"></span>
@@ -211,10 +211,12 @@
   var i=2, fine=false, fn=5;
   function unit(n){ return n===1?'client':'clients'; }
   function mins(n){ var m=n*3; return m>=60 ? (m%60===0?(m/60)+' hr':Math.floor(m/60)+' hr '+(m%60)+' min') : m+' min'; }
-  /* PROVENANCE: 47 reached is the sum of the messages they logged, 100 is the countable
-     target their own plan named. No money is projected from a message count. */
-  var REACHED=47, TARGET=100;
-  function reached(n){ return Math.min(TARGET,REACHED+n); }
+  /* PROVENANCE: the clock is the real one, the length is the plan's own estimate at about
+     3 min a client. An Action screen prices TODAY: how the goal is going is Clarity's face. */
+  var _now=new Date(), BASE=Math.floor((_now.getHours()*60+_now.getMinutes())/5)*5;
+  function clock(m){ var h=Math.floor(m/60)%24,mm=m%60,ap=h>=12?'pm':'am',hh=h%12||12;
+    return hh+':'+(mm<10?'0':'')+mm+' '+ap; }
+  function fin(n){ return clock(BASE+n*3); }
   function paint(){
     var n=fine?fn:N[i];
     Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
@@ -225,7 +227,7 @@
     Array.prototype.forEach.call(root.querySelectorAll('.fcu'),function(e){e.textContent=unit(fn);});
     root.querySelector('.fn').textContent=fn;
     root.querySelector('.funit').textContent=unit(fn);
-    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>. <b>'+reached(fn)+'</b> of the '+TARGET+' reached.';
+    root.querySelector('.fmeta').innerHTML='About <b>'+mins(fn)+'</b>, done about <b>'+fin(fn)+'</b>.';
   }
   Array.prototype.forEach.call(root.querySelectorAll('.opt'),function(o){
     o.addEventListener('click',function(){ fine=false; i=+o.dataset.i; paint(); });

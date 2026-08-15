@@ -22,7 +22,20 @@
      RULED, NOT BOXED: every number sits ON a hairline rule instead of inside a
      chip, which is what makes it read as a book instead of a spreadsheet.
      GESTURE LAW: writing the day in is a completion, so it is a hold now,
-     1400ms, early release aborts. -->
+     1400ms, early release aborts.
+
+     TIGHTENED RULE (Malik, 2026-08-15). "It is showing too much information."
+     An Action screen shows TODAY, never how far along the journey they are.
+     CUT the consequence line under the sizes: "the plan reckons about half a
+     pound a week off" is a projection, which is a reading of the goal, which
+     is Clarity's face. The size chips still make their consequence legible the
+     only way Action is allowed to, by changing the move sentence itself
+     (20 minutes walking / 60 minutes walking, no bread, no late snack).
+     What is left on the page: the row to write today's number on, today's
+     move, and the days already written. No goal, no target, no rate, no
+     distance. The room the projection gave back went to the book, which now
+     runs ten days deep instead of eight, so the ruled pages reach the foot of
+     the page and the open row keeps its air. -->
 <style>
 [data-k=lp-9] .ph{font-variant-numeric:tabular-nums}
 
@@ -58,7 +71,9 @@
 [data-k=lp-9] .done .open{cursor:default}
 
 /* --- the one instruction sentence, and the dial under it ----------------- */
-[data-k=lp-9] .act{margin:20px 0 0;font-size:16px;font-weight:700;line-height:1.32;letter-spacing:-.018em;
+/* nothing sits under the dial: the move sentence IS the consequence of the
+   size, and a rate ("half a pound a week off") would be a reading of the goal */
+[data-k=lp-9] .act{margin:22px 0 0;font-size:16px;font-weight:700;line-height:1.32;letter-spacing:-.018em;
   color:rgba(var(--ink),.97);min-height:42px}
 [data-k=lp-9] .seg{display:flex;gap:3px;margin:12px 0 0;padding:3px;border-radius:12px;background:rgba(var(--ink),.055)}
 [data-k=lp-9] .seg button{flex:1;font:500 12.5px var(--font);color:rgba(var(--ink),.90);background:transparent;border:0;
@@ -67,10 +82,9 @@
 [data-k=lp-9] .seg button.on{background:rgba(var(--ink),.13);color:rgba(var(--ink),.97);font-weight:700;
   box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
 [data-k=lp-9] .seg.lock button{cursor:default}
-[data-k=lp-9] .cons{margin:11px 0 0;font-size:12px;line-height:1.45;color:rgba(var(--ink),.90);min-height:35px}
 
 /* --- the completion: a hold, like every completion in the set ------------ */
-[data-k=lp-9] .hold{position:relative;height:58px;margin:14px 0 0;border-radius:14px;overflow:hidden;
+[data-k=lp-9] .hold{position:relative;height:58px;margin:16px 0 0;border-radius:14px;overflow:hidden;
   background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);
   cursor:default;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
   transition:background .28s ease-out,box-shadow .28s ease-out}
@@ -89,7 +103,7 @@
 /* --- the pages already written: ruled, never boxed ---------------------- */
 [data-k=lp-9] .past{margin:auto 0 0;padding-top:16px}
 /* same 12px inset as the open row, so every column in the book lines up */
-[data-k=lp-9] .past .rw{height:32px;padding:0 12px;align-items:center;
+[data-k=lp-9] .past .rw{height:30px;padding:0 12px;align-items:center;
   box-shadow:inset 0 -1px 0 rgba(var(--ink),.07)}
 [data-k=lp-9] .past .rw:last-child{box-shadow:none}
 [data-k=lp-9] .past .d{font-size:12.5px;color:rgba(var(--ink),.90)}
@@ -119,7 +133,6 @@
 
     <p class="act" id="l9act"></p>
     <div class="seg" id="l9seg" role="group" aria-label="how big today"></div>
-    <p class="cons" id="l9cons"></p>
 
     <div class="hold" id="l9hold" role="button" tabindex="0" aria-disabled="true">
       <span class="fl"></span>
@@ -133,34 +146,29 @@
 
 /* Two directions, one book. The days before today are the only raw numbers in
    either context, and the only arithmetic on them is yesterday's change. No
-   target lives here: what the numbers mean against the goal is Clarity's job. */
+   target lives here, and no rate either: what the numbers mean against the
+   goal, and how fast it is going, are both Clarity's face. */
 var CTX={
   down:{
-    H:[244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
+    H:[245.1,244.8,244.6,244.2,244.5,243.9,244.1,243.6,243.4,243.0,243.2,242.5,242.8,242.2],
     acts:[
-      {t:'Light',a:'20 minutes walking.',
-       c:'Holds you about where you are. Some days that is the work.'},
-      {t:'Steady',a:'40 minutes walking. No bread with dinner.',
-       c:'At this size the plan reckons about half a pound a week off.'},
-      {t:'Hard',a:'60 minutes walking. No bread, no late snack.',
-       c:'At this size the plan reckons closer to a pound a week off, as long as you sleep tonight.'}
+      {t:'Light',a:'20 minutes walking.'},
+      {t:'Steady',a:'40 minutes walking. No bread with dinner.'},
+      {t:'Hard',a:'60 minutes walking. No bread, no late snack.'}
     ],pick:1
   },
   up:{
-    H:[148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
+    H:[148.2,148.5,148.6,149.0,148.8,149.6,150.2,150.0,150.6,151.0,150.7,151.4,151.8,151.6],
     acts:[
-      {t:'Light',a:'Three full meals. No skipped lunch.',
-       c:'Holds you about where you are. Some days that is the work.'},
-      {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.',
-       c:'At this size the plan reckons about half a pound a week on.'},
-      {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.',
-       c:'At this size the plan reckons closer to a pound a week on, as long as you sleep tonight.'}
+      {t:'Light',a:'Three full meals. No skipped lunch.'},
+      {t:'Steady',a:'Three meals and a shake. Push session, 45 minutes.'},
+      {t:'Hard',a:'Four meals, two shakes. Heavy session, 60 minutes.'}
     ],pick:1
   }
 };
-var DAYS=['Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
+var DAYS=['Sat 1','Sun 2','Mon 3','Tue 4','Wed 5','Thu 6','Fri 7','Sat 8','Sun 9','Mon 10'],ROWS=DAYS.length;
 
-var act=r.querySelector('#l9act'),cons=r.querySelector('#l9cons'),seg=r.querySelector('#l9seg'),
+var act=r.querySelector('#l9act'),seg=r.querySelector('#l9seg'),
     book=r.querySelector('#l9book'),slot=r.querySelector('#l9slot'),inp=r.querySelector('#l9in'),
     hold=r.querySelector('#l9hold'),fl=hold.querySelector('.fl'),lab=r.querySelector('#l9lab'),
     past=r.querySelector('#l9past'),
@@ -181,7 +189,7 @@ function drawSeg(){
       if(written)return;
       [].forEach.call(seg.children,function(z){z.classList.remove('on');z.setAttribute('aria-pressed','false')});
       b.classList.add('on');b.setAttribute('aria-pressed','true');
-      pick=i;act.textContent=o.a;cons.textContent=o.c;
+      pick=i;act.textContent=o.a;
     });
     seg.appendChild(b);
   });
@@ -227,7 +235,6 @@ function write(){
   fl.style.transition='width .24s ease-out';fl.style.width='0';
   var d=v-C.H[C.H.length-1];
   lab.textContent='Written in';
-  cons.textContent='Tomorrow opens a new row at midnight.';
   past.insertBefore(row('Today',r1(v),sgn(d),true),past.firstElementChild);
   past.removeChild(past.lastElementChild);
 }
@@ -244,7 +251,7 @@ function render(key){
   clearTimeout(ht);ht=null;fl.style.transition='none';fl.style.width='0';
   hold.classList.remove('rdy');hold.setAttribute('aria-disabled','true');
   lab.textContent="Write today's weight first";
-  act.textContent=C.acts[pick].a;cons.textContent=C.acts[pick].c;
+  act.textContent=C.acts[pick].a;
   drawSeg();drawPast();
 }
 r.querySelectorAll('.bk button').forEach(function(b){
