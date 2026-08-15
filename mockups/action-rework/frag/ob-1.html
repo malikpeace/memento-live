@@ -45,16 +45,18 @@
 [data-k=ob-1] .o1-z:focus-visible{outline:2px solid rgba(var(--ink),.5);outline-offset:6px;border-radius:6px}
 [data-k=ob-1] .o1-z:active{transform:translateY(1.5px)}
 [data-k=ob-1] .o1-z>*{transition:text-shadow .3s ease-out,color .3s ease-out,opacity .32s ease-out,filter .32s ease-out}
-/* unconfirmed facts rest dim AND out of focus: pressing pulls the words into the light and into focus.
-   (deliberate interaction state, not resting body copy) */
-   BEAUTY PASS 2: the resting state was .40 + .9px blur, which made the whole
-   first screen read out of focus on arrival. It now rests legible (.58 + .5px)
-   and the press still buys a real step into full light. */
-[data-k=ob-1] .o1-z:not(.set)>*{opacity:.58;filter:blur(.5px)}
+/* Unconfirmed facts rest DIM: pressing pulls the words into the light. This is a
+   deliberate interaction state, not resting body copy, so the dim/lit gap has to be
+   unmistakable at a glance or the screen looks like everything is already confirmed.
+   (A beauty pass raised the rest state to .58 to stop it "arriving blurry" and left a
+   broken comment here, which killed this rule outright and lit every line. Malik caught
+   it. The fix: the blur is what read as broken, so it is nearly gone; the OPACITY now
+   carries the whole signal, .42 to 1.) */
+[data-k=ob-1] .o1-z:not(.set)>*{opacity:.42;filter:blur(.2px)}
 /* the smallest line cannot afford the full dim, or the date stops being readable at all */
-[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.66;filter:blur(.35px)}
+[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.5;filter:blur(.15px)}
 [data-k=ob-1] .o1-z.set>*{opacity:1;filter:none}
-@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.78;filter:blur(.25px)}}
+@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.62;filter:none}}
 [data-k=ob-1] .o1-z.o1-so{margin-top:30px}
 /* the zone owns the gap, not its first line, so the mark can sit on that first line */
 [data-k=ob-1] .o1-z.o1-zw{margin-top:20px}
