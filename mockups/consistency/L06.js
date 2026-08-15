@@ -1,14 +1,15 @@
 /* ============================================================
    L06, SHAPE-ADAPTIVE.
-   Same bones for every goal, a different lead and a different proof block.
-   The lens: the number that matters depends on the kind of goal, and the
-   page says how the goal is judged in plain words, without narrating its
-   own layout back at the user.
+   Same bones for every goal, a different PATTERN lead and a different proof
+   block. The lens: which part of the pattern matters depends on the kind of
+   goal. This page never says where the goal stands or how far is left, that
+   belongs to Clarity. Here it is only actions taken, days shown up, weeks
+   kept, time given, the record.
 
-     lead   : the one number this shape actually earns
-     proof  : a block built for this shape only (weeks / hold / runway /
-              distance / time), carrying the one sentence that explains
-              how this kind of goal is judged
+     lead   : the one pattern number this shape actually earns
+     proof  : a block built for this shape only (weeks / hold / months of
+              days banked / months of time), carrying the one sentence that
+              explains how this kind of goal is kept
      ledger : three quiet rows, never repeating the lead or the proof
      record : the heatmap, universal, never changes
      rhythm : which days you actually show up (gated on real data)
@@ -58,7 +59,7 @@
       'color:var(--text-lo);font-variant-numeric:tabular-nums}' +
     '.L06-wd{display:grid;gap:5px;margin-top:9px;font-size:11.5px;color:var(--text-lo);text-align:center}' +
 
-    /* ---- proof: bars (hold, runway, distance, time) ---- */
+    /* ---- proof: bars (hold, months of days, months of time) ---- */
     '.L06-bar{height:9px;border-radius:5px;background:rgba(var(--ink),.07);overflow:hidden}' +
     '.L06-bar i{display:block;height:100%;border-radius:5px;background:rgba(var(--accent-rgb),.62)}' +
     '.L06-bar i.dim{background:rgba(var(--ink),.26)}' +
@@ -98,7 +99,6 @@
     var h = min / 60, v = h < 10 ? Math.round(h * 10) / 10 : Math.round(h);
     return (v < 10 ? one(v) : nf(v)) + plural(v, ' hour', ' hours');
   }
-  function cap(t) { t = String(t == null ? '' : t); return t ? t.charAt(0).toUpperCase() + t.slice(1) : ''; }
   function row(l, v) { return '<div class="L06-r"><span>' + l + '</span><b>' + v + '</b></div>'; }
   function sec(h, body, note) {
     return '<div class="L06-sec"><div class="L06-h">' + h + '</div>' + body +
@@ -111,15 +111,13 @@
 
   W.CLAY['L06'] = {
     name: 'Shape-adaptive',
-    note: 'The page reorganizes per goal shape: a rate leads with sessions a week against the target, a held line leads with the unbroken stretch, an event leads with days banked, an open goal leads with time given, and the two quantity shapes lead with days shown up, the honest number under the number. Every block is gated on having something to say. When a chart would only redraw the lead (a first stretch, a first month), it is replaced by one sentence. Cut in this pass: the month chart the record already showed, the support panel that belonged to other modules, and every stat visible in the chart beside it.',
+    note: 'The page adapts the PATTERN lead per goal shape, never the goal\'s state. A rate leads with sessions a week against the cadence it chose, a held line leads with the unbroken stretch, an event leads with days of work banked, an open goal leads with time given, and the two quantity shapes lead with days shown up. Where the goal stands and how far is left belong to Clarity and are gone from here. Every block is gated on having something to say, and when a chart would only redraw the lead it is replaced by one sentence.',
     render: function (ctx) {
       ctx = ctx || {};
       var K = ctx.K || W.CKit || {};
       var log = (ctx.log && ctx.log.length) ? ctx.log : [];
       var s = ctx.s || {};
       var shape = ctx.shape || 'open';
-      var SHAPES = K.SHAPES || {};
-      var S = SHAPES[shape] || {};
       var MON = K.MON || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       var WD = K.WD || ['S','M','T','W','T','F','S'];
       var WDF = K.WDF || ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -158,6 +156,18 @@
         var k = d.date.getDay(); seenDow[k]++; if (d.on) byDow[k]++;
       });
 
+      /* the record grouped into months, so a shape can chart its own pattern */
+      function months(valueOf) {
+        var seen = {}, order = [];
+        log.forEach(function (d) {
+          if (!d || !d.date || typeof d.date.getMonth !== 'function') return;
+          var k = d.date.getFullYear() + '-' + d.date.getMonth();
+          if (!seen[k]) { seen[k] = { label: MON[d.date.getMonth()], v: 0 }; order.push(k); }
+          seen[k].v += num(valueOf(d));
+        });
+        return order.slice(-6).map(function (k) { return seen[k]; });
+      }
+
       /* ---------------- 1. THE LEAD (the shape decides the number) ---------------- */
       var lead;
 
@@ -167,7 +177,7 @@
           var onW = Math.max(0, Math.round(num(lastWeek ? lastWeek.on : total)));
           lead = onW >= cadence
             ? { pre: 'This week you have done', n: nf(onW), suf: '',
-                post: plural(onW, 'session', 'sessions') + ', past your target of ' + nf(cadence) + '.' }
+                post: plural(onW, 'session', 'sessions') + ', on a cadence of ' + nf(cadence) + ' a week.' }
             : { pre: 'This week you are at', n: nf(onW), suf: 'of ' + nf(cadence),
                 post: 'sessions. The week is still open.' };
         } else {
@@ -193,7 +203,7 @@
           pre: 'You have banked',
           n: nf(total),
           suf: '',
-          post: plural(total, 'day', 'days') + ' of work for ' + (S.unit || 'the day it happens') + '.'
+          post: plural(total, 'day', 'days') + ' of work' + (N > 1 ? ' since you started.' : ' so far.')
         };
       } else if (shape === 'open') {
         var showMin = minutes < 60;
@@ -225,7 +235,7 @@
         '<div class="L06-say">' + lead.post + '</div>';
 
       /* ---------------- 2. THE PROOF BLOCK (built for this shape only) ----------------
-         Its note carries the one sentence that says how this kind of goal is judged.
+         Its note carries the one sentence that says how this kind of goal is kept.
          When the chart would only redraw the lead, the sentence stands alone. */
       var proof = '';
 
@@ -274,57 +284,43 @@
         }
 
       } else if (shape === 'milestone') {
-        var left = Math.max(0, Math.round(S.dueIn == null ? 74 : num(S.dueIn)));
-        var tp = pct(N, N + left);
-        proof = sec('The runway',
-          '<div class="L06-lead2"><b>' +
-            (left === 0 ? 'Today' : nf(left) + '<em>' + plural(left, 'day to go', 'days to go') + '</em>') +
-          '</b><span>' + tp + '% of the way</span></div>' +
-          bar(tp) +
-          '<div class="L06-ends"><span>Day ' + nf(N) + '</span><span>' + cap(S.unit || 'the day') + '</span></div>',
-          'This one lands on a date. What counts is the work banked before it arrives.');
+        var mb = months(function (d) { return d.on ? 1 : 0; });
+        if (mb.length < 2) {
+          proof = '<div class="L06-lede">Work for this one banks up day by day. The count is the whole of it.</div>';
+        } else {
+          var mxb = 1; mb.forEach(function (b) { if (b.v > mxb) mxb = b.v; });
+          proof = sec('Days banked by month',
+            '<div class="L06-rows">' + mb.map(function (b) {
+              return brow(b.label, pct(b.v, mxb), days(b.v));
+            }).join('') + '</div>',
+            'Work for this one banks up day by day. The count is the whole of it.');
+        }
 
       } else if (shape === 'open') {
-        var seen = {}, order = [];
-        log.forEach(function (d) {
-          if (!d || !d.date || typeof d.date.getMonth !== 'function') return;
-          var k = d.date.getFullYear() + '-' + d.date.getMonth();
-          if (!seen[k]) { seen[k] = { label: MON[d.date.getMonth()], min: 0 }; order.push(k); }
-          seen[k].min += Math.max(0, num(d.minutes));
-        });
-        var buckets = order.slice(-6).map(function (k) { return seen[k]; });
+        var buckets = months(function (d) { return Math.max(0, num(d.minutes)); });
         if (buckets.length < 2) {
-          proof = '<div class="L06-lede">This goal has no number to hit, so the time you give it is the measure.</div>';
+          proof = '<div class="L06-lede">This one has no set finish, so the time you give it is the measure.</div>';
         } else {
-          var mxm = 1; buckets.forEach(function (b) { if (b.min > mxm) mxm = b.min; });
+          var mxm = 1; buckets.forEach(function (b) { if (b.v > mxm) mxm = b.v; });
           proof = sec('The time you gave',
             '<div class="L06-rows">' + buckets.map(function (b) {
-              return brow(b.label, pct(b.min, mxm), dur(b.min));
+              return brow(b.label, pct(b.v, mxm), dur(b.v));
             }).join('') + '</div>',
-            'This goal has no number to hit, so the time you give it is the measure.');
+            'This one has no set finish, so the time you give it is the measure.');
         }
 
       } else {
-        var at = Math.round(num(S.at)), tgt = Math.round(num(S.target));
-        var down = shape === 'quantity_down';
-        var knownFrom = S.from != null;
-        var from = knownFrom ? Math.round(num(S.from)) : 0;
-        var unit = S.unit || '', uSp = unit ? ' ' + unit : '';
-        var moved = down ? from - at : at;
-        var span = down ? from - tgt : tgt;
-        var p = span > 0 ? pct(moved, span) : 0;
-        var togo = down ? Math.max(0, at - tgt) : Math.max(0, tgt - at);
-        var story = down
-          ? (moved > 0 ? 'Down ' + nf(moved) + uSp + ' since you started, ' + nf(togo) + ' to go.'
-                       : 'Back where you started, ' + nf(togo) + uSp + ' to go.')
-          : nf(at) + uSp + ' so far, ' + nf(togo) + ' to go.';
-        proof = sec('The number',
-          '<div class="L06-lead2"><b>' + nf(at) + '<em>' + (unit ? unit + ' now' : 'now') + '</em></b>' +
-            '<span>' + p + '% of the way</span></div>' +
-          bar(p) +
-          '<div class="L06-ends"><span>' + (knownFrom ? 'Started at ' + nf(from) : '0') + '</span>' +
-            '<span>Goal ' + nf(tgt) + uSp + '</span></div>',
-          story + ' The days under it are the part you control.');
+        var qb = months(function (d) { return d.on ? 1 : 0; });
+        if (qb.length < 2) {
+          proof = '<div class="L06-lede">The days are the part you control, so the days are what this page keeps.</div>';
+        } else {
+          var mxq = 1; qb.forEach(function (b) { if (b.v > mxq) mxq = b.v; });
+          proof = sec('Days you showed up, by month',
+            '<div class="L06-rows">' + qb.map(function (b) {
+              return brow(b.label, pct(b.v, mxq), days(b.v));
+            }).join('') + '</div>',
+            'The days are the part you control, so the days are what this page keeps.');
+        }
       }
 
       /* ---------------- 3. THE LEDGER (three quiet rows, never the lead again) ------
@@ -364,7 +360,7 @@
       var recNote = log.length < 7 ? '' : ({
         frequency: 'Every filled square is a session.',
         maintenance: 'A blank square is a break in the line, and it stays on the record.',
-        milestone: 'Every filled square is a day banked before the date.',
+        milestone: 'Every filled square is a day of work banked.',
         open: 'Every filled square is a day you gave it time.'
       }[shape] || 'Every filled square is a day you showed up.');
 

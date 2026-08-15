@@ -6,7 +6,10 @@
      1. How much have I actually done?        -> the hero
      2. Am I doing it lately, more or less?   -> one same-length comparison
      3. What does the record honestly look like? -> the heatmap
-   Then one quiet last line for where the goal itself stands.
+   Then one quiet last line for the rhythm underneath all of it.
+
+   Nothing here says where the goal stands. Distance to the target belongs to
+   Clarity; this page is the pattern of the person, not the state of the goal.
 
    ONE composition, repeated three times at three sizes:
      a quiet lead-in, a number, a quiet consequence.
@@ -70,29 +73,42 @@
       '</div>';
   }
 
-  /* The only shape branching on the page: one closing line.
-     Rules for every shape: the lead-in names what this goal actually is, <b>
-     holds a bare number, <i> holds the words, and the line never repeats a
-     number already printed further up the page. */
+  /* longest run of consecutive on days, read off the log */
+  function bestRun(log, C) {
+    var best = 0, run = 0;
+    for (var i = 0; i < C; i++) {
+      if (log[i] && log[i].on) { run++; if (run > best) best = run; } else run = 0;
+    }
+    return best;
+  }
+
+  /* The only shape branching on the page: one closing line, and it is always a
+     line about the pattern, never about the goal's remaining distance.
+     Rules for every shape: the lead-in names what the line measures, <b> holds
+     a bare number, <i> holds the words, and the line never repeats a number
+     already printed further up the page. */
   function goalBlock(shape, s, K, N, log, C) {
-    var S = (K && K.SHAPES && K.SHAPES[shape]) || null;
     var lead = '', v = '', sub = '';
 
-    if (shape === 'quantity_up' && S) {
-      var at = fin(S.at) ? S.at : 0, target = fin(S.target) ? S.target : 0;
-      var pct = target > 0 ? Math.round(100 * at / target) : 0;
-      lead = 'Where the number stands';
-      v = '<b>' + num(at) + '</b><i>of ' + num(target) + ' ' + (S.unit || '') + '</i>';
-      sub = pct >= 100 ? 'You are there.' : pct + '% of the way there.';
-
-    } else if (shape === 'quantity_down' && S) {
-      var from = fin(S.from) ? S.from : 0, now = fin(S.at) ? S.at : 0, tgt = fin(S.target) ? S.target : 0;
-      var down = from - now, left = now - tgt;
-      lead = 'Where the number stands';
-      v = '<b>' + num(down) + '</b><i>' + (S.unit || '') + ' down so far</i>';
-      sub = left > 0 ? num(left) + ' ' + (S.unit || '') + ' left to go.'
-          : left === 0 ? 'You are at the target.'
-          : num(-left) + ' ' + (S.unit || '') + ' past the target.';
+    if (shape === 'quantity_up' || shape === 'quantity_down' || shape === 'milestone') {
+      /* The counting shapes get the same closing line: the rhythm underneath
+         the work. A weekly rate is a decimal, so it can never collide with the
+         whole day counts printed above it. */
+      var qDays = Math.min(28, C);
+      var qBest = bestRun(log, C);
+      lead = 'The rhythm underneath it';
+      if (qDays > 0 && qDays < 7) {
+        v = '<b>' + num(qBest) + '</b><i>' + plural(qBest, 'day') + ' in a row at your longest</i>';
+        sub = 'Your first week is still going.';
+      } else if (qDays > 0) {
+        var qRate = dec(onIn(log, C - qDays, C) / (qDays / 7));
+        v = '<b>' + qRate + '</b><i>' + (qRate === '1' ? 'day' : 'days') + ' a week lately</i>';
+        sub = (qDays >= 28 ? 'Averaged over your last four weeks. '
+             : 'Averaged over the ' + num(qDays) + ' days you have so far. ')
+             + 'Your longest run so far is ' + num(qBest) + ' ' + plural(qBest, 'day') + '.';
+      } else {
+        return '';
+      }
 
     } else if (shape === 'frequency') {
       /* Never printed as "5.5 of 4", which reads like a bug: the rate you set is
@@ -136,18 +152,6 @@
         : cur === 0 ? 'Today can start it again.'
         : 'This is the longest you have held it.';
 
-    } else if (shape === 'milestone' && S) {
-      var due = fin(S.dueIn) ? Math.round(S.dueIn) : 0;
-      var wks = Math.round(due / 7);
-      lead = 'What you are working toward';
-      v = due <= 0
-        ? '<b>' + (S.unit || 'the day') + '</b>'
-        : '<b>' + num(due) + '</b><i>' + plural(due, 'day') + ' until ' + (S.unit || 'the day') + '</i>';
-      sub = due <= 0 ? 'That day is here.'
-          : due < 7 ? 'Less than a week away.'
-          : wks <= 1 ? 'About a week away.'
-          : 'About ' + num(wks) + ' weeks away.';
-
     } else {
       return ''; /* open goals have no second number, so the page ends earlier */
     }
@@ -156,7 +160,7 @@
 
   W.CLAY['L01'] = {
     name: 'Calm zen minimum',
-    note: 'Ruthless subtraction: three blocks in one repeated composition (quiet lead-in, bare number, quiet consequence), hairlines and air instead of cards, green only in the record. Cuts current run and best run entirely (streak numbers survive only where the goal literally is a held line), swaps the rate percentage for a plain 30 against 30 day count, and drops every deep stat because none of them change what you do next. Each closing lead-in names the goal you actually set, the key under the record only explains the shades the record contains, and no number is ever printed twice.',
+    note: 'Ruthless subtraction: three blocks in one repeated composition (quiet lead-in, bare number, quiet consequence), hairlines and air instead of cards, green only in the record. Nothing on the page says where the goal stands; distance belongs to Clarity. Cuts current run and best run from the top (streak numbers survive only where the goal literally is a held line), swaps the rate percentage for a plain 30 against 30 day count, and closes on the rhythm underneath the work: days a week lately, the line you are holding, or the rate you are keeping. The key under the record only explains the shades the record contains, and no number is ever printed twice.',
     render: function (ctx) {
       var K = ctx.K, log = ctx.log || [], s = ctx.s || {}, shape = ctx.shape || 'open';
       var i, d;
@@ -226,7 +230,7 @@
           (legend ? '<div class="L01-cap">' + legend + '</div>' : '');
       }
 
-      /* 4. where the goal stands */
+      /* 4. the rhythm underneath the record */
       var goal = goalBlock(shape, s, K, N, log, C);
 
       return CSS + '<div class="L01-p">' + hero + lately + record + goal + '</div>';

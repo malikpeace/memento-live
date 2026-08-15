@@ -4,6 +4,9 @@
    alignment edges, one accent used only as data ink, a strict
    type ladder (72 / 22 / 16 / 13.5 / 12.5) and exactly two
    devices for the whole page: a ledger card and a grid of days.
+   The card answers one question only: what does the pattern look like
+   lately, next to what it looked like before. Where the goal stands is
+   Clarity's question, and it is not asked here.
    Every section answers one question and stops. Anything that
    does not change what you do next is a quiet footnote.
    ============================================================ */
@@ -140,24 +143,25 @@
 
   /* ---------- the one branch: the goal shape tunes the top of the card ----------
      Every shape returns the same three things, so the layout never changes shape:
-     one value, one bar, one supporting line. */
+     one value, one bar, one supporting line. None of them is a goal reading.
+     Where you stand against a target is Clarity's job; this card only ever
+     reports the pattern: what you did lately, and how that compares to you. */
+  function pattern(s, lately) {
+    var w = lately.w, on = lately.on, prev = lately.prevOn;
+    var v = num(on) + ' of the last ' + dstr(w);
+    if (lately.hasPrev) {
+      var mx = Math.max(1, on, prev);
+      var sub = on === prev ? 'the same as the ' + dstr(w) + ' before'
+        : (on > prev ? 'up from ' : 'down from ') + num(prev) + ' in the ' + dstr(w) + ' before';
+      return { kind: 'pattern', v: v, pct: pc(on, mx), sub: sub };
+    }
+    return { kind: 'pattern', v: v, pct: lately.rate, sub: 'that is ' + lately.rate + '% of the days you have had' };
+  }
+
   function goal(K, shape, s, log, lately) {
     var S = (K && K.SHAPES && K.SHAPES[shape]) || {};
     var N = log.length, today = log[N - 1].date;
 
-    if (shape === 'quantity_up') {
-      var at = Math.max(0, fin(S.at, 0)), tg = Math.max(1, fin(S.target, 1));
-      var uu = S.unit ? ' ' + S.unit : '';
-      return { v: num(at) + uu, pct: pc(at, tg),
-        sub: at >= tg ? 'the target was ' + num(tg) + ', you are past it'
-                      : 'of ' + num(tg) + ', ' + num(tg - at) + ' to go' };
-    }
-    if (shape === 'quantity_down') {
-      var a = fin(S.at, 0), f = fin(S.from, 0), t = fin(S.target, 0), u = S.unit ? ' ' + S.unit : '';
-      return { v: num(a) + u, pct: pc(f - a, Math.max(1, f - t)),
-        sub: a <= t ? 'from ' + num(f) + u + ', you are there'
-                    : 'from ' + num(f) + u + ', ' + num(a - t) + u + ' to go' };
-    }
     if (shape === 'frequency') {
       var cad = Math.max(1, Math.round(fin(S.cadence, fin(s.cadence, 4))));
       var un = S.unit || 'sessions';
@@ -183,21 +187,9 @@
       return { v: dstr(cur) + ' held', pct: pc(cur, Math.max(1, bst)),
         sub: 'unbroken since ' + long_(log[N - cur].date, today) + (cur >= bst ? ', your longest yet' : '') };
     }
-    if (shape === 'milestone') {
-      var due = Math.max(0, Math.round(fin(S.dueIn, 0)));
-      var dd = new Date(today.getTime() + due * 86400000);
-      var what = cap(S.unit || 'the day');
-      if (due === 0) {
-        return { v: 'Today', pct: 100, sub: what + ', with ' + dstr(fin(s.total, 0)) + ' banked for it' };
-      }
-      return { v: dstr(due) + ' out', pct: pc(N, N + due), sub: what + ' lands on ' + long_(dd, today) };
-    }
-    /* no number to chase: the bar is the honest recent rate, but only once that
-       window is genuinely shorter than the record the hero already reports */
-    if (lately && lately.windowed) {
-      return { v: lately.rate + '% of the last ' + lately.w + ' days', pct: lately.rate, sub: lately.sub };
-    }
-    return null;
+    /* every other shape reads the same, because the pattern does not care what
+       you are chasing: what you did lately, next to what you did before it */
+    return pattern(s, lately);
   }
 
   var STYLE = '<style>' +
@@ -255,7 +247,7 @@
 
   W.CLAY['L04'] = {
     name: 'The professional',
-    note: 'Linear/Stripe discipline: one column, two alignment edges, two devices (a ledger card and the day grid), green used only as data ink and never a border. One hero number, one card that answers where the goal stands and how the run is going, one labelled record. The heatmap is a true weeks-as-columns calendar with a month axis and weekday rows, and it carries a fainter tier for days with no record so the grid never invents a miss. Every goal shape lands in the same three slots at the top of the card: one value, one bar, one line. The support counts are a single quiet footnote, not a second dashboard.',
+    note: 'Linear/Stripe discipline: one column, two alignment edges, two devices (a ledger card and the day grid), green used only as data ink and never a border. One hero number, one card that reports the pattern lately and how the run is going, one labelled record. Nothing here reads distance to a target, that is Clarity\'s job. The heatmap is a true weeks-as-columns calendar with a month axis and weekday rows, and it carries a fainter tier for days with no record so the grid never invents a miss. Every goal shape lands in the same three slots at the top of the card: one value, one bar, one line, and all three are made of the pattern (actions lately against actions before), never of a target. The support counts are a single quiet footnote, not a second dashboard.',
     render: function (ctx) {
       var K = (ctx && ctx.K) || {}, log = (ctx && ctx.log) || [], s = (ctx && ctx.s) || {},
           shape = (ctx && ctx.shape) || 'open';
@@ -277,7 +269,8 @@
       var latelySub = moved || (num(on) + ' of ' + dstr(w));
       /* a recent-rate line only earns its place once it says something the hero does not */
       var windowed = w >= 7 && N >= w + 7;
-      var lately = { w: w, rate: rate, sub: latelySub, windowed: windowed };
+      var lately = { w: w, rate: rate, sub: latelySub, windowed: windowed,
+        on: on, prevOn: prevOn, hasPrev: hasPrev };
 
       /* where the best run sits in time */
       var runLen = 0, bestEnd = -1, best = 0;
@@ -297,7 +290,7 @@
         '<div class="L04-lead">' + noun + '</div>' +
         '<div class="L04-sub">' + since + '</div>';
 
-      /* ---------- the card: where the goal stands, then how the run is going ---------- */
+      /* ---------- the card: the pattern lately, then how the run is going ---------- */
       var g = goal(K, shape, s, log, lately);
       var top = g
         ? '<div class="L04-gv">' + g.v + '</div>' +
@@ -307,7 +300,7 @@
 
       var rows = '';
       /* the recent rate, unless the bar above already is it */
-      if (windowed && shape !== 'open') rows += row('Last ' + w + ' days', rate + '%', latelySub);
+      if (windowed && !(g && g.kind === 'pattern')) rows += row('Last ' + w + ' days', rate + '%', latelySub);
       /* the run, unless the bar above already is it, or the hero already said it */
       if (shape !== 'maintenance' && cur !== N) {
         rows += row('Current run', dstr(cur), cur > 0 ? 'going since ' + short(log[N - cur].date, today) : 'no run going right now');

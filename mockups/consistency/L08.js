@@ -29,6 +29,10 @@
    dashboard. No third recency window: the whisper owns recency, so the
    list does not repeat it. No closing manifesto, the record's own
    heading and its one legend line already say nothing is hidden.
+   And no goal section. Where the goal stands is Clarity's job, today is
+   Action's job. This page only holds the pattern of you: what you did,
+   how often, and the record of it. Anything that reads as distance to a
+   target was cut, and the rows that stayed are all pattern.
 
    Broken locked calls are named in `note` below. */
 (function () {
@@ -38,15 +42,11 @@
   var SUPKEYS = ['deepwork', 'reflection', 'checkin', 'vivere'];
   /* the kit only carries plural units, and a record's first week is full of ones */
   var SUPONE = { deepwork: 'session', reflection: 'entry', checkin: 'morning', vivere: 'vision' };
-  /* shapes that own a real second number. Anything else, including an
-     unknown shape string, is treated as 'open' and gets no goal line,
-     because the open line just restates the hero. */
-  var GOALSHAPES = { milestone: 1, frequency: 1, maintenance: 1, quantity_up: 1, quantity_down: 1 };
 
   W.CLAY['L08'] = {
     name: 'One number religion',
 
-    note: 'One number, days shown up, owns the entire first screen with only two whisper lines under it. Broke the locked call that the three-stat ledger sits with the hero (it moved below the fold with everything else), dropped percentages so no number reads as a grade, and dropped the rhythm and month charts so the page speaks one visual language: a number, a record, a list. Audit pass cut the support cards down to that same list, cut the scroll chevron and the closing manifesto, and stopped the list restating the hero on a young record.',
+    note: 'One number, days shown up, owns the entire first screen with only two whisper lines under it. Broke the locked call that the three-stat ledger sits with the hero (it moved below the fold with everything else), dropped percentages so no number reads as a grade, and dropped the rhythm and month charts so the page speaks one visual language: a number, a record, a list. Audit pass cut the support cards down to that same list, cut the scroll chevron and the closing manifesto, and stopped the list restating the hero on a young record. Philosophy pass cut the goal section entirely: no target, no distance, no countdown. What it held that was really pattern moved into the list as rows of the same weight, the held run for maintenance and the weekly cadence for frequency, plus the last 30 days against the 30 before.',
 
     render: function (ctx) {
       var K = ctx.K, log = ctx.log, s = ctx.s, sh = ctx.sh, shape = ctx.shape;
@@ -95,27 +95,6 @@
          On a clean record it is a platitude, and at zero it is a taunt. */
       var thesis = (total > 0 && s.missed > 0) ? 'That number never goes down.' : '';
 
-      /* ---------- the goal shape, one quiet line, below the fold ----------
-         'open' restates the hero number, so it gets no goal line at all rather
-         than a duplicate, and neither does an unknown shape. Milestone speaks
-         through its own number (days until it happens), not the shape's lead,
-         which would be the hero again. Maintenance holds its line only while
-         the held run differs from the hero: on a spotless record they are the
-         same number, so the goal line stays out and 'Every day so far' in the
-         whisper carries it. Frequency states the rate against the rate you
-         set, because the kit's own '5.8 of 4' reads like a broken fraction. */
-      var goal = null;
-      if (sh && GOALSHAPES[shape]) {
-        if (shape === 'milestone') goal = { lead: n(sh.ctx.v), sub: sh.ctx.l };
-        else if (shape === 'frequency') {
-          var cad = s.cadence || 4;
-          var rate = (s.last4Rate || 0).toFixed(1).replace(/\.0$/, '');
-          goal = N >= 28 ? { lead: rate, sub: 'sessions a week lately, against the ' + n(cad) + ' you set.' } : null;
-        }
-        else if (shape === 'maintenance') goal = s.current === total ? null : { lead: n(s.current), sub: sh.sub };
-        else goal = { lead: sh.lead, sub: sh.sub };
-      }
-
       /* ---------- the record: keep cells sane at every length ---------- */
       var kitCols = Math.max(7, Math.min(21, Math.round(Math.sqrt(N * 1.6))));
       var calCols = Math.max(kitCols, Math.min(14, N));
@@ -152,9 +131,22 @@
       /* the honest denominator, only once the whisper stops carrying it */
       if (N > 30) rows += row('Days since you started', n(N));
       /* on a young record the current run IS the hero number, so it stays out.
-         maintenance already states the held run in the goal line above. */
-      if (shape !== 'maintenance' && s.current !== total) rows += row('Current run', dstr(s.current));
+         maintenance calls the same run by its own name, held without a break. */
+      if (s.current !== total) {
+        rows += row(shape === 'maintenance' ? 'Held without a break' : 'Current run', dstr(s.current));
+      }
       if (s.best > s.current) rows += row('Longest run', dstr(s.best));
+      /* the cadence you keep, stated as a rhythm, not as a score against a
+         target. A frequency record is the one shape where a weekly rate is
+         the pattern itself. */
+      if (shape === 'frequency' && N >= 28) {
+        rows += row('Sessions a week lately', (s.last4Rate || 0).toFixed(1).replace(/\.0$/, ''));
+      }
+      /* two windows of the same length, side by side. It is the shape of the
+         record moving, and it names no target. */
+      if (N >= 60) {
+        rows += row('Last 30 days, and the 30 before', n(on30) + ' and ' + n(onIn(60) - on30));
+      }
       if (s.comebacks > 0) rows += row('Times you came back', n(s.comebacks));
       if (strongest) rows += row('Your strongest day', strongest);
       if (s.hours > 0) rows += row('Time on it', n(s.hours) + (s.hours === 1 ? ' hour' : ' hours'));
@@ -190,11 +182,6 @@
         '.L08-h{font-size:14px;font-weight:650;color:var(--text-hi);letter-spacing:-.01em;margin:0 0 12px}' +
         '.L08-sec{margin-top:32px}' +
         '.L08-note{font-size:12.5px;color:var(--text-mid);line-height:1.55;margin-top:14px}' +
-        '.L08-goal{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}' +
-        '.L08-goal b{font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--text-hi);' +
-          'font-variant-numeric:tabular-nums;line-height:1}' +
-        '.L08-goal span{font-size:14.5px;color:var(--text-mid);font-weight:500;line-height:1.3;' +
-          'min-width:0;overflow-wrap:anywhere}' +
         '.L08-rows{display:flex;flex-direction:column}' +
         '.L08-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:11px 0;' +
           'border-bottom:1px solid var(--hairline)}' +
@@ -228,12 +215,6 @@
           (calNote ? '<p class="L08-note">' + calNote + '</p>' : '') +
         '</div>';
 
-      var goalSec = goal ?
-        '<div class="L08-sec">' +
-          '<div class="L08-h">The goal</div>' +
-          '<div class="L08-goal"><b>' + goal.lead + '</b><span>' + goal.sub + '</span></div>' +
-        '</div>' : '';
-
       var ledger = rows ?
         '<div class="L08-sec">' +
           '<div class="L08-h">Your numbers</div>' +
@@ -246,7 +227,7 @@
           '<div class="L08-rows">' + supRows + '</div>' +
         '</div>' : '';
 
-      return css + '<div class="L08">' + hero + record + goalSec + ledger + support + '</div>';
+      return css + '<div class="L08">' + hero + record + ledger + support + '</div>';
     }
   };
 })();

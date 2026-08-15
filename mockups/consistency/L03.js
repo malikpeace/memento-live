@@ -15,21 +15,27 @@
    went further and cut the last three repeats:
      - the "last 30 days" row said the same thing as the month above it and the
        month-ago line below it, so it is gone,
-     - the goal card no longer prints a percentage that is only the two numbers
-       beside it divided,
+     - the card in the goal slot no longer prints a percentage that is only the
+       two numbers beside it divided,
      - a held vow no longer prints its own length twice (the run line steps
-       aside for the goal card when the shape is maintenance).
+       aside for the pattern card when the shape is maintenance).
    The two-row ledger became one plain sentence, which killed a heading and a
    table. The legend now only names states that actually occur, so day two does
    not carry a swatch for "missed". Day one reads as day one instead of "1 of 1
    day". The lifetime total sits quietly in the footer, the only place a total
-   belongs on a page whose whole point is that the month, not a number, leads. */
+   belongs on a page whose whole point is that the month, not a number, leads.
+
+   Scope pass. Consistency is the pattern of you, not where the goal stands.
+   The card that used to read "412 of 1,000" or "74 days until it happens" now
+   reads the pattern instead: the cadence this week for a rate, the length of a
+   held line, and otherwise this month against the same stretch of last month.
+   No target, no percentage, no countdown, no arrival named anywhere. */
 (function () {
   var W = window; W.CLAY = W.CLAY || {};
 
   W.CLAY['L03'] = {
     name: 'The month',
-    note: 'The real calendar of the month you are in leads the whole page, each week row counting itself under a "days" header, with earlier months underneath as real months. Breaks the locked hero: there is no big number at the top, the month carries it. Everything the calendar already shows was cut, so the page counts in one unit, days, and never repeats itself: one heading for the archive, one for the goal, and a single line for the run.',
+    note: 'The real calendar of the month you are in leads the whole page, each week row counting itself under a "days" header, with earlier months underneath as real months. Breaks the locked hero: there is no big number at the top, the month carries it. Everything the calendar already shows was cut, so the page counts in one unit, days, and never repeats itself: one heading for the archive, one for the pattern, and a single line for the run. The card in the middle reads the pattern the days make, this month against last, the cadence this week, the length of a held line, never where a goal stands.',
 
     render: function (ctx) {
       var K = ctx.K, log = ctx.log || [], s = ctx.s || {}, sh = ctx.sh, shape = ctx.shape || 'open';
@@ -199,19 +205,24 @@
       /* ---------------- what the month means, at most two plain lines ---------------- */
       var say = [], said = false;
 
-      /* a month ago today, only when the record actually reaches back that far */
+      /* a month ago today, only when the record actually reaches back that far.
+         the pattern card below carries this comparison for most shapes, so the
+         line only appears when the card is spending its space on something else */
       var pm = M === 0 ? 11 : M - 1, py = M === 0 ? Y - 1 : Y;
       var prevFirstYmd = py * 10000 + (pm + 1) * 100 + 1;
-      if (ymd(firstD) <= prevFirstYmd) {
-        var prevSoFar = 0;
+      var hasPrev = ymd(firstD) <= prevFirstYmd, prevSoFar = 0;
+      if (hasPrev) {
         log.forEach(function (d) {
           if (d.date.getFullYear() === py && d.date.getMonth() === pm && d.date.getDate() <= TD && d.on) prevSoFar++;
         });
+      }
+      var cardCarriesMonth = (shape !== 'frequency' && shape !== 'maintenance');
+      if (hasPrev && !cardCarriesMonth) {
         say.push('A month ago today you were at <b>' + nf(prevSoFar) + '</b> ' +
           (prevSoFar === 1 ? 'day' : 'days') + '. ' +
           (prevSoFar === monthOn ? 'Exactly where you are now.' : 'You are at <b>' + nf(monthOn) + '</b> now.'));
-        said = true;
       }
+      if (hasPrev) said = true;
 
       /* one month behind is not a strip, it is a sentence: a lone half width
          grid of mostly untracked days reads as a broken fragment. If the line
@@ -259,59 +270,66 @@
         '</div></div>';
       }
 
-      /* ---------------- where the goal stands ---------------- */
-      var lead = esc(sh && sh.lead), sub = esc(sh && sh.sub);
-      /* the shape line is written for a record with some size to it, so a young
-         record never gets told it has "1 days" or "1 sessions" */
-      if (lead === '1') sub = sub.replace(/^days\b/, 'day').replace(/^sessions\b/, 'session');
-      if (shape === 'frequency' && N < 28) sub = sub.replace(/,\s*last four weeks$/, ', so far');
+      /* ---------------- the pattern, in the same card slot ----------------
+         this card used to print how far the goal had come, which is Clarity's
+         job, not this page's. It now prints the pattern the days make: the
+         cadence for a rate, the length of a held line, and otherwise this
+         month against the same stretch of last month. Nothing here names an
+         arrival, a target, a percentage or a deadline. */
+      var lead = '', sub = '', note = '';
 
-      var ctxV = (sh && sh.ctx) ? esc(sh.ctx.v) : '', ctxL = (sh && sh.ctx) ? esc(sh.ctx.l) : '';
-      /* two of the shared labels are written as fragments and land as broken
-         sentences on their own line, so they get their verb back here */
-      if (shape === 'maintenance') ctxL = 'is the longest stretch you have held';
-      if (shape === 'quantity_down') ctxL = 'is where you are now';
-      /* a second number that only repeats the first is worse than no second line:
-         a percentage IS the two numbers beside it divided, a best run that equals
-         the current run is the same run twice, and frequency has its own week
-         line built on the sunday grid this calendar uses */
-      var ctxSkip = String(ctxV) === String(lead) ||
-        shape === 'quantity_up' ||
-        shape === 'frequency' ||
-        (shape === 'maintenance' && best <= cur);
-
-      /* the weeks a frequency goal actually landed, counted on the same sunday
-         weeks the calendar draws, so no two numbers on this page disagree */
-      var freqLine = '';
       if (shape === 'frequency') {
+        /* counted on the same sunday weeks the calendar draws, so no two
+           numbers on this page disagree */
         var wks = [], cw = null;
         log.forEach(function (d) {
           if (!cw || d.date.getDay() === 0) { cw = { on: 0 }; wks.push(cw); }
           if (d.on) cw.on++;
         });
         var cadence = num(s.cadence) || 4;
+        var thisWk = wks.length ? wks[wks.length - 1].on : 0;
+        /* "7 of 4" is not a sentence, so a week that runs over says so plainly */
+        if (thisWk > cadence) {
+          lead = nf(thisWk);
+          sub = (thisWk === 1 ? 'session' : 'sessions') + ' this week, above your usual ' + nf(cadence);
+        } else {
+          lead = nf(thisWk) + ' of ' + nf(cadence);
+          sub = (cadence === 1 ? 'session' : 'sessions') + ' this week';
+        }
         var met = wks.filter(function (w) { return w.on >= cadence; }).length;
         if (wks.length >= 3) {
-          freqLine = 'You hit all ' + nf(cadence) + ' in <b>' + nf(met) + '</b> of ' + nf(wks.length) + ' weeks.';
+          note = 'You hit all ' + nf(cadence) + ' in <b>' + nf(met) + '</b> of ' + nf(wks.length) + ' weeks.';
+        }
+      } else if (shape === 'maintenance') {
+        lead = nf(cur);
+        sub = (cur === 1 ? 'day held, unbroken' : 'days held, unbroken');
+        if (best > cur) note = '<b>' + dstr(best) + '</b> is the longest stretch you have held.';
+      } else {
+        lead = nf(monthOn);
+        sub = (monthOn === 1 ? 'day this month so far' : 'days this month so far');
+        if (hasPrev) {
+          note = prevSoFar === monthOn
+            ? 'By this day last month you were at <b>' + nf(prevSoFar) + '</b> too.'
+            : 'By this day last month you were at <b>' + nf(prevSoFar) + '</b>.';
+        } else if (monthAll >= 7) {
+          var perWk = Math.round(10 * monthOn / (monthAll / 7)) / 10;
+          note = 'About <b>' + nf(perWk) + '</b> a week this month.';
         }
       }
 
       var goal = '';
-      /* an open goal has no number to stand anywhere, and the whole page is
-         already the record, so the section simply does not appear */
-      if (shape !== 'open' && lead && sub) {
-        var note = freqLine ? '<i>' + freqLine + '</i>'
-          : (ctxV && !ctxSkip ? '<i><b>' + ctxV + '</b> ' + ctxL + '.</i>' : '');
-        goal = '<div class="L03-sec"><div class="L03-h">Where the goal stands</div>' +
-          '<div class="L03-goal"><p><b>' + lead + '</b> ' + sub + '.</p>' + note + '</div></div>';
+      if (lead && sub) {
+        goal = '<div class="L03-sec"><div class="L03-h">The pattern</div>' +
+          '<div class="L03-goal"><p><b>' + esc(lead) + '</b> ' + esc(sub) + '.</p>' +
+          (note ? '<i>' + note + '</i>' : '') + '</div></div>';
       }
 
       /* ---------------- the quiet total, the only one on the page ---------------- */
       var since = MONF[firstD.getMonth()] + ' ' + firstD.getDate() + ', ' + firstD.getFullYear();
-      /* the total is only news once the record outgrows the month on screen, and
-         a milestone card already banks it, so the rest of the time the footer
-         says the one thing nothing else says: when this started */
-      var totalIsNews = monthAll < log.length && shape !== 'milestone';
+      /* the total is only news once the record outgrows the month on screen, so
+         the rest of the time the footer says the one thing nothing else says:
+         when this started */
+      var totalIsNews = monthAll < log.length;
       var footTxt;
       if (ymd(firstD) === ymd(lastD)) footTxt = 'Day one.';
       else if (!totalIsNews) footTxt = 'Tracked since ' + since + '.';

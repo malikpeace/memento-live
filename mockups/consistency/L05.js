@@ -3,9 +3,12 @@
    One question on the page: am I further along than before?
    One number answers it, in one unit, three ways: the number,
    the verdict against your own past, and the shape it made
-   getting here. The goal gets one panel, the record gets one
-   grid, the all time total is a single footer line.
-   Nothing here is a counter that can only get worse.
+   getting here. Under it, this week against your usual week,
+   the record gets one grid, and the all time total is a single
+   footer line.
+   Nothing here is a counter that can only get worse, and
+   nothing here names a destination. Where you stand against a
+   target is Clarity's job; this page is the pattern of you.
    ============================================================ */
 (function () {
   var W = window; W.CLAY = W.CLAY || {};
@@ -73,7 +76,7 @@
     '.L05-note{font-size:12.5px;color:var(--text-mid);line-height:1.55;margin-top:10px}' +
     '.L05-h{font-size:14px;font-weight:650;letter-spacing:-.01em;margin:28px 0 11px;color:var(--text-hi)}' +
     '.L05-panel{background:var(--fill-1);box-shadow:var(--inset);border-radius:14px;padding:14px}' +
-    /* the goal */
+    /* this week against your usual */
     '.L05-goal__t{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}' +
     '.L05-goal__t b{font-size:29px;font-weight:750;letter-spacing:-.03em;line-height:1;color:var(--text-hi)}' +
     '.L05-goal__t span{font-size:13.5px;color:var(--text-mid);line-height:1.35;min-width:0}' +
@@ -113,55 +116,45 @@
       '<circle class="ck-spark__d" cx="' + dx.toFixed(1) + '" cy="' + dy.toFixed(1) + '" r="3"/></svg>';
   }
 
-  /* ---------- the goal itself, one compact panel per shape ---------- */
-  function goalPanel(K, sh, shape, s, N, win) {
-    if (shape === 'open') return '';
-    // an unbroken vow in the first fortnight is word for word the hero above it
-    if (shape === 'maintenance' && !win && num(s.current) >= N) return '';
-    var S = (K && K.SHAPES && K.SHAPES[shape]) || null;
-    var p = -1;
-    var lead = (sh && sh.lead != null) ? String(sh.lead) : fmt(s.total);
-    var sub = (sh && sh.sub) ? String(sh.sub) : plural(s.total, 'day recorded', 'days recorded');
-    var ctx = (sh && sh.ctx) ? sh.ctx : { v: num(s.rate) + '%', l: 'of days since you started' };
+  /* ---------- this week, against your usual week.
+     Same weight as the panel it replaces, but nothing in it names a
+     destination: it is your own showing up measured against your own
+     habit. Where you stand against a target belongs to Clarity. ---------- */
+  function weekPanel(log, s, shape, N, win) {
+    if (!win) return '';                       // under a fortnight there is no usual yet
+    var here = countOn(log, N - 7, 7);
+    // every complete week before this one, so "usual" is your own history
+    var sum = 0, wks = 0, i;
+    for (i = N - 14; i >= 0; i -= 7) { sum += countOn(log, i, 7); wks++; }
+    if (!wks) return '';
+    var usual = sum / wks;
+    var d = here - usual;
+    var line = Math.abs(d) < 0.5
+      ? 'About your usual week.'
+      : (d > 0 ? 'Above your usual week.' : 'Below your usual week.');
 
-    if (shape === 'quantity_up' && S) p = pct(S.at, S.target);
-    else if (shape === 'quantity_down' && S) p = pct(num(S.from) - num(S.at), num(S.from) - num(S.target));
-    else if (shape === 'frequency') p = pct(s.last4Rate, s.cadence);
-    else if (shape === 'milestone') {
-      // the countdown is the whole panel. Leading with the banked total would
-      // print the footer's own number twice at three times the size, and a bar
-      // of time left would be the one track on this page that fills by itself.
-      var due = S ? num(S.dueIn) : 0;
-      if (due > 0) {
-        lead = fmt(due);
-        sub = 'days until ' + (S.unit || 'the day itself');
-        ctx = { v: '', l: '' };
-      }
+    // one quiet row, and only where the shape has a pattern fact of its own
+    var cl = 'A usual week for you', cv = fmt(usual) + ' of 7';
+    if (shape === 'frequency' && num(s.cadence) > 0) {
+      cl = 'Sessions a week, last four weeks';
+      cv = fmt(s.last4Rate);
     } else if (shape === 'maintenance') {
-      // a track against your own best only reads as progress while there is
-      // something left to beat. At your peak it is a full bar that means nothing.
-      if (num(s.current) === 0) sub = 'days held right now';
-      if (num(s.best) > num(s.current)) p = pct(s.current, s.best);
-      else if (num(s.current) < N) ctx = { v: fmt(N), l: 'days since you started' };
-      else ctx = { v: '', l: '' };   // held every day so far, the lead already says it
+      cl = 'Days held right now';
+      cv = fmt(s.current);
     }
+    var dup = cv === fmt(here) + ' of 7';
 
-    var cv = (ctx && ctx.v != null) ? String(ctx.v) : '';
-    var cl = (ctx && ctx.l != null) ? String(ctx.l) : '';
-    // never print the bar's own percent again underneath the bar
-    var dup = p >= 0 && cv.replace(/\s/g, '') === p + '%';
-
-    return '<div class="L05-h">Where the goal stands</div>' +
+    return '<div class="L05-h">This week</div>' +
       '<div class="L05-panel">' +
-        '<div class="L05-goal__t"><b>' + lead + '</b><span>' + sub + '</span></div>' +
-        (p >= 0 ? '<div class="L05-track"><i style="width:' + Math.max(2, p) + '%"></i></div>' : '') +
-        (!dup && cv && cl ? '<div class="L05-goal__f"><span>' + cl + '</span><b>' + cv + '</b></div>' : '') +
+        '<div class="L05-goal__t"><b>' + fmt(here) + ' of 7</b><span>' + line + '</span></div>' +
+        '<div class="L05-track"><i style="width:' + Math.max(2, pct(here, 7)) + '%"></i></div>' +
+        (!dup ? '<div class="L05-goal__f"><span>' + cl + '</span><b>' + cv + '</b></div>' : '') +
       '</div>';
   }
 
   W.CLAY['L05'] = {
     name: 'Further than before',
-    note: 'Progress forward: the hero is the last 30 days against the 30 before, so the headline number re-earns itself every day, and the line under it is that exact number plotted, last dot included. One chip says which way it moved; a second, quieter one appears only while there is still ceiling above you (your best 30 on record), and on a genuine new high a single chip says so instead. The old run-against-your-best section is gone: a current run is the one counter here that could only get worse, and it spoke a second unit. What is left is the number, the goal, the record, and one footer line for the all time total.',
+    note: 'Progress forward: the hero is the last 30 days against the 30 before, so the headline number re-earns itself every day, and the line under it is that exact number plotted, last dot included. One chip says which way it moved; a second, quieter one appears only while there is still ceiling above you (your best 30 on record), and on a genuine new high a single chip says so instead. The goal panel is gone: distance to a target, percent of the way there, days until the date, that is Clarity telling you where you stand, not Consistency. In its place, same weight, this week measured against your own usual week, with a cadence or days held line where the shape has one. What is left is all pattern: the number, this week, the record, and one footer line for the all time total.',
     render: function (ctx) {
       var K = ctx.K, log = ctx.log || [], s = ctx.s || {}, sh = ctx.sh, shape = ctx.shape || 'open';
       var N = log.length;
@@ -215,8 +208,8 @@
             ' you’ll see this week against the one before it.</div>';
       }
 
-      /* ---------- the goal ---------- */
-      html += goalPanel(K, sh, shape, s, N, win);
+      /* ---------- this week against your usual ---------- */
+      html += weekPanel(log, s, shape, N, win);
 
       /* ---------- the record ---------- */
       if (N >= 7 && K && K.calendarHTML) {

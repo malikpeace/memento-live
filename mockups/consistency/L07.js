@@ -4,6 +4,8 @@
    chapter (this week, large), one honest comparison to the same
    point last week, then every finished week as a single row: 7
    cells and a count. A year reads as 52 chapters, not 365 pixels.
+   Pattern only: days shown up and weeks kept. Nothing here says
+   where the goal stands, how far is left, or when it lands.
    ============================================================ */
 (function () {
   var W = window;
@@ -79,8 +81,8 @@
   var CSS = '<style>' +
     '.L07{padding:6px 20px 46px;font-family:var(--font);color:var(--text-hi)}' +
     '.L07 p{margin:0}' +
-    /* the goal's own line, the one place goal shape speaks */
-    '.L07 .L07-goal{font-size:13.5px;color:var(--text-mid);line-height:1.45;' +
+    /* the opening line: the size of the record, in weeks */
+    '.L07 .L07-intro{font-size:13.5px;color:var(--text-mid);line-height:1.45;' +
       'font-variant-numeric:tabular-nums;overflow-wrap:break-word}' +
     /* the one hero */
     '.L07-num{display:flex;align-items:baseline;gap:10px;margin:12px 0 4px}' +
@@ -129,9 +131,9 @@
 
   W.CLAY['L07'] = {
     name: 'Weekly chapters',
-    note: 'Weeks are the unit. One open week at the top with the number you are at, one honest comparison to the same point last week, then every finished week as a row of seven cells and a count. Day streaks appear nowhere: the record is read a week at a time, and the seven columns of the list stay aligned so the shape of a normal week shows itself.',
+    note: 'Weeks are the unit. It opens with the size of the record in weeks, then this week large, one honest comparison to the same point last week, then every finished week as a row of seven cells and a count. Pattern only, no goal state: nothing here reports distance, percentage, or a date. Day streaks appear nowhere either, the record is read a week at a time, and the seven columns stay aligned so the shape of a normal week shows itself.',
     render: function (ctx) {
-      var log = ctx && ctx.log, s = ctx && ctx.s, sh = ctx && ctx.sh;
+      var log = ctx && ctx.log, s = ctx && ctx.s;
       if (!log || !log.length) return CSS + '<div class="L07"><p class="L07-line">No record yet.</p></div>';
 
       var weeks = buildWeeks(log);
@@ -139,10 +141,12 @@
       var prev = weeks.length > 1 ? weeks[weeks.length - 2] : null;
       var total = s && typeof s.total === 'number' ? s.total : log.filter(function (d) { return d.on; }).length;
 
-      /* ---- the goal's own line, the one place goal shape speaks ---- */
-      var goal;
-      if (sh && sh.lead && sh.sub) goal = sh.lead + ' ' + sh.sub + '.';
-      else goal = total + ' ' + plural(total, 'day', 'days') + ' recorded.';
+      /* ---- the opening line: how much record there is, measured in weeks ---- */
+      var intro = weeks.length + ' ' + plural(weeks.length, 'week', 'weeks') + ' of record, ' +
+        total + ' ' + plural(total, 'day', 'days') + ' you showed up.';
+      if (ctx && ctx.shape === 'maintenance' && s && typeof s.current === 'number' && s.current > 0) {
+        intro += ' ' + s.current + ' ' + plural(s.current, 'day', 'days') + ' held right now.';
+      }
 
       /* ---- the open chapter: one hero, one plain sentence under it ---- */
       var done = cw.rec >= 7;
@@ -186,7 +190,7 @@
       }
 
       var hero =
-        '<p class="L07-goal">' + goal + '</p>' +
+        '<p class="L07-intro">' + intro + '</p>' +
         '<div class="L07-num"><b>' + cw.on + '</b><span>of ' + cw.rec + '</span></div>' +
         '<p class="L07-cap">' + caption + '</p>' +
         heroCells(cw) +
@@ -203,8 +207,8 @@
         var bw = full.reduce(function (a, w) { return w.on > a.on ? w : a; }, full[0]);
         var line;
         if (ctx && ctx.shape === 'frequency') {
-          // a rate goal already states its days-a-week figure in the line above, so
-          // the average is not printed twice with two slightly different values
+          // a cadence goal reads better as weeks kept than as a decimal average:
+          // the pattern is how often the week was made, not a mean
           var cad = (s && s.cadence) || 4;
           var hit = full.filter(function (w) { return w.on >= cad; }).length;
           line = 'You hit ' + cad + ' days or more in <b>' + hit + ' of ' + full.length + '</b> finished weeks.';

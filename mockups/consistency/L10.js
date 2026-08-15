@@ -2,8 +2,11 @@
    The lens: this is the page you open every day, so it opens where you are.
    Today answers itself at the top (did you show up, what did that do to the run,
    what did today hold), then the page radiates outward in one direction only:
-   today, the goal it feeds, the last seven days, the last thirty, the whole
+   today, the pattern it joins, the last seven days, the last thirty, the whole
    record, your rhythm.
+   This page never speaks for the goal. No target, no distance, no countdown:
+   Consistency is the record of showing up, and the pattern beat reports the
+   record's own shape (a cadence, a line held, or the work itself).
    One reading order. One number per beat, and no number is ever printed twice.
    That rule killed the top ledger (the run belongs to today's sentence, the
    seven day count to the week strip, the thirty day count to the trend line,
@@ -19,7 +22,7 @@
   var W = window; W.CLAY = W.CLAY || {};
   W.CLAY['L10'] = {
     name: 'Today first',
-    note: 'Today-anchored: the page opens on today (showed up or still open, what that did to the run, what today held) and then radiates out to seven days, thirty days, the whole record and your rhythm. Every beat owns exactly one number and nothing is said twice, so the top ledger is gone (the run lives in today\'s sentence, the seven day count under the week strip, the thirty day count under the trend line, the all time rate in the record) and the record no longer restates the hero. Three visuals, each with a distinct job: the week strip for near term detail, the line for trend, the grid for the lifetime. The weekday bar chart was cut because the rhythm sentence already says it, and the record beat waits for day seven so it never renders as a second week strip.',
+    note: 'Today-anchored: the page opens on today (showed up or still open, what that did to the run, what today held) and then radiates out to the pattern it joins, seven days, thirty days, the whole record and your rhythm. It never speaks for the goal: no target, no distance, no countdown. The pattern beat reports the record\'s own shape, a weekly cadence for a rate you keep, days held for a line you hold, and the work itself (hours on the record, the average day, the support around it) for everything else. Every beat owns exactly one number and nothing is said twice, so the top ledger is gone (the run lives in today\'s sentence, the seven day count under the week strip, the thirty day count under the trend line, the all time rate in the record) and the record no longer restates the hero. Three visuals, each with a distinct job: the week strip for near term detail, the line for trend, the grid for the lifetime. The weekday bar chart was cut because the rhythm sentence already says it, and the record beat waits for day seven so it never renders as a second week strip.',
     render: function (ctx) {
       var K = ctx.K, log = ctx.log, s = ctx.s, sh = ctx.sh, shape = ctx.shape;
       var MON = K.MON, WD = K.WD, WDF = K.WDF;
@@ -101,12 +104,12 @@
         /* the record rows are the kit's own rows, not a private copy of them:
            one fewer design language on the page, and quieter than the beats above. */
         '.L10-sec .ck-rows{margin-top:14px}' +
-        /* the goal keeps a hero of its own, a third the size of today's, so the
-           reading order down the page is never in doubt */
-        '.L10-goal{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px}' +
-        '.L10-goal b{font-size:27px;font-weight:700;color:var(--text-hi);letter-spacing:-.028em;' +
+        /* the pattern beat keeps a hero of its own, a third the size of today's,
+           so the reading order down the page is never in doubt */
+        '.L10-lead{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px}' +
+        '.L10-lead b{font-size:27px;font-weight:700;color:var(--text-hi);letter-spacing:-.028em;' +
           'font-variant-numeric:tabular-nums;line-height:1.05}' +
-        '.L10-goal span{font-size:15px;font-weight:500;color:var(--l10-body);line-height:1.35}' +
+        '.L10-lead span{font-size:15px;font-weight:500;color:var(--l10-body);line-height:1.35}' +
         '.L10-wk .ck-mg__g b.tdy{box-shadow:0 0 0 2px rgba(var(--accent-rgb),.34)}' +
         '.L10-wk .ck-mg__g b.off.tdy,.L10-wk .ck-mg__g b.sup.tdy{box-shadow:0 0 0 2px rgba(var(--ink),.22)}' +
         /* a held rate sits at the top of its range, and with nothing behind it a
@@ -132,7 +135,7 @@
         : '';
 
       /* the run, said once on the whole page. for a line you hold, the run IS the
-         goal, so it is handed down to the goal beat instead of said here. */
+         pattern, so it is handed down to the pattern beat instead of said here. */
       var runIsGoal = shape === 'maintenance';
       var addLine;
       if (done) {
@@ -140,7 +143,7 @@
           ? (runNow > 1 ? 'You held the line again today.' : 'Today starts the line.')
           : (runNow > 1 ? 'Today took your run to <b>' + dstr(runNow) + '</b>.' : 'Today starts a new run.');
       } else if (runNow > 0) {
-        /* "through yesterday" is the goal beat's job for a line you hold, and
+        /* "through yesterday" is the pattern beat's job for a line you hold, and
            saying it in both places three lines apart reads as a stutter */
         addLine = runIsGoal
           ? 'The line is still unbroken.'
@@ -167,51 +170,77 @@
           (heldLine ? '<div class="L10-line L10-line--tight">' + heldLine + '</div>' : '') +
         '</div>';
 
-      /* ---------- where the goal stands. the only shape branching on the page. ----------
-         each shape leads with the one number today's block does not already own,
-         so the goal beat can never be the hero number wearing a second label. */
-      var goal = '';
-      if (shape !== 'open' && sh && sh.lead) {
-        var SH = (K.SHAPES && K.SHAPES[shape]) || {};
-        var gLead = esc(sh.lead), gSub = esc(sh.sub), gLine = '';
-        if (shape === 'quantity_up') {
-          gLine = (sh.ctx && sh.ctx.v) ? '<b>' + esc(sh.ctx.v) + '</b> of the way there.' : '';
-        } else if (shape === 'quantity_down') {
-          gLine = (SH.at != null) ? 'You are at <b>' + num(SH.at) + ' ' + esc(SH.unit) + '</b> right now.' : '';
-        } else if (shape === 'frequency') {
-          /* only finished weeks may be counted. the current week is always
-             partial, and scoring it against a full week's cadence prints a miss
-             that has not happened yet. */
-          var fullW = 0, metFull = 0, WKS = s.weeks || [];
-          for (var wI = 0; wI < WKS.length; wI++) {
-            if (WKS[wI].all === 7) { fullW++; if (WKS[wI].on >= (s.cadence || 4)) metFull++; }
-          }
-          gLine = fullW ? 'You have hit that rate in <b>' + num(metFull) + ' of ' + num(fullW) + '</b> full weeks.' : '';
-        } else if (shape === 'maintenance') {
-          /* a broken line is not a zero with a label on it. when there is
-             nothing being held, the beat drops its number and says so. */
-          var hold = done ? s.current : runNow;
-          if (hold > 0) {
-            gLead = num(hold);
-            gSub = (hold === 1 ? 'day held' : 'days held') + (done ? ', unbroken' : ', through yesterday');
-            gLine = s.best > hold
-              ? 'The longest you have held it is <b>' + dstr(s.best) + '</b>.'
-              : 'This is the longest you have held it.';
+      /* ---------- what the pattern holds. the only shape branching on the page. ----------
+         this beat never speaks for the goal: no target, no distance, no
+         countdown. it reads the record's own shape. a cadence keeps its weekly
+         rate, a held line keeps its days held, and everything else reports the
+         work itself, in the one number today's block does not already own. */
+      var pattern = '', pHead = 'What the pattern holds';
+      var pLead = '', pSub = '', pLine = '';
+      if (shape === 'frequency') {
+        pHead = 'Your cadence';
+        /* this week so far, scored against the cadence, and said as "so far" so a
+           partial week never prints a miss that has not happened yet */
+        var WKS = s.weeks || [];
+        var cad = s.cadence || 4;
+        var cur = WKS.length ? WKS[WKS.length - 1] : null;
+        if (cur) {
+          var partial = cur.all === 7 ? '' : ' so far';
+          if (cur.on > cad) {
+            /* "6 of 4" is not a fraction, it is a typo the reader has to forgive */
+            pLead = num(cur.on);
+            pSub = (cur.on === 1 ? 'session this week' : 'sessions this week') + partial + ', on a rate of ' + num(cad);
           } else {
-            gLead = ''; gSub = '';
-            gLine = s.best > 0
-              ? 'The line is broken. The longest you held it was <b>' + dstr(s.best) + '</b>.'
-              : 'The line starts the first day you show up.';
+            pLead = num(cur.on) + ' of ' + num(cad);
+            pSub = (cad === 1 ? 'session this week' : 'sessions this week') + partial;
           }
-        } else if (shape === 'milestone') {
-          if (SH.dueIn != null) { gLead = num(SH.dueIn); gSub = 'days until ' + esc(SH.unit); }
-          gLine = 'Every day on the board is banked for it.';
         }
-        goal =
+        var fullW = 0, metFull = 0;
+        for (var wI = 0; wI < WKS.length; wI++) {
+          if (WKS[wI].all === 7) { fullW++; if (WKS[wI].on >= cad) metFull++; }
+        }
+        pLine = fullW ? 'You have hit that rate in <b>' + num(metFull) + ' of ' + num(fullW) + '</b> full weeks.' : '';
+      } else if (shape === 'maintenance') {
+        pHead = 'The line you hold';
+        /* a broken line is not a zero with a label on it. when there is
+           nothing being held, the beat drops its number and says so. */
+        var hold = done ? s.current : runNow;
+        if (hold > 0) {
+          pLead = num(hold);
+          pSub = (hold === 1 ? 'day held' : 'days held') + (done ? ', unbroken' : ', through yesterday');
+          pLine = s.best > hold
+            ? 'The longest you have held it is <b>' + dstr(s.best) + '</b>.'
+            : 'This is the longest you have held it.';
+        } else {
+          pLine = s.best > 0
+            ? 'The line is broken. The longest you held it was <b>' + dstr(s.best) + '</b>.'
+            : 'The line starts the first day you show up.';
+        }
+      } else {
+        /* pure effort: the time the record is actually made of, plus the support
+           acts around it. no target is implied and none is printed. */
+        pHead = 'What you have put in';
+        var supT = s.sup || {}, supBits = [];
+        if (supT.deepwork) supBits.push(num(supT.deepwork) + (supT.deepwork === 1 ? ' deep work session' : ' deep work sessions'));
+        if (supT.reflection) supBits.push(num(supT.reflection) + (supT.reflection === 1 ? ' reflection' : ' reflections'));
+        if (supT.checkin) supBits.push(num(supT.checkin) + (supT.checkin === 1 ? ' check-in' : ' check-ins'));
+        if (supT.vivere) supBits.push(num(supT.vivere) + (supT.vivere === 1 ? ' look at Vivere' : ' looks at Vivere'));
+        var hrs = s.hours || 0, mn = s.minutes || 0;
+        if (hrs >= 1) { pLead = num(hrs); pSub = (hrs === 1 ? 'hour of work on the record' : 'hours of work on the record'); }
+        else if (mn > 0) { pLead = num(mn); pSub = (mn === 1 ? 'minute of work on the record' : 'minutes of work on the record'); }
+        if (pLead && s.avgSession > 0) {
+          pLine = 'That is <b>' + num(s.avgSession) + '</b> minutes on an average day you showed up.';
+        }
+        if (supBits.length) {
+          pLine += (pLine ? ' ' : '') + 'Around it: ' + list(supBits) + '.';
+        }
+      }
+      if (pLead || pLine) {
+        pattern =
           '<div class="L10-sec">' +
-            '<h2 class="L10-h">Where the goal stands</h2>' +
-            (gLead ? '<div class="L10-goal"><b>' + gLead + '</b><span>' + gSub + '</span></div>' : '') +
-            (gLine ? '<div class="L10-line' + (gLead ? ' L10-line--top' : '') + '">' + gLine + '</div>' : '') +
+            '<h2 class="L10-h">' + pHead + '</h2>' +
+            (pLead ? '<div class="L10-lead"><b>' + pLead + '</b><span>' + pSub + '</span></div>' : '') +
+            (pLine ? '<div class="L10-line' + (pLead ? ' L10-line--top' : '') + '">' + pLine + '</div>' : '') +
           '</div>';
       }
 
@@ -278,7 +307,7 @@
       if (N >= 8) {
         var rrows = '<div class="ck-row"><span>Rate since day one</span><b>' + s.rate + '%</b></div>';
         /* the best run is only news when it is not the run you are already on,
-           and for a line you hold the goal beat above already said it */
+           and for a line you hold the pattern beat above already said it */
         if (!runIsGoal && s.best > runNow) rrows += '<div class="ck-row"><span>Best run</span><b>' + dstr(s.best) + '</b></div>';
         if (N >= 30 && s.comebacks > 0) rrows += '<div class="ck-row"><span>Times you came back</span><b>' + num(s.comebacks) + '</b></div>';
         rrows += '<div class="ck-row"><span>Started</span><b>' + shortDate(log[0] && log[0].date, last.date) + '</b></div>';
@@ -334,7 +363,7 @@
       }
 
       return css + '<div class="cx"><div class="L10-wrap">' +
-        today + goal + week + lately + record + rhythm +
+        today + pattern + week + lately + record + rhythm +
         '</div></div>';
     }
   };

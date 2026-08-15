@@ -4,13 +4,15 @@
    An opening entry dated today, one number set inside a sentence, the honest
    calendar, then the record told as dated entries in the order they happened,
    ending on today. Every figure is derived from the log, printed in a sentence.
-   Nothing is stated twice: if the lede already prints it, no later line repeats it. */
+   Nothing is stated twice: if the lede already prints it, no later line repeats it.
+   Nothing here states where the goal stands or how far is left, that is Clarity's
+   job. This page only reports the pattern: days shown up, cadence, runs, breaks. */
 (function () {
   var W = window; W.CLAY = W.CLAY || {};
 
   W.CLAY['L02'] = {
     name: 'The journal',
-    note: 'Consistency written as a logbook you would reread: prose led, dated, numbers set inside sentences, zero cards, tiles or charts. One hero (the days you showed up), then at most two supporting lines, the honest calendar, the dated events, and at most two closing sentences. The rule the page is built on is that no fact appears twice: the lifetime percentage is gone because the lede already prints the ratio, the start date is printed once, a perfect record is said in the lede instead of announced again, and a stretch is never dated twice when the comeback and the longest run are the same run. Misses appear only as closed, dated events, never as a running shame counter. Everything can vanish: on day one the page is one entry and one square.',
+    note: 'Consistency written as a logbook you would reread: prose led, dated, numbers set inside sentences, zero cards, tiles or charts. It never says where the goal stands or how far is left, that sentence belongs to Clarity: every number here is the pattern of the work, days shown up, cadence, runs and breaks. One hero (the days you showed up), then at most two supporting lines, the honest calendar, the dated events, and at most two closing sentences. The rule the page is built on is that no fact appears twice: the lifetime percentage is gone because the lede already prints the ratio, the start date is printed once, a perfect record is said in the lede instead of announced again, and a stretch is never dated twice when the comeback and the longest run are the same run. Misses appear only as closed, dated events, never as a running shame counter. Everything can vanish: on day one the page is one entry and one square.',
 
     render: function (ctx) {
       var K = ctx.K, log = ctx.log, s = ctx.s, sh = ctx.sh || {}, shape = ctx.shape || 'open';
@@ -84,12 +86,16 @@
       var S = (K.SHAPES && K.SHAPES[shape]) || {};
       var lines = [];
 
-      if (shape === 'quantity_up' && S.at != null && S.target) {
-        lines.push('The number is at <b>' + num(S.at) + ' of ' + num(S.target) + '</b>' + (S.unit ? ' ' + S.unit : '') + '.');
-      } else if (shape === 'quantity_down' && S.from != null && S.at != null && S.target != null) {
-        var u = S.unit ? ' ' + S.unit : '', togo = S.at - S.target;
-        lines.push('The number is <b>' + num(S.from - S.at) + u + '</b> down from where it started' +
-          (togo > 0 ? ', with <b>' + num(togo) + u + '</b> still to go.' : ', and it is where you were aiming.'));
+      /* the page never states where the goal stands or how far is left: that is
+         Clarity's sentence. Here the only reading is the pattern of the work,
+         so a shape without its own cadence gets a rhythm line instead. */
+      if (shape === 'quantity_up' || shape === 'quantity_down' || shape === 'milestone') {
+        if (N >= 14 && N < 60 && !perfect) {
+          var wks = Math.min(4, Math.floor(N / 7)), span = wks * 7;
+          var perWk = onIn(log.slice(N - span)) / wks;
+          lines.push('Lately that has settled at about <b>' + one(perWk) +
+            (Math.round(perWk * 10) / 10 === 1 ? ' day' : ' days') + ' a week</b>.');
+        }
       } else if (shape === 'frequency' && N >= 8) {
         /* "lately" needs more than one week behind it to mean anything */
         var cad = S.cadence || s.cadence || 4;
@@ -104,10 +110,6 @@
           : s.best <= s.current && N >= 7
             ? 'The line has held <b>' + dw(s.current) + '</b> straight, the longest it has gone.'
             : 'The line has held <b>' + dw(s.current) + '</b> straight.');
-      } else if (shape === 'milestone') {
-        lines.push(S.dueIn > 0
-          ? 'Banked for ' + (S.unit || 'the day it counts') + ', <b>' + dw(S.dueIn) + '</b> out.'
-          : 'Banked for ' + (S.unit || 'the day it counts') + '.');
       }
 
       /* the honest recent read, the one real sign of direction on the page. It only

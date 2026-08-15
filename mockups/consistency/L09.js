@@ -13,14 +13,16 @@
    resolution with the record (days in the first week, weeks inside a single
    month, months once there is more than one) instead of stacking two tables
    that say the same thing at two zoom levels. Under the hero there is exactly
-   one support line, never two, and the goal shape stays silent whenever it
-   would only restate what is already on screen. Every number is read off
-   ctx.log or ctx.s, and the rows still add up by hand. */
+   one support line, and it is always about effort: pace, or the longest run of
+   consecutive days on the record. Nothing on this page names where the goal
+   stands, what is left, or when anything is due; that is Clarity's job, and a
+   receipt only itemises work already done. Every number is read off ctx.log or
+   ctx.s, and the rows still add up by hand. */
 (function () {
   var W = window; W.CLAY = W.CLAY || {};
   W.CLAY['L09'] = {
     name: 'The receipt',
-    note: 'Time invested is the hero and one breakdown under it literally adds up to it, so the page can be checked by hand. The breakdown changes resolution with the record: days in the first week, weeks inside one month, months after that. Streaks are gone on purpose, a run resets and hours never do. One table grammar, one hairline (the rule above the total), one support line under the hero, and the goal shape gets a quiet sentence only when it says something the hero does not.',
+    note: 'Time invested is the hero and one breakdown under it literally adds up to it, so the page can be checked by hand. The breakdown changes resolution with the record: days in the first week, weeks inside one month, months after that. Pure pattern: hours, sessions, entries, mornings, days, runs. Nothing about where the goal stands or what is left. One table grammar, one hairline (the rule above the total), and one support line under the hero, always about effort: the weekly pace, or the longest run on the record.',
     render: function (ctx) {
       var K = ctx.K, log = ctx.log || [], s = ctx.s || {}, sh = ctx.sh, shape = ctx.shape;
       var MONF = (K && K.MONF) || ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -103,31 +105,25 @@
         : 'Across <b>' + comma(onDays) + '</b> ' + pl(onDays, 'day', 'days') + ' since ' + startStr + '.';
 
       /* ---------- exactly one support line ----------
-         Two 14px lines a few pixels apart was the page's real confusion, so the
-         goal sentence and the pace sentence compete for one slot. The goal wins
-         when it has something to say, because that is the sign of progress the
-         hero cannot give; otherwise the pace speaks.
-         maintenance and open stay silent by design: they would only restate the
-         record above, and maintenance would have to name a run, which this
-         layout does not keep. */
-      var goalLine = '';
-      if (sh) {
-        var gv = sh.ctx || {};
-        if ((shape === 'quantity_up' || shape === 'quantity_down') && sh.lead && sh.sub) {
-          goalLine = esc(sh.lead) + ' ' + esc(sh.sub) + '.';
-        } else if (shape === 'milestone' && gv.v != null && gv.l) {
-          goalLine = esc(gv.v) + ' ' + esc(gv.l) + '.';
-        } else if (shape === 'frequency' && N >= 28 && sh.lead && sh.sub) {
-          goalLine = esc(sh.lead) + ' ' + esc(sh.sub) + '.';
-        }
-      }
-      /* The typical-day line is suppressed in the first week, where the
-         breakdown below is already day by day: there it is not an insight, it
-         is the hero divided by the rows underneath it. */
+         Two 14px lines a few pixels apart was the page's real confusion, so
+         there is one slot and it always holds effort. The goal shape is not
+         read here at all: where the goal stands, what is left and when
+         anything happens belong to Clarity, and a receipt only itemises work
+         already done. Pace speaks once there is enough record to average; in
+         the first week the longest run speaks instead, because the day rows
+         below already are the arithmetic. */
+      var bestRun = 0, curRun = 0;
+      log.forEach(function (d) {
+        if (d.on) { curRun++; if (curRun > bestRun) bestRun = curRun; }
+        else curRun = 0;
+      });
       var paceLine = '';
       if (N >= 14) paceLine = 'About ' + hm(totalMins / (N / 7)) + ' in an average week.';
       else if (N > 7 && onDays >= 2) paceLine = 'The days you show up average ' + hm(typical) + '.';
-      var support = goalLine || paceLine;
+      var runLine = bestRun >= 2
+        ? 'Longest run so far, <b>' + comma(bestRun) + '</b> days in a row.'
+        : '';
+      var support = paceLine || runLine;
 
       var hero =
         '<div class="L09-lead">You have put in</div>' +
@@ -235,6 +231,11 @@
            the column, so it stays plural at any count. */
         supBody += rowHTML(r.n, r.u, comma(v));
       });
+      /* the run belongs with the other counts whenever the support slot went to
+         pace, so the longest stretch is never lost off the receipt */
+      if (bestRun >= 2 && support !== runLine) {
+        supBody += rowHTML('Longest run', 'days in a row', comma(bestRun));
+      }
       var itemised = supBody
         ? '<div class="L09-sec"><div class="L09-h">What you did</div>' + supBody + '</div>'
         : '';
