@@ -52,11 +52,11 @@
    broken comment here, which killed this rule outright and lit every line. Malik caught
    it. The fix: the blur is what read as broken, so it is nearly gone; the OPACITY now
    carries the whole signal, .42 to 1.) */
-[data-k=ob-1] .o1-z:not(.set)>*{opacity:.42;filter:blur(.2px)}
+[data-k=ob-1] .o1-z:not(.set)>*{opacity:.24;filter:blur(.2px)}
 /* the smallest line cannot afford the full dim, or the date stops being readable at all */
-[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.5;filter:blur(.15px)}
+[data-k=ob-1] .o1-z.o1-zw:not(.set)>*{opacity:.3;filter:blur(.15px)}
 [data-k=ob-1] .o1-z.set>*{opacity:1;filter:none}
-@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.62;filter:none}}
+@media (hover:hover){[data-k=ob-1] .o1-z:not(.set):hover>*{opacity:.42;filter:none}}
 [data-k=ob-1] .o1-z.o1-so{margin-top:30px}
 /* the zone owns the gap, not its first line, so the mark can sit on that first line */
 [data-k=ob-1] .o1-z.o1-zw{margin-top:20px}
