@@ -59,6 +59,40 @@
   }
   /* dollar goals show the $ (Malik 2026-08-14) */
   function isMoney(unit) { return /^\$|dollar/i.test(String(unit || '').trim()); }
+  /* FIX 1 (Malik 2026-08-14): a goal is whatever they typed. "You lost 30
+     lbs!" is 16 characters, "You paid off all $47,000 of your student loans!"
+     is 46, and at a fixed 42px the long one grew 357px tall and fell off the
+     phone. The hero line now sizes itself to its own length and widens its
+     measure, so any sentence lands. */
+  function fitLine(ph, sel, base) {
+    var el = Q(ph, sel); if (!el) return;
+    var n = (el.textContent || '').replace(/\s+/g, ' ').trim().length;
+    var size = n <= 18 ? base : base * Math.pow(18 / n, 0.5);
+    size = Math.max(17, size);
+    el.style.fontSize = size.toFixed(1) + 'px';
+    el.style.maxWidth = (n <= 18 ? 10 : n <= 34 ? 14 : 17) + 'ch';
+  }
+  /* FIX 3: a wall must fit the phone it is drawn on. Shrink the scale until
+     the content stops overflowing its own box, so 500 moves never spill off
+     the screen and nothing is silently clipped. Returns true if it fits. */
+  function fitWall(ph, sel, prop, start, min, step) {
+    var el = Q(ph, sel); if (!el) return true;
+    var v = start, guard = 0;
+    el.style.setProperty(prop, v);
+    while (el.scrollHeight > el.clientHeight + 2 && v > min && guard++ < 60) {
+      v = Math.round((v - step) * 100) / 100;
+      el.style.setProperty(prop, v);
+    }
+    return el.scrollHeight <= el.clientHeight + 2;
+  }
+  function visibleCount(ph, wallSel, itemSel) {
+    var w = Q(ph, wallSel); if (!w) return 0;
+    var wr = w.getBoundingClientRect(), n = 0;
+    [].forEach.call(w.querySelectorAll(itemSel), function (it) {
+      if (it.getBoundingClientRect().bottom <= wr.bottom + 1) n++;
+    });
+    return n;
+  }
   /* the wall's shared arithmetic: every number derived from their own */
   function wallData(v) {
     var days = +v.days, moves = +v.moves, hours = +v.hours || 0, streak = +v.streak || 0;
@@ -70,7 +104,18 @@
     if (v.shape === 'target' && +v.start !== +v.value) marks = C.milestones({ target: +v.value, baseline: +v.start }, +v.value < +v.start ? 'down' : 'up').length;
     else if (v.shape === 'count') marks = C.COUNT_LADDER.filter(function (c) { return c <= +v.value; }).length;
     else marks = Math.floor(days / 7) + Math.floor(days / 30);
-    return { days: days, moves: moves, hours: hours, streak: streak, weeks: weeks, perWeek: perWeek, money: money, mf: mf, marks: marks };
+    /* FIX 2: some goals are won with nothing logged at all (an exam passed,
+       a deal closed). "0 sittings" is an embarrassing thing to print, and
+       printing the move word 874 times when they logged zero of them is a
+       lie. When there are no moves the screens fall back to DAYS, in both
+       the number and the noun. */
+    var hasMoves = moves > 0;
+    var count = hasMoves ? moves : days;
+    var noun = hasMoves ? (v.moveWord || 'moves') : 'days';
+    return { days: days, moves: moves, hours: hours, streak: streak, weeks: weeks,
+      perWeek: hasMoves ? perWeek : 0, money: money, mf: mf, marks: marks,
+      hasMoves: hasMoves, count: count, noun: noun, unitLabel: unitFor(count, noun),
+      one: singular(noun) };
   }
   function seeded(seed) { return function () { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }; }
 
@@ -858,17 +903,19 @@
         var words = String(v.line).trim().split(/\s+/), spans = '';
         for (var i = 0; i < words.length; i++) spans += '<span class="w" style="--i:' + i + '">' + esc(words[i]) + (i === words.length - 1 ? '!' : '') + '</span> ';
         put(ph, '.ba1-line', spans.trim());
+        fitLine(ph, '.ba1-line', 44); fitLine(ph, '.ba1-quiet', 19);
         var w = wallData(v);
-        put(ph, '.ba1-engine', '<b>' + fmt(w.days) + '</b> ' + plural(w.days, 'day', 'days') + ' &middot; <b>' + fmt(w.moves) + '</b> ' + esc(unitFor(w.moves, v.moveWord)));
+        put(ph, '.ba1-engine', '<b>' + fmt(w.days) + '</b> ' + plural(w.days, 'day', 'days')
+          + (w.hasMoves ? ' &middot; <b>' + fmt(w.moves) + '</b> ' + esc(w.unitLabel) : ''));
         /* THE LEDGER WALL: the record tiled edge to edge. The first AND last
            cells run full width (his 2026-08-14 note) so it reads as a slab. */
         var cells = [];
-        cells.push([fmt(w.moves), esc(unitFor(w.moves, v.moveWord)) + ', every one logged', 'ba1-cell--hero']);
-        cells.push([fmt(w.days), plural(w.days, 'day', 'days') + ' start to finish', '']);
+        cells.push([fmt(w.count), esc(w.unitLabel) + (w.hasMoves ? ', every one logged' : ' start to finish'), 'ba1-cell--hero']);
+        if (w.hasMoves) cells.push([fmt(w.days), plural(w.days, 'day', 'days') + ' start to finish', '']);
         if (w.hours > 0) cells.push([fmt(w.hours), 'hours put in', '']);
         if (w.streak > 0) cells.push([fmt(w.streak), 'days, your longest streak', '']);
         cells.push([fmt(w.weeks), plural(w.weeks, 'week', 'weeks'), '']);
-        if (w.perWeek > 0) cells.push([fmt(w.perWeek), esc(unitFor(2, v.moveWord)) + ' a week, on average', '']);
+        if (w.perWeek > 0) cells.push([fmt(w.perWeek), esc(unitFor(2, w.noun)) + ' a week, on average', '']);
         cells.push([fmt(w.marks), plural(w.marks, 'mark passed', 'marks passed'), '']);
         if (v.shape === 'target') cells.push([w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value), 'your own numbers', '']);
         if (cells.length % 2 === 0) cells[cells.length - 1][2] += ' ba1-cell--wide';
@@ -910,11 +957,11 @@
         var hEl = Q(ph, '.ba2-hero');
         if (hEl) hEl.style.fontSize = hero.length > 6 ? '84px' : hero.length > 4 ? '104px' : '132px';
         put(ph, '.ba2-unit', unit);
-        put(ph, '.ba2-line', esc(v.line) + '!');
+        put(ph, '.ba2-line', esc(v.line) + '!'); fitLine(ph, '.ba2-line', 28);
         /* THE COLUMN: EVERY move gets a slat, no cap (his 2026-08-14 note).
            500 moves = 500 slivers; the gap closes and the ink alternates so
            the density stays legible instead of collapsing into a bar. */
-        var n = Math.max(1, w.moves || w.days), t = '';
+        var n = Math.max(1, w.count), t = '';
         for (var i = 0; i < n; i++) {
           var top = i === n - 1;
           t += '<i class="' + (top ? 'top' : '') + '" style="--i:' + Math.min(i, 400) +
@@ -924,8 +971,8 @@
         if (tw) { tw.innerHTML = t; tw.style.gap = n <= 60 ? '2px' : n <= 160 ? '1px' : '0px'; }
         var side = '', k = 0;
         function stat(num, label, hot) { side += '<div class="ba2-s' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
-        stat(fmt(w.moves || w.days), w.moves ? esc(unitFor(w.moves, v.moveWord)) + ', every one' : 'days, every one', true);
-        stat(fmt(w.days), plural(w.days, 'day', 'days'));
+        stat(fmt(w.count), esc(w.unitLabel) + ', every one', true);
+        if (w.hasMoves) stat(fmt(w.days), plural(w.days, 'day', 'days'));
         if (w.hours > 0) stat(fmt(w.hours), 'hours');
         if (w.streak > 0) stat(fmt(w.streak) + '-day', 'longest streak');
         put(ph, '.ba2-side', side);
@@ -952,8 +999,8 @@
       apply: function (ph, v) {
         var sh = v.shape, w = wallData(v);
         put(ph, '.ba3-c1', fmt(w.days) + '<small>' + plural(w.days, 'day', 'days') + '</small>');
-        put(ph, '.ba3-c2', w.moves > 0
-          ? fmt(w.moves) + '<small>' + esc(unitFor(w.moves, v.moveWord)) + '</small>'
+        put(ph, '.ba3-c2', w.hasMoves
+          ? fmt(w.moves) + '<small>' + esc(w.unitLabel) + '</small>'
           : w.mf(+v.value) + '<small>' + esc(unitFor(+v.value, v.unit)) + '</small>');
         var c3;
         if (sh === 'target') c3 = w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value) + '<small>your own numbers</small>';
@@ -961,12 +1008,12 @@
         else if (sh === 'duration') c3 = 'day 1 &rarr; day ' + fmt(w.days) + '<small>the line held the whole way</small>';
         else c3 = 'done<small>no partial credit, and none needed</small>';
         put(ph, '.ba3-c3', c3);
-        put(ph, '.ba3-line', esc(v.line) + '!');
-        put(ph, '.ba3-fin', esc(v.line) + '!');
+        put(ph, '.ba3-line', esc(v.line) + '!'); fitLine(ph, '.ba3-line', 42);
+        put(ph, '.ba3-fin', esc(v.line) + '!'); fitLine(ph, '.ba3-fin', 28);
         var cards = '', k = 0;
         function card(num, label, cls) { cards += '<div class="ba3-k ' + (cls || '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
-        card(fmt(w.moves), esc(unitFor(w.moves, v.moveWord)), 'ba3-k--wide ba3-k--hot');
-        card(fmt(w.days), plural(w.days, 'day', 'days'));
+        card(fmt(w.count), esc(w.unitLabel), 'ba3-k--wide ba3-k--hot');
+        if (w.hasMoves) card(fmt(w.days), plural(w.days, 'day', 'days'));
         card(fmt(w.weeks), plural(w.weeks, 'week', 'weeks'));
         card(fmt(w.marks), 'marks');
         if (w.hours > 0) card(fmt(w.hours), 'hours');
@@ -996,12 +1043,12 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba4-line', esc(v.line) + '!');
+        put(ph, '.ba4-line', esc(v.line) + '!'); fitLine(ph, '.ba4-line', 42);
         var w = wallData(v);
         /* THE HALO: EVERY move orbits the Memento, no cap (his 2026-08-14
            note). The dots fill an annulus around the card, so 700 packs
            denser instead of flying off the screen, and the whole ring turns. */
-        var N = Math.max(1, w.moves || w.days), dots = '';
+        var N = Math.max(1, w.count), dots = '';
         var rMin = 82, rMax = 176;
         var size = N > 900 ? 2 : N > 450 ? 2.6 : N > 200 ? 3.4 : 4.6;
         for (var i = 0; i < N; i++) {
@@ -1012,7 +1059,7 @@
                   ';width:' + size + 'px;height:' + size + 'px;margin-left:' + x + 'px;margin-top:' + y + 'px"></i>';
         }
         put(ph, '.ba4-halo', dots);
-        put(ph, '.ba4-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + '. Every one of them, around it.</span>');
+        put(ph, '.ba4-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. Every one of them, around it.</span>');
       }
     },
 
@@ -1034,12 +1081,12 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba5-line', esc(v.line) + '!');
-        put(ph, '.ba5-fin', esc(v.line) + '!');
+        put(ph, '.ba5-line', esc(v.line) + '!'); fitLine(ph, '.ba5-line', 42);
+        put(ph, '.ba5-fin', esc(v.line) + '!'); fitLine(ph, '.ba5-fin', 28);
         var w = wallData(v);
         put(ph, '.ba5-once', w.days >= 300 ? 'A year of showing up, paid in full!' : fmt(w.days) + ' days of showing up, paid in full!');
         /* THE FIELD: EVERY move is a dot, no cap; the bloom turns slowly. */
-        var N = Math.max(1, w.moves || w.days);
+        var N = Math.max(1, w.count);
         var dr = Math.max(1.1, Math.min(4.4, 40 / Math.sqrt(N + 2))), c = 6.6, out = '';
         for (var i = 0; i < N; i++) {
           var rr = c * Math.sqrt(i), th = i * 2.399963;
@@ -1050,7 +1097,7 @@
         var span = Math.max(60, c * Math.sqrt(N) + 8);
         var svg = Q(ph, '.ba5-svg');
         if (svg) { svg.setAttribute('viewBox', (-span) + ' ' + (-span) + ' ' + (span * 2) + ' ' + (span * 2)); svg.innerHTML = out; }
-        put(ph, '.ba5-under', '<b>' + fmt(w.moves || w.days) + '</b><span>' + (w.moves ? esc(unitFor(w.moves, v.moveWord)) : 'days') + '. One dot for every single one.</span>');
+        put(ph, '.ba5-under', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '. One dot for every single one.</span>');
       }
     },
 
@@ -1072,21 +1119,29 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        /* the opening drops the line in letter by letter */
-        var chars = String(v.line).trim() + '!', out = '', n = 0;
-        for (var i = 0; i < chars.length; i++) {
-          var ch = chars.charAt(i);
-          out += ch === ' ' ? '<i style="--i:' + (n++) + '">&nbsp;</i>' : '<i style="--i:' + (n++) + '">' + esc(ch) + '</i>';
+        /* the line drops in letter by letter, but WORDS never split */
+        var words = (String(v.line).trim() + '!').split(/\s+/), out = '', n = 0;
+        for (var i = 0; i < words.length; i++) {
+          out += '<b>';
+          for (var c = 0; c < words[i].length; c++) out += '<i style="--i:' + (n++) + '">' + esc(words[i].charAt(c)) + '</i>';
+          out += '</b>' + (i < words.length - 1 ? ' ' : '');
         }
         put(ph, '.ba7-line', out);
-        put(ph, '.ba7-fin', esc(v.line) + '!');
-        /* THE TEN THOUSAND: the move word printed once per move, EVERY one */
-        var w = wallData(v), word = singular(v.moveWord || 'move');
-        var N = Math.max(1, w.moves || w.days), spans = '';
-        var fs = N > 700 ? 6.5 : N > 400 ? 8 : N > 200 ? 10 : N > 90 ? 13 : 17;
-        for (var i2 = 0; i2 < N; i2++) spans += '<s class="' + ((i2 + 1) % 10 === 0 ? 'hot' : '') + '" style="--i:' + Math.min(i2, 400) + ';font-size:' + fs + 'px">' + esc(word) + '</s>';
+        fitLine(ph, '.ba7-line', 46);
+        put(ph, '.ba7-fin', esc(v.line) + '!'); fitLine(ph, '.ba7-fin', 28);
+        /* THE TEN THOUSAND: one printed word per move, and the type shrinks
+           until they ALL fit. If a count is so big even 3px will not hold it,
+           the caption says exactly how many are shown rather than clipping
+           in silence (his provenance law). */
+        var w = wallData(v), word = w.one;
+        var N = Math.max(1, w.count), spans = '';
+        for (var i2 = 0; i2 < N; i2++) spans += '<s class="' + ((i2 + 1) % 10 === 0 ? 'hot' : '') + '" style="--i:' + Math.min(i2, 400) + '">' + esc(word) + '</s>';
         put(ph, '.ba7-wall', spans);
-        put(ph, '.ba7-tot', '<b>' + fmt(N) + '</b><span>' + (w.moves ? esc(unitFor(N, v.moveWord)) : 'days') + ', written out. Every tenth one lit.</span>');
+        var start = N > 700 ? 8 : N > 400 ? 10 : N > 200 ? 12 : N > 90 ? 15 : 18;
+        var fits = fitWall(ph, '.ba7-wall', '--fs', start, 3, 0.5);
+        var shown = fits ? N : visibleCount(ph, '.ba7-wall', 's');
+        put(ph, '.ba7-tot', '<b>' + fmt(N) + '</b><span>' + esc(w.unitLabel) + ', written out. Every tenth one lit.'
+          + (fits ? '' : ' (' + fmt(shown) + ' fit the screen; all ' + fmt(N) + ' counted.)') + '</span>');
       }
     },
 
@@ -1108,17 +1163,32 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba8-line', esc(v.line) + '!');
-        put(ph, '.ba8-fin', esc(v.line) + '!');
+        put(ph, '.ba8-line', esc(v.line) + '!'); fitLine(ph, '.ba8-line', 42);
+        put(ph, '.ba8-fin', esc(v.line) + '!'); fitLine(ph, '.ba8-fin', 28);
         var w = wallData(v);
         /* THE HEAT: one cell per DAY of the journey, shaded by how much they
            did that day. In the app these come from the real log; here they
            are distributed deterministically from their own totals. */
         var days = Math.max(1, Math.min(w.days, 730));
-        var moves = w.moves || days, rnd = seeded(days * 31 + moves);
-        var per = [];
-        for (var i = 0; i < days; i++) per.push(0);
-        for (var m2 = 0; m2 < moves; m2++) per[Math.floor(rnd() * days)]++;
+        var moves = w.count, rnd = seeded(days * 31 + moves);
+        var per = [], i;
+        for (i = 0; i < days; i++) per.push(0);
+        /* FIX 4: a line HELD is held every single day, so a no-buy year must
+           light all 365 cells, not 233. Only when there are genuinely fewer
+           moves than days does the grid go sparse, and then each move takes
+           its own day instead of stacking randomly. */
+        if (!w.hasMoves) {
+          /* nothing was ever logged (an exam passed, a deal closed): the grid
+             is the TIME it took, evenly, never a claim that they showed up */
+          for (i = 0; i < days; i++) per[i] = 1;
+        } else if (moves >= days) {
+          for (i = 0; i < days; i++) per[i] = 1;
+          for (var r2 = 0; r2 < moves - days; r2++) per[Math.floor(rnd() * days)]++;
+        } else {
+          var pool = [];
+          for (i = 0; i < days; i++) pool.push(i);
+          for (var m2 = 0; m2 < moves; m2++) per[pool.splice(Math.floor(rnd() * pool.length), 1)[0]] = 1;
+        }
         var cols = Math.max(7, Math.min(26, Math.round(Math.sqrt(days * 1.7))));
         var cells = '';
         for (var d = 0; d < days; d++) {
@@ -1129,10 +1199,11 @@
         if (g) { g.innerHTML = cells; g.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; }
         var lit = 0;
         for (var q = 0; q < days; q++) if (per[q] > 0) lit++;
-        put(ph, '.ba8-cap', 'Every day of it' + (w.days > days ? ' (the last ' + fmt(days) + ')' : '') + ', darker where you did more');
+        put(ph, '.ba8-cap', 'Every day of it' + (w.days > days ? ' (the last ' + fmt(days) + ')' : '')
+          + (w.hasMoves ? ', darker where you did more' : ', start to finish'));
         put(ph, '.ba8-keys',
-          '<div class="ba8-key"><b>' + fmt(w.moves) + '</b><span>' + esc(unitFor(w.moves, v.moveWord)) + '</span></div>'
-          + '<div class="ba8-key"><b>' + fmt(lit) + '</b><span>days you showed up</span></div>'
+          (w.hasMoves ? '<div class="ba8-key"><b>' + fmt(w.moves) + '</b><span>' + esc(w.unitLabel) + '</span></div>' : '')
+          + '<div class="ba8-key"><b>' + fmt(w.hasMoves ? lit : w.days) + '</b><span>' + (w.hasMoves ? 'days you showed up' : 'days it took') + '</span></div>'
           + (w.streak > 0 ? '<div class="ba8-key"><b>' + fmt(w.streak) + '</b><span>day streak</span></div>' : '')
           + (w.hours > 0 ? '<div class="ba8-key"><b>' + fmt(w.hours) + '</b><span>hours</span></div>' : ''));
       }
@@ -1178,11 +1249,11 @@
         put(ph, '.ba9-chips', chips);
         var boom = (0.25 + vals.length * 0.13 + 0.35).toFixed(2) + 's';
         var b1 = Q(ph, '.b1'); if (b1) b1.style.setProperty('--boom', boom);
-        put(ph, '.ba9-line', esc(v.line) + '!');
-        put(ph, '.ba9-fin', esc(v.line) + '!');
+        put(ph, '.ba9-line', esc(v.line) + '!'); fitLine(ph, '.ba9-line', 42);
+        put(ph, '.ba9-fin', esc(v.line) + '!'); fitLine(ph, '.ba9-fin', 28);
         /* THE FULL WALL: a mosaic, mixed weights, drifting gently. */
         var wall = [], j = 0;
-        wall.push([fmt(w.moves) + ' ' + esc(unitFor(w.moves, v.moveWord)), 'ba9-wc--xl ba9-wc--hot']);
+        wall.push([fmt(w.count) + ' ' + esc(w.unitLabel), 'ba9-wc--xl ba9-wc--hot']);
         wall.push([fmt(w.days) + ' days', 'ba9-wc--big']);
         if (w.streak > 0) wall.push([fmt(w.streak) + '-day streak', 'ba9-wc--big ba9-wc--hot']);
         if (w.hours > 0) wall.push([fmt(w.hours) + ' hours', 'ba9-wc--big']);
@@ -1195,6 +1266,7 @@
         var html = '';
         wall.forEach(function (c) { html += '<span class="ba9-wc ' + c[1] + '" style="--i:' + (j++) + '">' + c[0] + '</span>'; });
         put(ph, '.ba9-wall', html);
+        fitWall(ph, '.ba9-wall', '--s', 1, 0.45, 0.04);
       }
     },
 
@@ -1216,9 +1288,9 @@
         { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
       ],
       apply: function (ph, v) {
-        put(ph, '.ba10-line', esc(v.line) + '!');
-        put(ph, '.ba10-fin', esc(v.line) + '!');
-        var w = wallData(v), N = Math.max(1, w.moves || w.days);
+        put(ph, '.ba10-line', esc(v.line) + '!'); fitLine(ph, '.ba10-line', 42);
+        put(ph, '.ba10-fin', esc(v.line) + '!'); fitLine(ph, '.ba10-fin', 28);
+        var w = wallData(v), N = Math.max(1, w.count);
         /* THE ENGRAVING: the M is BUILT from their moves. Exactly N dots,
            every one inside the mark (ray-cast test on the real path), the
            spacing solved so the count comes out right, not approximated. */
@@ -1254,7 +1326,7 @@
         }
         var eng = Q(ph, '.ba10-eng');
         if (eng) eng.innerHTML = dots;
-        put(ph, '.ba10-under', '<b>' + fmt(take.length) + '</b><span>' + (w.moves ? esc(unitFor(N, v.moveWord)) : 'days') + '. The mark is made of them.</span>');
+        put(ph, '.ba10-under', '<b>' + fmt(take.length) + '</b><span>' + esc(w.unitLabel) + '. The mark is made of them.</span>');
       }
     }
 

@@ -9,6 +9,7 @@
 @keyframes ba7Wash{from{opacity:0}to{opacity:1}}
 [data-c="ba-7"] .ba7-line{position:relative;font-size:46px;font-weight:750;letter-spacing:-.042em;
   line-height:1.06;color:#0b0e12;max-width:10ch}
+[data-c="ba-7"] .ba7-line b{display:inline-block;white-space:nowrap;font-weight:inherit}
 [data-c="ba-7"] .ba7-line i{display:inline-block;font-style:normal;opacity:0}
 [data-c="ba-7"] .b1.on .ba7-line i{animation:ba7Drop .5s cubic-bezier(.16,1.35,.3,1) calc(.35s + var(--i)*.055s) both}
 @keyframes ba7Drop{from{opacity:0;transform:translateY(-46px) scale(1.2)}to{opacity:1;transform:none}}
@@ -27,10 +28,11 @@
 
 /* THE TEN THOUSAND: the move word printed once per move, a wall of text. */
 [data-c="ba-7"] .b2{padding:26px 18px}
-[data-c="ba-7"] .ba7-wall{width:100%;display:flex;flex-wrap:wrap;gap:3px 6px;justify-content:center;
-  align-content:center;max-height:70%;overflow:hidden}
+[data-c="ba-7"] .ba7-wall{--fs:11;width:100%;display:flex;flex-wrap:wrap;
+  gap:calc(var(--fs)*.28px) calc(var(--fs)*.55px);justify-content:center;
+  align-content:center;max-height:68%;overflow:hidden}
 [data-c="ba-7"] .ba7-wall s{text-decoration:none;font-weight:600;letter-spacing:0;
-  color:rgba(11,14,18,.44);opacity:0}
+  font-size:calc(var(--fs)*1px);line-height:1.15;color:rgba(11,14,18,.44);opacity:0}
 [data-c="ba-7"] .ba7-wall s.hot{color:rgba(11,14,18,.96);font-weight:700}
 [data-c="ba-7"] .b2.on .ba7-wall s{animation:ba7In .25s ease-out calc(var(--i)*.005s) forwards}
 @keyframes ba7In{to{opacity:1}}
