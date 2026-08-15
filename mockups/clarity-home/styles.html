@@ -112,7 +112,6 @@
   /* ---- shared standing bits: unit inline, as-of, three-point rail ---- */
   .inner .unit{font-size:.5em;font-weight:650;letter-spacing:0;margin-left:.28em;color:var(--mid)}
   .inner .asof{color:var(--lo);font-size:.74rem;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
-  .inner .aim{color:var(--mid);font-size:.86rem;margin-top:4px}
   .inner .prog{margin:16px 0 0}
   .inner .track{position:relative;height:4px;border-radius:99px;background:rgba(255,255,255,.09)}
   .inner .track i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cyan))}
@@ -141,17 +140,17 @@
 <script>
 const SHAPES = [
   { id:'qup', label:'Quantity up', face:'num',
-    cur:'12,400', unit:'subs', aim:'heading for 100,000', pct:12.4,
+    cur:'12,400', unit:'subs', pct:12.4,
     start:'8,100', target:'100,000', asOf:'as of 2 days ago', rem:'+87,600', remLab:'to go',
     why:'Watching the people who matter most scroll their lives away, and knowing the channel could reach them.',
     anti:'Another year of edits sitting in drafts while the ideas go stale.' },
   { id:'qdown', label:'Quantity down', face:'num',
-    cur:'232.5', unit:'lbs', aim:'heading for 220', pct:43.2,
+    cur:'232.5', unit:'lbs', pct:43.2,
     start:'242', target:'220', asOf:'as of yesterday', rem:'-12.5 lbs', remLab:'to go',
     why:'Keeping up with your kids without running out of breath.',
     anti:'Feeling a little worse every season in a body that keeps getting harder to live in.' },
   { id:'screen', label:'Screen time', face:'num',
-    cur:'3h 40m', unit:'a day', aim:'heading for 2h', pct:34,
+    cur:'3h 40m', unit:'a day', pct:34,
     start:'4h 30m', target:'2h', asOf:'as of this morning', rem:'-1h 40m', remLab:'to go',
     why:'Getting those hours back for the people in the room instead of the feed.',
     anti:'Another year handed to a scroll you will not remember a single minute of.' },
