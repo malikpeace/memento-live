@@ -50,3 +50,17 @@
   under the island at ~38% ink. It is the door back to The logic ("Why this
   plan" in the app) and the brand on the day screen. In the gallery, tapping
   it jumps to lg-1 carrying the current bucket.
+
+## 2026-08-16 night 4: the scale callback, the rail, logic flat
+- lg-1 screen + focus briefs now argue through THE SCALE FROM CLARITY, and
+  the real gs element (fulcrum/beam/red/cyan, depth skin, flip animation) is
+  ported mini into the brief. The one deliberate colour on the page, it is a
+  Clarity callback by design.
+- lg-1 v5 FLAT: glass cards are gone. Equation + plate are ruled sections
+  (hairlines above/below, no fill), type up (star 21, body 13.5/1.62),
+  more air. Malik: "very minimal and very flat... nothing else to do other
+  than focus on this action."
+- u-1 THE RAIL: flat vertical line on the right edge, pull up = heavier.
+  Moves through the full size ladder and drags the plate with it (crossing a
+  named size folds/grows supports); one state with the size sheet. Hidden
+  once the day is held and on off days. Keyboard accessible.

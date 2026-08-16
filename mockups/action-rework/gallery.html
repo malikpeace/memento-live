@@ -914,50 +914,79 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 /* centers when the brief is short, scrolls from the top when it is long
    (justify-content:center would clip the top of overflowing content) */
 [data-k=lg-1] .lg1-in{margin:auto 0}
-[data-k=lg-1] .lg1-star{margin:0 0 14px;font-size:19px;font-weight:700;line-height:1.32;
-  letter-spacing:-.024em;color:var(--text-hi);text-wrap:pretty}
-[data-k=lg-1] .lg1 p.b{margin:0 0 11px;font-size:12.5px;line-height:1.52;
+[data-k=lg-1] .lg1-star{margin:0 0 18px;font-size:21px;font-weight:700;line-height:1.32;
+  letter-spacing:-.025em;color:var(--text-hi);text-wrap:pretty}
+[data-k=lg-1] .lg1 p.b{margin:0 0 14px;font-size:13.5px;line-height:1.62;
   color:rgba(var(--ink),.92);text-wrap:pretty}
 [data-k=lg-1] .lg1 p.b b{font-weight:600;color:var(--text-hi)}
 /* the act card: only the act. The paragraph above it already did the talking. */
 /* the plate card: the star act, then the two supports each with the one line
    that earns its place, so nothing on tomorrow's day screen came from nowhere */
-[data-k=lg-1] .lg1-mv{margin:5px 0 12px;border-radius:12px;padding:14px 15px;
-  background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+/* FLAT (Malik: no layers, nothing glassy, the page is one surface). The
+   plate is a ruled section: hairlines above and below, nothing filled. */
+[data-k=lg-1] .lg1-mv{margin:8px 0 18px;padding:14px 0;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.14), inset 0 -1px 0 rgba(var(--ink),.14)}
+[data-k=lg-1] .lg1-mv p{margin:0;font-size:15.5px;font-weight:700;line-height:1.32;
+  letter-spacing:-.016em;color:var(--text-hi)}
+[data-k=lg-1] .lg1-mv .sup{margin-top:12px;padding-top:12px;
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
-[data-k=lg-1] .lg1-mv p{margin:0;font-size:14.5px;font-weight:700;line-height:1.3;
-  letter-spacing:-.014em;color:var(--text-hi)}
-[data-k=lg-1] .lg1-mv .sup{margin-top:11px;padding-top:11px;
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
-[data-k=lg-1] .lg1-mv .sup b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;
+[data-k=lg-1] .lg1-mv .sup b{display:block;font-size:13px;font-weight:600;line-height:1.32;
   color:var(--text-hi)}
-[data-k=lg-1] .lg1-mv .sup span{display:block;margin-top:2px;font-size:11px;line-height:1.4;
+[data-k=lg-1] .lg1-mv .sup span{display:block;margin-top:2px;font-size:11.5px;line-height:1.42;
   color:rgba(var(--ink),.78)}
 /* how the machine runs: a few labeled rows, cadence and the stall promise */
-[data-k=lg-1] .lg1-runs{display:flex;flex-direction:column;gap:7px;margin:2px 0 13px}
-[data-k=lg-1] .lg1-runs p{margin:0;font-size:12px;line-height:1.48;color:rgba(var(--ink),.92)}
+[data-k=lg-1] .lg1-runs{display:flex;flex-direction:column;gap:9px;margin:2px 0 16px}
+[data-k=lg-1] .lg1-runs p{margin:0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.92)}
 [data-k=lg-1] .lg1-runs p b{font-weight:600;color:var(--text-hi)}
 /* the covenant: the deal the hold signs */
-[data-k=lg-1] .lg1-cov{margin:0 0 2px;font-size:12.5px;font-weight:500;line-height:1.52;
+[data-k=lg-1] .lg1-cov{margin:0 0 2px;font-size:13.5px;font-weight:500;line-height:1.55;
   color:var(--text-hi)}
 /* the equation block: the math gets its own visual moment. Stacked terms,
    tabular numerals, the result separated and emphasized. Checkable at a
    glance, which is what kills the AI feel: prose can only be believed. */
-[data-k=lg-1] .lg1-eq{display:flex;flex-direction:column;gap:8px;margin:4px 0 13px;
-  padding:13px 15px;border-radius:12px;background:rgba(22,25,31,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lg-1] .lg1-eq{display:flex;flex-direction:column;gap:9px;margin:8px 0 18px;
+  padding:14px 0;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.14), inset 0 -1px 0 rgba(var(--ink),.14)}
 [data-k=lg-1] .lg1-eq div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-[data-k=lg-1] .lg1-eq s{text-decoration:none;font-size:11.5px;line-height:1.3;
+[data-k=lg-1] .lg1-eq s{text-decoration:none;font-size:12px;line-height:1.3;
   color:rgba(var(--ink),.80)}
-[data-k=lg-1] .lg1-eq b{font-size:13.5px;font-weight:700;letter-spacing:-.01em;
+[data-k=lg-1] .lg1-eq b{font-size:14px;font-weight:700;letter-spacing:-.01em;
   color:var(--text-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
 [data-k=lg-1] .lg1-eq .r{margin-top:1px;padding-top:10px;box-shadow:inset 0 1px 0 rgba(var(--ink),.13)}
-[data-k=lg-1] .lg1-eq .r b{font-size:16px}
-[data-k=lg-1] .lg1-src{margin:10px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
-[data-k=lg-1] .lg1-fair{margin:14px 0 0;font-size:16px;font-weight:700;letter-spacing:-.016em;
+[data-k=lg-1] .lg1-eq .r b{font-size:17px}
+[data-k=lg-1] .lg1-src{margin:12px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.78)}
+[data-k=lg-1] .lg1-fair{margin:16px 0 0;font-size:17px;font-weight:700;letter-spacing:-.018em;
   color:var(--text-hi)}
+/* THE SCALE from Clarity's opening, ported small: fulcrum, beam, the red
+   distraction weight, the cyan purpose weight. The flip animation IS the
+   argument: the purpose side grows and the beam tips. Real elements, real
+   colors (the one deliberate colour on this page, it is a Clarity callback). */
+[data-k=lg-1] .lgs{position:relative;width:200px;height:106px;margin:2px auto 18px}
+[data-k=lg-1] .lgs__f{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;
+  border-bottom:17px solid rgba(var(--ink),.94)}
+[data-k=lg-1] .lgs__beam{position:absolute;bottom:17px;left:5px;right:5px;height:3px;
+  background:rgba(var(--ink),.94);border-radius:2px;transform-origin:center bottom;
+  animation:lgsFlip 5s ease-in-out infinite}
+[data-k=lg-1] .lgs__red,[data-k=lg-1] .lgs__cyan{position:absolute;bottom:5px;border-radius:6px}
+[data-k=lg-1] .lgs__red{left:-2px;width:44px;height:36px;background-color:#ec4227;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,0) 46%,rgba(0,0,0,.24) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -3px 6px rgba(0,0,0,.28),0 8px 16px rgba(0,0,0,.5);
+  transform-origin:bottom center;animation:lgsDim 5s ease-in-out infinite}
+[data-k=lg-1] .lgs__cyan{right:-1px;width:19px;height:15px;background-color:#4ecdec;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,0) 46%,rgba(0,20,30,.26) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 5px rgba(0,20,30,.3),0 6px 14px rgba(0,0,0,.45);
+  animation:lgsGrow 5s ease-in-out infinite}
+@keyframes lgsFlip{0%,43%{transform:rotate(-6deg)}56%,90%{transform:rotate(9deg)}100%{transform:rotate(-6deg)}}
+@keyframes lgsDim{0%,40%{transform:scale(1);opacity:.85}55%{transform:scale(.55);opacity:.3}
+  65%,88%{transform:scale(.5);opacity:.25}100%{transform:scale(1);opacity:.85}}
+@keyframes lgsGrow{0%,40%{width:19px;height:15px;background-color:#4ecdec}
+  52%{width:50px;height:41px;background-color:#4db8ff}60%,88%{width:46px;height:38px;background-color:#4db8ff}
+  100%{width:19px;height:15px;background-color:#4ecdec}}
+@media (prefers-reduced-motion:reduce){
+  [data-k=lg-1] .lgs__beam{animation:none;transform:rotate(9deg)}
+  [data-k=lg-1] .lgs__red{animation:none;transform:scale(.5);opacity:.25}
+  [data-k=lg-1] .lgs__cyan{animation:none;width:46px;height:38px;background-color:#4db8ff}}
 /* the hold: same law as everywhere, an early release does nothing */
 [data-k=lg-1] .lg1-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
   border:0;border-radius:14px;overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;
@@ -1051,8 +1080,9 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       intro:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>8 hours</b> as where the day stands, so the plan starts from your number.'],
       eq:[['Your number now','8 hours'],['The goal','3 hours']],
       res:['To win back, every day','5 hours'],
-      ps:['Here is how focus works: your brain is always weighing what deserves its attention, and the phone keeps winning because nothing on the table beats it. Deleting the apps helps, you named &#8220;TikTok, Instagram and Reddit&#8221; as the big three. But removal alone leaves a void, and a bored brain claws its way back to stimulation.',
-          'So the plan does both. Day one removes the three. Then the hours get somewhere better to go: you said the evenings should be for your music, so that becomes the replacement, with progress you can see. Once progress feels better than the scroll, focus stops being an uphill fight and the number falls on its own.',
+      scale:true,
+      ps:['Remember the scale from Clarity: your attention always tips toward the heaviest thing on it, and right now the phone is the heaviest thing on yours. You named &#8220;TikTok, Instagram and Reddit&#8221; as the big three. Deleting them helps, but removal alone leaves a void, and a bored brain claws its way back to stimulation.',
+          'So the plan works both sides. Day one takes weight off the phone&#8217;s side. Then the other side gets loaded: you said the evenings should be for your music, so that becomes the replacement, with progress you can see. Once progress outweighs the scroll, the scale flips and focus stops being a fight.',
           'Phone away at 8pm guards the night while that takes hold. You type each night&#8217;s number from your Screen Time report. The first two weeks are the hard part. After that it starts running itself.'],
       sup:[['Phone away at 8:00pm','the one guarded moment the night turns on'],
            ['Audiobook at lunch, not YouTube','the midday hours need somewhere to go too']],
@@ -1127,7 +1157,8 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     focus:{star:'&#8220;Deep work every day until the migration ships.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and you said the mornings vanish into email before the real work starts.'],
       eq:null,
-      ps:['Focus is a skill, and your brain is always weighing what deserves it. Email wins because it pays back in seconds. So the plan claims the first hours for the migration and makes that work pay back visibly too: one protected block, phone in another room, a single tab, every block counted.',
+      scale:true,
+      ps:['Focus is a skill, and it runs on the scale from Clarity: your attention tips toward the heaviest thing on it, and email wins mornings because it pays back in seconds. So the plan claims the first hours for the migration and makes that work pay back visibly too: one protected block, phone in another room, a single tab, every block counted.',
           'You size the block each day. The block itself is not negotiable, because you said it yourself: once the morning goes, the day goes with it.'],
       sup:[['Phone in another room','the fight is won before it starts'],
            ['Single tab only','one tab is the whole discipline']],
@@ -1161,7 +1192,11 @@ mx-11 is the deliberate counter-example: the same design carrying five.
         +c.eq.map(function(r){return '<div><s>'+r[0]+'</s><b>'+r[1]+'</b></div>'}).join('')
         +'<div class="r"><s>'+c.res[0]+'</s><b>'+c.res[1]+'</b></div></div>';
     }
-    h+=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    c.ps.forEach(function(p,i){
+      h+='<p class="b">'+p+'</p>';
+      if(i===0&&c.scale)h+='<div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
+        +'<div class="lgs__beam"><b class="lgs__red"></b><b class="lgs__cyan"></b></div></div>';
+    });
     /* the plate: the act, then the supports with the line that earns each */
     h+='<div class="lg1-mv"><p>'+c.act+'</p>'
       +c.sup.map(function(x){return '<div class="sup"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')
@@ -1588,6 +1623,21 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=u-1] .u1-dw.gone{display:none}
 [data-k=u-1] .u1.signed .u1-dw{display:none}
 
+/* --- THE RAIL (Malik, 2026-08-16): a flat vertical line on the right edge
+   you pull up and down like a thermostat. Up is heavier. It moves through
+   the full size ladder and drags the plate with it (crossing a named size
+   folds or grows the supports), so it and the size sheet are one state. --- */
+[data-k=u-1] .u1-rail{position:absolute;right:2px;top:50%;transform:translateY(-50%);
+  width:30px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
+  background:none;padding:0}
+[data-k=u-1] .u1-rail::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;
+  margin-left:-1px;border-radius:1px;background:rgba(var(--ink),.15)}
+[data-k=u-1] .u1-rail i{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:3px;
+  border-radius:2px;background:rgba(var(--ink),.92);transition:top .1s ease-out;pointer-events:none}
+[data-k=u-1] .u1-rail.hide{display:none}
+[data-k=u-1] .u1-rail:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
+[data-k=u-1] .u1-star{padding-right:22px}
+
 /* --- the supports: the same day, one rank down -------------------------- */
 [data-k=u-1] .u1-plate{position:relative;z-index:2}
 [data-k=u-1] .u1-rule{height:1px;background:rgba(var(--ink),.13);margin:0 0 4px;
@@ -1745,6 +1795,8 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     <button type="button" class="u1-m" aria-label="Why this plan">
       <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
     </button>
+    <button type="button" class="u1-rail" role="slider" aria-label="today's intensity"
+      aria-orientation="vertical"><i></i></button>
     <div class="u1-sp a"></div>
 
     <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
@@ -2014,9 +2066,42 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     /* the star already carries the length, so the door only offers to start */
     if(show)dwmin.textContent='';
   }
+  /* the rail's ladder: every size this bucket owns, ordered light to heavy.
+     Heaviness direction comes from the three named sizes (screen time runs
+     downward: an earlier hour is the heavier night). */
+  function ladder(){
+    if(!C.fmt)return [0,1,2];
+    var asc=C.three[2]>C.three[0];
+    return (C.all||C.three).slice().sort(function(a,b){return asc?a-b:b-a});
+  }
+  function railDraw(){
+    rail.classList.toggle('hide',signed||off);
+    if(signed||off)return;
+    var L=ladder(),H=rail.clientHeight-3,i;
+    if(!C.fmt)i=acts-1;
+    else{i=L.indexOf(val);
+      if(i<0){var best=0,bd=Infinity;L.forEach(function(v,j){var d=Math.abs(v-val);if(d<bd){bd=d;best=j}});i=best;}}
+    knob.style.top=((1-i/(L.length-1))*H)+'px';
+    rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax',String(L.length-1));
+    rail.setAttribute('aria-valuenow',String(i));
+  }
+  function railSet(y){
+    var L=ladder(),rect=rail.getBoundingClientRect(),
+        t=Math.min(1,Math.max(0,(y-rect.top)/rect.height)),
+        i=Math.round((1-t)*(L.length-1));
+    if(!C.fmt)acts=i+1;
+    else{
+      val=L[i];
+      var asc=C.three[2]>C.three[0],hv=function(v){return asc?v:-v};
+      acts=hv(val)<=hv(C.three[0])?1:hv(val)<=hv(C.three[1])?2:3;
+    }
+    for(var k2=acts-1;k2<2;k2++)ticks[k2]=false;
+    paint();
+  }
+
   function paint(){
     root.classList.toggle('signed',signed);
-    drawStar();drawSizes();drawPlate();drawDW();
+    drawStar();drawSizes();drawPlate();drawDW();railDraw();
     hold.querySelector('span').textContent=off?C.offHold:'Hold to complete';
     restLine.textContent=C.rest;
     offBtn.classList.toggle('show',!!C.offable);
@@ -2164,6 +2249,30 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     if(beat){clearTimeout(beat);beat=null;}
     setSizing(false);root.classList.remove('closed');
     toggle(pulse,false);toggle(rest,false);paint();
+  });
+
+  var rail=q('.u1-rail'),knob=q('.u1-rail i');
+  rail.addEventListener('pointerdown',function(e){
+    if(signed||off)return;
+    try{rail.setPointerCapture(e.pointerId)}catch(z){}
+    if(root.classList.contains('sizing'))setSizing(false);
+    railSet(e.clientY);
+    var mv=function(ev){railSet(ev.clientY)},
+        up=function(){rail.removeEventListener('pointermove',mv);
+          rail.removeEventListener('pointerup',up);rail.removeEventListener('pointercancel',up)};
+    rail.addEventListener('pointermove',mv);
+    rail.addEventListener('pointerup',up);rail.addEventListener('pointercancel',up);
+  });
+  rail.addEventListener('keydown',function(e){
+    if(signed||off)return;
+    var L=ladder(),i=+rail.getAttribute('aria-valuenow')||0,d=0;
+    if(e.key==='ArrowUp')d=1;else if(e.key==='ArrowDown')d=-1;else return;
+    e.preventDefault();
+    i=Math.min(L.length-1,Math.max(0,i+d));
+    if(!C.fmt)acts=i+1;else{val=L[i];
+      var asc=C.three[2]>C.three[0],hv=function(v){return asc?v:-v};
+      acts=hv(val)<=hv(C.three[0])?1:hv(val)<=hv(C.three[1])?2:3;}
+    for(var k2=acts-1;k2<2;k2++)ticks[k2]=false;paint();
   });
 
   /* the M: back to The logic, carrying this screen's bucket with it */

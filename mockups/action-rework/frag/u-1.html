@@ -118,6 +118,21 @@
 [data-k=u-1] .u1-dw.gone{display:none}
 [data-k=u-1] .u1.signed .u1-dw{display:none}
 
+/* --- THE RAIL (Malik, 2026-08-16): a flat vertical line on the right edge
+   you pull up and down like a thermostat. Up is heavier. It moves through
+   the full size ladder and drags the plate with it (crossing a named size
+   folds or grows the supports), so it and the size sheet are one state. --- */
+[data-k=u-1] .u1-rail{position:absolute;right:2px;top:50%;transform:translateY(-50%);
+  width:30px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
+  background:none;padding:0}
+[data-k=u-1] .u1-rail::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;
+  margin-left:-1px;border-radius:1px;background:rgba(var(--ink),.15)}
+[data-k=u-1] .u1-rail i{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:3px;
+  border-radius:2px;background:rgba(var(--ink),.92);transition:top .1s ease-out;pointer-events:none}
+[data-k=u-1] .u1-rail.hide{display:none}
+[data-k=u-1] .u1-rail:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
+[data-k=u-1] .u1-star{padding-right:22px}
+
 /* --- the supports: the same day, one rank down -------------------------- */
 [data-k=u-1] .u1-plate{position:relative;z-index:2}
 [data-k=u-1] .u1-rule{height:1px;background:rgba(var(--ink),.13);margin:0 0 4px;
@@ -275,6 +290,8 @@
     <button type="button" class="u1-m" aria-label="Why this plan">
       <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
     </button>
+    <button type="button" class="u1-rail" role="slider" aria-label="today's intensity"
+      aria-orientation="vertical"><i></i></button>
     <div class="u1-sp a"></div>
 
     <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
@@ -544,9 +561,42 @@
     /* the star already carries the length, so the door only offers to start */
     if(show)dwmin.textContent='';
   }
+  /* the rail's ladder: every size this bucket owns, ordered light to heavy.
+     Heaviness direction comes from the three named sizes (screen time runs
+     downward: an earlier hour is the heavier night). */
+  function ladder(){
+    if(!C.fmt)return [0,1,2];
+    var asc=C.three[2]>C.three[0];
+    return (C.all||C.three).slice().sort(function(a,b){return asc?a-b:b-a});
+  }
+  function railDraw(){
+    rail.classList.toggle('hide',signed||off);
+    if(signed||off)return;
+    var L=ladder(),H=rail.clientHeight-3,i;
+    if(!C.fmt)i=acts-1;
+    else{i=L.indexOf(val);
+      if(i<0){var best=0,bd=Infinity;L.forEach(function(v,j){var d=Math.abs(v-val);if(d<bd){bd=d;best=j}});i=best;}}
+    knob.style.top=((1-i/(L.length-1))*H)+'px';
+    rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax',String(L.length-1));
+    rail.setAttribute('aria-valuenow',String(i));
+  }
+  function railSet(y){
+    var L=ladder(),rect=rail.getBoundingClientRect(),
+        t=Math.min(1,Math.max(0,(y-rect.top)/rect.height)),
+        i=Math.round((1-t)*(L.length-1));
+    if(!C.fmt)acts=i+1;
+    else{
+      val=L[i];
+      var asc=C.three[2]>C.three[0],hv=function(v){return asc?v:-v};
+      acts=hv(val)<=hv(C.three[0])?1:hv(val)<=hv(C.three[1])?2:3;
+    }
+    for(var k2=acts-1;k2<2;k2++)ticks[k2]=false;
+    paint();
+  }
+
   function paint(){
     root.classList.toggle('signed',signed);
-    drawStar();drawSizes();drawPlate();drawDW();
+    drawStar();drawSizes();drawPlate();drawDW();railDraw();
     hold.querySelector('span').textContent=off?C.offHold:'Hold to complete';
     restLine.textContent=C.rest;
     offBtn.classList.toggle('show',!!C.offable);
@@ -694,6 +744,30 @@
     if(beat){clearTimeout(beat);beat=null;}
     setSizing(false);root.classList.remove('closed');
     toggle(pulse,false);toggle(rest,false);paint();
+  });
+
+  var rail=q('.u1-rail'),knob=q('.u1-rail i');
+  rail.addEventListener('pointerdown',function(e){
+    if(signed||off)return;
+    try{rail.setPointerCapture(e.pointerId)}catch(z){}
+    if(root.classList.contains('sizing'))setSizing(false);
+    railSet(e.clientY);
+    var mv=function(ev){railSet(ev.clientY)},
+        up=function(){rail.removeEventListener('pointermove',mv);
+          rail.removeEventListener('pointerup',up);rail.removeEventListener('pointercancel',up)};
+    rail.addEventListener('pointermove',mv);
+    rail.addEventListener('pointerup',up);rail.addEventListener('pointercancel',up);
+  });
+  rail.addEventListener('keydown',function(e){
+    if(signed||off)return;
+    var L=ladder(),i=+rail.getAttribute('aria-valuenow')||0,d=0;
+    if(e.key==='ArrowUp')d=1;else if(e.key==='ArrowDown')d=-1;else return;
+    e.preventDefault();
+    i=Math.min(L.length-1,Math.max(0,i+d));
+    if(!C.fmt)acts=i+1;else{val=L[i];
+      var asc=C.three[2]>C.three[0],hv=function(v){return asc?v:-v};
+      acts=hv(val)<=hv(C.three[0])?1:hv(val)<=hv(C.three[1])?2:3;}
+    for(var k2=acts-1;k2<2;k2++)ticks[k2]=false;paint();
   });
 
   /* the M: back to The logic, carrying this screen's bucket with it */
