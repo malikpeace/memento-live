@@ -64,6 +64,38 @@
   function stateOf(A, date) { var e = A.map[dkey(date)]; return e ? e.st : null; }
   function entryOf(A, date) { return A.map[dkey(date)] || null; }
 
+  /* the bare notched M, subtle brand mark */
+  function mMark(cls, size) {
+    return '<svg class="' + cls + '" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M4 19V7l8 6 8-6v12"/></svg>';
+  }
+
+  /* draw a green thread through runs of consecutive kept days in the month grid,
+     so a run reads as one connected line instead of separate boxes */
+  function drawThreads() {
+    var cal = document.querySelector('#ev .cal');
+    if (!cal) return;
+    var old = cal.querySelector('.cal-thread'); if (old) old.remove();
+    var cells = [].slice.call(cal.querySelectorAll('.d[data-on]'));
+    var W = cal.clientWidth, H = cal.clientHeight;
+    var svg = '<svg class="cal-thread" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
+    var segs = '';
+    for (var i = 0; i < cells.length - 1; i++) {
+      var a = cells[i], b = cells[i + 1];
+      if (a.getAttribute('data-on') !== '1' || b.getAttribute('data-on') !== '1') continue;
+      if (Math.abs(a.offsetTop - b.offsetTop) > 4) continue; // same visual row only
+      var ax = a.offsetLeft + a.offsetWidth / 2, ay = a.offsetTop + a.offsetHeight / 2;
+      var bx = b.offsetLeft + b.offsetWidth / 2, by = b.offsetTop + b.offsetHeight / 2;
+      var w = Math.max(6, Math.min(a.offsetWidth, a.offsetHeight) * 0.34);
+      segs += '<line x1="' + ax + '" y1="' + ay + '" x2="' + bx + '" y2="' + by + '" stroke="rgba(63,217,78,0.55)" stroke-width="' + w + '" stroke-linecap="round"/>';
+    }
+    if (!segs) return;
+    var node = document.createElement('div');
+    node.innerHTML = svg + segs + '</svg>';
+    cal.insertBefore(node.firstChild, cal.firstChild);
+  }
+
   function arrows(id, canBack, canFwd) {
     return '<span class="nav" id="' + id + '">' +
       '<button type="button" data-step="-1"' + (canBack ? '' : ' disabled') + ' aria-label="Back">' +
@@ -80,41 +112,37 @@
       : SHAPE === 'frequency' ? (n === 1 ? 'session toward the rate you keep' : 'sessions toward the rate you keep')
       : (n === 1 ? 'action completed toward your goal' : 'actions completed toward your goal');
     var counted = log[log.length - 1].on;
-    return '<div><div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
+    return '<div class="one__brand">' + mMark('m-mark', 26) + '</div>' +
+      '<div><div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
       (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div></div>' +
       '<div class="one__hint">Scroll<svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l6 6 6-6"/></svg></div>';
   }
 
-  /* ---------- at a glance ---------- */
-  function glance(s, log, A) {
-    var N = s.N, w30 = Math.min(30, N);
-    var slice = log.slice(-w30);
-    var now = slice.filter(function (d) { return d.on; }).length;
-    var before = N >= 60 ? log.slice(-60, -30).filter(function (d) { return d.on; }).length : null;
-    var v, fill, mark = '';
-    if (SHAPE === 'frequency') {
-      var wk = log.slice(-Math.min(7, N)).filter(function (d) { return d.on; }).length;
-      v = plural(wk, 'session') + ' this week';
-      fill = Math.min(100, Math.round(100 * wk / A.target));
-      mark = '<i style="left:' + Math.min(99, Math.round(100 * A.target / 7)) + '%"></i>';
-    } else if (SHAPE === 'maintenance') {
-      v = plural(s.current, 'day') + ' held';
-      fill = s.best ? Math.min(100, Math.round(100 * s.current / s.best)) : 100;
-    } else {
-      v = now + ' of the last ' + w30 + ' days';
-      var mx = Math.max(now, before === null ? 0 : before, 1);
-      fill = Math.round(100 * now / Math.max(mx, w30));
-      if (before !== null) mark = '<i style="left:' + Math.round(100 * before / Math.max(mx, 30)) + '%"></i>';
-    }
-    var strip = slice.map(function (d, i, a) {
-      return '<b class="' + stateOf(A, d.date) + (i === a.length - 1 ? ' today' : '') + '"></b>';
+  /* ---------- consistency score: a rolling read that can improve, plus a
+     heatmap of the window whose green deepens the more consistent you are.
+     Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
+  function scoreBlock(s, log, A) {
+    var win = Math.min(90, log.length), slice = log.slice(-win);
+    var kept = 0, missed = 0;
+    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'missed') missed++; });
+    var denom = kept + missed, score = denom ? Math.round(100 * kept / denom) : 100;
+    var a = (0.26 + 0.52 * (score / 100)).toFixed(2); // muted at low scores, vivid near 100
+    var tone = 'rgba(63,217,78,' + a + ')';
+    var cells = slice.map(function (d) {
+      var st = stateOf(A, d.date);
+      var bg = st === 'kept' ? tone : st === 'sup' ? 'rgba(63,217,78,.2)'
+        : st === 'missed' ? 'rgba(255,255,255,.05)' : 'rgba(255,255,255,.02)';
+      return '<b style="background:' + bg + '"></b>';
     }).join('');
-    return '<div class="sec"><div class="sec__h"><b>At a glance</b></div>' +
-      '<div class="glance"><div class="glance__v">' + v + '</div>' +
-      '<div class="glance__bar"><u style="width:' + fill + '%"></u>' + mark + '</div>' +
-      '<div class="glance__strip">' + strip + '</div></div></div>';
+    var label = win >= 84 ? 'consistent, last 3 months' : 'consistent, last ' + plural(win, 'day');
+    var bright = score >= 80;
+    return '<div class="sec"><div class="sec__h"><b>Consistency score</b></div>' +
+      '<div class="glance">' + mMark('glance__m', 132) +
+      '<div class="score"><div class="score__n"' + (bright ? ' style="color:#eafff0"' : '') + '>' + score + '</div>' +
+      '<div class="score__lbl">' + label + '</div></div>' +
+      '<div class="score__hm">' + cells + '</div></div></div>';
   }
 
   /* ---------- calendar: WEEK, a readable day list ---------- */
@@ -162,7 +190,7 @@
       var st = e ? e.st : (date > today ? 'ahead' : 'ahead');
       if (e) { tracked = true; monthDays++; if (e.st === 'kept') { rowKept++; monthKept++; } }
       cells += big
-        ? '<div class="d ' + st + (e && sameDay(date, today) ? ' today' : '') + '">' + dd + '</div>'
+        ? '<div class="d ' + st + (e && sameDay(date, today) ? ' today' : '') + '" data-on="' + (e && e.st === 'kept' ? '1' : '0') + '">' + dd + '</div>'
         : '<b class="' + (e ? st : 'ahead') + '"></b>';
       slot++;
       if (big && slot % 7 === 0) { cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>'; out += cells; cells = ''; rowKept = 0; tracked = false; }
@@ -266,8 +294,12 @@
       var ws = new Date(t), kept = 0, tracked = 0, g = '';
       for (var i = 0; i < 7; i++) {
         var d = addDays(ws, i), e = entryOf(A, d);
+        var st = e ? e.st : 'pad';
         if (e) { tracked++; if (e.st === 'kept') kept++; }
-        g += '<b class="' + (e ? e.st : 'pad') + '"></b>';
+        // an X marks a day kept, like crossing it off
+        var glyph = st === 'kept' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+          : st === 'sup' ? '<i class="dot"></i>' : '';
+        g += '<b class="' + st + '">' + glyph + '</b>';
       }
       var denom = SHAPE === 'frequency' ? A.target : tracked;
       var full = kept >= denom;
@@ -319,7 +351,7 @@
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
-    return hero + '<div class="ev__grid"><div class="ev__col">' + glance(s, log, A) + cal + '</div>' +
+    return hero + '<div class="ev__grid"><div class="ev__col">' + scoreBlock(s, log, A) + cal + '</div>' +
       '<div class="ev__col">' + tracks(log) + rhythm(s) + chapters(log, A) + monthBars(s) + ledger(s, log) + '</div></div>';
   }
 
@@ -332,6 +364,9 @@
     el('day').textContent = 'Day ' + N;
     el('pgOne').innerHTML = pageOne(s, log);
     el('ev').innerHTML = pageTwo(s, log, A);
+    // rAF stalls in a backgrounded tab, so a timeout backstop guarantees the draw
+    if (window.requestAnimationFrame) requestAnimationFrame(drawThreads);
+    setTimeout(drawThreads, 60);
 
     var sc = el('scale');
     if (sc) sc.addEventListener('click', function (e) {
