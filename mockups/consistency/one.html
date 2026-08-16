@@ -74,14 +74,17 @@
   .glance__strip b.sup { background: rgba(63,217,78,0.22); }
   .glance__strip b.today { outline: 1.5px solid rgba(63,217,78,0.95); outline-offset: -1.5px; }
   .glance { position: relative; overflow: hidden; }
-  .glance__badge { position: absolute; top: 14px; right: 14px; width: 26px; height: 26px; border-radius: 7px;
-    background: #f4fff7; display: flex; align-items: center; justify-content: center; color: #06140a; }
-  .score { display: flex; align-items: baseline; gap: 12px; position: relative; }
-  .score__n { font-size: 54px; font-weight: 750; letter-spacing: -0.04em; line-height: 0.9;
-    color: var(--text-hi, #fff); font-variant-numeric: tabular-nums; }
-  .score__lbl { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); }
-  .score__hm { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 16px; position: relative; }
-  .score__hm b { aspect-ratio: 1; border-radius: 5px; background: rgba(255,255,255,0.05); }
+  /* the score card is inverted: a white slab with black elements */
+  .glance--score { background: #f4f5f2; color: #08130a; border-radius: 18px; padding: 18px 18px 20px;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    box-shadow: 0 10px 34px rgba(0,0,0,0.42); position: relative; overflow: hidden; }
+  .score__m { position: absolute; top: 15px; right: 18px; font-size: 21px; font-weight: 800; line-height: 1;
+    color: #08130a; letter-spacing: -0.02em; }
+  .score__lbl { font-size: 13px; font-weight: 600; color: rgba(8,19,10,0.55); }
+  .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
+    color: #08130a; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .score__hm { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 18px; }
+  .score__hm b { aspect-ratio: 1; border-radius: 5px; background: rgba(8,19,10,0.08); }
 
   /* ---- the calendar, month view ---- */
   .scale { display: inline-flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 2px; }

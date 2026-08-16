@@ -130,19 +130,18 @@
     var kept = 0, missed = 0;
     slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'missed') missed++; });
     var denom = kept + missed, score = denom ? Math.round(100 * kept / denom) : 100;
-    var a = (0.26 + 0.52 * (score / 100)).toFixed(2); // muted at low scores, vivid near 100
-    var tone = 'rgba(63,217,78,' + a + ')';
+    // green deepens with the score; on a white slab the kept cells carry a solid tone
+    var a = (0.42 + 0.5 * (score / 100)).toFixed(2);
+    var tone = 'rgba(47,178,66,' + a + ')';
     var cells = slice.map(function (d) {
       var st = stateOf(A, d.date);
-      var bg = st === 'kept' ? tone : st === 'sup' ? 'rgba(63,217,78,.2)'
-        : st === 'missed' ? 'rgba(255,255,255,.05)' : 'rgba(255,255,255,.02)';
+      var bg = st === 'kept' ? tone : st === 'sup' ? 'rgba(47,178,66,.3)' : 'rgba(8,19,10,.08)';
       return '<b style="background:' + bg + '"></b>';
     }).join('');
-    var label = win >= 84 ? 'consistent, last 3 months' : 'consistent, last ' + plural(win, 'day');
-    var bright = score >= 80;
-    return '<div class="sec"><div class="sec__h"><b>Consistency score</b></div>' +
-      '<div class="glance"><div class="glance__badge">' + mMark('', 15) + '</div>' +
-      '<div class="score"><div class="score__n"' + (bright ? ' style="color:#eafff0"' : '') + '>' + score + '</div></div>' +
+    return '<div class="sec">' +
+      '<div class="glance glance--score"><div class="score__m">M</div>' +
+      '<div class="score__lbl">Score</div>' +
+      '<div class="score__n">' + score + '</div>' +
       '<div class="score__hm">' + cells + '</div></div></div>';
   }
 
