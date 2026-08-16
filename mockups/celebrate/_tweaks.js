@@ -116,7 +116,9 @@
   }
   /* the wall's shared arithmetic: every number derived from their own */
   function wallData(v) {
-    var days = +v.days, moves = +v.moves, hours = +v.hours || 0, streak = +v.streak || 0;
+    /* hours is NOT a field the app records (verified 2026-08-16), so no
+       screen may print it. It is gone from every BIG ASS wall. */
+    var days = +v.days, moves = +v.moves, streak = +v.streak || 0;
     var weeks = Math.max(1, Math.round(days / 7));
     var perWeek = moves > 0 ? Math.round(moves / weeks * 10) / 10 : 0;
     var money = isMoney(v.unit);
@@ -133,7 +135,7 @@
     var hasMoves = moves > 0;
     var count = hasMoves ? moves : days;
     var noun = hasMoves ? (v.moveWord || 'moves') : 'days';
-    return { days: days, moves: moves, hours: hours, streak: streak, weeks: weeks,
+    return { days: days, moves: moves, streak: streak, weeks: weeks,
       perWeek: hasMoves ? perWeek : 0, money: money, mf: mf, marks: marks,
       hasMoves: hasMoves, count: count, noun: noun, unitLabel: unitFor(count, noun),
       one: singular(noun) };
@@ -916,8 +918,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         var words = String(v.line).trim().split(/\s+/), spans = '';
@@ -930,7 +931,6 @@
         var cells = [];
         cells.push([fmt(w.count), esc(w.unitLabel) + (w.hasMoves ? ', every one logged' : ' start to finish'), 'ba1-cell--hero']);
         if (w.hasMoves) cells.push([fmt(w.days), plural(w.days, 'day', 'days') + ' start to finish', '']);
-        if (w.hours > 0) cells.push([fmt(w.hours), 'hours put in', '']);
         if (w.streak > 0) cells.push([fmt(w.streak), 'days, your longest streak', '']);
         cells.push([fmt(w.weeks), plural(w.weeks, 'week', 'weeks'), '']);
         if (w.perWeek > 0) cells.push([fmt(w.perWeek), esc(unitFor(2, w.noun)) + ' a week, on average', '']);
@@ -961,8 +961,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         var sh = v.shape, w = wallData(v);
@@ -998,7 +997,6 @@
         function stat(num, label, hot) { side += '<div class="ba2-s' + (hot ? ' hot' : '') + '" style="--i:' + (k++) + '"><b>' + num + '</b><span>' + label + '</span></div>'; }
         stat(fmt(w.count), esc(w.unitLabel) + ', every one', true);
         if (w.hasMoves) stat(fmt(w.days), plural(w.days, 'day', 'days'));
-        if (w.hours > 0) stat(fmt(w.hours), 'hours');
         if (w.streak > 0) stat(fmt(w.streak) + '-day', 'longest streak');
         put(ph, '.ba2-side', side);
       }
@@ -1018,8 +1016,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba4-line', esc(v.line) + '!'); fitLine(ph, '.ba4-line', 42);
@@ -1057,8 +1054,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         var w = wallData(v);
@@ -1120,8 +1116,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         /* the line drops in letter by letter, but WORDS never split */
@@ -1171,8 +1166,7 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 184, min: 0, max: 5000 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
       ],
       apply: function (ph, v) {
         put(ph, '.ba8-line', esc(v.line) + '!'); fitLine(ph, '.ba8-line', 42);
@@ -1217,8 +1211,7 @@
         put(ph, '.ba8-keys',
           (w.hasMoves ? '<div class="ba8-key"><b>' + fmt(w.moves) + '</b><span>' + esc(w.unitLabel) + '</span></div>' : '')
           + '<div class="ba8-key"><b>' + fmt(w.hasMoves ? lit : w.days) + '</b><span>' + (w.hasMoves ? 'days you showed up' : 'days it took') + '</span></div>'
-          + (w.streak > 0 ? '<div class="ba8-key"><b>' + fmt(w.streak) + '</b><span>day streak</span></div>' : '')
-          + (w.hours > 0 ? '<div class="ba8-key"><b>' + fmt(w.hours) + '</b><span>hours</span></div>' : ''));
+          + (w.streak > 0 ? '<div class="ba8-key"><b>' + fmt(w.streak) + '</b><span>day streak</span></div>' : ''));
       }
     }
   };
