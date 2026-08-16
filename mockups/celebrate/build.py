@@ -54,6 +54,7 @@ VERDICTS = {
   # sentence removed)
   'rf-gap':'g','rf-fall':'g','rf-rec':'g',  # rf-card CUT 2026-08-13 (folded into the grand finale)
   # BIG ASS CELEBRATIONS: built 2026-08-13 at his ask, ungraded, needs his eyes
+  'ba-0':'y',  # THE GRAND FINALE, Malik's own fusion 2026-08-16, ungraded
   'ba-1':'y','ba-2':'y','ba-4':'y','ba-5':'y',  # ba-3 Roll Call CUT 2026-08-15
   'ba-7':'y','ba-8':'y',  # ba-6 Countdown, ba-9 Wall, ba-10 Monument CUT
   # evolution: the whole family REMOVED at his ask 2026-08-13 (page deleted)
@@ -75,7 +76,7 @@ def shell(title, body, back=True):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
-<link rel="stylesheet" href="_kit.css?v=tw23">
+<link rel="stylesheet" href="_kit.css?v=tw24">
 </head><body data-accent="cyan">
 <div class="bar">
   {'<a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>' if back else ''}
@@ -84,7 +85,7 @@ def shell(title, body, back=True):
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
 {body}
-<script src="chooser.js?v=tw23"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw24"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>"""
 

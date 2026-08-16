@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIG ASS CELEBRATIONS</title>
-<link rel="stylesheet" href="_kit.css?v=tw23">
+<link rel="stylesheet" href="_kit.css?v=tw24">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -10,7 +10,195 @@
   <span class="sw"><button data-a="cyan" style="background:#2bd4d4" class="on"></button><button data-a="green" style="background:#3fd94e"></button><button data-a="amber" style="background:#ffb73d"></button><button data-a="rose" style="background:#ff6b9d"></button><button data-a="blue" style="background:#4f8cff"></button><button data-a="teal" style="background:#19c3a6"></button></span>
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
-<div class="gal"><h1>BIG ASS CELEBRATIONS</h1><p class="gal__sub">The grand finale, the top of the reward pyramid: what fires the day someone reaches their MASSIVE goal. SIX full options, every one driven by the same sliders across all four goal shapes that can finish (target hit, count done, duration held, event done). The Memento itself takes part: sealed, remembering, or wearing the colour. Fires ONCE, outranks everything, and the day it fires nothing else shows. PICK ONE: these are six versions of the SAME moment, not six different moments, and each already swaps its numbers, nouns and units per goal shape on its own. The trigger (how the app knows a goal is finished) is specced in GOAL-REACHED-SPEC.md, not built. Hours logged is gone everywhere: the app does not record time.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The Detonation</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<div class="gal"><h1>BIG ASS CELEBRATIONS</h1><p class="gal__sub">The grand finale, the top of the reward pyramid: what fires the day someone reaches their MASSIVE goal. SIX full options, every one driven by the same sliders across all four goal shapes that can finish (target hit, count done, duration held, event done). The Memento itself takes part: sealed, remembering, or wearing the colour. Fires ONCE, outranks everything, and the day it fires nothing else shows. PICK ONE: these are six versions of the SAME moment, not six different moments, and each already swaps its numbers, nouns and units per goal shape on its own. The trigger (how the app knows a goal is finished) is specced in GOAL-REACHED-SPEC.md, not built. Hours logged is gone everywhere: the app does not record time.</p><div class="grid"><div class="item"><p class="item__label"><span class="item__n">1</span><span class="item__name">The Grand Finale</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+/* ba-0 "The Grand Finale". Malik's own pick, 2026-08-16, three of the family
+   fused into ONE: the Detonation's M slowly gaining colour, the Crown's rings
+   collapsing into it, then "guess what..." and a tap. The tap detonates into
+   the Fireworks: a full celebration that climaxes on one big firework and
+   their total. Then they SWIPE between two stat views (the dots, for scale,
+   and the numbers), the bare M crowning both as the brand. */
+
+/* ---- BEAT 1: the M fills, the rings collapse into it, then the prompt ---- */
+[data-c="ba-0"] .ba0-open{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="ba-0"] .ba0-m0{width:172px;height:172px}
+[data-c="ba-0"] .ba0-m0 .gh{fill:rgba(235,238,248,.14)}
+[data-c="ba-0"] .ba0-m0 .fl{fill:var(--accent);clip-path:inset(100% 0 0 0)}
+[data-c="ba-0"] .b1.on .ba0-m0 .fl{animation:ba0Fill 2.9s cubic-bezier(.45,0,.55,1) .35s forwards}
+@keyframes ba0Fill{to{clip-path:inset(0 0 0 0)}}
+/* the Crown's rings, collapsing INTO the mark as it colours */
+[data-c="ba-0"] .ba0-ring{position:absolute;left:50%;top:82px;width:70px;height:70px;margin:-35px 0 0 -35px;
+  border-radius:50%;border:2.5px solid rgba(var(--accent-rgb),.8);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-rg1{animation:ba0In 1.05s cubic-bezier(.5,0,.75,.5) .7s both}
+[data-c="ba-0"] .b1.on .ba0-rg2{animation:ba0In 1.05s cubic-bezier(.5,0,.75,.5) 1.35s both}
+[data-c="ba-0"] .b1.on .ba0-rg3{animation:ba0In .95s cubic-bezier(.5,0,.75,.5) 2s both}
+@keyframes ba0In{0%{opacity:0;transform:scale(6.5)}30%{opacity:1}100%{opacity:0;transform:scale(.3)}}
+[data-c="ba-0"] .ba0-guess{margin-top:32px;font-size:24px;font-weight:650;letter-spacing:-.02em;
+  color:var(--text-hi);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-guess{animation:ba0Soft .7s ease-out 3s both}
+[data-c="ba-0"] .ba0-tap{margin-top:14px;font-size:11.5px;letter-spacing:.03em;color:var(--text-lo);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-tap{animation:ba0Soft .6s ease-out 3.5s both}
+@keyframes ba0Soft{from{opacity:0}to{opacity:1}}
+
+/* ---- BEAT 2: the tap detonates, then the big firework + their total ---- */
+[data-c="ba-0"] .ba0-flood{position:absolute;inset:0;background:var(--accent)}
+[data-c="ba-0"] .b2.on .ba0-flood{animation:ba0Flood .22s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba0Flood{from{opacity:0}to{opacity:1}}
+[data-c="ba-0"] .ba0-sh{position:absolute;left:50%;top:34%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:50%;border:3px solid rgba(11,14,18,.5);opacity:0}
+[data-c="ba-0"] .b2.on .ba0-s1{animation:ba0Ring .9s cubic-bezier(.2,.7,.3,1) .05s both}
+[data-c="ba-0"] .b2.on .ba0-s2{animation:ba0Ring 1s cubic-bezier(.2,.7,.3,1) .22s both}
+[data-c="ba-0"] .b2.on .ba0-s3{animation:ba0Ring 1.1s cubic-bezier(.2,.7,.3,1) .42s both}
+@keyframes ba0Ring{0%{opacity:.85;transform:scale(.2)}100%{opacity:0;transform:scale(9)}}
+[data-c="ba-0"] .ba0-top{position:absolute;left:0;right:0;top:15%;display:flex;flex-direction:column;
+  align-items:center;padding:0 28px}
+[data-c="ba-0"] .b2.on .ba0-top{animation:ba0Shake .5s linear .18s both}
+@keyframes ba0Shake{0%,100%{transform:none}20%{transform:translate(3px,-3px)}40%{transform:translate(-3px,2px)}
+  60%{transform:translate(2px,2px)}80%{transform:translate(-2px,-2px)}}
+[data-c="ba-0"] .ba0-m2{width:74px;height:74px;fill:#0b0e12}
+[data-c="ba-0"] .b2.on .ba0-m2{animation:ba0MSlam .5s cubic-bezier(.16,1.35,.3,1) .1s both}
+@keyframes ba0MSlam{from{opacity:0;transform:scale(2.4)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-0"] .ba0-line{margin-top:18px;font-size:38px;font-weight:750;letter-spacing:-.04em;
+  line-height:1.04;color:#0b0e12;text-align:center}
+[data-c="ba-0"] .ba0-line .w{display:inline-block;opacity:0}
+[data-c="ba-0"] .b2.on .ba0-line .w{animation:ba0Word .38s cubic-bezier(.16,1.3,.3,1) calc(.5s + var(--i)*.12s) both}
+@keyframes ba0Word{from{opacity:0;transform:translateY(18px) scale(1.25)}to{opacity:1;transform:none}}
+/* the big firework, lower half: a launch streak, a flash, a spark burst */
+[data-c="ba-0"] .ba0-big{position:absolute;left:50%;top:66%;width:0;height:0}
+[data-c="ba-0"] .ba0-big .tr{position:absolute;left:-1.5px;top:0;width:3px;height:150px;border-radius:2px;
+  transform-origin:50% 100%;background:linear-gradient(to top,rgba(11,14,18,0),rgba(11,14,18,.75));opacity:0}
+[data-c="ba-0"] .b2.on .ba0-big .tr{animation:ba0Launch .55s cubic-bezier(.25,.7,.4,1) 1.35s both}
+@keyframes ba0Launch{0%{opacity:0;transform:translateY(230px) scaleY(.4)}25%{opacity:1}72%{opacity:1}
+  100%{opacity:0;transform:translateY(0) scaleY(1)}}
+[data-c="ba-0"] .ba0-big .fl{position:absolute;left:-70px;top:-70px;width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 64%);opacity:0}
+[data-c="ba-0"] .b2.on .ba0-big .fl{animation:ba0Flash .6s ease-out 1.88s both}
+@keyframes ba0Flash{0%{opacity:0;transform:scale(.1)}20%{opacity:1}100%{opacity:0;transform:scale(1.6)}}
+[data-c="ba-0"] .ba0-big .sp{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;
+  background:rgba(11,14,18,.88);opacity:0}
+[data-c="ba-0"] .ba0-big .sp:nth-child(3n){background:#fff}
+[data-c="ba-0"] .b2.on .ba0-big .sp{animation:ba0Spark 1.7s cubic-bezier(.1,.62,.28,1) 1.9s both}
+@keyframes ba0Spark{0%{opacity:0;transform:translate(0,0) scale(.5)}
+  6%{opacity:1;transform:translate(calc(var(--dx)*.22),calc(var(--dy)*.22)) scale(1.15)}
+  55%{opacity:1;transform:translate(calc(var(--dx)*.86),calc(var(--dy)*.86 + 16px)) scale(.9)}
+  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 108px)) scale(.45)}}
+[data-c="ba-0"] .ba0-total{position:absolute;left:0;right:0;top:64%;text-align:center;opacity:0}
+[data-c="ba-0"] .ba0-total b{font-size:56px;font-weight:750;letter-spacing:-.04em;color:#0b0e12;
+  font-variant-numeric:tabular-nums;display:block;line-height:1}
+[data-c="ba-0"] .ba0-total span{display:block;margin-top:6px;font-size:13px;font-weight:600;color:rgba(11,14,18,.75)}
+[data-c="ba-0"] .b2.on .ba0-total{animation:ba0Rise .55s ease-out 2.5s both}
+@keyframes ba0Rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* the small sky fireworks (a few dark sparks) so the whole sky joins in */
+[data-c="ba-0"] .ba0-sky{position:absolute;width:0;height:0}
+[data-c="ba-0"] .ba0-sky i{position:absolute;width:5px;height:5px;border-radius:50%;background:rgba(11,14,18,.7);opacity:0}
+[data-c="ba-0"] .ba0-sky i:nth-child(2n){background:#fff}
+[data-c="ba-0"] .b2.on .ba0-sky i{animation:ba0Sky 1s cubic-bezier(.15,.6,.3,1) var(--t,.6s) both}
+@keyframes ba0Sky{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 40px))}}
+
+/* ---- BEAT 3: swipe between two stat views, the M crowning both ---- */
+[data-c="ba-0"] .b3{padding:0}
+[data-c="ba-0"] .ba0-stats{position:absolute;inset:0;display:flex;flex-direction:column}
+[data-c="ba-0"] .ba0-crown{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:30px 0 6px}
+[data-c="ba-0"] .ba0-mc{width:52px;height:52px;fill:#0b0e12}
+[data-c="ba-0"] .b3.on .ba0-mc{animation:ba0Soft .6s ease-out .1s both}
+[data-c="ba-0"] .ba0-pager{flex:1 1 auto;position:relative;overflow:hidden}
+[data-c="ba-0"] .ba0-track{display:flex;width:200%;height:100%;transition:transform .38s cubic-bezier(.3,.7,.3,1)}
+[data-c="ba-0"] .ba0-slide{width:50%;height:100%;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:6px 22px 8px}
+[data-c="ba-0"] .ba0-slabel{font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:rgba(11,14,18,.55);font-weight:650;margin-bottom:10px}
+/* slide A: the dots, every move a spark */
+[data-c="ba-0"] .ba0-svg{display:block;overflow:visible;max-width:100%}
+[data-c="ba-0"] .ba0-svg circle{opacity:0}
+[data-c="ba-0"] .b3.on .ba0-scaleOn .ba0-svg circle{animation:ba0Pop .5s cubic-bezier(.16,1.2,.3,1) calc(var(--i)*var(--step,.004)*1s) both}
+@keyframes ba0Pop{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+[data-c="ba-0"] .ba0-acount{margin-top:14px;text-align:center}
+[data-c="ba-0"] .ba0-acount b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:#0b0e12;
+  font-variant-numeric:tabular-nums}
+[data-c="ba-0"] .ba0-acount span{display:block;margin-top:5px;font-size:12px;color:rgba(11,14,18,.7)}
+/* slide B: the numbers */
+[data-c="ba-0"] .ba0-wall{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+[data-c="ba-0"] .ba0-cell{padding:15px 14px;border-radius:13px;background:rgba(11,14,18,.06);
+  box-shadow:inset 0 1px 0 rgba(11,14,18,.05);text-align:left}
+[data-c="ba-0"] .ba0-cell b{display:block;font-size:34px;font-weight:750;letter-spacing:-.04em;line-height:1;
+  color:#0b0e12;font-variant-numeric:tabular-nums}
+[data-c="ba-0"] .ba0-cell span{display:block;margin-top:6px;font-size:11px;color:rgba(11,14,18,.62)}
+[data-c="ba-0"] .ba0-cell--hero{grid-column:1/-1}
+[data-c="ba-0"] .ba0-cell--hero b{font-size:52px}
+/* the dots under the pager */
+[data-c="ba-0"] .ba0-dots{flex:0 0 auto;display:flex;gap:8px;justify-content:center;padding:8px 0 30px}
+[data-c="ba-0"] .ba0-dot{width:7px;height:7px;border-radius:50%;background:rgba(11,14,18,.28);transition:background .2s,width .2s}
+[data-c="ba-0"] .ba0-dot.on{width:20px;border-radius:4px;background:rgba(11,14,18,.7)}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-0"] .ba0-m0 .fl{clip-path:inset(0 0 0 0);animation:none}
+  [data-c="ba-0"] .ba0-ring,[data-c="ba-0"] .ba0-sh,[data-c="ba-0"] .ba0-big,[data-c="ba-0"] .ba0-sky{display:none}
+  [data-c="ba-0"] .ba0-guess,[data-c="ba-0"] .ba0-tap,[data-c="ba-0"] .ba0-m2,[data-c="ba-0"] .ba0-total,
+  [data-c="ba-0"] .ba0-mc{opacity:1;transform:none;animation:none}
+  [data-c="ba-0"] .ba0-line .w{opacity:1;transform:none;animation:none}
+  [data-c="ba-0"] .ba0-top{animation:none}
+  [data-c="ba-0"] .ba0-svg circle{opacity:1;animation:none}
+}
+</style>
+<div class="ph" data-c="ba-0">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ba0-open">
+        <svg class="ba0-m0" viewBox="0 0 512 512" aria-hidden="true">
+          <path class="gh" d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>
+          <path class="fl" d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/>
+        </svg>
+        <div class="ba0-ring ba0-rg1"></div>
+        <div class="ba0-ring ba0-rg2"></div>
+        <div class="ba0-ring ba0-rg3"></div>
+        <div class="ba0-guess">Guess what&hellip;</div>
+        <div class="ba0-tap">Tap.</div>
+      </div>
+    </div>
+
+    <div class="b b2" data-confetti>
+      <div class="ba0-flood"></div>
+      <div class="ba0-sh ba0-s1"></div>
+      <div class="ba0-sh ba0-s2"></div>
+      <div class="ba0-sh ba0-s3"></div>
+      <div class="ba0-sky" aria-hidden="true"></div>
+      <div class="ba0-top">
+        <svg class="ba0-m2" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <div class="ba0-line"></div>
+      </div>
+      <div class="ba0-big" aria-hidden="true"><i class="tr"></i><em class="fl"></em></div>
+      <div class="ba0-total"></div>
+    </div>
+
+    <div class="b b3">
+      <div class="ba0-stats">
+        <div class="ba0-crown">
+          <svg class="ba0-mc" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        </div>
+        <div class="ba0-pager">
+          <div class="ba0-track">
+            <div class="ba0-slide ba0-scaleOn">
+              <div class="ba0-slabel">In scale</div>
+              <svg class="ba0-svg" width="286" height="300" viewBox="0 0 286 300" aria-hidden="true"></svg>
+              <div class="ba0-acount"></div>
+            </div>
+            <div class="ba0-slide">
+              <div class="ba0-slabel">The numbers</div>
+              <div class="ba0-wall"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ba0-dots">
+          <span class="ba0-dot on"></span><span class="ba0-dot"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">swipe the stats &middot; tap to replay</div>
+</div>
+<p class="item__note">Malik's pick, fused: the Detonation's M gaining colour, the Crown's rings collapsing into it, "guess what...", then a tap detonates into the Fireworks and one big firework with the total. Swipe the stats between the dots (for scale) and the numbers. The bare M crowns it as the brand.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The Detonation</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-1 "The Detonation". Beat 1 is a held breath: their goal line alone on
    black, barely lit, with a slow-charging spark line beneath. THE TAP
    DETONATES IT: triple shockwave, full flood, the M slamming in with a
@@ -132,7 +320,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">An M alone in the dark, slowly filling with their colour, waiting to be tapped. THE TAP DETONATES IT: triple shockwave, full colour, the M slamming in with a screen shake, the goal line landing word by word. Then the ledger wall: the whole record, tiled edge to edge.</p></div><div class="item"><p class="item__label"><span class="item__n">2</span><span class="item__name">The Rise</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">An M alone in the dark, slowly filling with their colour, waiting to be tapped. THE TAP DETONATES IT: triple shockwave, full colour, the M slamming in with a screen shake, the goal line landing word by word. Then the ledger wall: the whole record, tiled edge to edge.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The Rise</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-2 "The Rise". The number they chased rises up THROUGH the screen,
    enormous, edge to edge, and the instant it locks the whole screen pulses
    their colour, shakes, and rains. The goal made monumental: nothing on
@@ -234,7 +422,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">The number they chased rises up through the screen, enormous, and the instant it locks the screen pulses their colour and shakes. One honest line under it, nothing invented. Then THE COLUMN: one slat for every single move, stacked into a tower.</p></div><div class="item"><p class="item__label"><span class="item__n">3</span><span class="item__name">The Crown</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">The number they chased rises up through the screen, enormous, and the instant it locks the screen pulses their colour and shakes. One honest line under it, nothing invented. Then THE COLUMN: one slat for every single move, stacked into a tower.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The Crown</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-4 "The Crown". The Memento is the whole ceremony: it sits small in the
    dark, then CHARGES, rings of their colour collapsing INTO it, its glow
    climbing, until it can't hold it and ERUPTS: the colour bursts out of the
@@ -353,7 +541,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">The MARK is the ceremony: it charges in the dark, rings of colour collapsing onto it, then it ERUPTS and the colour swallows the screen. Then THE HALO: one dot per move orbiting the mark, the whole ring slowly turning.</p></div><div class="item"><p class="item__label"><span class="item__n">4</span><span class="item__name">The Fireworks</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">The MARK is the ceremony: it charges in the dark, rings of colour collapsing onto it, then it ERUPTS and the colour swallows the screen. Then THE HALO: one dot per move orbiting the mark, the whole ring slowly turning.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The Fireworks</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-5 "The Fireworks". Rebuilt on his 2026-08-15 note. Beat one is SILENT:
    two words in the dark, nothing else, no sparks, no confetti, just the
    wait. The tap sets the whole sky off. Beat three counts what they did as
@@ -487,7 +675,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">Two words in the dark and nothing else, no sparks, no confetti, just the wait. The tap sets the whole sky off. Then ONE BIG ASS FIREWORK: it launches, it opens, and every single move they ever logged is one spark in it. The count IS the explosion.</p></div><div class="item"><p class="item__label"><span class="item__n">5</span><span class="item__name">The Ten Thousand</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">Two words in the dark and nothing else, no sparks, no confetti, just the wait. The tap sets the whole sky off. Then ONE BIG ASS FIREWORK: it launches, it opens, and every single move they ever logged is one spark in it. The count IS the explosion.</p></div><div class="item"><p class="item__label"><span class="item__n">6</span><span class="item__name">The Ten Thousand</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-7 "The Ten Thousand". The wall is the star (Malik loved it): their move
    word printed once per move, a page of proof, every tenth lit. The opening
    was rebuilt on his note (the old triple-echo is gone): the colour is there
@@ -572,7 +760,7 @@
   <div class="keepbtn">Keep</div>
   <div class="hint">Tap to replay</div>
 </div>
-<p class="item__note">Every word he loved, kept: the wall prints their move word ONCE PER MOVE, every tenth lit, a page of proof. New opening (the old triple-echo is gone): the goal line drops in letter by letter onto the flood.</p></div><div class="item"><p class="item__label"><span class="item__n">6</span><span class="item__name">The Heat</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
+<p class="item__note">Every word he loved, kept: the wall prints their move word ONCE PER MOVE, every tenth lit, a page of proof. New opening (the old triple-echo is gone): the goal line drops in letter by letter onto the flood.</p></div><div class="item"><p class="item__label"><span class="item__n">7</span><span class="item__name">The Heat</span><span class="vd vd--y" title="Changed since review / ungraded — needs your eyes">!</span></p><style>
 /* ba-8 "The Heat". Rebuilt on his note (the spotlight opening and the basic
    records board are gone). Opening: the colour is there from frame one and
    the M DRAWS ITSELF, stroke by stroke, then floods solid and the goal line
@@ -659,6 +847,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The mark fades up slowly out of the colour, then the goal line lands. Then THE HEAT: a heatmap of the whole journey, one cell per day, darker where they did more, so the shape of the effort is visible at a glance.</p></div></div></div>
-<script src="chooser.js?v=tw23"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw24"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

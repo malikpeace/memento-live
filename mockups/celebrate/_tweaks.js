@@ -144,6 +144,52 @@
 
   function Q(ph, sel) { return ph.querySelector(sel); }
   function put(ph, sel, html) { var el = Q(ph, sel); if (el) el.innerHTML = html; }
+
+  /* The swipe pager for ba-0's stat views. The kit clones the stage on every
+     replay, so listeners live on the STABLE .ph via delegation and read the
+     current track/dots fresh each time. A real horizontal swipe must not also
+     trip the kit's tap-to-replay: since the click target is a descendant of
+     .ph, a capture-phase blocker on .ph runs BEFORE the kit's bubble click
+     and stops it whenever a swipe just happened. */
+  function wirePager(ph) {
+    if (ph._pagerWired) return; ph._pagerWired = true;
+    var startX = 0, startY = 0, dragging = false, moved = 0;
+    function pageTo(i) {
+      var track = ph.querySelector('.ba0-track'); if (!track) return;
+      ph._page = Math.max(0, Math.min(1, i));
+      track.style.transform = 'translateX(' + (ph._page * -50) + '%)';
+      var dots = ph.querySelectorAll('.ba0-dot');
+      [].forEach.call(dots, function (d, k) { d.classList.toggle('on', k === ph._page); });
+    }
+    ph.addEventListener('pointerdown', function (e) {
+      if (!e.target.closest || !e.target.closest('.ba0-pager')) return;
+      dragging = true; moved = 0; startX = e.clientX; startY = e.clientY;
+    });
+    ph.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      moved = e.clientX - startX;
+    });
+    ph.addEventListener('pointerup', function (e) {
+      if (!dragging) return; dragging = false;
+      if (Math.abs(moved) > 36 && Math.abs(moved) > Math.abs(e.clientY - startY)) {
+        pageTo((ph._page || 0) + (moved < 0 ? 1 : -1));
+        ph._pagerJustSwiped = true;
+        setTimeout(function () { ph._pagerJustSwiped = false; }, 350);
+      }
+    });
+    ph.addEventListener('click', function (e) {
+      var d = e.target.closest && e.target.closest('.ba0-dot');
+      if (d) { var dd = [].indexOf.call(ph.querySelectorAll('.ba0-dot'), d); pageTo(dd); ph._pagerJustSwiped = true; setTimeout(function () { ph._pagerJustSwiped = false; }, 50); e.stopPropagation(); return; }
+      if (ph._pagerJustSwiped) { e.stopPropagation(); return; }
+      /* a replay tap: normalise the pager back to slide 0 before the kit
+         clones the stage, so the next run starts on the dots view */
+      if (ph.classList.contains('done')) {
+        var tr = ph.querySelector('.ba0-track'); if (tr) tr.style.transform = '';
+        ph._page = 0;
+        [].forEach.call(ph.querySelectorAll('.ba0-dot'), function (d, k) { d.classList.toggle('on', k === 0); });
+      }
+    }, true);
+  }
   function cnt(ph, sel, to, from) {
     var el = Q(ph, sel); if (!el) return;
     el.setAttribute('data-count', (from == null ? 0 : from) + '|' + to);
@@ -904,6 +950,81 @@
     /* ================= BIG ASS CELEBRATIONS. Nine grand finales; the
        colour lands and STAYS (his 2026-08-14 call), and the walls show
        EVERY move, never a sample. ================================== */
+
+    /* ba-0 "The Grand Finale", Malik's own fusion (2026-08-16): the
+       Detonation open + the Crown's rings + the Fireworks climax, then a
+       SWIPE between two stat views (the dots and the numbers). */
+    'ba-0': {
+      c: [
+        { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
+          { v: 'target', l: 'target hit (weight, debt)' },
+          { v: 'count', l: 'count done (100 sessions)' },
+          { v: 'duration', l: 'duration held (no-buy year)' },
+          { v: 'event', l: 'event done (passed the bar)' } ] },
+        { k: 'line', t: 't', l: 'The goal, their words', v: 'You lost 30 lbs' },
+        { k: 'start', t: 'n', l: 'Start number', v: 230 },
+        { k: 'value', t: 'n', l: 'Final number', v: 200 },
+        { k: 'unit', t: 't', l: 'Unit', v: 'lbs' },
+        { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
+        { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
+        { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
+      ],
+      apply: function (ph, v) {
+        var w = wallData(v);
+        /* the goal line, word by word, in beat 2 */
+        var words = esc(v.line).replace(/\s+/g, ' ').trim().split(' ');
+        put(ph, '.ba0-line', words.map(function (word, i) {
+          return '<span class="w" style="--i:' + i + '">' + word + '</span>';
+        }).join(' ') + (/[!?.]$/.test(v.line) ? '' : '!'));
+        var ln = Q(ph, '.ba0-line');
+        if (ln) ln.style.fontSize = (words.join(' ').length > 16 ? 30 : 38) + 'px';
+        /* the total under the big firework */
+        put(ph, '.ba0-total', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + ', every one a spark</span>');
+        /* the big firework spark burst (beat 2) */
+        var fwr = seeded(53), big = '';
+        for (var s = 0; s < 44; s++) {
+          var a = (s / 44) * 6.2832 + fwr() * 0.2, rr = (74 + fwr() * 40) * (0.6 + fwr() * 0.5);
+          big += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
+        }
+        var bigEl = Q(ph, '.ba0-big'); if (bigEl) bigEl.insertAdjacentHTML('beforeend', big);
+        /* a few small sky fireworks so the whole sky joins in */
+        var sky = '', pos = [[26, 24], [74, 20], [50, 12], [16, 40], [86, 44]];
+        pos.forEach(function (p, k) {
+          var dot = '';
+          for (var q = 0; q < 10; q++) { var an = (q / 10) * 6.2832, rd = 30 + fwr() * 14; dot += '<i style="--dx:' + (Math.cos(an) * rd).toFixed(0) + 'px;--dy:' + (Math.sin(an) * rd).toFixed(0) + 'px;--t:' + (0.5 + k * 0.28).toFixed(2) + 's"></i>'; }
+          sky += dot;
+        });
+        var skyEl = Q(ph, '.ba0-sky');
+        if (skyEl) { skyEl.innerHTML = sky; skyEl.style.left = '50%'; skyEl.style.top = '48%'; }
+        /* stat view A: one spark per move, one tight shell */
+        var N = Math.max(1, w.count), W = 286, H = 300, cx = W / 2, cy = H / 2;
+        var maxR = Math.min(cx - 6, 30 + Math.sqrt(N) * 8), jit = seeded(N * 7 + 3), dots = '';
+        for (var d = 0; d < N; d++) {
+          var ang = d * 2.399963 + (jit() - 0.5) * 0.3, t = Math.sqrt((d + 0.6) / N), rad = maxR * t * (0.9 + jit() * 0.2);
+          var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * 1.02;
+          var sz = (3.2 - t * 1.6) * (N > 900 ? 0.62 : N > 380 ? 0.8 : 1);
+          dots += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + Math.max(0.85, sz).toFixed(2) +
+                  '" fill="' + (d % 6 === 0 ? 'rgba(255,255,255,.92)' : 'rgba(11,14,18,.8)') + '" style="--i:' + d + '"></circle>';
+        }
+        var svg = Q(ph, '.ba0-svg'); if (svg) svg.innerHTML = dots;
+        sweep(ph, '.ba0-svg', N, 1.15);
+        put(ph, '.ba0-acount', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>');
+        /* stat view B: the numbers */
+        var cells = [[w.money ? '' : '', '']];
+        cells = [];
+        cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>', 'ba0-cell--hero']);
+        if (w.hasMoves) cells.push(['<b>' + fmt(w.days) + '</b><span>' + plural(w.days, 'day', 'days') + ' start to finish</span>', '']);
+        else cells.push(['<b>' + fmt(w.days) + '</b><span>days it took</span>', '']);
+        cells.push(['<b>' + fmt(w.weeks) + '</b><span>' + plural(w.weeks, 'week', 'weeks') + '</span>', '']);
+        if (w.streak > 0) cells.push(['<b>' + fmt(w.streak) + '</b><span>day best streak</span>', '']);
+        if (w.perWeek > 0) cells.push(['<b>' + fmt(w.perWeek) + '</b><span>' + esc(unitFor(2, w.noun)) + ' a week</span>', '']);
+        put(ph, '.ba0-wall', cells.map(function (c) { return '<div class="ba0-cell ' + c[1] + '">' + c[0] + '</div>'; }).join(''));
+        /* wire the swipe pager (once) */
+        wirePager(ph);
+      }
+    },
+
     'ba-1': {
       c: [
         { k: 'shape', t: 's', l: 'Goal shape', v: 'target', o: [
