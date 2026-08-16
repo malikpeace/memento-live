@@ -135,7 +135,40 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 @keyframes rmBreatheA{from{opacity:0}to{opacity:.9}}
 @keyframes rmBreatheB{from{opacity:.85}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){.grid::before,.grid::after{animation:none;opacity:.4}}
-</style></head><body><div class="gal">
+/* THE ROOM TOGGLE (Malik, 2026-08-16): dots vs graph paper vs pure black,
+   side by side on the same screens, so the pick is made by looking. */
+body.rm-graph .grid{background-image:
+    linear-gradient(rgba(var(--ink),.09) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(var(--ink),.09) 1px,transparent 1px);
+  background-size:26px 26px;background-position:12px 12px;
+  -webkit-mask-image:none;mask-image:none}
+body.rm-graph .grid::before,body.rm-graph .grid::after,
+body.rm-black .grid::before,body.rm-black .grid::after{display:none}
+body.rm-black .grid{display:none}
+.rm-tg{position:fixed;top:14px;right:18px;z-index:200;display:flex;align-items:center;gap:6px;
+  padding:6px 8px;border-radius:11px;background:rgba(16,18,22,.92);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08), 0 12px 30px rgba(0,0,0,.4)}
+.rm-tg i{font-style:normal;font-size:10.5px;font-weight:700;color:rgba(var(--ink),.9);padding:0 3px}
+.rm-tg button{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;font-family:var(--font);
+  font-size:10.5px;font-weight:700;color:rgba(var(--ink),.55);background:rgba(var(--ink),.05);
+  border-radius:7px;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+.rm-tg button.on{color:#0b0c10;background:rgba(235,238,248,.92)}
+</style></head><body>
+<div class="rm-tg"><i>Room</i><button data-rm="dots" class="on">Dots</button><button
+  data-rm="graph">Graph</button><button data-rm="black">Black</button></div>
+<script>(function(){
+  var KEY='ar-room',tg=document.currentScript.previousElementSibling;
+  function set(m){
+    document.body.className=m==='dots'?'':'rm-'+m;
+    tg.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.rm===m)});
+    try{localStorage.setItem(KEY,m)}catch(e){}
+  }
+  tg.addEventListener('click',function(e){var b=e.target.closest('button');if(b)set(b.dataset.rm)});
+  var saved='dots';try{saved=localStorage.getItem(KEY)||'dots'}catch(e){}
+  set(saved);
+})();</script>
+<div class="gal">
 <h1>Action rework: the survivors</h1>
 <p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
 The room is Points: the grid's intersections, breathing. Every intensity control now obeys the three-choice law, exactly three
