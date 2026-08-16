@@ -1018,7 +1018,8 @@
         { k: 'days', t: 'r', l: 'Days it took', v: 126, min: 1, max: 900 },
         { k: 'moves', t: 'r', l: 'Moves logged', v: 215, min: 0, max: 2000 },
         { k: 'moveWord', t: 't', l: 'Move word', v: 'weigh-ins' },
-        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 }
+        { k: 'streak', t: 'r', l: 'Best streak (days)', v: 41, min: 0, max: 365 },
+        { k: 'active', t: 'r', l: 'Days shown up', v: 104, min: 0, max: 900 }
       ],
       apply: function (ph, v) {
         var w = wallData(v);
@@ -1062,12 +1063,27 @@
         buildSphere(ph, Math.max(1, w.count));
         var totalLabel = (w.hasMoves ? 'total ' : '') + w.unitLabel;
         put(ph, '.ba0-acount', '<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>');
-        /* stat view B: the numbers */
+        /* stat view B: the numbers. The two that actually say "you CHANGED"
+           lead (Malik 2026-08-16): the transformation (from -> to) and the
+           consistency (days you showed up). The rest is volume. */
         var cells = [];
-        cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>', 'ba0-cell--hero']);
+        var isT = (v.shape === 'target' && +v.start !== +v.value);
+        if (isT) {
+          var down = +v.value < +v.start, delta = Math.abs(+v.start - +v.value);
+          var verb = down ? (w.money ? 'paid off' : 'down') : 'gained';
+          var span = (w.money && down) ? (w.mf(delta) + ' paid off')
+                                       : (w.mf(delta) + ' ' + esc(v.unit) + ' ' + verb);
+          cells.push(['<b class="ba0-xform">' + w.mf(+v.start) + ' &rarr; ' + w.mf(+v.value) + '</b><span>' + span + '</span>', 'ba0-cell--hero']);
+          cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>', '']);
+        } else {
+          cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>', 'ba0-cell--hero']);
+        }
+        /* consistency: what share of the days they actually showed up */
+        var active = Math.max(0, Math.min(+v.active || 0, w.days));
+        var pct = w.days > 0 ? Math.round(active / w.days * 100) : 0;
+        cells.push(['<b>' + pct + '%</b><span>of ' + fmt(w.days) + ' days, showed up</span>', '']);
         if (w.hasMoves) cells.push(['<b>' + fmt(w.days) + '</b><span>' + plural(w.days, 'day', 'days') + ' start to finish</span>', '']);
         else cells.push(['<b>' + fmt(w.days) + '</b><span>days it took</span>', '']);
-        cells.push(['<b>' + fmt(w.weeks) + '</b><span>' + plural(w.weeks, 'week', 'weeks') + '</span>', '']);
         if (w.streak > 0) cells.push(['<b>' + fmt(w.streak) + '</b><span>day best streak</span>', '']);
         if (w.perWeek > 0) cells.push(['<b>' + fmt(w.perWeek) + '</b><span>' + esc(unitFor(2, w.noun)) + ' a week</span>', '']);
         put(ph, '.ba0-wall', cells.map(function (c) { return '<div class="ba0-cell ' + c[1] + '">' + c[0] + '</div>'; }).join(''));
