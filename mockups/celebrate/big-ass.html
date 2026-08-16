@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BIG ASS CELEBRATIONS</title>
-<link rel="stylesheet" href="_kit.css?v=tw28">
+<link rel="stylesheet" href="_kit.css?v=tw29">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -21,13 +21,13 @@
      numbers. No labels, no Keep. */
 
 /* ---- BEAT 1: the M colours in as the dots are pulled into it ---- */
-[data-c="ba-0"] .ba0-m0{position:absolute;left:50%;top:40%;width:98px;height:98px;margin-left:-49px;
+[data-c="ba-0"] .ba0-m0{position:absolute;left:50%;top:50%;width:98px;height:98px;margin-left:-49px;
   transform:translateY(-50%);fill:var(--accent);opacity:0}
 [data-c="ba-0"] .b1.on .ba0-m0{animation:ba0MColour 2.7s cubic-bezier(.55,0,.55,1) .25s both}
 @keyframes ba0MColour{from{opacity:0}to{opacity:1}}
 /* the accretion field: dots spawn out around the M and spiral into its centre
    (Clarity's nsv2FieldSpiral curve, ported verbatim), pulling the colour in */
-[data-c="ba-0"] .ba0-field{position:absolute;left:50%;top:40%;width:0;height:0}
+[data-c="ba-0"] .ba0-field{position:absolute;left:50%;top:50%;width:0;height:0}
 [data-c="ba-0"] .ba0-field i{position:absolute;left:0;top:0;width:var(--s,2.5px);height:var(--s,2.5px);
   border-radius:50%;background:radial-gradient(circle at 42% 40%,#fff,rgba(255,255,255,.85) 55%,rgba(var(--accent-rgb),.75));
   box-shadow:0 0 calc(var(--s,2.5px)*2.4) rgba(var(--accent-rgb),.55);opacity:0}
@@ -38,10 +38,10 @@
   50%{transform:rotate(calc(var(--a) + 140deg)) translateX(calc(var(--r,120px) * .42)) scale(.8);opacity:.9;animation-timing-function:cubic-bezier(.3,.5,.75,.5)}
   92%{opacity:.8}
   100%{transform:rotate(calc(var(--a) + 300deg)) translateX(3px) scale(.2);opacity:0}}
-[data-c="ba-0"] .ba0-guess{position:absolute;left:0;right:0;top:57%;text-align:center;
+[data-c="ba-0"] .ba0-guess{position:absolute;left:0;right:0;top:64%;text-align:center;
   font-size:24px;font-weight:650;letter-spacing:-.02em;color:var(--text-hi);opacity:0}
 [data-c="ba-0"] .b1.on .ba0-guess{animation:ba0Soft .8s ease-out 2.7s both}
-[data-c="ba-0"] .ba0-tap{position:absolute;left:0;right:0;top:62%;text-align:center;
+[data-c="ba-0"] .ba0-tap{position:absolute;left:0;right:0;top:69%;text-align:center;
   font-size:11.5px;letter-spacing:.03em;color:var(--text-lo);opacity:0}
 [data-c="ba-0"] .b1.on .ba0-tap{animation:ba0Soft .6s ease-out 3.3s both}
 @keyframes ba0Soft{from{opacity:0}to{opacity:1}}
@@ -50,7 +50,7 @@
 [data-c="ba-0"] .ba0-flood{position:absolute;inset:0;background:var(--accent)}
 [data-c="ba-0"] .b2.on .ba0-flood{animation:ba0Flood .22s cubic-bezier(.2,.8,.3,1) both}
 @keyframes ba0Flood{from{opacity:0}to{opacity:1}}
-[data-c="ba-0"] .ba0-sh{position:absolute;left:50%;top:40%;width:60px;height:60px;margin:-30px 0 0 -30px;
+[data-c="ba-0"] .ba0-sh{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;
   border-radius:50%;border:2.5px solid rgba(11,14,18,.4);opacity:0}
 [data-c="ba-0"] .b2.on .ba0-s1{animation:ba0Ring 1s cubic-bezier(.2,.7,.3,1) .06s both}
 [data-c="ba-0"] .b2.on .ba0-s2{animation:ba0Ring 1.1s cubic-bezier(.2,.7,.3,1) .28s both}
@@ -60,29 +60,33 @@
 [data-c="ba-0"] .ba0-m2{position:absolute;left:50%;top:40%;width:98px;height:98px;margin-left:-49px;
   transform:translateY(-50%);fill:#0b0e12;opacity:0}
 [data-c="ba-0"] .b2.on .ba0-m2{animation:ba0Soft .35s ease-out .04s both}
-[data-c="ba-0"] .ba0-line{position:absolute;left:0;right:0;top:53%;text-align:center;padding:0 26px;
-  font-size:40px;font-weight:750;letter-spacing:-.04em;line-height:1.06;color:#0b0e12;opacity:0}
+[data-c="ba-0"] .ba0-line{position:absolute;left:0;right:0;top:60%;text-align:center;padding:0 26px;
+  font-size:40px;font-weight:750;letter-spacing:-.04em;line-height:1.06;color:#0b0e12;opacity:0;z-index:3}
 [data-c="ba-0"] .b2.on .ba0-line{animation:ba0LineIn .6s cubic-bezier(.2,.8,.3,1) .5s both}
 @keyframes ba0LineIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-/* the fireworks, lower half */
-[data-c="ba-0"] .ba0-big{position:absolute;left:50%;top:78%;width:0;height:0}
-[data-c="ba-0"] .ba0-big .tr{position:absolute;left:-1.5px;top:0;width:3px;height:150px;border-radius:2px;
-  transform-origin:50% 100%;background:linear-gradient(to top,rgba(11,14,18,0),rgba(11,14,18,.72));opacity:0}
-[data-c="ba-0"] .b2.on .ba0-big .tr{animation:ba0Launch .55s cubic-bezier(.25,.7,.4,1) 1.3s both}
-@keyframes ba0Launch{0%{opacity:0;transform:translateY(210px) scaleY(.4)}25%{opacity:1}72%{opacity:1}
+/* THE SHOW: a lot of fireworks that keep going off for ~9 seconds. Each burst
+   launches a streak, flashes, then throws sparks that arc and fall; the whole
+   field is staggered by --t so bursts keep popping across the screen. */
+[data-c="ba-0"] .ba0-fw{position:absolute;width:0;height:0}
+[data-c="ba-0"] .ba0-fw .tr{position:absolute;left:-1.5px;top:0;width:3px;height:var(--h,120px);border-radius:2px;
+  transform-origin:50% 100%;background:linear-gradient(to top,rgba(11,14,18,0),rgba(11,14,18,.7));opacity:0}
+[data-c="ba-0"] .b2.on .ba0-fw .tr{animation:ba0Launch .5s cubic-bezier(.25,.7,.4,1) var(--t,0s) both}
+@keyframes ba0Launch{0%{opacity:0;transform:translateY(var(--lh,190px)) scaleY(.4)}25%{opacity:1}70%{opacity:1}
   100%{opacity:0;transform:translateY(0) scaleY(1)}}
-[data-c="ba-0"] .ba0-big .fl{position:absolute;left:-70px;top:-70px;width:140px;height:140px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 64%);opacity:0}
-[data-c="ba-0"] .b2.on .ba0-big .fl{animation:ba0Flash .6s ease-out 1.82s both}
+[data-c="ba-0"] .ba0-fw .fl{position:absolute;left:calc(var(--fs,90px)/-2);top:calc(var(--fs,90px)/-2);
+  width:var(--fs,90px);height:var(--fs,90px);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.92),rgba(255,255,255,0) 64%);opacity:0}
+[data-c="ba-0"] .b2.on .ba0-fw .fl{animation:ba0Flash .55s ease-out calc(var(--t,0s) + .44s) both}
 @keyframes ba0Flash{0%{opacity:0;transform:scale(.1)}20%{opacity:1}100%{opacity:0;transform:scale(1.6)}}
-[data-c="ba-0"] .ba0-big .sp{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;
-  background:rgba(11,14,18,.86);opacity:0}
-[data-c="ba-0"] .ba0-big .sp:nth-child(3n){background:#fff}
-[data-c="ba-0"] .b2.on .ba0-big .sp{animation:ba0Spark 1.7s cubic-bezier(.1,.62,.28,1) 1.84s both}
+[data-c="ba-0"] .ba0-fw .sp{position:absolute;width:4.5px;height:4.5px;margin:-2.25px 0 0 -2.25px;border-radius:50%;
+  background:rgba(11,14,18,.85);opacity:0}
+[data-c="ba-0"] .ba0-fw .sp:nth-child(3n){background:#fff}
+[data-c="ba-0"] .ba0-fw .sp:nth-child(5n){width:3px;height:3px}
+[data-c="ba-0"] .b2.on .ba0-fw .sp{animation:ba0Spark 1.6s cubic-bezier(.1,.62,.28,1) calc(var(--t,0s) + .44s) both}
 @keyframes ba0Spark{0%{opacity:0;transform:translate(0,0) scale(.5)}
   6%{opacity:1;transform:translate(calc(var(--dx)*.22),calc(var(--dy)*.22)) scale(1.15)}
   55%{opacity:1;transform:translate(calc(var(--dx)*.86),calc(var(--dy)*.86 + 14px)) scale(.9)}
-  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 92px)) scale(.45)}}
+  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 90px)) scale(.4)}}
 
 /* ---- BEAT 3: swipe the sphere and the numbers, the M crowning both ---- */
 [data-c="ba-0"] .b3{padding:0}
@@ -113,7 +117,7 @@
 
 @media (min-width:768px){ [data-c="ba-0"] .ba0-wall{max-width:420px;margin:0 auto} }
 @media (prefers-reduced-motion:reduce){
-  [data-c="ba-0"] .ba0-field,[data-c="ba-0"] .ba0-sh,[data-c="ba-0"] .ba0-big{display:none}
+  [data-c="ba-0"] .ba0-field,[data-c="ba-0"] .ba0-sh,[data-c="ba-0"] .ba0-fw{display:none}
   [data-c="ba-0"] .ba0-m0,[data-c="ba-0"] .ba0-guess,[data-c="ba-0"] .ba0-tap,[data-c="ba-0"] .ba0-m2,
   [data-c="ba-0"] .ba0-line,[data-c="ba-0"] .ba0-mc{opacity:1;animation:none}
   [data-c="ba-0"] .ba0-line{transform:none}
@@ -133,9 +137,9 @@
       <div class="ba0-flood"></div>
       <div class="ba0-sh ba0-s1"></div>
       <div class="ba0-sh ba0-s2"></div>
+      <div class="ba0-fwrap" aria-hidden="true"></div>
       <svg class="ba0-m2" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
       <div class="ba0-line"></div>
-      <div class="ba0-big" aria-hidden="true"><i class="tr"></i><em class="fl"></em></div>
     </div>
 
     <div class="b b3">
@@ -812,6 +816,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">The mark fades up slowly out of the colour, then the goal line lands. Then THE HEAT: a heatmap of the whole journey, one cell per day, darker where they did more, so the shape of the effort is visible at a glance.</p></div></div></div>
-<script src="chooser.js?v=tw28"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw29"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

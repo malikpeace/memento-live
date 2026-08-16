@@ -1032,13 +1032,27 @@
           mot += '<i style="--a:' + ma + 'deg;--r:' + mrad + 'px;--s:' + ms + 'px;--d:' + md + 's;--del:' + mdl + 's"></i>';
         }
         put(ph, '.ba0-field', mot);
-        /* the big firework spark burst (beat 2), no count text on this page */
-        var fwr = seeded(53), big = '';
-        for (var s = 0; s < 44; s++) {
-          var a = (s / 44) * 6.2832 + fwr() * 0.2, rr = (74 + fwr() * 40) * (0.6 + fwr() * 0.5);
-          big += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
+        /* THE SHOW (beat 2): a lot of fireworks that keep going off for ~9s.
+           ~20 bursts staggered across the screen, framing the M and line (a
+           top band and a bottom band, clear of the middle where the text is).
+           No count text on this page. */
+        var fwr = seeded(53), shows = '';
+        var BURSTS = 20;
+        for (var f = 0; f < BURSTS; f++) {
+          var top = f % 2 === 0;                                  // alternate top / bottom band
+          var fx = (10 + fwr() * 80).toFixed(1);
+          var fy = top ? (10 + fwr() * 30).toFixed(1) : (68 + fwr() * 22).toFixed(1);
+          var t = (fwr() * 8.5).toFixed(2);                       // when it goes off, 0..8.5s
+          var reach = 44 + fwr() * 40, flash = (reach * 1.5).toFixed(0), np = 20;
+          var body = '<i class="tr" style="--h:' + (90 + fwr() * 70).toFixed(0) + 'px;--lh:' + (150 + fwr() * 90).toFixed(0) + 'px"></i>' +
+                     '<em class="fl" style="--fs:' + flash + 'px"></em>';
+          for (var q = 0; q < np; q++) {
+            var a = (q / np) * 6.2832 + fwr() * 0.22, rr = reach * (0.6 + fwr() * 0.55);
+            body += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
+          }
+          shows += '<div class="ba0-fw" style="left:' + fx + '%;top:' + fy + '%;--t:' + t + 's">' + body + '</div>';
         }
-        var bigEl = Q(ph, '.ba0-big'); if (bigEl) bigEl.insertAdjacentHTML('beforeend', big);
+        var fwrap = Q(ph, '.ba0-fwrap'); if (fwrap) fwrap.innerHTML = shows;
         /* stat view A: a slowly turning 3D sphere of their moves, one point
            each, drifting a little so it feels alive (Malik 2026-08-16) */
         buildSphere(ph, Math.max(1, w.count));
