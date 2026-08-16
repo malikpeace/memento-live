@@ -64,35 +64,37 @@
   function stateOf(A, date) { var e = A.map[dkey(date)]; return e ? e.st : null; }
   function entryOf(A, date) { return A.map[dkey(date)] || null; }
 
-  /* the bare notched M, subtle brand mark */
+  /* the real Memento M (the notched mark), used subtly for branding */
   function mMark(cls, size) {
-    return '<svg class="' + cls + '" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
-      'stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-      '<path d="M4 19V7l8 6 8-6v12"/></svg>';
+    return '<svg class="' + cls + '" width="' + size + '" height="' + size + '" viewBox="42 40 428 432" ' +
+      'fill="currentColor" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>';
   }
 
-  /* draw a green thread through runs of consecutive kept days in the month grid,
-     so a run reads as one connected line instead of separate boxes */
+  /* mark kept days with a green line running under the day numbers: a run of
+     consecutive kept days reads as one continuous line, a lone kept day as a
+     short dash. The calendar grid and numbers stay exactly as they were. */
   function drawThreads() {
     var cal = document.querySelector('#ev .cal');
     if (!cal) return;
     var old = cal.querySelector('.cal-thread'); if (old) old.remove();
     var cells = [].slice.call(cal.querySelectorAll('.d[data-on]'));
-    var W = cal.clientWidth, H = cal.clientHeight;
-    var svg = '<svg class="cal-thread" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">';
-    var segs = '';
-    for (var i = 0; i < cells.length - 1; i++) {
-      var a = cells[i], b = cells[i + 1];
-      if (a.getAttribute('data-on') !== '1' || b.getAttribute('data-on') !== '1') continue;
-      if (Math.abs(a.offsetTop - b.offsetTop) > 4) continue; // same visual row only
-      var ax = a.offsetLeft + a.offsetWidth / 2, ay = a.offsetTop + a.offsetHeight / 2;
-      var bx = b.offsetLeft + b.offsetWidth / 2, by = b.offsetTop + b.offsetHeight / 2;
-      var w = Math.max(6, Math.min(a.offsetWidth, a.offsetHeight) * 0.34);
-      segs += '<line x1="' + ax + '" y1="' + ay + '" x2="' + bx + '" y2="' + by + '" stroke="rgba(63,217,78,0.55)" stroke-width="' + w + '" stroke-linecap="round"/>';
+    var W = cal.clientWidth, H = cal.clientHeight, segs = '', i = 0;
+    while (i < cells.length) {
+      if (cells[i].getAttribute('data-on') !== '1') { i++; continue; }
+      var top = cells[i].offsetTop, j = i;
+      while (j + 1 < cells.length && cells[j + 1].getAttribute('data-on') === '1' &&
+             Math.abs(cells[j + 1].offsetTop - top) <= 4) j++;
+      var a = cells[i], b = cells[j];
+      var y = a.offsetTop + a.offsetHeight * 0.8; // an underline, clear of the number
+      var thick = Math.max(3.5, Math.min(a.offsetWidth, a.offsetHeight) * 0.13);
+      var x1 = a.offsetLeft + a.offsetWidth / 2, x2 = b.offsetLeft + b.offsetWidth / 2;
+      if (i === j) { var h = a.offsetWidth * 0.2; x1 = a.offsetLeft + a.offsetWidth / 2 - h; x2 = a.offsetLeft + a.offsetWidth / 2 + h; }
+      segs += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="#3fd94e" stroke-width="' + thick + '" stroke-linecap="round"/>';
+      i = j + 1;
     }
     if (!segs) return;
     var node = document.createElement('div');
-    node.innerHTML = svg + segs + '</svg>';
+    node.innerHTML = '<svg class="cal-thread" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + segs + '</svg>';
     cal.insertBefore(node.firstChild, cal.firstChild);
   }
 

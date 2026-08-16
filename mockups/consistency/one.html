@@ -94,18 +94,19 @@
   .mh i em { font-style: normal; font-weight: 700; font-size: 18px; color: var(--text-hi, #fff); }
   .cal { display: grid; grid-template-columns: repeat(7, 1fr) 34px; gap: 6px; position: relative; }
   .cal-thread { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-  .cal > * { position: relative; z-index: 1; }
+  .cal .wd, .cal .d, .cal .wc { position: relative; z-index: 1; }
   .cal .wd { font-size: 11px; color: var(--text-lo, rgba(255,255,255,0.46)); text-align: center;
     padding-bottom: 2px; }
   .cal .wd.g { color: var(--text-lo, rgba(255,255,255,0.32)); }
-  .cal .d { aspect-ratio: 1; border-radius: 50%; background: transparent;
+  .cal .d { aspect-ratio: 1; border-radius: 11px; background: transparent;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 650; color: var(--text-lo, rgba(255,255,255,0.34));
+    font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.3);
     font-variant-numeric: tabular-nums; }
   .cal .d.pad { background: transparent; }
-  .cal .d.kept { background: rgba(63,217,78,0.62); color: #06140a; }
-  .cal .d.sup { background: rgba(63,217,78,0.2); color: rgba(255,255,255,0.72); }
-  .cal .d.missed { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.12); color: var(--text-lo, rgba(255,255,255,0.34)); }
+  /* kept days are not filled; the green line under them does the marking */
+  .cal .d.kept { color: var(--text-hi, #fff); font-weight: 700; }
+  .cal .d.sup { color: rgba(63,217,78,0.72); font-weight: 650; }
+  .cal .d.missed { color: rgba(255,255,255,0.24); }
   /* a day the goal never asked for is not a miss: no fill, just a quiet number */
   .cal .d.rest { background: transparent; color: rgba(255,255,255,0.2); }
   .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
