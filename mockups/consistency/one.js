@@ -64,10 +64,10 @@
   function stateOf(A, date) { var e = A.map[dkey(date)]; return e ? e.st : null; }
   function entryOf(A, date) { return A.map[dkey(date)] || null; }
 
-  /* the real Memento M (the notched mark), used subtly for branding */
+  /* the real Memento M, the exact logo path from the app boot mask and tab bar */
   function mMark(cls, size) {
-    return '<svg class="' + cls + '" width="' + size + '" height="' + size + '" viewBox="42 40 428 432" ' +
-      'fill="currentColor" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>';
+    return '<svg class="' + cls + '" width="' + size + '" height="' + size + '" viewBox="140 136 232 240" ' +
+      'fill="currentColor" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   }
 
   /* mark kept days with a green line running under the day numbers: a run of
@@ -139,7 +139,7 @@
       return '<b style="background:' + bg + '"></b>';
     }).join('');
     return '<div class="sec">' +
-      '<div class="glance glance--score"><div class="score__m">M</div>' +
+      '<div class="glance glance--score"><div class="score__m">' + mMark('', 22) + '</div>' +
       '<div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + '</div>' +
       '<div class="score__hm">' + cells + '</div></div></div>';
