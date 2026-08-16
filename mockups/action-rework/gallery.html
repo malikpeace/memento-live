@@ -848,6 +848,191 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 </section>
 
 </div></section>
+<section class="grp"><h2>The logic</h2><p>What the loading lands on: the plan as reasoning, in their own words. Why the first move is the highest leverage one, what the plan does after it. Then it stays, behind a quiet "Why this plan" door on the day screen.</p><div class="wall">
+<!-- ARCHETYPE (difference law): lg-1 reasoned brief over a single act card.
+     Nothing else in the set is a READING page: every other screen is built to
+     be glanced. This one is built to be understood once, then kept. -->
+<section class="cell" id="lg-1" data-k="lg-1">
+<!-- THE LOGIC (Malik, 2026-08-16). The page the loading lands on: the plan
+     arrives as reasoning, not a bare sentence. It explains, in their own
+     words, why the first move is the highest leverage one, and what the plan
+     does after it. STATIC by his call: no conversation, no tuning field yet.
+     It is also a STANDING page: after the reveal, a quiet "Why this plan"
+     door on the day screen reopens it anytime.
+
+     PROVENANCE: every claim on this page quotes something the person gave
+     Memento themselves, the star from Clarity, the number they typed, the
+     answer they gave in the refine step. The page says so out loud once, at
+     the bottom, because that sentence IS the trust.
+
+     GLANCE LAW EXEMPTION: this is deliberately the one reading page in the
+     module. It still stays under five short paragraphs, and the act card
+     carries only the act.
+
+     VOICE: witness, not coach. No hype, no encouragement register, no
+     "It's not X, it's Y". -->
+<style>
+[data-k=lg-1] .lg1{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:50px 20px 18px;font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+[data-k=lg-1] .lg1-scroll{flex:1;min-height:0;overflow-y:auto;position:relative;z-index:2;
+  scrollbar-width:none;display:flex;flex-direction:column;justify-content:center}
+[data-k=lg-1] .lg1-scroll::-webkit-scrollbar{display:none}
+[data-k=lg-1] .lg1-star{margin:0 0 14px;font-size:20px;font-weight:700;line-height:1.3;
+  letter-spacing:-.024em;color:var(--text-hi);text-wrap:pretty}
+[data-k=lg-1] .lg1 p.b{margin:0 0 11px;font-size:12.5px;line-height:1.52;
+  color:rgba(var(--ink),.92);text-wrap:pretty}
+[data-k=lg-1] .lg1 p.b b{font-weight:600;color:var(--text-hi)}
+/* the act card: only the act. The paragraph above it already did the talking. */
+[data-k=lg-1] .lg1-mv{margin:5px 0 12px;border-radius:12px;padding:14px 15px;
+  background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lg-1] .lg1-mv p{margin:0;font-size:14.5px;font-weight:700;line-height:1.3;
+  letter-spacing:-.014em;color:var(--text-hi)}
+[data-k=lg-1] .lg1-src{margin:2px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
+/* the hold: same law as everywhere, an early release does nothing */
+[data-k=lg-1] .lg1-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
+  border:0;border-radius:14px;overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;
+  font-family:var(--font);cursor:pointer;touch-action:none;z-index:2;
+  transition:background .14s ease-out,transform .09s ease-out}
+[data-k=lg-1] .lg1-go i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=lg-1] .lg1-go span{position:relative;display:grid;place-items:center;height:100%;
+  font-size:15px;font-weight:700;letter-spacing:-.012em}
+[data-k=lg-1] .lg1-go:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=lg-1] .lg1-go:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lg-1] .lg1-keep{margin:9px 0 0;flex:0 0 auto;text-align:center;font-size:10.5px;
+  line-height:1.4;color:rgba(var(--ink),.72);z-index:2}
+/* after the hold: the same close grammar as the day screens */
+[data-k=lg-1] .lg1-rest{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:60px 26px 40px;text-align:center;background:#050608;
+  opacity:0;visibility:hidden;transition:opacity .42s ease-out,visibility 0s linear .42s}
+[data-k=lg-1] .lg1-rest.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=lg-1] .lg1-rest p{margin:0;font-size:20px;font-weight:500;line-height:1.34;
+  letter-spacing:-.02em;color:rgba(var(--ink),.96)}
+[data-k=lg-1] .lg1-rest p+p{color:rgba(var(--ink),.90)}
+[data-k=lg-1] .lg1-again{position:absolute;left:0;right:0;bottom:32px;margin:0 auto;width:fit-content;
+  border:0;border-radius:999px;height:30px;padding:0 14px;background:rgba(22,25,31,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.90);
+  font:400 12px/1 var(--font);cursor:pointer}
+@media (prefers-reduced-motion:reduce){[data-k=lg-1] .lg1 *,[data-k=lg-1] .lg1-rest{transition:none!important}}
+</style>
+<h3>The logic</h3><p class="reach"><b>10/10</b><span>everyone, at every plan reveal, then kept</span></p>
+<p class="cap">The plan arrives as reasoning: what you said, where you stand by your own number, why the first move is the highest leverage one, and what the plan does after it. Static, then kept behind a quiet "Why this plan" door on the day screen.</p>
+<div class="bk" role="group" aria-label="which bucket this page is explaining">
+  <i>Bucket</i>
+  <button type="button" data-b="focus">Focus</button>
+  <button type="button" class="on" data-b="screen">Screen time</button>
+  <button type="button" data-b="projects">Projects</button>
+  <button type="button" data-b="school">School</button>
+  <button type="button" data-b="weight">Weight</button>
+  <button type="button" data-b="fitness">Fitness</button>
+  <button type="button" data-b="money">Money</button>
+  <button type="button" data-b="business">Business</button>
+</div>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="lg1">
+    <div class="lg1-scroll">
+      <p class="lg1-star"></p>
+      <div class="lg1-body"></div>
+      <div class="lg1-mv"><p></p></div>
+      <p class="lg1-src">Every line above came from what you told Memento.</p>
+    </div>
+    <button type="button" class="lg1-go"><i></i><span>Hold to start today</span></button>
+    <p class="lg1-keep">This page stays. Why this plan, on your day screen, reopens it.</p>
+  </div>
+  <div class="lg1-rest" aria-hidden="true">
+    <p>Day one.</p>
+    <p>Your day screen is next.</p>
+    <button type="button" class="lg1-again" tabindex="-1">Run it again</button>
+  </div>
+</div>
+<script>(function(){
+  var r=document.currentScript.closest('.cell');if(!r)return;
+  var q=function(s){return r.querySelector(s)},
+      star=q('.lg1-star'),body=q('.lg1-body'),mv=q('.lg1-mv p'),
+      go=q('.lg1-go'),fill=q('.lg1-go i'),rest=q('.lg1-rest'),again=q('.lg1-again');
+
+  /* Same people as u-1: the star, the typed number and the refine answer all
+     line up with what the universal layout then hands them each day. */
+  var B={
+    screen:{star:'Under 3 hours a day. My evenings back.',
+      ps:['You wrote this in Clarity, and you typed <b>8 hours</b> as where the day stands now.',
+          'Eight to three is a big jump, and it is simpler than it looks. You named <b>TikTok, Instagram and Reddit</b> as the three that eat the hours. Trimming apps you barely open saves minutes. Removing those three saves hours, so that is the first move.',
+          'After it, the plan changes jobs: one guarded moment a night, phone away at 8, so they stay gone and the hours stay yours.'],
+      act:'Delete TikTok, Instagram and Reddit.'},
+    money:{star:'$3,000 a month so I can quit the warehouse.',
+      ps:['You wrote this in Clarity. You typed <b>$1,850</b> for last month, and you said every client you have came from someone you reached out to first.',
+          'So the plan bets on the one thing with a track record here: outreach. Yours. Each client so far began as a message, which makes messages the lever, not the website, not the logo.',
+          'Three a day, sized up or down by you. Revenue gets asked about on Sundays, and the plan adjusts to whatever number you write.'],
+      act:'Message 3 potential clients.'},
+    weight:{star:'195 by June.',
+      ps:['You wrote this in Clarity. You typed <b>212</b> this morning, and you said evenings are where it falls apart.',
+          'Nobody can "lose a pound" today, so this plan only ever hands you acts you can actually finish: the walk, the log, the boundary. The scale stays a number you write in at your own morning ritual, never a test.',
+          'The walk lands after dinner on purpose. It sits exactly where you said the day breaks.'],
+      act:'A 40 minute walk after dinner.'},
+    fitness:{star:'Train three times a week, every week.',
+      ps:['You wrote this in Clarity, and you said the pattern is always the same: three strong weeks, then nothing.',
+          'So the real opponent is the restart. Your training days are fixed, rest days are real days with their own screen, and a missed session never resets anything. It just sits there, counted, yours.',
+          'The plan asks for no number at all. The sessions are the record.'],
+      act:'Push day session.'},
+    school:{star:'3.5 GPA by May.',
+      ps:['You wrote this in Clarity, and you said ability was never the problem. Studying loses to the phone, every night.',
+          'A GPA cannot be done today. Study hours can. So the semester becomes sessions, and the one condition you gave, phone in another room, is written into the move itself.',
+          'Grades get asked about only when they exist. Between results, the sessions are the whole job.'],
+      act:'Study 2 hours, phone in another room.'},
+    projects:{star:'Launch Memento September 1.',
+      ps:['You wrote this in Clarity, and you listed <b>14 blockers</b> between here and launched. That list is the plan. Nothing here is guessed, because you already named every piece.',
+          'The order is smallest first. Clearing the little ones fast is what makes the big ones start to move, so the daily move never changes shape: one deep session, aimed at whatever is smallest and still open.'],
+      act:'One deep session on the smallest open blocker.'},
+    focus:{star:'Deep work every day until the migration ships.',
+      ps:['You wrote this in Clarity, and you said the mornings vanish into email before the real work starts.',
+          'So the plan claims the morning before anything else can: one protected block, phone in another room, a single tab. You set the size of the block each day. The block itself is the plan.'],
+      act:'Deep work on the migration, 90 min.'},
+    business:{star:'$10k a month from the studio.',
+      ps:['You wrote this in Clarity. You typed <b>$3,200</b> for last month, and you said the product is good but nobody sees it.',
+          'That makes the bottleneck attention, and the highest leverage act you own is output. More hours of polish cannot move a number nobody can see, so the deep work stays on the product and the posting protects it.',
+          'The business number gets asked on Sundays, and the plan bends to whatever you write.'],
+      act:'Deep work on the product, 3 hours.'}
+  };
+
+  function load(k){
+    var c=B[k];
+    star.textContent=c.star;
+    body.innerHTML=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    mv.textContent=c.act;
+    rest.classList.remove('open');rest.setAttribute('aria-hidden','true');
+  }
+  r.querySelectorAll('.bk button[data-b]').forEach(function(b){
+    b.addEventListener('click',function(){
+      r.querySelectorAll('.bk button[data-b]').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');load(b.dataset.b);
+    });
+  });
+
+  var t=null;
+  function down(e){
+    if(e&&e.pointerId!=null){try{go.setPointerCapture(e.pointerId)}catch(z){}}
+    fill.style.transition='width 1s linear';fill.style.width='100%';
+    t=setTimeout(function(){t=null;fill.style.transition='none';fill.style.width='0';
+      rest.classList.add('open');rest.setAttribute('aria-hidden','false');},1000);
+  }
+  function up(){if(t){clearTimeout(t);t=null;}
+    fill.style.transition='width .16s ease-out';fill.style.width='0';}
+  go.addEventListener('pointerdown',down);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){go.addEventListener(ev,up)});
+  go.addEventListener('keydown',function(e){
+    if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();down();}});
+  go.addEventListener('keyup',up);go.addEventListener('blur',up);
+  again.addEventListener('click',function(){load(cur());});
+  function cur(){var b=r.querySelector('.bk button.on');return b?b.dataset.b:'screen'}
+
+  load('screen');
+})();</script>
+</section>
+
+</div></section>
 <section class="grp"><h2>The pulse</h2><p>The module's one ask, at the close, at the goal's own cadence. No loop screen asks for a number; they all end here.</p><div class="wall">
 <!-- ARCHETYPE (difference law): pu-1 centred poster field -->
 <section class="cell" id="pu-1" data-k="pu-1">
@@ -1183,21 +1368,21 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 /* --- beat 2: SIZE IT. three sizes, and each one IS a plate -------------- */
 [data-k=u-1] .u1-sizes{display:none;margin-top:12px;position:relative;z-index:2}
 [data-k=u-1] .u1.sizing .u1-sizes{display:block}
-[data-k=u-1] .u1-three{display:flex;gap:6px}
-[data-k=u-1] .u1-three button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 5px 9px;
-  cursor:pointer;font-family:var(--font);text-align:center;background:rgba(22,25,31,.95);
+/* one glass track, three cells, the chosen one raised. The role/act captions
+   left the buttons: the single consequence line below carries them, so the
+   control stopped being nine competing labels (Malik: make it look better). */
+[data-k=u-1] .u1-three{display:flex;gap:2px;padding:3px;border-radius:12px;
+  background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out,transform .09s ease-out}
-[data-k=u-1] .u1-three button:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
-[data-k=u-1] .u1-three i{display:block;font-style:normal;font-size:10.5px;line-height:1;
-  color:rgba(var(--ink),.72)}
-[data-k=u-1] .u1-three b{display:block;margin-top:5px;font-size:13.5px;font-weight:500;line-height:1.05;
-  color:rgba(var(--ink),.92);font-variant-numeric:tabular-nums}
-[data-k=u-1] .u1-three s{display:block;margin-top:4px;text-decoration:none;font-size:10.5px;
-  line-height:1;color:rgba(var(--ink),.72);font-variant-numeric:tabular-nums}
-[data-k=u-1] .u1-three button.on{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=u-1] .u1-three button{flex:1;min-width:0;border:0;border-radius:9px;padding:11px 4px;
+  cursor:pointer;font-family:var(--font);text-align:center;background:none;
+  transition:background .16s ease-out}
+[data-k=u-1] .u1-three b{display:block;font-size:14px;font-weight:500;line-height:1;
+  color:rgba(var(--ink),.80);font-variant-numeric:tabular-nums;transition:color .16s ease-out}
+[data-k=u-1] .u1-three button.on{background:rgba(52,58,68,.98);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.14), 0 6px 16px rgba(0,0,0,.35)}
 [data-k=u-1] .u1-three button.on b{color:var(--text-hi);font-weight:700}
-[data-k=u-1] .u1-three button.on i,[data-k=u-1] .u1-three button.on s{color:rgba(var(--ink),.84)}
 [data-k=u-1] .u1-three button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=u-1] .u1-foot{display:flex;align-items:center;gap:10px;margin-top:8px}
 [data-k=u-1] .u1-est{margin:0;font-size:11.5px;line-height:1.3;color:rgba(var(--ink),.78)}
@@ -1207,7 +1392,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=u-1] .u1-more:hover,[data-k=u-1] .u1-more.on{color:rgba(var(--ink),.96)}
 [data-k=u-1] .u1-more.gone{display:none}
 [data-k=u-1] .u1-sizes.free .u1-three{flex-wrap:wrap}
-[data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33.333% - 4px)}
+[data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33% - 2px)}
 
 /* --- beat 3: the deep work door, only when the star is session shaped ---- */
 [data-k=u-1] .u1-dw{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
@@ -1535,7 +1720,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       rest:'See you tomorrow.'}
   };
   var ROLES=['lighter','today&#8217;s','heavier'];
-  var ACTS=['just the star','star and one','star and two'];
+  var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
   var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
   var C=B.focus,acts=2,val=C.three[1],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
@@ -1586,35 +1771,40 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   }
   function drawSizes(){
     three.innerHTML='';
-    if(!C.fmt){ /* nothing to size on the star: the three are the plate itself */
+    var roles=C.roles||ROLES,cap=function(s){return s.charAt(0).toUpperCase()+s.slice(1)};
+    if(!C.fmt){ /* nothing to size on the star: the three are the plate itself,
+                   so the cells carry the role names and the line below the cost */
       [0,1,2].forEach(function(i){
         var b=document.createElement('button');b.type='button';b.dataset.i=i;
-        b.innerHTML='<i>'+ROLES[i]+'</i><s>'+ACTS[i]+'</s>';
+        b.innerHTML='<b>'+cap(roles[i])+'</b>';
         if(i===acts-1)b.classList.add('on');
         three.appendChild(b);
       });
-      more.classList.add('gone');est.textContent='';return;
-    }
-    more.classList.remove('gone');
-    var roles=C.roles||ROLES;
-    if(free){
-      C.all.forEach(function(v){
-        var b=document.createElement('button');b.type='button';b.dataset.v=v;
-        b.innerHTML='<b>'+sizeLabel(v)+'</b>';
-        if(v===val)b.classList.add('on');
-        three.appendChild(b);
-      });
+      more.classList.add('gone');
     }else{
-      C.three.forEach(function(v,i){
-        var b=document.createElement('button');b.type='button';b.dataset.v=v;b.dataset.i=i;
-        b.innerHTML='<i>'+roles[i]+'</i><b>'+sizeLabel(v)+'</b><s>'+ACTS[i]+'</s>';
-        if(v===val&&i===acts-1)b.classList.add('on');
-        three.appendChild(b);
-      });
+      more.classList.remove('gone');
+      if(free){
+        C.all.forEach(function(v){
+          var b=document.createElement('button');b.type='button';b.dataset.v=v;
+          b.innerHTML='<b>'+sizeLabel(v)+'</b>';
+          if(v===val)b.classList.add('on');
+          three.appendChild(b);
+        });
+      }else{
+        C.three.forEach(function(v,i){
+          var b=document.createElement('button');b.type='button';b.dataset.v=v;b.dataset.i=i;
+          b.innerHTML='<b>'+sizeLabel(v)+'</b>';
+          if(v===val&&i===acts-1)b.classList.add('on');
+          three.appendChild(b);
+        });
+      }
+      more.textContent=free?'three sizes':'more sizes';
+      more.classList.toggle('on',free);
     }
-    est.innerHTML=estimate(val);
-    more.textContent=free?'three sizes':'more sizes';
-    more.classList.toggle('on',free);
+    /* ONE line under the track says what the choice buys: how many acts the
+       day has, plus the plan's own time estimate when it has one */
+    var e=estimate(val);
+    est.innerHTML=CONSEQ[acts-1]+(e?' '+e:'');
   }
   function drawPlate(){
     sups.forEach(function(s,i){

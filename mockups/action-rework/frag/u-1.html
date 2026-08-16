@@ -67,21 +67,21 @@
 /* --- beat 2: SIZE IT. three sizes, and each one IS a plate -------------- */
 [data-k=u-1] .u1-sizes{display:none;margin-top:12px;position:relative;z-index:2}
 [data-k=u-1] .u1.sizing .u1-sizes{display:block}
-[data-k=u-1] .u1-three{display:flex;gap:6px}
-[data-k=u-1] .u1-three button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 5px 9px;
-  cursor:pointer;font-family:var(--font);text-align:center;background:rgba(22,25,31,.95);
+/* one glass track, three cells, the chosen one raised. The role/act captions
+   left the buttons: the single consequence line below carries them, so the
+   control stopped being nine competing labels (Malik: make it look better). */
+[data-k=u-1] .u1-three{display:flex;gap:2px;padding:3px;border-radius:12px;
+  background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out,transform .09s ease-out}
-[data-k=u-1] .u1-three button:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
-[data-k=u-1] .u1-three i{display:block;font-style:normal;font-size:10.5px;line-height:1;
-  color:rgba(var(--ink),.72)}
-[data-k=u-1] .u1-three b{display:block;margin-top:5px;font-size:13.5px;font-weight:500;line-height:1.05;
-  color:rgba(var(--ink),.92);font-variant-numeric:tabular-nums}
-[data-k=u-1] .u1-three s{display:block;margin-top:4px;text-decoration:none;font-size:10.5px;
-  line-height:1;color:rgba(var(--ink),.72);font-variant-numeric:tabular-nums}
-[data-k=u-1] .u1-three button.on{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.07)}
+[data-k=u-1] .u1-three button{flex:1;min-width:0;border:0;border-radius:9px;padding:11px 4px;
+  cursor:pointer;font-family:var(--font);text-align:center;background:none;
+  transition:background .16s ease-out}
+[data-k=u-1] .u1-three b{display:block;font-size:14px;font-weight:500;line-height:1;
+  color:rgba(var(--ink),.80);font-variant-numeric:tabular-nums;transition:color .16s ease-out}
+[data-k=u-1] .u1-three button.on{background:rgba(52,58,68,.98);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.14), 0 6px 16px rgba(0,0,0,.35)}
 [data-k=u-1] .u1-three button.on b{color:var(--text-hi);font-weight:700}
-[data-k=u-1] .u1-three button.on i,[data-k=u-1] .u1-three button.on s{color:rgba(var(--ink),.84)}
 [data-k=u-1] .u1-three button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=u-1] .u1-foot{display:flex;align-items:center;gap:10px;margin-top:8px}
 [data-k=u-1] .u1-est{margin:0;font-size:11.5px;line-height:1.3;color:rgba(var(--ink),.78)}
@@ -91,7 +91,7 @@
 [data-k=u-1] .u1-more:hover,[data-k=u-1] .u1-more.on{color:rgba(var(--ink),.96)}
 [data-k=u-1] .u1-more.gone{display:none}
 [data-k=u-1] .u1-sizes.free .u1-three{flex-wrap:wrap}
-[data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33.333% - 4px)}
+[data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33% - 2px)}
 
 /* --- beat 3: the deep work door, only when the star is session shaped ---- */
 [data-k=u-1] .u1-dw{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
@@ -419,7 +419,7 @@
       rest:'See you tomorrow.'}
   };
   var ROLES=['lighter','today&#8217;s','heavier'];
-  var ACTS=['just the star','star and one','star and two'];
+  var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
   var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
   var C=B.focus,acts=2,val=C.three[1],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
@@ -470,35 +470,40 @@
   }
   function drawSizes(){
     three.innerHTML='';
-    if(!C.fmt){ /* nothing to size on the star: the three are the plate itself */
+    var roles=C.roles||ROLES,cap=function(s){return s.charAt(0).toUpperCase()+s.slice(1)};
+    if(!C.fmt){ /* nothing to size on the star: the three are the plate itself,
+                   so the cells carry the role names and the line below the cost */
       [0,1,2].forEach(function(i){
         var b=document.createElement('button');b.type='button';b.dataset.i=i;
-        b.innerHTML='<i>'+ROLES[i]+'</i><s>'+ACTS[i]+'</s>';
+        b.innerHTML='<b>'+cap(roles[i])+'</b>';
         if(i===acts-1)b.classList.add('on');
         three.appendChild(b);
       });
-      more.classList.add('gone');est.textContent='';return;
-    }
-    more.classList.remove('gone');
-    var roles=C.roles||ROLES;
-    if(free){
-      C.all.forEach(function(v){
-        var b=document.createElement('button');b.type='button';b.dataset.v=v;
-        b.innerHTML='<b>'+sizeLabel(v)+'</b>';
-        if(v===val)b.classList.add('on');
-        three.appendChild(b);
-      });
+      more.classList.add('gone');
     }else{
-      C.three.forEach(function(v,i){
-        var b=document.createElement('button');b.type='button';b.dataset.v=v;b.dataset.i=i;
-        b.innerHTML='<i>'+roles[i]+'</i><b>'+sizeLabel(v)+'</b><s>'+ACTS[i]+'</s>';
-        if(v===val&&i===acts-1)b.classList.add('on');
-        three.appendChild(b);
-      });
+      more.classList.remove('gone');
+      if(free){
+        C.all.forEach(function(v){
+          var b=document.createElement('button');b.type='button';b.dataset.v=v;
+          b.innerHTML='<b>'+sizeLabel(v)+'</b>';
+          if(v===val)b.classList.add('on');
+          three.appendChild(b);
+        });
+      }else{
+        C.three.forEach(function(v,i){
+          var b=document.createElement('button');b.type='button';b.dataset.v=v;b.dataset.i=i;
+          b.innerHTML='<b>'+sizeLabel(v)+'</b>';
+          if(v===val&&i===acts-1)b.classList.add('on');
+          three.appendChild(b);
+        });
+      }
+      more.textContent=free?'three sizes':'more sizes';
+      more.classList.toggle('on',free);
     }
-    est.innerHTML=estimate(val);
-    more.textContent=free?'three sizes':'more sizes';
-    more.classList.toggle('on',free);
+    /* ONE line under the track says what the choice buys: how many acts the
+       day has, plus the plan's own time estimate when it has one */
+    var e=estimate(val);
+    est.innerHTML=CONSEQ[acts-1]+(e?' '+e:'');
   }
   function drawPlate(){
     sups.forEach(function(s,i){
