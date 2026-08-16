@@ -141,9 +141,8 @@
     var label = win >= 84 ? 'consistent, last 3 months' : 'consistent, last ' + plural(win, 'day');
     var bright = score >= 80;
     return '<div class="sec"><div class="sec__h"><b>Consistency score</b></div>' +
-      '<div class="glance">' + mMark('glance__m', 132) +
-      '<div class="score"><div class="score__n"' + (bright ? ' style="color:#eafff0"' : '') + '>' + score + '</div>' +
-      '<div class="score__lbl">' + label + '</div></div>' +
+      '<div class="glance"><div class="glance__badge">' + mMark('', 15) + '</div>' +
+      '<div class="score"><div class="score__n"' + (bright ? ' style="color:#eafff0"' : '') + '>' + score + '</div></div>' +
       '<div class="score__hm">' + cells + '</div></div></div>';
   }
 
