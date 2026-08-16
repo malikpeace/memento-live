@@ -18,10 +18,19 @@
   var K = window.CKit;
   if (!K) return;
 
-  var DAY = 168, SHAPE = 'quantity_up', SCALE = 'month';
+  // real goals, so you can see how the same module reads for different people.
+  // The structure is universal by design; the shape tunes cadence + wording.
+  var PERSONAS = [
+    { label: 'Business', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal' },
+    { label: 'Fitness', shape: 'frequency', cadence: 4, sub: 'workouts toward the rate you keep' },
+    { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit' },
+    { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep' },
+    { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held' },
+    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number' }
+  ];
+  var PERSONA = PERSONAS[0];
+  var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
   var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal';
-  var SHAPES = [['quantity_up', 'Grow a number'], ['quantity_down', 'Bring it down'], ['frequency', 'A rate'],
-    ['maintenance', 'A line held'], ['milestone', 'One event'], ['open', 'No number']];
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -83,9 +92,7 @@
   function pageOne(s, log) {
     var n = s.total;
     var size = n < 100 ? 132 : n < 1000 ? 112 : 92;
-    var word = SHAPE === 'maintenance' ? (n === 1 ? 'day the line has held' : 'days the line has held')
-      : SHAPE === 'frequency' ? (n === 1 ? 'session toward the rate you keep' : 'sessions toward the rate you keep')
-      : (n === 1 ? 'action completed toward your goal' : 'actions completed toward your goal');
+    var word = PERSONA.sub;
     var counted = log[log.length - 1].on;
     return '<div class="one__brand">' + mMark('m-mark', 26) + '</div>' +
       '<div><div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
@@ -335,16 +342,17 @@
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
-    return hero + '<div class="ev__grid"><div class="ev__col">' + scoreBlock(s, log, A) + cal + '</div>' +
-      '<div class="ev__col">' + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log) + '</div></div>';
+    // score sits above the "you've shown up" line
+    return scoreBlock(s, log, A) + hero + '<div class="ev__grid"><div class="ev__col">' + cal + rhythm(s) + '</div>' +
+      '<div class="ev__col">' + tracks(log) + monthBars(s) + ledger(s, log) + '</div></div>';
   }
 
   /* ---------- render + wiring ---------- */
   function render() {
     var N = Math.max(1, DAY);
     var log = K.buildLog(N, SHAPE);
-    var s = K.stats(log, SHAPE, 4);
-    var A = annotate(log, SHAPE, s.cadence || 4);
+    var s = K.stats(log, SHAPE, PERSONA.cadence);
+    var A = annotate(log, SHAPE, PERSONA.cadence);
     el('day').textContent = 'Day ' + N;
     el('pgOne').innerHTML = pageOne(s, log);
     el('ev').innerHTML = pageTwo(s, log, A);
@@ -370,7 +378,7 @@
   }
 
   el('dayChips').innerHTML = DAYS.map(function (d) { return '<button data-d="' + d + '"' + (d === DAY ? ' class="on"' : '') + '>Day ' + d + '</button>'; }).join('');
-  el('shapeChips').innerHTML = SHAPES.map(function (sp) { return '<button data-s="' + sp[0] + '"' + (sp[0] === SHAPE ? ' class="on"' : '') + '>' + sp[1] + '</button>'; }).join('');
+  el('shapeChips').innerHTML = PERSONAS.map(function (p, i) { return '<button data-p="' + i + '"' + (p === PERSONA ? ' class="on"' : '') + '>' + p.label + '</button>'; }).join('');
   el('slider').addEventListener('input', function () {
     DAY = +this.value; MOFF = 0; WOFF = 0; YOFF = 0;
     [].forEach.call(document.querySelectorAll('#dayChips button'), function (b) { b.classList.toggle('on', +b.getAttribute('data-d') === DAY); });
@@ -384,7 +392,7 @@
   });
   el('shapeChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    SHAPE = b.getAttribute('data-s'); MOFF = 0; WOFF = 0; YOFF = 0;
+    PERSONA = PERSONAS[+b.getAttribute('data-p')]; SHAPE = PERSONA.shape; MOFF = 0; WOFF = 0; YOFF = 0;
     [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
     render();
   });
@@ -397,10 +405,13 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
-  el('fxChips').innerHTML = '<button data-fx="flat" class="on">Flat</button><button data-fx="glass">Glass</button>';
+  el('fxChips').innerHTML = '<button data-fx="flat" class="on">Flat</button><button data-fx="glass">Glass</button><button data-fx="glassplus">Glass +</button>';
   el('fxChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    document.documentElement.classList.toggle('glass', b.getAttribute('data-fx') === 'glass');
+    var fx = b.getAttribute('data-fx');
+    document.documentElement.classList.remove('glass', 'glassplus');
+    if (fx === 'glass') document.documentElement.classList.add('glass');
+    if (fx === 'glassplus') document.documentElement.classList.add('glassplus');
     [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
   });
   el('viewChips').innerHTML = '<button data-v="desk">Desktop</button><button data-v="phone">Phone</button>';
