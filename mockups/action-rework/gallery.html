@@ -876,9 +876,12 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   padding:50px 20px 18px;font-variant-numeric:tabular-nums;
   -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
 [data-k=lg-1] .lg1-scroll{flex:1;min-height:0;overflow-y:auto;position:relative;z-index:2;
-  scrollbar-width:none;display:flex;flex-direction:column;justify-content:center}
+  scrollbar-width:none;display:flex;flex-direction:column}
 [data-k=lg-1] .lg1-scroll::-webkit-scrollbar{display:none}
-[data-k=lg-1] .lg1-star{margin:0 0 14px;font-size:20px;font-weight:700;line-height:1.3;
+/* centers when the brief is short, scrolls from the top when it is long
+   (justify-content:center would clip the top of overflowing content) */
+[data-k=lg-1] .lg1-in{margin:auto 0}
+[data-k=lg-1] .lg1-star{margin:0 0 14px;font-size:19px;font-weight:700;line-height:1.32;
   letter-spacing:-.024em;color:var(--text-hi);text-wrap:pretty}
 [data-k=lg-1] .lg1 p.b{margin:0 0 11px;font-size:12.5px;line-height:1.52;
   color:rgba(var(--ink),.92);text-wrap:pretty}
@@ -891,6 +894,8 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lg-1] .lg1-mv p{margin:0;font-size:14.5px;font-weight:700;line-height:1.3;
   letter-spacing:-.014em;color:var(--text-hi)}
 [data-k=lg-1] .lg1-src{margin:2px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
+[data-k=lg-1] .lg1-fair{margin:14px 0 0;font-size:16px;font-weight:700;letter-spacing:-.016em;
+  color:var(--text-hi)}
 /* the hold: same law as everywhere, an early release does nothing */
 [data-k=lg-1] .lg1-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
   border:0;border-radius:14px;overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;
@@ -918,7 +923,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 @media (prefers-reduced-motion:reduce){[data-k=lg-1] .lg1 *,[data-k=lg-1] .lg1-rest{transition:none!important}}
 </style>
 <h3>The logic</h3><p class="reach"><b>10/10</b><span>everyone, at every plan reveal, then kept</span></p>
-<p class="cap">The plan arrives as reasoning: what you said, where you stand by your own number, why the first move is the highest leverage one, and what the plan does after it. Static, then kept behind a quiet "Why this plan" door on the day screen.</p>
+<p class="cap">The plan arrives as reasoning, in Malik's structure: the goal quoted in their own words, the commitment restated, the actual math (estimates labeled as estimates), the narrowing to the highest leverage act, and a "Fair?" the hold answers. Long is fine, it scrolls. Kept behind a quiet "Why this plan" door on the day screen.</p>
 <div class="bk" role="group" aria-label="which bucket this page is explaining">
   <i>Bucket</i>
   <button type="button" data-b="focus">Focus</button>
@@ -933,13 +938,14 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 <div class="ph">
   <div class="grid"></div>
   <div class="lg1">
-    <div class="lg1-scroll">
+    <div class="lg1-scroll"><div class="lg1-in">
       <p class="lg1-star"></p>
       <div class="lg1-body"></div>
       <div class="lg1-mv"><p></p></div>
       <p class="lg1-src">Every line above came from what you told Memento.</p>
-    </div>
-    <button type="button" class="lg1-go"><i></i><span>Hold to start today</span></button>
+      <p class="lg1-fair">Fair?</p>
+    </div></div>
+    <button type="button" class="lg1-go"><i></i><span>Hold to agree. Start today.</span></button>
     <p class="lg1-keep">This page stays. Why this plan, on your day screen, reopens it.</p>
   </div>
   <div class="lg1-rest" aria-hidden="true">
@@ -954,52 +960,57 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       star=q('.lg1-star'),body=q('.lg1-body'),mv=q('.lg1-mv p'),
       go=q('.lg1-go'),fill=q('.lg1-go i'),rest=q('.lg1-rest'),again=q('.lg1-again');
 
-  /* Same people as u-1: the star, the typed number and the refine answer all
-     line up with what the universal layout then hands them each day. */
+  /* Malik's structure (2026-08-16): the star QUOTED in their own words, the
+     commitment restated, the actual math where math exists (anything Memento
+     derived rather than was told says so in the sentence), the narrowing to
+     the highest leverage act, then "Fair?" and the hold as the yes. Long is
+     fine, the page scrolls: the whole plan, spelled out, right there. */
   var B={
-    screen:{star:'Under 3 hours a day. My evenings back.',
-      ps:['You wrote this in Clarity, and you typed <b>8 hours</b> as where the day stands now.',
-          'Eight to three is a big jump, and it is simpler than it looks. You named <b>TikTok, Instagram and Reddit</b> as the three that eat the hours. Trimming apps you barely open saves minutes. Removing those three saves hours, so that is the first move.',
-          'After it, the plan changes jobs: one guarded moment a night, phone away at 8, so they stay gone and the hours stay yours.'],
+    screen:{star:'&#8220;Under 3 hours a day. My evenings back.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>8 hours</b> as where the day stands, so the plan starts from 8. Yours, not an average.',
+          'The math: 8 down to 3 means finding <b>5 hours</b>. You named &#8220;TikTok, Instagram and Reddit&#8221; as the three that take most of it. Trimming apps you barely open saves minutes. Removing those three, by your own report, is most of the 5 hours in a single act.',
+          'So the plan has two jobs. Day one removes them. Every day after guards one moment, phone away at 8pm, so they stay gone and the number keeps falling on its own. You type the day&#8217;s hours each night from your Screen Time report, and the plan tightens or eases off what you write.'],
       act:'Delete TikTok, Instagram and Reddit.'},
-    money:{star:'$3,000 a month so I can quit the warehouse.',
-      ps:['You wrote this in Clarity. You typed <b>$1,850</b> for last month, and you said every client you have came from someone you reached out to first.',
-          'So the plan bets on the one thing with a track record here: outreach. Yours. Each client so far began as a message, which makes messages the lever, not the website, not the logo.',
-          'Three a day, sized up or down by you. Revenue gets asked about on Sundays, and the plan adjusts to whatever number you write.'],
+    money:{star:'&#8220;$3,000 a month so I can quit the warehouse.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>$1,850</b> for last month, so the gap is <b>$1,150</b>.',
+          'The math: you said your average client is worth about <b>$400 a month</b>, your number. So the gap is roughly <b>3 more clients</b>. And you said every client you have came from someone you reached out to first, which settles what the daily act is. Messages, not the website, not the logo.',
+          'If replies keep running the way you described, 3 clients is a few dozen real conversations. That is messages every day, sized to the day you are having. Revenue gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
       act:'Message 3 potential clients.'},
-    weight:{star:'195 by June.',
-      ps:['You wrote this in Clarity. You typed <b>212</b> this morning, and you said evenings are where it falls apart.',
-          'Nobody can "lose a pound" today, so this plan only ever hands you acts you can actually finish: the walk, the log, the boundary. The scale stays a number you write in at your own morning ritual, never a test.',
-          'The walk lands after dinner on purpose. It sits exactly where you said the day breaks.'],
-      act:'A 40 minute walk after dinner.'},
-    fitness:{star:'Train three times a week, every week.',
-      ps:['You wrote this in Clarity, and you said the pattern is always the same: three strong weeks, then nothing.',
-          'So the real opponent is the restart. Your training days are fixed, rest days are real days with their own screen, and a missed session never resets anything. It just sits there, counted, yours.',
+    weight:{star:'&#8220;Lose 50lbs in 6 months so I look good for summer.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now. Losing weight comes down to math, and the struggle you named is diet, so that is where the plan aims.',
+          'The math: you typed <b>6&#8217;1, 300lbs</b>, and 50lbs in 180 days. A pound is roughly 3,500 calories, so that is 175,000 calories over 6 months. Call it <b>1,000 a day</b>. Aggressive, but it is arithmetic, not willpower.',
+          'At your size, maintenance is likely around <b>3,500 calories</b>. That one is an estimate, and the scale number you type each morning will correct it. Eat around <b>2,500 a day</b> for 6 months and the goal follows, down to the laws of physics.',
+          'So the first action is not a diet. It is building the one thing that makes those numbers livable for 180 days, yours, not a template:'],
+      act:'Build a meal plan of 2,000 to 2,500 calories and 200 to 250g of protein you can comfortably keep for 6 months.'},
+    fitness:{star:'&#8220;Train three times a week, every week.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said the pattern is always the same: three strong weeks, then nothing.',
+          'So the opponent is the restart, not the workouts. Your training days are fixed so there is nothing to decide each morning. Rest days are real days with their own screen. A missed session never resets anything, it just sits there, counted, yours.',
           'The plan asks for no number at all. The sessions are the record.'],
       act:'Push day session.'},
-    school:{star:'3.5 GPA by May.',
-      ps:['You wrote this in Clarity, and you said ability was never the problem. Studying loses to the phone, every night.',
-          'A GPA cannot be done today. Study hours can. So the semester becomes sessions, and the one condition you gave, phone in another room, is written into the move itself.',
-          'Grades get asked about only when they exist. Between results, the sessions are the whole job.'],
+    school:{star:'&#8220;A 3.5 GPA by May.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said ability was never the problem. Studying loses to the phone, every night.',
+          'A GPA cannot be done today. It arrives later, as a result. What can be done today is hours, and you said the two classes dragging the average down are the ones with the heaviest reading, so the sessions aim there first.',
+          'The one condition you gave, &#8220;phone in another room,&#8221; is written into the move itself, because you told us exactly where the fight is. Grades get asked about only when they exist. Between results, the sessions are the whole job.'],
       act:'Study 2 hours, phone in another room.'},
-    projects:{star:'Launch Memento September 1.',
-      ps:['You wrote this in Clarity, and you listed <b>14 blockers</b> between here and launched. That list is the plan. Nothing here is guessed, because you already named every piece.',
-          'The order is smallest first. Clearing the little ones fast is what makes the big ones start to move, so the daily move never changes shape: one deep session, aimed at whatever is smallest and still open.'],
-      act:'One deep session on the smallest open blocker.'},
-    focus:{star:'Deep work every day until the migration ships.',
-      ps:['You wrote this in Clarity, and you said the mornings vanish into email before the real work starts.',
-          'So the plan claims the morning before anything else can: one protected block, phone in another room, a single tab. You set the size of the block each day. The block itself is the plan.'],
+    projects:{star:'&#8220;Work 3 to 4 hours a day on Memento until it ships.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now, and you already know the shape of it: the hours. The real question is the one you asked yourself, &#8220;what does the deep work consist of?&#8221;',
+          'You said payments are set up, marketing is handled through your YouTube audience, and what is left is the product itself. You said Clarity is done. That leaves one module standing between here and shipped.',
+          'So the next sessions are not &#8220;work on Memento.&#8221; They are aimed: hyper focused on making the Action module damn good, because by your own list it is the tallest thing left. When it falls, the plan re-aims at whatever is tallest then.'],
+      act:'One deep session on the Action module.'},
+    focus:{star:'&#8220;Deep work every day until the migration ships.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said the mornings vanish into email before the real work starts.',
+          'So the plan claims the morning before anything else can. One protected block, phone in another room, a single tab. You size the block each day. The block itself is not negotiable, because you said it yourself: once the morning goes, the day goes with it.'],
       act:'Deep work on the migration, 90 min.'},
-    business:{star:'$10k a month from the studio.',
-      ps:['You wrote this in Clarity. You typed <b>$3,200</b> for last month, and you said the product is good but nobody sees it.',
-          'That makes the bottleneck attention, and the highest leverage act you own is output. More hours of polish cannot move a number nobody can see, so the deep work stays on the product and the posting protects it.',
-          'The business number gets asked on Sundays, and the plan bends to whatever you write.'],
+    business:{star:'&#8220;$10k a month from the studio.&#8221;',
+      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>$3,200</b> for last month, and you said the product is good but nobody sees it.',
+          'The math: $3,200 to $10k is roughly 3x. You said your average project is about <b>$1,600</b>, your number, so the gap is about <b>4 more projects a month</b>. And by your own account, every project so far came from someone who saw your work. Nobody new can see work that is not posted.',
+          'So the deep work stays on the product, and the posting protects it. Output is the lever you actually own. The business number gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
       act:'Deep work on the product, 3 hours.'}
   };
 
   function load(k){
     var c=B[k];
-    star.textContent=c.star;
+    star.innerHTML=c.star;
     body.innerHTML=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
     mv.textContent=c.act;
     rest.classList.remove('open');rest.setAttribute('aria-hidden','true');
@@ -1660,41 +1671,46 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     if(v<120)return v+' min';
     return Math.floor(v/60)+' hr '+(v%60)+' min';
   };
+  /* THE PLATE DEFAULT (Malik, 2026-08-16): the day ARRIVES FULL, star plus
+     both supports, at the plan's own proposed size (always index 2 of three).
+     The two smaller sizes fold downward: lighter is star and one, lightest is
+     just the star. Bigger sizes still exist behind "more". */
   var B={
     /* the size token sits at the END for the session goals: "One 2 hours
        block" is broken English at the top end, and a star that only reads
        right at one size is not a universal star. */
     focus:{pre:'Deep work on the migration, ',post:'.',fmt:mins,
-      three:[45,90,120],all:[30,45,60,75,90,120],
+      three:[45,60,90],all:[30,45,60,75,90,120],
       dw:true,dwv:function(v){return v},
       sup:['Phone in another room','Single tab only'],
       pulse:null,rest:'See you tomorrow.'},
     screen:{pre:'Phone away at ',post:'.',
       fmt:function(v){var h=Math.floor(v/60),m=v%60,ap=h>=12?'pm':'am';
         return (h%12||12)+':'+('0'+m).slice(-2)+ap;},
-      roles:['easier','tonight&#8217;s','tighter'],
-      /* minutes past midnight: 9:00pm is the easier night, 7:30pm the tighter one */
-      three:[1260,1200,1170],all:[1140,1170,1200,1230,1260,1290],
+      roles:['easiest','easier','tonight&#8217;s'],
+      /* minutes past midnight: 9:30pm is the easiest night, 8:00pm the plan's;
+         tighter hours (7:30 and earlier) live behind "more" */
+      three:[1290,1260,1200],all:[1140,1170,1200,1230,1260,1290],
       dw:false,sup:['Audiobook at lunch, not YouTube','Delete TikTok'],
       pulse:{kind:'num',q:'Tonight I spent',pre:'',suf:'h',tail:'on my phone.',dec:true,
         src:'From your Screen Time report, asked each night.'},
       rest:'See you tomorrow.'},
     projects:{pre:'Deep session on the smallest open blocker, ',post:'.',fmt:mins,
-      three:[45,60,90],all:[30,45,60,90,120,150],
+      three:[30,45,60],all:[30,45,60,90,120,150],
       dw:true,dwv:function(v){return v},
       sup:['Ship one visible thing','Write tomorrow&#8217;s first step'],
       pulse:{kind:'choice',q:'Is that blocker cleared?',opts:['Cleared','Not yet'],
         src:'From your own blocker list, asked after each session.'},
       rest:'See you tomorrow.'},
     school:{pre:'Study ',post:', phone in another room.',fmt:mins,
-      three:[60,120,180],all:[45,60,90,120,150,180],
+      three:[60,90,120],all:[45,60,90,120,150,180],
       dw:true,dwv:function(v){return v},
       sup:['Rewrite one page of notes','Email about office hours'],
       pulse:{kind:'num',q:'My GPA is',pre:'',suf:'',tail:'this semester.',dec:true,
         src:'Asked when results exist, never between.'},
       rest:'See you tomorrow.'},
     weight:{pre:'A ',post:' walk after dinner.',fmt:mins,
-      three:[25,40,60],all:[20,25,30,40,50,60],
+      three:[20,25,40],all:[20,25,30,40,50,60],
       dw:false,sup:['Log every meal in MyFitnessPal','Water bottle done by 6'],
       pulse:{kind:'num',q:'The scale said',pre:'',suf:'lb',tail:'this morning.',dec:true,
         src:'Asked once a day, whenever you weigh.'},
@@ -1706,23 +1722,23 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       offable:true,offStar:'Rest day.',offHold:'Hold to close the day'},
     money:{pre:'Message ',post:' potential clients.',
       fmt:function(v){return String(v)},one:' potential client.',
-      three:[3,5,8],all:[1,2,3,5,8,12],
+      three:[1,2,3],all:[1,2,3,5,8,12],
       dw:false,estMin:5,sup:['Send the invoice','30 minutes on the offer page'],
       pulse:{kind:'num',q:'I brought in',pre:'$',suf:'',tail:'this week.',dec:false,
         src:'Asked once a week, Sundays.'},
       rest:'See you tomorrow.'},
     business:{pre:'Deep work on the product, ',post:'.',fmt:mins,
-      three:[120,180,240],all:[60,120,180,240,300,360],
+      three:[60,120,180],all:[60,120,180,240,300,360],
       dw:true,dwv:function(v){return v},
       sup:['Post on 3 platforms','Write one script'],
       pulse:{kind:'num',q:'The business made',pre:'$',suf:'',tail:'this week.',dec:false,
         src:'Asked once a week, Sundays.'},
       rest:'See you tomorrow.'}
   };
-  var ROLES=['lighter','today&#8217;s','heavier'];
+  var ROLES=['lightest','lighter','today&#8217;s'];
   var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
   var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
-  var C=B.focus,acts=2,val=C.three[1],free=false,off=false,
+  var C=B.focus,acts=3,val=C.three[2],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
 
   function stamp(){var d=new Date(),h=d.getHours();
@@ -1954,7 +1970,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   /* --- swapping the bucket ----------------------------------------------- */
   function load(k){
     C=B[k];off=false;free=false;sizes.classList.remove('free');
-    acts=2;val=C.three[1];ticks=[false,false];signed=false;
+    acts=3;val=C.three[2];ticks=[false,false];signed=false;
     if(beat){clearTimeout(beat);beat=null;}
     if(dwT){clearInterval(dwT);dwT=null;}
     setSizing(false);root.classList.remove('closed');

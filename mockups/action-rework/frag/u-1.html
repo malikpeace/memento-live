@@ -359,41 +359,46 @@
     if(v<120)return v+' min';
     return Math.floor(v/60)+' hr '+(v%60)+' min';
   };
+  /* THE PLATE DEFAULT (Malik, 2026-08-16): the day ARRIVES FULL, star plus
+     both supports, at the plan's own proposed size (always index 2 of three).
+     The two smaller sizes fold downward: lighter is star and one, lightest is
+     just the star. Bigger sizes still exist behind "more". */
   var B={
     /* the size token sits at the END for the session goals: "One 2 hours
        block" is broken English at the top end, and a star that only reads
        right at one size is not a universal star. */
     focus:{pre:'Deep work on the migration, ',post:'.',fmt:mins,
-      three:[45,90,120],all:[30,45,60,75,90,120],
+      three:[45,60,90],all:[30,45,60,75,90,120],
       dw:true,dwv:function(v){return v},
       sup:['Phone in another room','Single tab only'],
       pulse:null,rest:'See you tomorrow.'},
     screen:{pre:'Phone away at ',post:'.',
       fmt:function(v){var h=Math.floor(v/60),m=v%60,ap=h>=12?'pm':'am';
         return (h%12||12)+':'+('0'+m).slice(-2)+ap;},
-      roles:['easier','tonight&#8217;s','tighter'],
-      /* minutes past midnight: 9:00pm is the easier night, 7:30pm the tighter one */
-      three:[1260,1200,1170],all:[1140,1170,1200,1230,1260,1290],
+      roles:['easiest','easier','tonight&#8217;s'],
+      /* minutes past midnight: 9:30pm is the easiest night, 8:00pm the plan's;
+         tighter hours (7:30 and earlier) live behind "more" */
+      three:[1290,1260,1200],all:[1140,1170,1200,1230,1260,1290],
       dw:false,sup:['Audiobook at lunch, not YouTube','Delete TikTok'],
       pulse:{kind:'num',q:'Tonight I spent',pre:'',suf:'h',tail:'on my phone.',dec:true,
         src:'From your Screen Time report, asked each night.'},
       rest:'See you tomorrow.'},
     projects:{pre:'Deep session on the smallest open blocker, ',post:'.',fmt:mins,
-      three:[45,60,90],all:[30,45,60,90,120,150],
+      three:[30,45,60],all:[30,45,60,90,120,150],
       dw:true,dwv:function(v){return v},
       sup:['Ship one visible thing','Write tomorrow&#8217;s first step'],
       pulse:{kind:'choice',q:'Is that blocker cleared?',opts:['Cleared','Not yet'],
         src:'From your own blocker list, asked after each session.'},
       rest:'See you tomorrow.'},
     school:{pre:'Study ',post:', phone in another room.',fmt:mins,
-      three:[60,120,180],all:[45,60,90,120,150,180],
+      three:[60,90,120],all:[45,60,90,120,150,180],
       dw:true,dwv:function(v){return v},
       sup:['Rewrite one page of notes','Email about office hours'],
       pulse:{kind:'num',q:'My GPA is',pre:'',suf:'',tail:'this semester.',dec:true,
         src:'Asked when results exist, never between.'},
       rest:'See you tomorrow.'},
     weight:{pre:'A ',post:' walk after dinner.',fmt:mins,
-      three:[25,40,60],all:[20,25,30,40,50,60],
+      three:[20,25,40],all:[20,25,30,40,50,60],
       dw:false,sup:['Log every meal in MyFitnessPal','Water bottle done by 6'],
       pulse:{kind:'num',q:'The scale said',pre:'',suf:'lb',tail:'this morning.',dec:true,
         src:'Asked once a day, whenever you weigh.'},
@@ -405,23 +410,23 @@
       offable:true,offStar:'Rest day.',offHold:'Hold to close the day'},
     money:{pre:'Message ',post:' potential clients.',
       fmt:function(v){return String(v)},one:' potential client.',
-      three:[3,5,8],all:[1,2,3,5,8,12],
+      three:[1,2,3],all:[1,2,3,5,8,12],
       dw:false,estMin:5,sup:['Send the invoice','30 minutes on the offer page'],
       pulse:{kind:'num',q:'I brought in',pre:'$',suf:'',tail:'this week.',dec:false,
         src:'Asked once a week, Sundays.'},
       rest:'See you tomorrow.'},
     business:{pre:'Deep work on the product, ',post:'.',fmt:mins,
-      three:[120,180,240],all:[60,120,180,240,300,360],
+      three:[60,120,180],all:[60,120,180,240,300,360],
       dw:true,dwv:function(v){return v},
       sup:['Post on 3 platforms','Write one script'],
       pulse:{kind:'num',q:'The business made',pre:'$',suf:'',tail:'this week.',dec:false,
         src:'Asked once a week, Sundays.'},
       rest:'See you tomorrow.'}
   };
-  var ROLES=['lighter','today&#8217;s','heavier'];
+  var ROLES=['lightest','lighter','today&#8217;s'];
   var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
   var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
-  var C=B.focus,acts=2,val=C.three[1],free=false,off=false,
+  var C=B.focus,acts=3,val=C.three[2],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
 
   function stamp(){var d=new Date(),h=d.getHours();
@@ -653,7 +658,7 @@
   /* --- swapping the bucket ----------------------------------------------- */
   function load(k){
     C=B[k];off=false;free=false;sizes.classList.remove('free');
-    acts=2;val=C.three[1];ticks=[false,false];signed=false;
+    acts=3;val=C.three[2];ticks=[false,false];signed=false;
     if(beat){clearTimeout(beat);beat=null;}
     if(dwT){clearInterval(dwT);dwT=null;}
     setSizing(false);root.classList.remove('closed');
