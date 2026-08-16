@@ -183,3 +183,28 @@ brief: minimal, MONOCHROME, STATIC (he rejected every dynamic one), mature,
 purposeful, locks you into the action. The grid worked because it felt like
 a serious WORKBENCH; find that family without copying it. No blur, no
 space, no abstract art, no motion, no mouse-following, nothing "AI".
+
+## THE CREED (Malik, 2026-08-16: his goal philosophy, harvested for the
+## logic page. Source: his grill answers + his video scripts in the repo
+## root, "This Video is About Brain Rot" + "The fear of living a mediocre
+## life". EVERY brief/plan/AI prompt reasons FROM these, never generic
+## self-help.)
+- FOCUS IS A SKILL. The brain constantly weighs what deserves attention;
+  the phone wins when nothing on the table beats it. Removal alone leaves a
+  void and a bored brain claws back to stimulation. The real lever: progress
+  on a worthy goal with markers the brain can latch onto. That makes focus
+  automatic instead of an uphill battle. (So screen-time plans PAIR removal
+  with a named worthy replacement.)
+- PAY THE BRAIN EARLY. The beginning is the hardest part because rewards
+  have not arrived. People who work for years are not willpower freaks,
+  they are being rewarded; if it felt like nothing they would stop. So make
+  progress visible before results exist (logs, counts, markers). "2-3 weeks
+  of actually trying, then it becomes automatic."
+- NOT A ROBOT (fitness): the goal under the goal is being a healthy human,
+  and a healthy human moves more. Athlete identity. A non-negotiable floor:
+  the bar can drop, the day cannot. Never miss twice.
+- GOALS ARE MATH. Decompose honestly once, then live the daily number. The
+  logic page shows it as a literal EQUATION BLOCK (stacked terms, tabular
+  numerals, result emphasized); derived numbers say "our estimate"/"likely".
+- LEVERAGE: a few actions carry most of the result. ENVIRONMENT beats
+  willpower. SHOWING UP compounds. REMEMBER WHY YOU STARTED.

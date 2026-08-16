@@ -926,6 +926,20 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k=lg-1] .lg1-mv p{margin:0;font-size:14.5px;font-weight:700;line-height:1.3;
   letter-spacing:-.014em;color:var(--text-hi)}
+/* the equation block: the math gets its own visual moment. Stacked terms,
+   tabular numerals, the result separated and emphasized. Checkable at a
+   glance, which is what kills the AI feel: prose can only be believed. */
+[data-k=lg-1] .lg1-eq{display:flex;flex-direction:column;gap:8px;margin:4px 0 13px;
+  padding:13px 15px;border-radius:12px;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lg-1] .lg1-eq div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+[data-k=lg-1] .lg1-eq s{text-decoration:none;font-size:11.5px;line-height:1.3;
+  color:rgba(var(--ink),.80)}
+[data-k=lg-1] .lg1-eq b{font-size:13.5px;font-weight:700;letter-spacing:-.01em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
+[data-k=lg-1] .lg1-eq .r{margin-top:1px;padding-top:10px;box-shadow:inset 0 1px 0 rgba(var(--ink),.13)}
+[data-k=lg-1] .lg1-eq .r b{font-size:16px}
 [data-k=lg-1] .lg1-src{margin:2px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
 [data-k=lg-1] .lg1-fair{margin:14px 0 0;font-size:16px;font-weight:700;letter-spacing:-.016em;
   color:var(--text-hi)}
@@ -956,7 +970,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 @media (prefers-reduced-motion:reduce){[data-k=lg-1] .lg1 *,[data-k=lg-1] .lg1-rest{transition:none!important}}
 </style>
 <h3>The logic</h3><p class="reach"><b>10/10</b><span>everyone, at every plan reveal, then kept</span></p>
-<p class="cap">The plan arrives as reasoning, in Malik's structure: the goal quoted in their own words, the commitment restated, the actual math (estimates labeled as estimates), the narrowing to the highest leverage act, and a "Fair?" the hold answers. Long is fine, it scrolls. Kept behind a quiet "Why this plan" door on the day screen.</p>
+<p class="cap">The plan as reasoning, carrying Malik's actual philosophy: the goal quoted in their words, the math as a literal equation block, the brain-needs-a-worthy-replacement logic on screen time, pay-the-brain-early on every slow goal, and a "Fair?" the hold answers. Kept behind "Why this plan" on the day screen.</p>
 <div class="bk" role="group" aria-label="which bucket this page is explaining">
   <i>Bucket</i>
   <button type="button" data-b="focus">Focus</button>
@@ -994,57 +1008,97 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       go=q('.lg1-go'),fill=q('.lg1-go i'),rest=q('.lg1-rest'),again=q('.lg1-again');
 
   /* Malik's structure (2026-08-16): the star QUOTED in their own words, the
-     commitment restated, the actual math where math exists (anything Memento
-     derived rather than was told says so in the sentence), the narrowing to
-     the highest leverage act, then "Fair?" and the hold as the yes. Long is
-     fine, the page scrolls: the whole plan, spelled out, right there. */
+     commitment restated, the actual math AS AN EQUATION BLOCK where numbers
+     exist (anything Memento derived rather than was told says "likely" or
+     "our estimate"), the narrowing to the highest leverage act, then "Fair?"
+     and the hold as the yes. Long is fine, the page scrolls.
+
+     THE REASONING IS HIS, harvested 2026-08-16 (grill + his video scripts):
+     - Focus is a skill. The brain is always weighing what deserves its
+       attention, and the phone wins when nothing on the table beats it.
+       Removal alone starves the brain and it claws back to stimulation; the
+       real lever is progress on a worthy goal with markers the brain can
+       latch onto, which makes focus automatic instead of an uphill fight.
+     - The beginning is the hardest part because the rewards have not arrived
+       yet. People who work for years are not willpower freaks, they are
+       being rewarded. So make progress visible before results exist (logs,
+       counts): pay the brain early. "It takes 2 or 3 weeks of actually
+       trying, then it becomes automatic."
+     - Fitness: you are not a robot. The goal under the goal is being a
+       healthy human, and a healthy human moves more. Athlete identity, a
+       non-negotiable floor (the bar can drop, the day cannot), never miss
+       twice.
+     - Goals are math. Leverage: a few actions carry most of the result.
+       Environment beats willpower. Showing up compounds. */
+  /* Each bucket: intro paragraphs, an optional equation block (rows + an
+     emphasized result), closing paragraphs, the act. */
   var B={
     screen:{star:'&#8220;Under 3 hours a day. My evenings back.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>8 hours</b> as where the day stands, so the plan starts from 8. Yours, not an average.',
-          'The math: 8 down to 3 means finding <b>5 hours</b>. You named &#8220;TikTok, Instagram and Reddit&#8221; as the three that take most of it. Trimming apps you barely open saves minutes. Removing those three, by your own report, is most of the 5 hours in a single act.',
-          'So the plan has two jobs. Day one removes them. Every day after guards one moment, phone away at 8pm, so they stay gone and the number keeps falling on its own. You type the day&#8217;s hours each night from your Screen Time report, and the plan tightens or eases off what you write.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>8 hours</b> as where the day stands, so the plan starts from your number.'],
+      eq:[['Your number now','8 hours'],['The goal','3 hours']],
+      res:['To win back, every day','5 hours'],
+      ps:['Here is how focus works: your brain is always weighing what deserves its attention, and the phone keeps winning because nothing on the table beats it. Deleting the apps helps, you named &#8220;TikTok, Instagram and Reddit&#8221; as the big three. But removal alone leaves a void, and a bored brain claws its way back to stimulation.',
+          'So the plan does both. Day one removes the three. Then the hours get somewhere better to go: you said the evenings should be for your music, so that becomes the replacement, with progress you can see. Once progress feels better than the scroll, focus stops being an uphill fight and the number falls on its own.',
+          'Phone away at 8pm guards the night while that takes hold. You type each night&#8217;s number from your Screen Time report. The first two weeks are the hard part. After that it starts running itself.'],
       act:'Delete TikTok, Instagram and Reddit.'},
     money:{star:'&#8220;$3,000 a month so I can quit the warehouse.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>$1,850</b> for last month, so the gap is <b>$1,150</b>.',
-          'The math: you said your average client is worth about <b>$400 a month</b>, your number. So the gap is roughly <b>3 more clients</b>. And you said every client you have came from someone you reached out to first, which settles what the daily act is. Messages, not the website, not the logo.',
-          'If replies keep running the way you described, 3 clients is a few dozen real conversations. That is messages every day, sized to the day you are having. Revenue gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now, and by your own account every client you have came from someone you reached out to first. That settles what the daily act is.'],
+      eq:[['The goal','$3,000 a month'],['Last month, your number','$1,850'],['The gap','$1,150'],['Your average client','&#8776; $400 a month']],
+      res:['So the gap is','&#8776; 3 clients'],
+      ps:['Three clients is a few dozen real conversations, and most messages will go nowhere. The math already expects that. Every message gets logged, so the pile grows even on days revenue sits still, and watching that pile grow is what keeps you sending through the quiet weeks.',
+          'Messages every day, sized to the day you are having. Revenue gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
       act:'Message 3 potential clients.'},
     weight:{star:'&#8220;Lose 50lbs in 6 months so I look good for summer.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now. Losing weight comes down to math, and the struggle you named is diet, so that is where the plan aims.',
-          'The math: you typed <b>6&#8217;1, 300lbs</b>, and 50lbs in 180 days. A pound is roughly 3,500 calories, so that is 175,000 calories over 6 months. Call it <b>1,000 a day</b>. Aggressive, but it is arithmetic, not willpower.',
-          'At your size, maintenance is likely around <b>3,500 calories</b>. That one is an estimate, and the scale number you type each morning will correct it. Eat around <b>2,500 a day</b> for 6 months and the goal follows, down to the laws of physics.',
-          'So the first action is not a diet. It is building the one thing that makes those numbers livable for 180 days, yours, not a template:'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now. Losing weight comes down to math, and the struggle you named is diet, so that is where the plan aims.'],
+      eq:[['To lose','50 lbs in 180 days'],['A pound is roughly','3,500 cal'],['50 &#215; 3,500','175,000 cal'],['Spread over 180 days','&#8776; 1,000 a day'],['Your maintenance, our estimate','&#8776; 3,500 cal']],
+      res:['So you eat, per day','&#8776; 2,500 cal'],
+      ps:['The maintenance line is an estimate, and the scale number you type each morning corrects it. Everything else is arithmetic: hold the daily number and the goal arrives on schedule, down to the laws of physics.',
+          'The first weeks are the worst of it. Your habits change before the scale does, so the log is where progress shows first. Which is why the first action builds the one thing that makes the number livable for 180 days:'],
       act:'Build a meal plan of 2,000 to 2,500 calories and 200 to 250g of protein you can comfortably keep for 6 months.'},
     fitness:{star:'&#8220;Train three times a week, every week.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said the pattern is always the same: three strong weeks, then nothing.',
-          'So the opponent is the restart, not the workouts. Your training days are fixed so there is nothing to decide each morning. Rest days are real days with their own screen. A missed session never resets anything, it just sits there, counted, yours.',
-          'The plan asks for no number at all. The sessions are the record.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now, and you said the pattern is always the same: three strong weeks, then nothing.'],
+      eq:null,
+      ps:['So the plan removes the decisions and lowers the floor. Training days are fixed. A 30 minute session keeps the day. A walk keeps the day. You are not a robot, and the goal under the goal is simple: a healthy human moves more, and you are becoming someone who trains.',
+          'Two rules carry it. The bar can drop, the day cannot. And a missed day is never followed by a second one. Rest days are real days, the sessions get counted, and the count is the identity growing.'],
       act:'Push day session.'},
     school:{star:'&#8220;A 3.5 GPA by May.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said ability was never the problem. Studying loses to the phone, every night.',
-          'A GPA cannot be done today. It arrives later, as a result. What can be done today is hours, and you said the two classes dragging the average down are the ones with the heaviest reading, so the sessions aim there first.',
-          'The one condition you gave, &#8220;phone in another room,&#8221; is written into the move itself, because you told us exactly where the fight is. Grades get asked about only when they exist. Between results, the sessions are the whole job.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now, and you said ability was never the problem. Studying loses to the phone, every night.'],
+      eq:null,
+      ps:['A GPA cannot be done today, it arrives later as a result. Hours can be done today. You said the two heaviest-reading classes are dragging the average, so the sessions aim there first, and the condition you gave, &#8220;phone in another room,&#8221; is written into the move itself.',
+          'The start is the worst of it: hours in, nothing graded back yet. So the sessions get counted and progress stays visible long before results exist. Grades get asked about only when they do.'],
       act:'Study 2 hours, phone in another room.'},
     projects:{star:'&#8220;Work 3 to 4 hours a day on Memento until it ships.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now, and you already know the shape of it: the hours. The real question is the one you asked yourself, &#8220;what does the deep work consist of?&#8221;',
-          'You said payments are set up, marketing is handled through your YouTube audience, and what is left is the product itself. You said Clarity is done. That leaves one module standing between here and shipped.',
+      intro:['This is the goal you&#8217;ve committed yourself to right now, and you already know the shape of it: the hours. The real question is the one you asked yourself, &#8220;what does the deep work consist of?&#8221;'],
+      eq:null,
+      ps:['You said payments are set up, marketing is handled through your YouTube audience, and what is left is the product itself. You said Clarity is done. That leaves one module standing between here and shipped.',
           'So the next sessions are not &#8220;work on Memento.&#8221; They are aimed: hyper focused on making the Action module damn good, because by your own list it is the tallest thing left. When it falls, the plan re-aims at whatever is tallest then.'],
       act:'One deep session on the Action module.'},
     focus:{star:'&#8220;Deep work every day until the migration ships.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now, and you said the mornings vanish into email before the real work starts.',
-          'So the plan claims the morning before anything else can. One protected block, phone in another room, a single tab. You size the block each day. The block itself is not negotiable, because you said it yourself: once the morning goes, the day goes with it.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now, and you said the mornings vanish into email before the real work starts.'],
+      eq:null,
+      ps:['Focus is a skill, and your brain is always weighing what deserves it. Email wins because it pays back in seconds. So the plan claims the first hours for the migration and makes that work pay back visibly too: one protected block, phone in another room, a single tab, every block counted.',
+          'You size the block each day. The block itself is not negotiable, because you said it yourself: once the morning goes, the day goes with it.'],
       act:'Deep work on the migration, 90 min.'},
     business:{star:'&#8220;$10k a month from the studio.&#8221;',
-      ps:['This is the goal you&#8217;ve committed yourself to right now. You typed <b>$3,200</b> for last month, and you said the product is good but nobody sees it.',
-          'The math: $3,200 to $10k is roughly 3x. You said your average project is about <b>$1,600</b>, your number, so the gap is about <b>4 more projects a month</b>. And by your own account, every project so far came from someone who saw your work. Nobody new can see work that is not posted.',
-          'So the deep work stays on the product, and the posting protects it. Output is the lever you actually own. The business number gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
+      intro:['This is the goal you&#8217;ve committed yourself to right now. You said the product is good but nobody sees it, and that makes the bottleneck attention.'],
+      eq:[['The goal','$10k a month'],['Last month, your number','$3,200'],['Your average project','&#8776; $1,600']],
+      res:['So the gap is','&#8776; 4 projects a month'],
+      ps:['Nobody new can hire work they have never seen, so output is the lever you actually own. The deep work stays on the product, and the posting protects it. Posts get logged, so the work stays visible even in the weeks the number sits still.',
+          'The business number gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
       act:'Deep work on the product, 3 hours.'}
   };
 
   function load(k){
-    var c=B[k];
+    var c=B[k],h='';
     star.innerHTML=c.star;
-    body.innerHTML=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    h+=c.intro.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    if(c.eq){
+      h+='<div class="lg1-eq">'
+        +c.eq.map(function(r){return '<div><s>'+r[0]+'</s><b>'+r[1]+'</b></div>'}).join('')
+        +'<div class="r"><s>'+c.res[0]+'</s><b>'+c.res[1]+'</b></div></div>';
+    }
+    h+=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    body.innerHTML=h;
     mv.textContent=c.act;
     rest.classList.remove('open');rest.setAttribute('aria-hidden','true');
   }

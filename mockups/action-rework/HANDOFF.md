@@ -26,3 +26,13 @@
   index 2 (roles lightest/lighter/today's; screen easiest/easier/tonight's).
   Sizes fold DOWN; bigger sizes live behind "more". His "I want at least 2
   supports visible" + picked "Default heavier".
+
+## 2026-08-16 night: logic v3 (his philosophy + equation blocks) + room toggle
+- Gallery top-right: Room toggle, Dots / Graph / Black, persisted per browser.
+- lg-1 v3: equation blocks (glass card, stacked terms, tabular numerals,
+  emphasized result) on weight/money/business/screen; briefs now reason FROM
+  Malik's creed (see THE CREED in CONTRACT.md, harvested from his grill
+  answers + his video scripts in repo root). Slop purge: the "not X, it's Y"
+  patterns I had shipped are dead. Screen-time brief now carries his focus
+  theory: removal + a named worthy replacement + visible markers.
+- His scripts (docx in repo root) are source material for voice/philosophy.
