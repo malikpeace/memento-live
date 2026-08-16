@@ -190,6 +190,51 @@
       }
     }, true);
   }
+
+  /* ba-0 slide A: a 3D sphere of their moves, one point each, turning slowly
+     with a little per-point drift so it feels alive. Canvas, so 2,000 points
+     stay at 60fps; one loop per phone, drawing only while beat 3 is on. */
+  function buildSphere(ph, n) {
+    var pts = [], off = 2 / n, inc = Math.PI * (3 - Math.sqrt(5)), rnd = seeded(n * 31 + 7);
+    for (var i = 0; i < n; i++) {
+      var y = i * off - 1 + off / 2, r = Math.sqrt(Math.max(0, 1 - y * y)), phi = i * inc;
+      pts.push({ x: Math.cos(phi) * r, y: y, z: Math.sin(phi) * r,
+        w: (i % 6 === 0), ph: rnd() * 6.2832, amp: 0.012 + rnd() * 0.03 });
+    }
+    ph._sphere = pts;
+    if (ph._sphereLoop) return;
+    ph._sphereLoop = true;
+    var ang = 0, tilt = 0, fr = 0;
+    (function tick() {
+      requestAnimationFrame(tick);
+      var b3 = ph.querySelector('.b3.on'); if (!b3) return;
+      var cv = ph.querySelector('.ba0-cv'); if (!cv) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var cw = cv.clientWidth || 262, chh = cv.clientHeight || 280;
+      if (cv.width !== (cw * dpr | 0)) { cv.width = cw * dpr; cv.height = chh * dpr; }
+      var ctx = cv.getContext('2d'); if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cw, chh);
+      ang += 0.006; tilt = Math.sin(fr * 0.004) * 0.35; fr++;
+      var cx = cw / 2, cy = chh / 2, R = Math.min(cx, cy) - 10;
+      var ca = Math.cos(ang), sa = Math.sin(ang), ct = Math.cos(tilt), st = Math.sin(tilt);
+      var P = ph._sphere, L = P.length, big = L > 900 ? 0.55 : L > 380 ? 0.72 : 1;
+      for (var k = 0; k < L; k++) {
+        var p = P[k], rr = 1 + Math.sin(fr * 0.02 + p.ph) * p.amp;
+        var x = p.x * rr, y = p.y * rr, z = p.z * rr;
+        var x1 = x * ca - z * sa, z1 = x * sa + z * ca;          // spin around Y
+        var y1 = y * ct - z1 * st, z2 = y * st + z1 * ct;        // gentle tilt
+        var depth = (z2 + 1) / 2;                                 // 0 back .. 1 front
+        var px = cx + x1 * R, py = cy + y1 * R;
+        var sz = (0.7 + depth * 2.1) * big;
+        ctx.globalAlpha = 0.25 + depth * 0.72;
+        ctx.fillStyle = p.w ? '#ffffff' : 'rgba(11,14,18,0.9)';
+        ctx.beginPath(); ctx.arc(px, py, Math.max(0.5, sz), 0, 6.2832); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    })();
+  }
+
   function cnt(ph, sel, to, from) {
     var el = Q(ph, sel); if (!el) return;
     el.setAttribute('data-count', (from == null ? 0 : from) + '|' + to);
@@ -972,37 +1017,24 @@
       ],
       apply: function (ph, v) {
         var w = wallData(v);
-        /* the goal line in beat 2, one clean line (rises as a whole, no
-           choppy per-word bounce) */
+        /* the goal line, centred (the most important thing), one clean line */
         var lineText = (v.line || '').replace(/\s+/g, ' ').trim();
         put(ph, '.ba0-line', esc(lineText) + (/[!?.]$/.test(lineText) ? '' : '!'));
         var ln = Q(ph, '.ba0-line');
-        if (ln) ln.style.fontSize = (lineText.length > 22 ? 27 : lineText.length > 15 ? 32 : 38) + 'px';
-        /* the total under the big firework */
-        put(ph, '.ba0-total', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + ', every one a spark</span>');
-        /* the big firework spark burst (beat 2) */
+        if (ln) ln.style.fontSize = (lineText.length > 22 ? 32 : lineText.length > 15 ? 38 : 44) + 'px';
+        /* the big firework spark burst (beat 2), no count text on this page */
         var fwr = seeded(53), big = '';
         for (var s = 0; s < 44; s++) {
           var a = (s / 44) * 6.2832 + fwr() * 0.2, rr = (74 + fwr() * 40) * (0.6 + fwr() * 0.5);
           big += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
         }
         var bigEl = Q(ph, '.ba0-big'); if (bigEl) bigEl.insertAdjacentHTML('beforeend', big);
-        /* stat view A: one spark per move, one tight shell */
-        var N = Math.max(1, w.count), W = 286, H = 300, cx = W / 2, cy = H / 2;
-        var maxR = Math.min(cx - 6, 30 + Math.sqrt(N) * 8), jit = seeded(N * 7 + 3), dots = '';
-        for (var d = 0; d < N; d++) {
-          var ang = d * 2.399963 + (jit() - 0.5) * 0.3, t = Math.sqrt((d + 0.6) / N), rad = maxR * t * (0.9 + jit() * 0.2);
-          var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad * 1.02;
-          var sz = (3.2 - t * 1.6) * (N > 900 ? 0.62 : N > 380 ? 0.8 : 1);
-          dots += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + Math.max(0.85, sz).toFixed(2) +
-                  '" fill="' + (d % 6 === 0 ? 'rgba(255,255,255,.92)' : 'rgba(11,14,18,.8)') + '" style="--i:' + d + '"></circle>';
-        }
-        var svg = Q(ph, '.ba0-svg'); if (svg) svg.innerHTML = dots;
-        sweep(ph, '.ba0-svg', N, 1.15);
+        /* stat view A: a slowly turning 3D sphere of their moves, one point
+           each, drifting a little so it feels alive (Malik 2026-08-16) */
+        buildSphere(ph, Math.max(1, w.count));
         put(ph, '.ba0-acount', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>');
         /* stat view B: the numbers */
-        var cells = [[w.money ? '' : '', '']];
-        cells = [];
+        var cells = [];
         cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>', 'ba0-cell--hero']);
         if (w.hasMoves) cells.push(['<b>' + fmt(w.days) + '</b><span>' + plural(w.days, 'day', 'days') + ' start to finish</span>', '']);
         else cells.push(['<b>' + fmt(w.days) + '</b><span>days it took</span>', '']);
