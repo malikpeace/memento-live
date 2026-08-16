@@ -204,19 +204,24 @@
     ph._sphere = pts;
     if (ph._sphereLoop) return;
     ph._sphereLoop = true;
-    var ang = 0, tilt = 0, fr = 0;
+    var ang = 0, tilt = 0, fr = 0, born = 0, wasOn = false;
     (function tick() {
       requestAnimationFrame(tick);
-      var b3 = ph.querySelector('.b3.on'); if (!b3) return;
+      var b3 = ph.querySelector('.b3.on');
+      if (!b3) { wasOn = false; return; }
+      /* the moves EXPLODE out of the M: each time beat 3 opens, restart the
+         expansion so the dots fly from the centre (on the M) out to the sphere */
+      if (!wasOn) { wasOn = true; born = fr; }
       var cv = ph.querySelector('.ba0-cv'); if (!cv) return;
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var cw = cv.clientWidth || 262, chh = cv.clientHeight || 280;
+      var cw = cv.clientWidth || 280, chh = cv.clientHeight || 300;
       if (cv.width !== (cw * dpr | 0)) { cv.width = cw * dpr; cv.height = chh * dpr; }
       var ctx = cv.getContext('2d'); if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cw, chh);
       ang += 0.006; tilt = Math.sin(fr * 0.004) * 0.35; fr++;
-      var cx = cw / 2, cy = chh / 2, R = Math.min(cx, cy) - 10;
+      var e = Math.min(1, (fr - born) / 48), exp = 1 - Math.pow(1 - e, 3);   // burst-out ease
+      var cx = cw / 2, cy = chh / 2, R = (Math.min(cx, cy) - 10) * exp;
       var ca = Math.cos(ang), sa = Math.sin(ang), ct = Math.cos(tilt), st = Math.sin(tilt);
       var P = ph._sphere, L = P.length, big = L > 900 ? 0.55 : L > 380 ? 0.72 : 1;
       for (var k = 0; k < L; k++) {
@@ -1022,13 +1027,12 @@
         put(ph, '.ba0-line', esc(lineText) + (/[!?.]$/.test(lineText) ? '' : '!'));
         var ln = Q(ph, '.ba0-line');
         if (ln) ln.style.fontSize = (lineText.length > 22 ? 30 : lineText.length > 15 ? 35 : 40) + 'px';
-        /* beat 1: the dots pulled into the M (Clarity's nsv2FieldSpiral motion,
-           so the moment rhymes with the rest of Memento). One-time convergence,
-           timed to land as the M finishes colouring in. */
+        /* beat 1: MANY dots stream in from off the card and spiral into the M
+           (Clarity's nsv2FieldSpiral motion), slower now so it feels special. */
         var mr = seeded(19), mot = '';
-        for (var m = 0; m < 30; m++) {
-          var ma = (mr() * 360).toFixed(0), mrad = (88 + mr() * 74).toFixed(0),
-              ms = (1.6 + mr() * 2.4).toFixed(1), md = (1.9 + mr() * 0.7).toFixed(2), mdl = (mr() * 0.6).toFixed(2);
+        for (var m = 0; m < 60; m++) {
+          var ma = (mr() * 360).toFixed(0), mrad = (210 + mr() * 180).toFixed(0),
+              ms = (1.6 + mr() * 2.6).toFixed(1), md = (3.0 + mr() * 1.6).toFixed(2), mdl = (mr() * 1.2).toFixed(2);
           mot += '<i style="--a:' + ma + 'deg;--r:' + mrad + 'px;--s:' + ms + 'px;--d:' + md + 's;--del:' + mdl + 's"></i>';
         }
         put(ph, '.ba0-field', mot);
@@ -1056,10 +1060,11 @@
         /* stat view A: a slowly turning 3D sphere of their moves, one point
            each, drifting a little so it feels alive (Malik 2026-08-16) */
         buildSphere(ph, Math.max(1, w.count));
-        put(ph, '.ba0-acount', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>');
+        var totalLabel = (w.hasMoves ? 'total ' : '') + w.unitLabel;
+        put(ph, '.ba0-acount', '<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>');
         /* stat view B: the numbers */
         var cells = [];
-        cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + '</span>', 'ba0-cell--hero']);
+        cells.push(['<b>' + fmt(w.count) + '</b><span>' + esc(totalLabel) + '</span>', 'ba0-cell--hero']);
         if (w.hasMoves) cells.push(['<b>' + fmt(w.days) + '</b><span>' + plural(w.days, 'day', 'days') + ' start to finish</span>', '']);
         else cells.push(['<b>' + fmt(w.days) + '</b><span>days it took</span>', '']);
         cells.push(['<b>' + fmt(w.weeks) + '</b><span>' + plural(w.weeks, 'week', 'weeks') + '</span>', '']);
