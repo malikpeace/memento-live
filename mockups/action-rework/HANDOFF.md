@@ -64,3 +64,11 @@
   Moves through the full size ladder and drags the plate with it (crossing a
   named size folds/grows supports); one state with the size sheet. Hidden
   once the day is held and on off days. Keyboard accessible.
+
+## 2026-08-16 night 5: the refresher drawer + the graduation rail
+- lg-1: the Clarity scale moved into a flat ruled disclosure row, "A
+  refresher on focus" (screen + focus briefs). Closed by default; expands to
+  the diagram + one caption line. Nobody is forced through it.
+- u-1 rail v2: the naked line is dead. Now a graduation ladder: one small
+  tick per size on the right edge, named sizes slightly longer, the current
+  size a long bright mark. Same drag/tap/keys, same one-state with the sheet.

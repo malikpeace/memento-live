@@ -957,11 +957,28 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lg-1] .lg1-src{margin:12px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.78)}
 [data-k=lg-1] .lg1-fair{margin:16px 0 0;font-size:17px;font-weight:700;letter-spacing:-.018em;
   color:var(--text-hi)}
+/* the refresher drawer: the scale is optional reading, not forced. A flat
+   ruled row that expands. */
+[data-k=lg-1] .lg1-ref{margin:2px 0 14px}
+[data-k=lg-1] .lg1-ref>button{display:flex;align-items:center;width:100%;border:0;background:none;
+  padding:11px 0;cursor:pointer;font-family:var(--font);text-align:left;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.12), inset 0 -1px 0 rgba(var(--ink),.12);
+  color:rgba(var(--ink),.92);font-size:12.5px;font-weight:600}
+[data-k=lg-1] .lg1-ref>button svg{width:11px;height:11px;margin-left:auto;fill:none;
+  stroke:rgba(var(--ink),.72);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .22s ease-out}
+[data-k=lg-1] .lg1-ref.open>button svg{transform:rotate(180deg)}
+[data-k=lg-1] .lg1-ref>button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=lg-1] .lg1-ref .bd{overflow:hidden;max-height:0;transition:max-height .3s ease-out}
+[data-k=lg-1] .lg1-ref.open .bd{max-height:230px}
+[data-k=lg-1] .lg1-ref .cap2{margin:0 0 10px;font-size:12px;line-height:1.52;
+  color:rgba(var(--ink),.85);text-align:center;max-width:230px;margin-left:auto;margin-right:auto}
+@media (prefers-reduced-motion:reduce){[data-k=lg-1] .lg1-ref .bd{transition:none}}
 /* THE SCALE from Clarity's opening, ported small: fulcrum, beam, the red
    distraction weight, the cyan purpose weight. The flip animation IS the
    argument: the purpose side grows and the beam tips. Real elements, real
    colors (the one deliberate colour on this page, it is a Clarity callback). */
-[data-k=lg-1] .lgs{position:relative;width:200px;height:106px;margin:2px auto 18px}
+[data-k=lg-1] .lgs{position:relative;width:200px;height:106px;margin:14px auto 12px}
 [data-k=lg-1] .lgs__f{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
   width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;
   border-bottom:17px solid rgba(var(--ink),.94)}
@@ -1194,8 +1211,12 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     }
     c.ps.forEach(function(p,i){
       h+='<p class="b">'+p+'</p>';
-      if(i===0&&c.scale)h+='<div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
-        +'<div class="lgs__beam"><b class="lgs__red"></b><b class="lgs__cyan"></b></div></div>';
+      if(i===0&&c.scale)h+='<div class="lg1-ref">'
+        +'<button type="button" aria-expanded="false"><span>A refresher on focus</span>'
+        +'<svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>'
+        +'<div class="bd"><div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
+        +'<div class="lgs__beam"><b class="lgs__red"></b><b class="lgs__cyan"></b></div></div>'
+        +'<p class="cap2">The heaviest side wins automatically. The plan shrinks the left and grows the right, until the scale flips.</p></div></div>';
     });
     /* the plate: the act, then the supports with the line that earns each */
     h+='<div class="lg1-mv"><p>'+c.act+'</p>'
@@ -1208,6 +1229,11 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     body.innerHTML=h;
     rest.classList.remove('open');rest.setAttribute('aria-hidden','true');
   }
+  body.addEventListener('click',function(e){
+    var b=e.target.closest('.lg1-ref>button');if(!b)return;
+    var ref=b.closest('.lg1-ref'),open=!ref.classList.contains('open');
+    ref.classList.toggle('open',open);b.setAttribute('aria-expanded',open?'true':'false');
+  });
   r.querySelectorAll('.bk button[data-b]').forEach(function(b){
     b.addEventListener('click',function(){
       r.querySelectorAll('.bk button[data-b]').forEach(function(x){x.classList.remove('on')});
@@ -1627,13 +1653,14 @@ mx-11 is the deliberate counter-example: the same design carrying five.
    you pull up and down like a thermostat. Up is heavier. It moves through
    the full size ladder and drags the plate with it (crossing a named size
    folds or grows the supports), so it and the size sheet are one state. --- */
-[data-k=u-1] .u1-rail{position:absolute;right:2px;top:50%;transform:translateY(-50%);
-  width:30px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
-  background:none;padding:0}
-[data-k=u-1] .u1-rail::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;
-  margin-left:-1px;border-radius:1px;background:rgba(var(--ink),.15)}
-[data-k=u-1] .u1-rail i{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:3px;
-  border-radius:2px;background:rgba(var(--ink),.92);transition:top .1s ease-out;pointer-events:none}
+[data-k=u-1] .u1-rail{position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:36px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
+  background:none;padding:2px 10px 2px 0;display:flex;flex-direction:column;
+  justify-content:space-between;align-items:flex-end}
+[data-k=u-1] .u1-rail i{width:8px;height:2px;border-radius:1px;background:rgba(var(--ink),.20);
+  pointer-events:none;transition:width .14s ease-out,background .14s ease-out,height .14s ease-out}
+[data-k=u-1] .u1-rail i.mk{width:13px;background:rgba(var(--ink),.32)}
+[data-k=u-1] .u1-rail i.on{width:20px;height:3px;background:rgba(var(--ink),.95)}
 [data-k=u-1] .u1-rail.hide{display:none}
 [data-k=u-1] .u1-rail:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
 [data-k=u-1] .u1-star{padding-right:22px}
@@ -1796,7 +1823,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
       <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
     </button>
     <button type="button" class="u1-rail" role="slider" aria-label="today's intensity"
-      aria-orientation="vertical"><i></i></button>
+      aria-orientation="vertical"></button>
     <div class="u1-sp a"></div>
 
     <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
@@ -2077,11 +2104,18 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   function railDraw(){
     rail.classList.toggle('hide',signed||off);
     if(signed||off)return;
-    var L=ladder(),H=rail.clientHeight-3,i;
+    var L=ladder(),i;
     if(!C.fmt)i=acts-1;
     else{i=L.indexOf(val);
       if(i<0){var best=0,bd=Infinity;L.forEach(function(v,j){var d=Math.abs(v-val);if(d<bd){bd=d;best=j}});i=best;}}
-    knob.style.top=((1-i/(L.length-1))*H)+'px';
+    /* a graduation per size, top = heaviest; named sizes get longer marks */
+    rail.innerHTML='';
+    for(var j=L.length-1;j>=0;j--){
+      var t=document.createElement('i');
+      if(C.fmt&&C.three.indexOf(L[j])>-1)t.className='mk';
+      if(j===i)t.className='on';
+      rail.appendChild(t);
+    }
     rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax',String(L.length-1));
     rail.setAttribute('aria-valuenow',String(i));
   }
@@ -2251,7 +2285,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     toggle(pulse,false);toggle(rest,false);paint();
   });
 
-  var rail=q('.u1-rail'),knob=q('.u1-rail i');
+  var rail=q('.u1-rail');
   rail.addEventListener('pointerdown',function(e){
     if(signed||off)return;
     try{rail.setPointerCapture(e.pointerId)}catch(z){}

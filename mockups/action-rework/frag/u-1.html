@@ -122,13 +122,14 @@
    you pull up and down like a thermostat. Up is heavier. It moves through
    the full size ladder and drags the plate with it (crossing a named size
    folds or grows the supports), so it and the size sheet are one state. --- */
-[data-k=u-1] .u1-rail{position:absolute;right:2px;top:50%;transform:translateY(-50%);
-  width:30px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
-  background:none;padding:0}
-[data-k=u-1] .u1-rail::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;
-  margin-left:-1px;border-radius:1px;background:rgba(var(--ink),.15)}
-[data-k=u-1] .u1-rail i{position:absolute;left:50%;transform:translateX(-50%);width:14px;height:3px;
-  border-radius:2px;background:rgba(var(--ink),.92);transition:top .1s ease-out;pointer-events:none}
+[data-k=u-1] .u1-rail{position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:36px;height:180px;z-index:4;cursor:ns-resize;touch-action:none;border:0;
+  background:none;padding:2px 10px 2px 0;display:flex;flex-direction:column;
+  justify-content:space-between;align-items:flex-end}
+[data-k=u-1] .u1-rail i{width:8px;height:2px;border-radius:1px;background:rgba(var(--ink),.20);
+  pointer-events:none;transition:width .14s ease-out,background .14s ease-out,height .14s ease-out}
+[data-k=u-1] .u1-rail i.mk{width:13px;background:rgba(var(--ink),.32)}
+[data-k=u-1] .u1-rail i.on{width:20px;height:3px;background:rgba(var(--ink),.95)}
 [data-k=u-1] .u1-rail.hide{display:none}
 [data-k=u-1] .u1-rail:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
 [data-k=u-1] .u1-star{padding-right:22px}
@@ -291,7 +292,7 @@
       <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
     </button>
     <button type="button" class="u1-rail" role="slider" aria-label="today's intensity"
-      aria-orientation="vertical"><i></i></button>
+      aria-orientation="vertical"></button>
     <div class="u1-sp a"></div>
 
     <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
@@ -572,11 +573,18 @@
   function railDraw(){
     rail.classList.toggle('hide',signed||off);
     if(signed||off)return;
-    var L=ladder(),H=rail.clientHeight-3,i;
+    var L=ladder(),i;
     if(!C.fmt)i=acts-1;
     else{i=L.indexOf(val);
       if(i<0){var best=0,bd=Infinity;L.forEach(function(v,j){var d=Math.abs(v-val);if(d<bd){bd=d;best=j}});i=best;}}
-    knob.style.top=((1-i/(L.length-1))*H)+'px';
+    /* a graduation per size, top = heaviest; named sizes get longer marks */
+    rail.innerHTML='';
+    for(var j=L.length-1;j>=0;j--){
+      var t=document.createElement('i');
+      if(C.fmt&&C.three.indexOf(L[j])>-1)t.className='mk';
+      if(j===i)t.className='on';
+      rail.appendChild(t);
+    }
     rail.setAttribute('aria-valuemin','0');rail.setAttribute('aria-valuemax',String(L.length-1));
     rail.setAttribute('aria-valuenow',String(i));
   }
@@ -746,7 +754,7 @@
     toggle(pulse,false);toggle(rest,false);paint();
   });
 
-  var rail=q('.u1-rail'),knob=q('.u1-rail i');
+  var rail=q('.u1-rail');
   rail.addEventListener('pointerdown',function(e){
     if(signed||off)return;
     try{rail.setPointerCapture(e.pointerId)}catch(z){}
