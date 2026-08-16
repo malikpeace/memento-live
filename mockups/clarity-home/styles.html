@@ -216,6 +216,13 @@
     padding:17px 22px;border-radius:999px;background:#fff;color:#0b1112;font-size:16px;font-weight:700;
     letter-spacing:.01em;box-shadow:0 18px 40px rgba(0,0,0,.45)}
 
+  /* ---- the note stack (dated notes that accrue over time) ---- */
+  .inner .nEntry + .nEntry{margin-top:13px;padding-top:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .inner .nAdd{margin-top:14px;display:inline-flex;align-items:center;color:var(--cyan);font-size:.82rem;font-weight:650}
+  .stF .nAdd,.stL .nAdd{display:flex;justify-content:center;width:100%}
+  .stL .nAdd{color:#8be9fa}
+  .stL .nEntry + .nEntry{padding-top:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+
   /* ---- shared standing bits: unit inline, as-of, three-point rail ---- */
   .inner .unit{font-size:.5em;font-weight:650;letter-spacing:0;margin-left:.28em;color:var(--mid)}
   .inner .asof{color:var(--lo);font-size:.74rem;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
@@ -287,7 +294,15 @@ const SHAPES = [
     anti:'More evenings half-there behind a screen, feeling worse in a body you’re not taking care of.' },
 ];
 const TWEAK='Tweak your Neutron Star';
-const PROMISE={txt:'I will show up for this even on the days nobody sees it. The person I said I would become is worth the boring Tuesdays.', sig:'Maya · written July 2, 2026'};
+const NOTES=[
+  {txt:'I will show up for this even on the days nobody sees it. The person I said I would become is worth the boring Tuesdays.', date:'written July 2, 2026'},
+  {txt:'Slower month than I hoped. Reminding myself this was always a marathon, and I am still running it.', date:'July 30, 2026'},
+];
+function noteStack(txtCls, sigCls){
+  return NOTES.map(n=>`<div class="nEntry"><div class="${txtCls}">${n.txt}</div><div class="${sigCls}">Maya · ${n.date}</div></div>`).join('')
+    + `<div class="nAdd">${plusIcon}Add a note</div>`;
+}
+const plusIcon='<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 5v14M5 12h14"/></svg>';
 const editIcon='<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;margin-right:6px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
 /* value with its unit locked inline, never on its own line */
@@ -324,7 +339,7 @@ function rA(s){
     : `<div class="card"><div class="lab">Why this matters</div><div class="txt">${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="card"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div class="card prom"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
+    <div class="card prom"><div class="lab">Your notes to yourself</div>${noteStack('txt','sig')}</div>
     <div class="change">${TWEAK}</div>`;
 }
 function rC(s){
@@ -340,7 +355,7 @@ function rC(s){
     : `<div class="kicker">Why this matters</div><div class="why">${s.why}</div>`;
   return `<div class="head">Summary:</div>${stand}${why}<div class="rule"></div>
     <div class="kicker">If nothing changes</div><div class="anti">${s.anti}</div><div class="rule"></div>
-    <div class="kicker">Your note to yourself</div><div class="promtxt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
+    <div class="kicker">Your notes to yourself</div>${noteStack('promtxt','sig')}
     <div class="change">${TWEAK}</div>`;
 }
 function rF(s){
@@ -352,7 +367,7 @@ function rF(s){
     <div class="numsub">${s.sub}</div><div class="asof" style="text-align:center">${s.asOf}</div>`;
   return `${top}<div class="why" ${s.face==='why'?'style="font-size:1.2rem;max-width:262px"':''}>${s.why}</div>
     <div class="anti">${s.anti}</div>
-    <div class="prom">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
+    ${noteStack('prom','sig')}
     <div class="change">${TWEAK}</div>`;
 }
 function rH(s){
@@ -366,7 +381,7 @@ function rH(s){
   const why=`<div class="panel">${s.face==='why'?'':'<div class="lab">Why this matters</div>'}<div class="txt" ${s.face==='why'?'style="font-size:1.05rem;line-height:1.6"':''}>${s.why}</div></div>`;
   return `<div class="head">Summary:</div>${stand}${why}
     <div class="panel panel--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div class="panel"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
+    <div class="panel"><div class="lab">Your notes to yourself</div>${noteStack('txt','sig')}</div>
     <div class="change">${TWEAK}</div>`;
 }
 
@@ -382,7 +397,7 @@ function rJ(s){
   return `<div class="amb"></div><div class="amb2"></div><div class="in">
     <div class="head">Summary:</div>${stand}${why}
     <div class="pane pane--anti"><div class="lab">If nothing changes</div><div class="anti">${s.anti}</div></div>
-    <div class="pane"><div class="lab">Your note to yourself</div><div class="txt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div></div>
+    <div class="pane"><div class="lab">Your notes to yourself</div>${noteStack('txt','sig')}</div>
     <div class="change">${TWEAK}</div></div>`;
 }
 
@@ -399,7 +414,7 @@ function rK(s){
   return `<div class="amb"></div><div class="amb2"></div><div class="sheet">
     <div class="head">Summary:</div>${stand}${why}<div class="rule"></div>
     <div class="kicker">If nothing changes</div><div class="anti">${s.anti}</div><div class="rule"></div>
-    <div class="kicker">Your note to yourself</div><div class="promtxt">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
+    <div class="kicker">Your notes to yourself</div>${noteStack('promtxt','sig')}
     <div class="change">${TWEAK}</div></div>`;
 }
 
@@ -419,7 +434,7 @@ function rL(s){
     <div class="divider"></div>
     <div class="lab">If nothing changes</div><div class="anti">${s.anti}</div>
     <div class="divider"></div>
-    <div class="lab">Your note to yourself</div><div class="note">${PROMISE.txt}</div><div class="sig">${PROMISE.sig}</div>
+    <div class="lab">Your notes to yourself</div>${noteStack('note','sig')}
     <div class="cta">${TWEAK}</div></div>`;
 }
 
