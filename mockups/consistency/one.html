@@ -107,7 +107,7 @@
     font-variant-numeric: tabular-nums; }
   .cal .d.pad { background: transparent; }
   /* kept days are not filled; the green line under them does the marking */
-  .cal .d.kept { color: var(--text-hi, #fff); font-weight: 700; }
+  .cal .d.kept { color: #3fd94e; font-weight: 800; }
   .cal .d.sup { color: rgba(63,217,78,0.72); font-weight: 650; }
   .cal .d.missed { color: rgba(255,255,255,0.24); }
   /* a day the goal never asked for is not a miss: no fill, just a quiet number */
@@ -117,8 +117,9 @@
   .key u.r { background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
   .cal .d.rest, .cal .d.ahead { font-weight: 500; }
   .cal .wc { display: flex; align-items: center; justify-content: flex-end;
-    font-size: 12.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
+    font-size: 12.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.7));
     font-variant-numeric: tabular-nums; }
+  .cal .wc.met { color: #3fd94e; font-weight: 800; }
   .key { display: flex; flex-wrap: wrap; gap: 7px 16px; margin-top: 14px; }
   .key span { display: flex; align-items: center; gap: 7px; font-size: 11.5px;
     color: var(--text-mid, rgba(255,255,255,0.8)); }
@@ -142,7 +143,26 @@
   .mlog__g b.rest { background: rgba(255,255,255,0.02); }
   .mlog__g b.ahead { background: rgba(255,255,255,0.032); }
   .mlog__g b.pad { background: transparent; }
-  /* week view */
+  /* week view: a real detailed week */
+  .wkstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 18px; }
+  .wkc { text-align: center; }
+  .wkc span { display: block; font-size: 10.5px; color: var(--text-lo, rgba(255,255,255,0.4)); margin-bottom: 6px; }
+  .wkc b { display: flex; aspect-ratio: 1; align-items: center; justify-content: center; border-radius: 13px;
+    background: rgba(255,255,255,0.04); font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.3);
+    font-variant-numeric: tabular-nums; }
+  .wkc b.kept { color: #3fd94e; font-weight: 800; background: rgba(63,217,78,0.1); }
+  .wkc b.sup { color: rgba(63,217,78,0.72); }
+  .wkc b.missed { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.1); color: rgba(255,255,255,0.28); }
+  .wkc b.today { outline: 2px solid rgba(63,217,78,0.9); outline-offset: -2px; }
+  .wkstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 14px; }
+  .wkstat { background: rgba(255,255,255,0.04); border-radius: 13px; padding: 13px 13px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+  .wkstat b { display: block; font-size: 20px; font-weight: 750; letter-spacing: -0.02em; line-height: 1;
+    font-variant-numeric: tabular-nums; }
+  .wkstat b.met { color: #3fd94e; }
+  .wkstat span { display: block; font-size: 11px; color: var(--text-lo, rgba(255,255,255,0.46)); margin-top: 6px; line-height: 1.35; }
+  .wkdid { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.7)); }
+  /* legacy day list (unused now) */
   .wk7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
   .wk7 > div { text-align: center; }
   .wk7 b { display: block; aspect-ratio: 1; border-radius: 14px; background: rgba(255,255,255,0.045); }

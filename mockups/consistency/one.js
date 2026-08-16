@@ -70,33 +70,6 @@
       'fill="currentColor" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   }
 
-  /* mark kept days with a green line running under the day numbers: a run of
-     consecutive kept days reads as one continuous line, a lone kept day as a
-     short dash. The calendar grid and numbers stay exactly as they were. */
-  function drawThreads() {
-    var cal = document.querySelector('#ev .cal');
-    if (!cal) return;
-    var old = cal.querySelector('.cal-thread'); if (old) old.remove();
-    var cells = [].slice.call(cal.querySelectorAll('.d[data-on]'));
-    var W = cal.clientWidth, H = cal.clientHeight, segs = '', i = 0;
-    while (i < cells.length) {
-      if (cells[i].getAttribute('data-on') !== '1') { i++; continue; }
-      var top = cells[i].offsetTop, j = i;
-      while (j + 1 < cells.length && cells[j + 1].getAttribute('data-on') === '1' &&
-             Math.abs(cells[j + 1].offsetTop - top) <= 4) j++;
-      var a = cells[i], b = cells[j];
-      var y = a.offsetTop + a.offsetHeight * 0.8; // an underline, clear of the number
-      var thick = Math.max(3.5, Math.min(a.offsetWidth, a.offsetHeight) * 0.13);
-      var x1 = a.offsetLeft + a.offsetWidth / 2, x2 = b.offsetLeft + b.offsetWidth / 2;
-      if (i === j) { var h = a.offsetWidth * 0.2; x1 = a.offsetLeft + a.offsetWidth / 2 - h; x2 = a.offsetLeft + a.offsetWidth / 2 + h; }
-      segs += '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="#3fd94e" stroke-width="' + thick + '" stroke-linecap="round"/>';
-      i = j + 1;
-    }
-    if (!segs) return;
-    var node = document.createElement('div');
-    node.innerHTML = '<svg class="cal-thread" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + segs + '</svg>';
-    cal.insertBefore(node.firstChild, cal.firstChild);
-  }
 
   function arrows(id, canBack, canFwd) {
     return '<span class="nav" id="' + id + '">' +
@@ -145,39 +118,49 @@
       '<div class="score__hm">' + cells + '</div></div></div>';
   }
 
-  /* ---------- calendar: WEEK, a readable day list ---------- */
-  function weekView(log, A) {
+  /* ---------- calendar: WEEK, a proper detailed view ---------- */
+  function weekView(log, s, A) {
     var today = log[log.length - 1].date, start0 = log[0].date;
     var ws = addDays(startOfWeek(today), WOFF * 7);
     var canBack = ws > startOfWeek(start0), canFwd = WOFF < 0;
-    var rows = '', kept = 0, mins = 0, tracked = 0;
+    var days = [], kept = 0, mins = 0, tracked = 0, deep = 0, notes = 0, checks = 0;
     for (var i = 0; i < 7; i++) {
-      var d = addDays(ws, i);
-      var e = entryOf(A, d);
+      var d = addDays(ws, i), e = entryOf(A, d);
       var st = e ? e.st : (d > today ? 'ahead' : 'before');
-      var did = [];
       if (e) {
-        if (e.d.sup.deepwork) did.push('deep work');
-        if (e.d.sup.reflection) did.push('note');
-        if (e.d.sup.checkin) did.push('check in');
+        tracked++;
+        if (e.st === 'kept') { kept++; mins += e.d.min || 0; }
+        if (e.d.sup.deepwork) deep++;
+        if (e.d.sup.reflection) notes++;
+        if (e.d.sup.checkin) checks++;
       }
-      if (e && e.d.on) { kept++; mins += e.d.min || 0; }
-      if (e) tracked++;
-      var word = st === 'kept' ? 'kept' : st === 'sup' ? 'something smaller'
-        : st === 'missed' ? 'missed' : st === 'rest' ? 'rest' : st === 'ahead' ? '' : 'before you started';
-      rows += '<div class="dl__r">' +
-        '<span class="dl__d' + (sameDay(d, today) ? ' now' : '') + '">' + WD[d.getDay()] + ' ' + d.getDate() + '</span>' +
-        '<span class="dl__s ' + (st === 'ahead' || st === 'before' ? '' : st) + '"></span>' +
-        '<span class="dl__w">' + word + '</span>' +
-        '<span class="dl__t">' + (did.length ? did.join(' · ') : '') + '</span></div>';
+      days.push({ d: d, e: e, st: st });
     }
+    // the week at a glance: a row of seven cells, green number on the days kept
+    var strip = days.map(function (x) {
+      var cls = (x.st === 'ahead' || x.st === 'before') ? 'out' : x.st;
+      return '<div class="wkc"><span>' + WDM[(x.d.getDay() + 6) % 7] + '</span>' +
+        '<b class="' + cls + (sameDay(x.d, today) ? ' today' : '') + '">' + x.d.getDate() + '</b></div>';
+    }).join('');
+    // three stats: kept vs its target, hours, and how it sits against a usual week
+    var target = SHAPE === 'frequency' ? A.target : 7;
+    var met = SHAPE === 'frequency' ? kept >= target : null;
+    var keptStat = '<div class="wkstat"><b class="' + (met ? 'met' : '') + '">' + kept + ' of ' + target + '</b><span>' +
+      (SHAPE === 'frequency' ? (met ? 'rate kept' : 'sessions this week') : 'days kept') + '</span></div>';
+    var hoursStat = '<div class="wkstat"><b>' + (mins ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : '0h') + '</b><span>on it this week</span></div>';
+    var usual = s.N >= 14 ? Math.round(s.perWeek) : null;
+    var cmp = usual === null ? 'the record is young' : kept > usual ? 'above your usual ' + usual : kept < usual ? 'below your usual ' + usual : 'your usual week';
+    var usualStat = '<div class="wkstat"><b>' + (usual === null ? kept : (kept >= usual ? '↑' : kept === usual ? '=' : '↓')) + '</b><span>' + cmp + '</span></div>';
+    // what filled the week
+    var did = [];
+    if (deep) did.push(deep + ' deep work');
+    if (notes) did.push(notes + (notes === 1 ? ' note' : ' notes'));
+    if (checks) did.push(checks + ' check in' + (checks === 1 ? '' : 's'));
+    var didLine = did.length ? '<div class="wkdid">Also this week: ' + did.join(', ') + '.</div>' : '';
     var label = K.MON[ws.getMonth()] + ' ' + ws.getDate();
-    var foot = tracked
-      ? '<div class="dl__foot"><b>' + kept + '</b> of ' + (SHAPE === 'frequency' ? A.target : tracked) + ' kept' +
-        (mins ? '   ·   <b>' + Math.round(mins / 60) + 'h ' + (mins % 60) + 'm</b>' : '') + '</div>'
-      : '<div class="dl__foot">No record in this week yet.</div>';
     return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd) + '</div>' +
-      '<div>' + rows + '</div>' + foot;
+      '<div class="wkstrip">' + strip + '</div>' +
+      '<div class="wkstats">' + keptStat + hoursStat + usualStat + '</div>' + didLine;
   }
 
   /* ---------- month grid from the day map ---------- */
@@ -217,19 +200,46 @@
     return chips.length >= 2 ? '<div class="key">' + chips.join('') + '</div>' : '';
   }
 
+  /* the month grid: kept days are a green number (no fills, no lines). Per week
+     the count column shows kept, and for a rate goal it reads kept/target and
+     turns green when the week hit the rate, a success you can spot at a glance. */
+  function monthGridBig(A, y, m, today) {
+    var last = new Date(y, m + 1, 0), cursor = startOfWeek(new Date(y, m, 1));
+    var rows = '', monthKept = 0, monthDays = 0;
+    while (cursor <= last) {
+      var wk = '', weekKept = 0, anyIn = false;
+      for (var i = 0; i < 7; i++) {
+        var d = addDays(cursor, i), e = A.map[dkey(d)];
+        if (e && e.st === 'kept') weekKept++;
+        var inMonth = d.getMonth() === m && d.getFullYear() === y;
+        if (!inMonth) { wk += '<div class="d pad"></div>'; continue; }
+        anyIn = true;
+        if (e) { monthDays++; if (e.st === 'kept') monthKept++; }
+        var st = e ? e.st : 'ahead';
+        wk += '<div class="d ' + st + (e && sameDay(d, today) ? ' today' : '') + '">' + d.getDate() + '</div>';
+      }
+      var met = SHAPE === 'frequency' && weekKept >= A.target;
+      var wc = !anyIn ? '' : (SHAPE === 'frequency' ? weekKept + '/' + A.target : String(weekKept));
+      rows += wk + '<div class="wc' + (met ? ' met' : '') + '">' + wc + '</div>';
+      cursor = addDays(cursor, 7);
+    }
+    return { rows: rows, kept: monthKept, days: monthDays };
+  }
+
   /* ---------- calendar: MONTH ---------- */
   function monthView(log, s, A) {
     var today = log[log.length - 1].date, start0 = log[0].date;
     var base = new Date(today.getFullYear(), today.getMonth() + MOFF, 1);
     var canBack = base > new Date(start0.getFullYear(), start0.getMonth(), 1), canFwd = MOFF < 0;
-    var g = gridFor(A, base.getFullYear(), base.getMonth(), today, true);
-    var head = WD.map(function (w) { return '<div class="wd">' + w + '</div>'; }).join('') + '<div class="wd g">days</div>';
+    var g = monthGridBig(A, base.getFullYear(), base.getMonth(), today);
+    var head = WD.map(function (w) { return '<div class="wd">' + w + '</div>'; }).join('') +
+      '<div class="wd g">' + (SHAPE === 'frequency' ? 'rate' : 'days') + '</div>';
     var run = '<div class="runline">Your current run is <b>' + plural(s.current, 'day') + '</b>' +
       (s.best > s.current ? '. Your longest is <b>' + plural(s.best, 'day') + '</b>.' : ', the longest you have had.') + '</div>';
     return '<div class="mh"><b>' + K.MONF[base.getMonth()] + '</b>' +
       '<span style="display:flex;align-items:center;gap:12px"><i><em>' + g.kept + '</em> of ' + plural(g.days, 'day') + '</i>' +
       arrows('navMonth', canBack, canFwd) + '</span></div>' +
-      '<div class="cal">' + head + g.html + '</div>' + legend(A, log) + run;
+      '<div class="cal">' + head + g.rows + '</div>' + legend(A, log) + run;
   }
 
   /* ---------- calendar: YEAR, all twelve months ---------- */
@@ -285,32 +295,6 @@
       K.dowChart(s) + '</div>';
   }
 
-  /* ---------- every week so far, L07 grammar ---------- */
-  function chapters(log, A) {
-    var starts = A.weekStarts.slice().reverse().slice(0, 14);
-    if (starts.length < 2) return '';
-    var today = log[log.length - 1].date;
-    var rows = starts.map(function (t) {
-      var ws = new Date(t), kept = 0, tracked = 0, g = '';
-      for (var i = 0; i < 7; i++) {
-        var d = addDays(ws, i), e = entryOf(A, d);
-        var st = e ? e.st : 'pad';
-        if (e) { tracked++; if (e.st === 'kept') kept++; }
-        // an X marks a day kept, like crossing it off
-        var glyph = st === 'kept' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
-          : st === 'sup' ? '<i class="dot"></i>' : '';
-        g += '<b class="' + st + '">' + glyph + '</b>';
-      }
-      var denom = SHAPE === 'frequency' ? A.target : tracked;
-      var full = kept >= denom;
-      return '<div class="chap__r"><span class="chap__w">' + K.MON[ws.getMonth()] + ' ' + ws.getDate() + '</span>' +
-        '<span class="chap__g">' + g + '</span>' +
-        '<span class="chap__n' + (full ? ' full' : '') + '">' + kept + ' of ' + denom + '</span></div>';
-    }).join('');
-    return '<div class="sec"><div class="sec__h"><b>Every week so far</b><i>newest first</i></div>' +
-      '<div class="chap"><div class="chap__head"><span></span><span class="chap__wd">' +
-      WD.map(function (w) { return '<span>' + w + '</span>'; }).join('') + '</span><span></span></div>' + rows + '</div></div>';
-  }
 
   function monthBars(s) {
     var ms = s.months.slice(-6);
@@ -346,13 +330,13 @@
     var hero = '<div class="ev__hero"><div class="ev__say">You’ve shown up</div>' +
       '<div class="ev__num">' + s.total.toLocaleString() + '</div>' +
       '<div class="ev__since">of ' + plural(s.N, 'day') + ' since ' + K.MON[log[0].date.getMonth()] + ' ' + log[0].date.getDate() + '</div></div>';
-    var body = SCALE === 'week' ? weekView(log, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
+    var body = SCALE === 'week' ? weekView(log, s, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
     var cal = '<div class="sec"><div class="sec__h"><b>The calendar</b><span class="scale" id="scale">' +
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
     return hero + '<div class="ev__grid"><div class="ev__col">' + scoreBlock(s, log, A) + cal + '</div>' +
-      '<div class="ev__col">' + tracks(log) + rhythm(s) + chapters(log, A) + monthBars(s) + ledger(s, log) + '</div></div>';
+      '<div class="ev__col">' + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log) + '</div></div>';
   }
 
   /* ---------- render + wiring ---------- */
@@ -364,9 +348,6 @@
     el('day').textContent = 'Day ' + N;
     el('pgOne').innerHTML = pageOne(s, log);
     el('ev').innerHTML = pageTwo(s, log, A);
-    // rAF stalls in a backgrounded tab, so a timeout backstop guarantees the draw
-    if (window.requestAnimationFrame) requestAnimationFrame(drawThreads);
-    setTimeout(drawThreads, 60);
 
     var sc = el('scale');
     if (sc) sc.addEventListener('click', function (e) {
