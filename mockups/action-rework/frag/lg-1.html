@@ -36,12 +36,27 @@
   color:rgba(var(--ink),.92);text-wrap:pretty}
 [data-k=lg-1] .lg1 p.b b{font-weight:600;color:var(--text-hi)}
 /* the act card: only the act. The paragraph above it already did the talking. */
+/* the plate card: the star act, then the two supports each with the one line
+   that earns its place, so nothing on tomorrow's day screen came from nowhere */
 [data-k=lg-1] .lg1-mv{margin:5px 0 12px;border-radius:12px;padding:14px 15px;
   background:rgba(22,25,31,.95);
   -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
 [data-k=lg-1] .lg1-mv p{margin:0;font-size:14.5px;font-weight:700;line-height:1.3;
   letter-spacing:-.014em;color:var(--text-hi)}
+[data-k=lg-1] .lg1-mv .sup{margin-top:11px;padding-top:11px;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
+[data-k=lg-1] .lg1-mv .sup b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;
+  color:var(--text-hi)}
+[data-k=lg-1] .lg1-mv .sup span{display:block;margin-top:2px;font-size:11px;line-height:1.4;
+  color:rgba(var(--ink),.78)}
+/* how the machine runs: a few labeled rows, cadence and the stall promise */
+[data-k=lg-1] .lg1-runs{display:flex;flex-direction:column;gap:7px;margin:2px 0 13px}
+[data-k=lg-1] .lg1-runs p{margin:0;font-size:12px;line-height:1.48;color:rgba(var(--ink),.92)}
+[data-k=lg-1] .lg1-runs p b{font-weight:600;color:var(--text-hi)}
+/* the covenant: the deal the hold signs */
+[data-k=lg-1] .lg1-cov{margin:0 0 2px;font-size:12.5px;font-weight:500;line-height:1.52;
+  color:var(--text-hi)}
 /* the equation block: the math gets its own visual moment. Stacked terms,
    tabular numerals, the result separated and emphasized. Checkable at a
    glance, which is what kills the AI feel: prose can only be believed. */
@@ -56,7 +71,7 @@
   color:var(--text-hi);font-variant-numeric:tabular-nums;white-space:nowrap}
 [data-k=lg-1] .lg1-eq .r{margin-top:1px;padding-top:10px;box-shadow:inset 0 1px 0 rgba(var(--ink),.13)}
 [data-k=lg-1] .lg1-eq .r b{font-size:16px}
-[data-k=lg-1] .lg1-src{margin:2px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
+[data-k=lg-1] .lg1-src{margin:10px 0 0;font-size:11px;line-height:1.45;color:rgba(var(--ink),.78)}
 [data-k=lg-1] .lg1-fair{margin:14px 0 0;font-size:16px;font-weight:700;letter-spacing:-.016em;
   color:var(--text-hi)}
 /* the hold: same law as everywhere, an early release does nothing */
@@ -104,7 +119,6 @@
     <div class="lg1-scroll"><div class="lg1-in">
       <p class="lg1-star"></p>
       <div class="lg1-body"></div>
-      <div class="lg1-mv"><p></p></div>
       <p class="lg1-src">Every line above came from what you told Memento.</p>
       <p class="lg1-fair">Fair?</p>
     </div></div>
@@ -120,7 +134,7 @@
 <script>(function(){
   var r=document.currentScript.closest('.cell');if(!r)return;
   var q=function(s){return r.querySelector(s)},
-      star=q('.lg1-star'),body=q('.lg1-body'),mv=q('.lg1-mv p'),
+      star=q('.lg1-star'),body=q('.lg1-body'),
       go=q('.lg1-go'),fill=q('.lg1-go i'),rest=q('.lg1-rest'),again=q('.lg1-again');
 
   /* Malik's structure (2026-08-16): the star QUOTED in their own words, the
@@ -156,6 +170,12 @@
       ps:['Here is how focus works: your brain is always weighing what deserves its attention, and the phone keeps winning because nothing on the table beats it. Deleting the apps helps, you named &#8220;TikTok, Instagram and Reddit&#8221; as the big three. But removal alone leaves a void, and a bored brain claws its way back to stimulation.',
           'So the plan does both. Day one removes the three. Then the hours get somewhere better to go: you said the evenings should be for your music, so that becomes the replacement, with progress you can see. Once progress feels better than the scroll, focus stops being an uphill fight and the number falls on its own.',
           'Phone away at 8pm guards the night while that takes hold. You type each night&#8217;s number from your Screen Time report. The first two weeks are the hard part. After that it starts running itself.'],
+      sup:[['Phone away at 8:00pm','the one guarded moment the night turns on'],
+           ['Audiobook at lunch, not YouTube','the midday hours need somewhere to go too']],
+      runs:[['Every day','one screen: the boundary, the supports, a hold.'],
+            ['Every night','you type the day&#8217;s hours from your Screen Time report.'],
+            ['First look','two weeks. Long enough for the void to close.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
       act:'Delete TikTok, Instagram and Reddit.'},
     money:{star:'&#8220;$3,000 a month so I can quit the warehouse.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and by your own account every client you have came from someone you reached out to first. That settles what the daily act is.'],
@@ -163,6 +183,12 @@
       res:['So the gap is','&#8776; 3 clients'],
       ps:['Three clients is a few dozen real conversations, and most messages will go nowhere. The math already expects that. Every message gets logged, so the pile grows even on days revenue sits still, and watching that pile grow is what keeps you sending through the quiet weeks.',
           'Messages every day, sized to the day you are having. Revenue gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
+      sup:[['Send the invoice','money already earned gets collected first'],
+           ['30 minutes on the offer page','so the messages land somewhere stronger']],
+      runs:[['Every day','one screen: the messages, sized to the day you are having.'],
+            ['Sundays','you type what came in. The math re-runs.'],
+            ['First look','two weeks of logged messages.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
       act:'Message 3 potential clients.'},
     weight:{star:'&#8220;Lose 50lbs in 6 months so I look good for summer.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now. Losing weight comes down to math, and the struggle you named is diet, so that is where the plan aims.'],
@@ -170,30 +196,62 @@
       res:['So you eat, per day','&#8776; 2,500 cal'],
       ps:['The maintenance line is an estimate, and the scale number you type each morning corrects it. Everything else is arithmetic: hold the daily number and the goal arrives on schedule, down to the laws of physics.',
           'The first weeks are the worst of it. Your habits change before the scale does, so the log is where progress shows first. Which is why the first action builds the one thing that makes the number livable for 180 days:'],
+      sup:[['A 40 minute walk after dinner','it sits exactly where you said the day breaks'],
+           ['Log every meal in MyFitnessPal','the log shows progress before the scale does']],
+      runs:[['Every day','one screen: the walk, the log, a hold.'],
+            ['Each morning','the scale number, typed at your own ritual.'],
+            ['First look','two weeks. Habits move before the scale does.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
       act:'Build a meal plan of 2,000 to 2,500 calories and 200 to 250g of protein you can comfortably keep for 6 months.'},
     fitness:{star:'&#8220;Train three times a week, every week.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and you said the pattern is always the same: three strong weeks, then nothing.'],
       eq:null,
       ps:['So the plan removes the decisions and lowers the floor. Training days are fixed. A 30 minute session keeps the day. A walk keeps the day. You are not a robot, and the goal under the goal is simple: a healthy human moves more, and you are becoming someone who trains.',
           'Two rules carry it. The bar can drop, the day cannot. And a missed day is never followed by a second one. Rest days are real days, the sessions get counted, and the count is the identity growing.'],
+      sup:[['Protein first at every meal','the training only works if the kitchen agrees'],
+           ['Sleep by 11','recovery is half the session']],
+      runs:[['Training days','one screen: the session, a hold.'],
+            ['Rest days','real days with their own screen. No number is ever asked.'],
+            ['First look','two weeks, six sessions.'],
+            ['If you miss','never twice. That is the only rule.']],
+      cov:'Your job is the sessions. Memento&#8217;s job is to hold the plan, keep the count, and never let a day quietly disappear.',
       act:'Push day session.'},
     school:{star:'&#8220;A 3.5 GPA by May.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and you said ability was never the problem. Studying loses to the phone, every night.'],
       eq:null,
       ps:['A GPA cannot be done today, it arrives later as a result. Hours can be done today. You said the two heaviest-reading classes are dragging the average, so the sessions aim there first, and the condition you gave, &#8220;phone in another room,&#8221; is written into the move itself.',
           'The start is the worst of it: hours in, nothing graded back yet. So the sessions get counted and progress stays visible long before results exist. Grades get asked about only when they do.'],
+      sup:[['Rewrite one page of notes','rewriting is the fastest proof you understood'],
+           ['Email about office hours','help asked early beats help asked desperate']],
+      runs:[['Every day','one screen: the session, the supports, a hold.'],
+            ['When grades exist','you write them in. Never between.'],
+            ['First look','two weeks of counted hours.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
       act:'Study 2 hours, phone in another room.'},
     projects:{star:'&#8220;Work 3 to 4 hours a day on Memento until it ships.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and you already know the shape of it: the hours. The real question is the one you asked yourself, &#8220;what does the deep work consist of?&#8221;'],
       eq:null,
       ps:['You said payments are set up, marketing is handled through your YouTube audience, and what is left is the product itself. You said Clarity is done. That leaves one module standing between here and shipped.',
           'So the next sessions are not &#8220;work on Memento.&#8221; They are aimed: hyper focused on making the Action module damn good, because by your own list it is the tallest thing left. When it falls, the plan re-aims at whatever is tallest then.'],
+      sup:[['Ship one visible thing','visible progress is what pays the brain'],
+           ['Write tomorrow&#8217;s first step','so tomorrow starts without a decision']],
+      runs:[['Every day','one screen: the session, aimed at the tallest thing.'],
+            ['After each session','cleared or not yet, on the thing it aimed at.'],
+            ['First look','two weeks.'],
+            ['If it stalls','the plan re-aims. The ship date holds.']],
       act:'One deep session on the Action module.'},
     focus:{star:'&#8220;Deep work every day until the migration ships.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now, and you said the mornings vanish into email before the real work starts.'],
       eq:null,
       ps:['Focus is a skill, and your brain is always weighing what deserves it. Email wins because it pays back in seconds. So the plan claims the first hours for the migration and makes that work pay back visibly too: one protected block, phone in another room, a single tab, every block counted.',
           'You size the block each day. The block itself is not negotiable, because you said it yourself: once the morning goes, the day goes with it.'],
+      sup:[['Phone in another room','the fight is won before it starts'],
+           ['Single tab only','one tab is the whole discipline']],
+      runs:[['Every day','one screen: the block, the supports, a hold.'],
+            ['No number','the blocks themselves are the record.'],
+            ['First look','two weeks of counted blocks.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
+      cov:'Your job is the acts. Memento&#8217;s job is to hold the plan, keep the count, and never let a day quietly disappear.',
       act:'Deep work on the migration, 90 min.'},
     business:{star:'&#8220;$10k a month from the studio.&#8221;',
       intro:['This is the goal you&#8217;ve committed yourself to right now. You said the product is good but nobody sees it, and that makes the bottleneck attention.'],
@@ -201,6 +259,12 @@
       res:['So the gap is','&#8776; 4 projects a month'],
       ps:['Nobody new can hire work they have never seen, so output is the lever you actually own. The deep work stays on the product, and the posting protects it. Posts get logged, so the work stays visible even in the weeks the number sits still.',
           'The business number gets asked on Sundays, and the plan re-runs this math on whatever you write.'],
+      sup:[['Post on 3 platforms','nobody can hire what they cannot see'],
+           ['Write one script','tomorrow&#8217;s post starts today']],
+      runs:[['Every day','one screen: the deep work, the posts, a hold.'],
+            ['Sundays','you type what the business made. The math re-runs.'],
+            ['First look','two weeks.'],
+            ['If it stalls','the plan changes, the goal doesn&#8217;t.']],
       act:'Deep work on the product, 3 hours.'}
   };
 
@@ -214,8 +278,15 @@
         +'<div class="r"><s>'+c.res[0]+'</s><b>'+c.res[1]+'</b></div></div>';
     }
     h+=c.ps.map(function(p){return '<p class="b">'+p+'</p>'}).join('');
+    /* the plate: the act, then the supports with the line that earns each */
+    h+='<div class="lg1-mv"><p>'+c.act+'</p>'
+      +c.sup.map(function(x){return '<div class="sup"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')
+      +'</div>';
+    h+='<div class="lg1-runs">'
+      +c.runs.map(function(r){return '<p><b>'+r[0]+'.</b> '+r[1]+'</p>'}).join('')
+      +'</div>';
+    h+='<p class="lg1-cov">'+(c.cov||'Your job is the acts. Memento&#8217;s job is to hold the math, ask the questions, and never let a day quietly disappear.')+'</p>';
     body.innerHTML=h;
-    mv.textContent=c.act;
     rest.classList.remove('open');rest.setAttribute('aria-hidden','true');
   }
   r.querySelectorAll('.bk button[data-b]').forEach(function(b){

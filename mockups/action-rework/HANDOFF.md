@@ -36,3 +36,11 @@
   patterns I had shipped are dead. Screen-time brief now carries his focus
   theory: removal + a named worthy replacement + visible markers.
 - His scripts (docx in repo root) are source material for voice/philosophy.
+
+## 2026-08-16 night 2: logic v4 (the three additions, Malik-approved)
+- The plate card: act + BOTH supports, each with the one line that earns it
+  (nothing on the day screen comes from nowhere).
+- The machine rows: Every day / cadence ask / First look (checkpoint) /
+  If it stalls ("the plan changes, the goal doesn't"; fitness: "never twice").
+- The covenant before Fair?: "Your job is the acts. Memento's job is to hold
+  the math, ask the questions, and never let a day quietly disappear."
