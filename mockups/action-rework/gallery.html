@@ -1113,6 +1113,685 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 </section>
 
 </div></section>
+<section class="grp"><h2>THE UNIVERSAL LAYOUT</h2><p>One plug-and-play screen for every goal: the star act + up to two supports, size, hold, close. Toggle all eight buckets. If this survives Malik, the costume layouts retire.</p><div class="wall">
+<!-- ARCHETYPE (difference law): u-1 star act over subordinate plate.
+     Nothing else in the set stacks a full-size statement over ranked lesser
+     acts: lp-1 is a full-bleed statement alone, lp-17 a declarative sentence
+     alone, lp-12 seven equal columns, lp-15 a bottom sheet. Here the screen
+     has a HIERARCHY of acts: one owns it, up to two sit under it, and the
+     intensity control is what decides how many exist. -->
+<section class="cell" id="u-1" data-k="u-1">
+<!-- THE PLATE (Malik, 2026-08-16). The candidate that retires the costume
+     layouts: a day is ONE STAR ACT plus up to TWO SUPPORTING ACTS, and every
+     one of the eight buckets plugs into it without changing the furniture.
+
+     WHY IT CAN BE UNIVERSAL: every bucket already produces the same three
+     things at plan time, a headline act, a size for it, and a couple of small
+     acts that protect it. The costume layouts differed only in how they DREW
+     those. Here the drawing is fixed and the content moves.
+
+     INTENSITY IS THE PLATE. There is no separate dial: the three sizes on the
+     star also decide how many acts the day has. Lighter folds a support row
+     away, heavier adds the third, so light is literally just the star. That is
+     the consequence made legible (contract, mechanics brief): you can see what
+     you are buying because rows appear and disappear in front of you.
+
+     THE HOLD LAW REACHES THE SUB-ACTS. Supports are not checkboxes. Each one
+     takes a short hold (450ms) and an early release does nothing, so no bare
+     tap ever confirms anything on this screen. The day itself takes the full
+     1400ms hold and requires only the STAR. Unticked supports lapse quietly:
+     they are what protected the day, not the day.
+
+     ONE ASK: nothing is typed on this screen. The close is the module's only
+     entry moment, in Clarity's voice, at that bucket's own cadence, and it is
+     skipped entirely for the buckets that have no number (focus, fitness).
+
+     PROVENANCE: the star, the supports and the named task are the person's own
+     from Clarity and intake. Every duration is the plan's estimate and says
+     "about". The only measured-sounding number on any close is quoted straight
+     back to its source ("from your Screen Time report"). Nothing is sensed.
+
+     PILLAR PURITY: today only. No streak, no position, no pace, no history,
+     no goal-relative reading anywhere. -->
+<style>
+[data-k=u-1] .u1{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:40px 18px 22px;font-variant-numeric:tabular-nums;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+[data-k=u-1] .u1-sp{min-height:8px}
+[data-k=u-1] .u1-sp.a{flex:.55}
+[data-k=u-1] .u1-sp.b{flex:.9}
+
+/* --- beat 1: SEE IT. the star act owns the screen ----------------------- */
+[data-k=u-1] .u1-star{margin:0;position:relative;z-index:2;font-size:25px;font-weight:700;
+  line-height:1.28;letter-spacing:-.028em;color:var(--text-hi);text-wrap:pretty}
+[data-k=u-1] .u1-tok{display:inline;padding:0 1px 2px;margin:0;border:0;background:none;
+  box-shadow:inset 0 -2px 0 rgba(var(--ink),.32);color:var(--text-hi);
+  font:700 25px/1.28 var(--font);letter-spacing:-.028em;font-variant-numeric:tabular-nums;
+  cursor:pointer;transition:box-shadow .16s ease-out}
+[data-k=u-1] .u1.sizing .u1-tok{box-shadow:inset 0 -2px 0 #3fd94e}
+/* the star that has no number still needs the plate control, so the sentence
+   ends in the same affordance the token carries, at label scale */
+[data-k=u-1] .u1-car{display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;margin-left:6px;vertical-align:2px;border:0;border-radius:8px;
+  background:rgba(var(--ink),.08);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:pointer}
+[data-k=u-1] .u1-car svg{width:10px;height:10px;fill:none;stroke:rgba(var(--ink),.82);
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s ease-out}
+[data-k=u-1] .u1.sizing .u1-car svg{transform:rotate(180deg)}
+[data-k=u-1] .u1.signed .u1-tok{box-shadow:none;pointer-events:none;cursor:default}
+[data-k=u-1] .u1.signed .u1-car{display:none}
+
+/* --- beat 2: SIZE IT. three sizes, and each one IS a plate -------------- */
+[data-k=u-1] .u1-sizes{display:none;margin-top:12px;position:relative;z-index:2}
+[data-k=u-1] .u1.sizing .u1-sizes{display:block}
+[data-k=u-1] .u1-three{display:flex;gap:6px}
+[data-k=u-1] .u1-three button{flex:1;min-width:0;border:0;border-radius:10px;padding:8px 5px 9px;
+  cursor:pointer;font-family:var(--font);text-align:center;background:rgba(22,25,31,.95);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);transition:background .16s ease-out,transform .09s ease-out}
+[data-k=u-1] .u1-three button:active{transform:translateY(1px);background:rgba(30,34,42,.96)}
+[data-k=u-1] .u1-three i{display:block;font-style:normal;font-size:10.5px;line-height:1;
+  color:rgba(var(--ink),.72)}
+[data-k=u-1] .u1-three b{display:block;margin-top:5px;font-size:13.5px;font-weight:500;line-height:1.05;
+  color:rgba(var(--ink),.92);font-variant-numeric:tabular-nums}
+[data-k=u-1] .u1-three s{display:block;margin-top:4px;text-decoration:none;font-size:10.5px;
+  line-height:1;color:rgba(var(--ink),.72);font-variant-numeric:tabular-nums}
+[data-k=u-1] .u1-three button.on{background:rgba(30,52,34,.96);box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
+[data-k=u-1] .u1-three button.on b{color:var(--text-hi);font-weight:700}
+[data-k=u-1] .u1-three button.on i,[data-k=u-1] .u1-three button.on s{color:rgba(var(--ink),.84)}
+[data-k=u-1] .u1-three button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=u-1] .u1-foot{display:flex;align-items:center;gap:10px;margin-top:8px}
+[data-k=u-1] .u1-est{margin:0;font-size:11.5px;line-height:1.3;color:rgba(var(--ink),.78)}
+[data-k=u-1] .u1-est:empty{display:none}
+[data-k=u-1] .u1-more{margin-left:auto;border:0;border-radius:8px;padding:5px 0 5px 8px;background:none;
+  color:rgba(var(--ink),.80);font:500 11.5px/1 var(--font);cursor:pointer;transition:color .16s ease-out}
+[data-k=u-1] .u1-more:hover,[data-k=u-1] .u1-more.on{color:rgba(var(--ink),.96)}
+[data-k=u-1] .u1-more.gone{display:none}
+[data-k=u-1] .u1-sizes.free .u1-three{flex-wrap:wrap}
+[data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33.333% - 4px)}
+
+/* --- beat 3: the deep work door, only when the star is session shaped ---- */
+[data-k=u-1] .u1-dw{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
+  margin-top:14px;position:relative;z-index:2;height:30px;padding:0 11px 0 9px;border:0;border-radius:9px;
+  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.4);
+  backdrop-filter:blur(24px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  color:rgba(var(--ink),.92);font-family:var(--font);cursor:pointer}
+[data-k=u-1] .u1-dw b{font-size:12px;font-weight:500}
+[data-k=u-1] .u1-dw em{font-style:normal;font-size:11.5px;color:rgba(var(--ink),.72);
+  font-variant-numeric:tabular-nums}
+[data-k=u-1] .u1-dw svg{width:13px;height:13px;color:rgba(var(--ink),.82)}
+[data-k=u-1] .u1-dw.gone{display:none}
+[data-k=u-1] .u1.signed .u1-dw{display:none}
+
+/* --- the supports: the same day, one rank down -------------------------- */
+[data-k=u-1] .u1-plate{position:relative;z-index:2}
+[data-k=u-1] .u1-rule{height:1px;background:rgba(var(--ink),.13);margin:0 0 4px;
+  transition:opacity .22s ease-out}
+[data-k=u-1] .u1-rule.gone{opacity:0}
+[data-k=u-1] .u1-sup{display:block;width:100%;height:42px;overflow:hidden;border:0;border-radius:10px;
+  padding:0;background:none;font-family:var(--font);text-align:left;cursor:pointer;
+  transition:height .26s cubic-bezier(.2,.7,.2,1),opacity .18s ease-out}
+[data-k=u-1] .u1-sup.gone{height:0;opacity:0;pointer-events:none}
+[data-k=u-1] .u1-sup .in{display:flex;align-items:center;gap:11px;height:42px;padding:0 6px}
+[data-k=u-1] .u1-box{position:relative;flex:0 0 auto;width:17px;height:17px;border-radius:6px;overflow:hidden;
+  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
+/* the short hold, drawn: the tick fills, an early release drains it */
+[data-k=u-1] .u1-box i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.62)}
+[data-k=u-1] .u1-box svg{position:absolute;inset:0;margin:auto;width:11px;height:11px;fill:none;
+  stroke:#0b1a0d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0;
+  transition:opacity .12s ease-out}
+[data-k=u-1] .u1-sup .tx{font-size:13.5px;font-weight:400;line-height:1.25;color:rgba(var(--ink),.90);
+  transition:color .2s ease-out}
+[data-k=u-1] .u1-sup.on .u1-box{background:#3fd94e;box-shadow:none}
+[data-k=u-1] .u1-sup.on .u1-box i{width:0}
+[data-k=u-1] .u1-sup.on .u1-box svg{opacity:1}
+[data-k=u-1] .u1-sup.on .tx{color:var(--text-hi)}
+/* lapsed: after the day is held, an unticked support just stops asking.
+   No red, no strike, no word about it. */
+[data-k=u-1] .u1-sup.lapse{pointer-events:none}
+[data-k=u-1] .u1-sup.lapse .tx{color:rgba(var(--ink),.62)}
+[data-k=u-1] .u1-sup.lapse .u1-box{background:rgba(var(--ink),.06)}
+[data-k=u-1] .u1.signed .u1-sup{pointer-events:none}
+[data-k=u-1] .u1-sup:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:1px}
+
+/* --- beat 4: HOLD IT DONE ----------------------------------------------- */
+[data-k=u-1] .u1-hold{position:relative;width:100%;height:52px;margin-top:14px;border:0;border-radius:14px;
+  overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;font-family:var(--font);
+  cursor:pointer;touch-action:none;z-index:2;transition:background .14s ease-out,transform .09s ease-out}
+[data-k=u-1] .u1-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+[data-k=u-1] .u1-hold span{position:relative;display:grid;place-items:center;height:100%;
+  font-size:15.5px;font-weight:700;letter-spacing:-.012em}
+[data-k=u-1] .u1-hold:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=u-1] .u1-hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=u-1] .u1.signed .u1-hold{display:none}
+/* --- beat 5a: the green beat, undo lives inside it ---------------------- */
+[data-k=u-1] .u1-done{display:none;align-items:center;gap:9px;height:52px;margin-top:14px;padding:0 4px 0 6px;
+  position:relative;z-index:2}
+[data-k=u-1] .u1.signed .u1-done{display:flex}
+[data-k=u-1] .u1-done b{width:8px;height:8px;border-radius:3px;background:#3fd94e;flex:0 0 auto}
+[data-k=u-1] .u1-done span{font-size:13.5px;font-weight:400;color:rgba(var(--ink),.92)}
+[data-k=u-1] .u1-undo{margin-left:auto;border:0;border-radius:9px;height:30px;padding:0 12px;
+  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  color:rgba(var(--ink),.92);font:500 12.5px/1 var(--font);cursor:pointer}
+[data-k=u-1] .u1-undo:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+[data-k=u-1] .u1-wash{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.16));
+  transition:height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease-out}
+[data-k=u-1] .u1.signed .u1-wash{height:44%}
+[data-k=u-1] .u1.closed .u1-wash{height:0;opacity:0}
+
+/* --- beat 3b: the deep work room ---------------------------------------- */
+[data-k=u-1] .u1-room{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;padding:60px 26px 40px;background:#050608;
+  opacity:0;visibility:hidden;transition:opacity .28s ease-out,visibility 0s linear .28s}
+[data-k=u-1] .u1-room.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=u-1] .u1-room p{margin:0;max-width:220px;text-align:center;font-size:14px;line-height:1.35;
+  color:rgba(var(--ink),.90)}
+[data-k=u-1] .u1-room .clk{font-size:56px;font-weight:700;letter-spacing:-.045em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-k=u-1] .u1-room button{border:0;border-radius:11px;height:38px;padding:0 18px;
+  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
+  color:rgba(var(--ink),.92);font:500 13px/1 var(--font);cursor:pointer}
+
+/* --- beat 5b: the one ask, in this screen's grammar --------------------- */
+[data-k=u-1] .u1-pulse{position:absolute;inset:0;z-index:9;display:flex;flex-direction:column;
+  padding:40px 18px 22px;background:rgba(5,6,8,.972);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  opacity:0;visibility:hidden;transition:opacity .3s ease-out,visibility 0s linear .3s}
+[data-k=u-1] .u1-pulse.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=u-1] .u1-pulse .u1-sp.a{flex:.62}
+[data-k=u-1] .u1-pulse .u1-sp.b{flex:1}
+[data-k=u-1] .u1-ask{margin:0;font-size:22px;font-weight:700;letter-spacing:-.026em;line-height:1.3;
+  color:var(--text-hi)}
+[data-k=u-1] .u1-pen{display:flex;align-items:baseline;gap:4px;margin:10px 0 0}
+[data-k=u-1] .u1-pen.gone{display:none}
+[data-k=u-1] .u1-pen em{font-style:normal;font-size:26px;font-weight:500;color:rgba(var(--ink),.84)}
+[data-k=u-1] .u1-pen input{-webkit-appearance:none;appearance:none;border:0;outline:0;background:none;
+  padding:0;margin:0;width:52px;font-family:var(--font);font-weight:700;font-size:56px;line-height:1.12;
+  letter-spacing:-.05em;color:rgba(var(--ink),1);font-variant-numeric:tabular-nums;
+  caret-color:rgba(var(--ink),.92)}
+[data-k=u-1] .u1-pen input::placeholder{color:rgba(var(--ink),.20)}
+[data-k=u-1] .u1-prule{height:1px;width:52px;margin:2px 0 0;background:rgba(var(--ink),.28);
+  transition:background .18s ease-out,width .12s ease-out}
+[data-k=u-1] .u1-prule.gone{display:none}
+[data-k=u-1] .u1-tail{margin-top:4px}
+[data-k=u-1] .u1-tail:empty{display:none}
+[data-k=u-1] .u1-pulse.focus .u1-prule{background:rgba(var(--ink),.55)}
+[data-k=u-1] .u1-mirror{position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden;
+  font-family:var(--font);font-weight:700;font-size:56px;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums}
+[data-k=u-1] .u1-pick{display:none;gap:6px;margin:16px 0 0}
+[data-k=u-1] .u1-pick.on{display:flex}
+[data-k=u-1] .u1-pick button{flex:1;border:0;border-radius:11px;height:46px;cursor:pointer;
+  font:500 14px/1 var(--font);color:rgba(var(--ink),.92);background:rgba(22,25,31,.95);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=u-1] .u1-pick button.on{background:rgba(30,52,34,.96);color:var(--text-hi);font-weight:700;
+  box-shadow:inset 0 1px 0 rgba(63,217,78,.34)}
+[data-k=u-1] .u1-src{margin:18px 0 0;font-size:11.5px;line-height:1.45;color:rgba(var(--ink),.78)}
+[data-k=u-1] .u1-psave{position:relative;width:100%;height:52px;border:0;border-radius:14px;overflow:hidden;
+  background:rgba(22,25,31,.94);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
+  font-family:var(--font);cursor:pointer;touch-action:none}
+[data-k=u-1] .u1-psave i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.22)}
+[data-k=u-1] .u1-psave span{position:relative;display:grid;place-items:center;height:100%;font-size:14.5px;
+  font-weight:500;color:rgba(var(--ink),.62);transition:color .18s ease-out,font-weight .18s ease-out}
+[data-k=u-1] .u1-pulse.armed .u1-psave span{color:rgba(var(--ink),.96);font-weight:700}
+[data-k=u-1] .u1-pskip{display:block;width:100%;height:40px;margin-top:6px;border:0;background:none;
+  border-radius:12px;color:rgba(var(--ink),.78);font:500 13px/1 var(--font);cursor:pointer}
+[data-k=u-1] .u1-pskip:active{color:rgba(var(--ink),.96)}
+[data-k=u-1] .u1-psave:focus-visible,[data-k=u-1] .u1-pskip:focus-visible{
+  outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
+
+/* --- beat 5c: rest ------------------------------------------------------ */
+[data-k=u-1] .u1-rest{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:60px 26px 40px;text-align:center;background:#050608;
+  opacity:0;visibility:hidden;transition:opacity .42s ease-out,visibility 0s linear .42s}
+[data-k=u-1] .u1-rest.open{opacity:1;visibility:visible;transition-delay:0s}
+[data-k=u-1] .u1-rest p{margin:0;font-size:20px;font-weight:500;line-height:1.34;letter-spacing:-.02em;
+  color:rgba(var(--ink),.96)}
+[data-k=u-1] .u1-rest p+p{color:rgba(var(--ink),.90)}
+[data-k=u-1] .u1-again{position:absolute;left:0;right:0;bottom:32px;margin:0 auto;width:fit-content;
+  border:0;border-radius:999px;height:30px;padding:0 14px;background:rgba(22,25,31,.94);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.09);color:rgba(var(--ink),.90);
+  font:400 12px/1 var(--font);cursor:pointer}
+[data-k=u-1] .u1-again:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:3px}
+[data-k=u-1] .u1-off{display:none}
+[data-k=u-1] .u1-off.show{display:inline-flex}
+@media (prefers-reduced-motion:reduce){[data-k=u-1] .u1 *,[data-k=u-1] .u1-pulse,
+  [data-k=u-1] .u1-rest,[data-k=u-1] .u1-room{transition:none!important}}
+</style>
+<h3>The one</h3><p class="reach"><b>10/10</b><span>the candidate: one layout, every bucket, every day</span></p>
+<p class="cap">A day is one star act plus up to two supporting acts: the sentence owns the screen, the supports sit under it as quiet short holds, and the size control is the plate itself, so going lighter folds a support away until light is just the star. Same furniture for all eight buckets.</p>
+<div class="bk" role="group" aria-label="which bucket this screen is carrying">
+  <i>Bucket</i>
+  <button type="button" class="on" data-b="focus">Focus</button>
+  <button type="button" data-b="screen">Screen time</button>
+  <button type="button" data-b="projects">Projects</button>
+  <button type="button" data-b="school">School</button>
+  <button type="button" data-b="weight">Weight</button>
+  <button type="button" data-b="fitness">Fitness</button>
+  <button type="button" data-b="money">Money</button>
+  <button type="button" data-b="business">Business</button>
+  <button type="button" class="u1-off" data-off="1">Off day</button>
+</div>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="u1">
+    <div class="u1-wash" aria-hidden="true"></div>
+    <div class="u1-sp a"></div>
+
+    <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
+        aria-haspopup="true" aria-expanded="false" aria-label="how big today is"></button><span
+        class="post"></span><button type="button" class="u1-car" aria-haspopup="true" aria-expanded="false"
+        aria-label="how big today is"><svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button></p>
+
+    <div class="u1-sizes">
+      <div class="u1-three" role="group" aria-label="today's size"></div>
+      <div class="u1-foot"><p class="u1-est"></p><button type="button" class="u1-more">more sizes</button></div>
+    </div>
+
+    <button type="button" class="u1-dw">
+      <svg viewBox="0 0 13 13" fill="none" aria-hidden="true">
+        <circle cx="6.5" cy="7.2" r="5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M6.5 4.4V7.2H8.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M4.9 1.3h3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg><b>Start the timer</b><em></em>
+    </button>
+
+    <div class="u1-sp b"></div>
+
+    <div class="u1-plate">
+      <div class="u1-rule"></div>
+      <button type="button" class="u1-sup" data-s="0"><span class="in">
+        <span class="u1-box"><i></i><svg viewBox="0 0 12 12"><path d="M2.4 6.3l2.4 2.4 4.8-5"/></svg></span>
+        <span class="tx"></span></span></button>
+      <button type="button" class="u1-sup" data-s="1"><span class="in">
+        <span class="u1-box"><i></i><svg viewBox="0 0 12 12"><path d="M2.4 6.3l2.4 2.4 4.8-5"/></svg></span>
+        <span class="tx"></span></span></button>
+    </div>
+
+    <button type="button" class="u1-hold"><i></i><span>Hold to complete</span></button>
+    <div class="u1-done"><b></b><span class="dt"></span><button type="button" class="u1-undo">Undo</button></div>
+  </div>
+
+  <div class="u1-room" aria-hidden="true">
+    <p class="move"></p>
+    <p class="clk">00:00</p>
+    <button type="button" class="out" tabindex="-1">End</button>
+  </div>
+
+  <div class="u1-pulse" aria-hidden="true">
+    <div class="u1-sp a"></div>
+    <p class="u1-ask"></p>
+    <div class="u1-pen">
+      <span class="ppre"></span>
+      <input type="text" inputmode="decimal" autocomplete="off" placeholder="0"
+             aria-label="today's number" tabindex="-1">
+      <em class="psuf"></em>
+    </div>
+    <div class="u1-prule"></div>
+    <p class="u1-ask u1-tail"></p>
+    <div class="u1-pick" role="group" aria-label="answer"></div>
+    <p class="u1-src"></p>
+    <div class="u1-sp b"></div>
+    <button type="button" class="u1-psave" tabindex="-1"><i></i><span>Hold to save</span></button>
+    <button type="button" class="u1-pskip" tabindex="-1">Not now</button>
+  </div>
+
+  <div class="u1-rest" aria-hidden="true">
+    <p>That&#8217;s the day.</p>
+    <p class="rl">See you tomorrow.</p>
+    <button type="button" class="u1-again" tabindex="-1">Run it again</button>
+  </div>
+</div>
+<script>(function(){
+  var r=document.currentScript.closest('.cell');if(!r)return;
+  var q=function(s){return r.querySelector(s)},
+      root=q('.u1'),star=q('.u1-star'),pre=q('.u1-star .pre'),post=q('.u1-star .post'),
+      tok=q('.u1-tok'),car=q('.u1-car'),
+      sizes=q('.u1-sizes'),three=q('.u1-three'),est=q('.u1-est'),more=q('.u1-more'),
+      dw=q('.u1-dw'),dwmin=q('.u1-dw em'),
+      rule=q('.u1-rule'),sups=[].slice.call(r.querySelectorAll('.u1-sup')),
+      hold=q('.u1-hold'),hfill=q('.u1-hold i'),
+      doneRow=q('.u1-done'),doneTx=q('.u1-done .dt'),undo=q('.u1-undo'),
+      room=q('.u1-room'),rmove=q('.u1-room .move'),rclk=q('.u1-room .clk'),rout=q('.u1-room .out'),
+      pulse=q('.u1-pulse'),ask=q('.u1-ask'),tail=q('.u1-tail'),pen=q('.u1-pen'),ppre=q('.ppre'),psuf=q('.psuf'),
+      pin=q('.u1-pen input'),prule=q('.u1-prule'),pick=q('.u1-pick'),src=q('.u1-src'),
+      psave=q('.u1-psave'),pfill=q('.u1-psave i'),pskip=q('.u1-pskip'),
+      rest=q('.u1-rest'),restLine=q('.u1-rest .rl'),again=q('.u1-again'),
+      offBtn=q('.u1-off'),
+      mirror=document.createElement('span');
+  mirror.className='u1-mirror';r.appendChild(mirror);
+
+  /* --- THE EIGHT BUCKETS -------------------------------------------------
+     Every one of them is the same object: a star sentence with an optional
+     size token, three sizes ordered light to heavy (which is also one, two,
+     three acts), two supports, an optional deep work door, and the close.
+     The acts are ACTS: each has a yes/no doneWhen. No outcome ("eat 2,400
+     calories") is ever assigned as a move. Task names and support acts are
+     the person's own words from Clarity and intake. */
+  /* durations read the way a person says them: 45 min, 90 min, 2 hours.
+     Never "1 hr 30 min" for a number everyone calls ninety. */
+  var mins=function(v){
+    if(v%60===0)return (v/60)+(v===60?' hour':' hours');
+    if(v<120)return v+' min';
+    return Math.floor(v/60)+' hr '+(v%60)+' min';
+  };
+  var B={
+    /* the size token sits at the END for the session goals: "One 2 hours
+       block" is broken English at the top end, and a star that only reads
+       right at one size is not a universal star. */
+    focus:{pre:'Deep work on the migration, ',post:'.',fmt:mins,
+      three:[45,90,120],all:[30,45,60,75,90,120],
+      dw:true,dwv:function(v){return v},
+      sup:['Phone in another room','Single tab only'],
+      pulse:null,rest:'See you tomorrow.'},
+    screen:{pre:'Phone away at ',post:'.',
+      fmt:function(v){var h=Math.floor(v/60),m=v%60,ap=h>=12?'pm':'am';
+        return (h%12||12)+':'+('0'+m).slice(-2)+ap;},
+      roles:['easier','tonight&#8217;s','tighter'],
+      /* minutes past midnight: 9:00pm is the easier night, 7:30pm the tighter one */
+      three:[1260,1200,1170],all:[1140,1170,1200,1230,1260,1290],
+      dw:false,sup:['Audiobook at lunch, not YouTube','Delete TikTok'],
+      pulse:{kind:'num',q:'Tonight I spent',pre:'',suf:'h',tail:'on my phone.',dec:true,
+        src:'From your Screen Time report, asked each night.'},
+      rest:'See you tomorrow.'},
+    projects:{pre:'Deep session on the smallest open blocker, ',post:'.',fmt:mins,
+      three:[45,60,90],all:[30,45,60,90,120,150],
+      dw:true,dwv:function(v){return v},
+      sup:['Ship one visible thing','Write tomorrow&#8217;s first step'],
+      pulse:{kind:'choice',q:'Is that blocker cleared?',opts:['Cleared','Not yet'],
+        src:'From your own blocker list, asked after each session.'},
+      rest:'See you tomorrow.'},
+    school:{pre:'Study ',post:', phone in another room.',fmt:mins,
+      three:[60,120,180],all:[45,60,90,120,150,180],
+      dw:true,dwv:function(v){return v},
+      sup:['Rewrite one page of notes','Email about office hours'],
+      pulse:{kind:'num',q:'My GPA is',pre:'',suf:'',tail:'this semester.',dec:true,
+        src:'Asked when results exist, never between.'},
+      rest:'See you tomorrow.'},
+    weight:{pre:'A ',post:' walk after dinner.',fmt:mins,
+      three:[25,40,60],all:[20,25,30,40,50,60],
+      dw:false,sup:['Log every meal in MyFitnessPal','Water bottle done by 6'],
+      pulse:{kind:'num',q:'The scale said',pre:'',suf:'lb',tail:'this morning.',dec:true,
+        src:'Asked once a day, whenever you weigh.'},
+      rest:'See you tomorrow.'},
+    fitness:{pre:'Push day session.',post:'',fmt:null,
+      three:[0,0,0],all:null,
+      dw:false,sup:['Protein first at every meal','Sleep by 11'],
+      pulse:null,rest:'Back Thursday.',
+      offable:true,offStar:'Rest day.',offHold:'Hold to close the day'},
+    money:{pre:'Message ',post:' potential clients.',
+      fmt:function(v){return String(v)},one:' potential client.',
+      three:[3,5,8],all:[1,2,3,5,8,12],
+      dw:false,estMin:5,sup:['Send the invoice','30 minutes on the offer page'],
+      pulse:{kind:'num',q:'I brought in',pre:'$',suf:'',tail:'this week.',dec:false,
+        src:'Asked once a week, Sundays.'},
+      rest:'See you tomorrow.'},
+    business:{pre:'Deep work on the product, ',post:'.',fmt:mins,
+      three:[120,180,240],all:[60,120,180,240,300,360],
+      dw:true,dwv:function(v){return v},
+      sup:['Post on 3 platforms','Write one script'],
+      pulse:{kind:'num',q:'The business made',pre:'$',suf:'',tail:'this week.',dec:false,
+        src:'Asked once a week, Sundays.'},
+      rest:'See you tomorrow.'}
+  };
+  var ROLES=['lighter','today&#8217;s','heavier'];
+  var ACTS=['just the star','star and one','star and two'];
+  var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
+  var C=B.focus,acts=2,val=C.three[1],free=false,off=false,
+      signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
+
+  function stamp(){var d=new Date(),h=d.getHours();
+    return (h%12||12)+':'+('0'+d.getMinutes()).slice(-2)+(h>=12?'pm':'am');}
+
+  /* a generic hold: the fill runs, an early release drains it and nothing
+     happens. Every gesture on this screen goes through here, sub-acts too. */
+  function bindHold(el,fillEl,ms,go,guard){
+    var t=null;
+    function on(e){
+      if(guard&&!guard())return;
+      if(e&&e.pointerId!=null){try{el.setPointerCapture(e.pointerId)}catch(z){}}
+      fillEl.style.transition='width '+(ms/1000)+'s linear';fillEl.style.width='100%';
+      t=setTimeout(function(){t=null;fillEl.style.transition='none';fillEl.style.width='0';go();},ms);
+    }
+    function offh(){if(t){clearTimeout(t);t=null;}
+      fillEl.style.transition='width .16s ease-out';fillEl.style.width='0';}
+    el.addEventListener('pointerdown',on);
+    ['pointerup','pointerleave','pointercancel'].forEach(function(ev){el.addEventListener(ev,offh)});
+    el.addEventListener('keydown',function(e){
+      if((e.key==='Enter'||e.key===' ')&&!e.repeat){e.preventDefault();on();}});
+    el.addEventListener('keyup',offh);
+    el.addEventListener('blur',offh);
+    return offh;
+  }
+
+  function estimate(v){
+    if(!C.estMin)return '';
+    var m=C.estMin*v;
+    return 'About '+(m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+(m%60)+' min':''))+'.';
+  }
+  function sizeLabel(v){return C.fmt?C.fmt(v):''}
+
+  function drawStar(){
+    if(off){pre.innerHTML=C.offStar;post.innerHTML='';tok.innerHTML='';
+      tok.style.display='none';car.style.display='none';return;}
+    pre.innerHTML=C.pre;
+    /* the hidden token is emptied too: a screen reader should never find last
+       bucket's size sitting inside this bucket's sentence */
+    if(!C.fmt){tok.style.display='none';tok.innerHTML='';car.style.display='';post.innerHTML=C.post;}
+    else{
+      tok.style.display='';car.style.display='none';
+      tok.innerHTML=sizeLabel(val);
+      post.innerHTML=(C.one&&val===1)?C.one:C.post;
+    }
+  }
+  function drawSizes(){
+    three.innerHTML='';
+    if(!C.fmt){ /* nothing to size on the star: the three are the plate itself */
+      [0,1,2].forEach(function(i){
+        var b=document.createElement('button');b.type='button';b.dataset.i=i;
+        b.innerHTML='<i>'+ROLES[i]+'</i><s>'+ACTS[i]+'</s>';
+        if(i===acts-1)b.classList.add('on');
+        three.appendChild(b);
+      });
+      more.classList.add('gone');est.textContent='';return;
+    }
+    more.classList.remove('gone');
+    var roles=C.roles||ROLES;
+    if(free){
+      C.all.forEach(function(v){
+        var b=document.createElement('button');b.type='button';b.dataset.v=v;
+        b.innerHTML='<b>'+sizeLabel(v)+'</b>';
+        if(v===val)b.classList.add('on');
+        three.appendChild(b);
+      });
+    }else{
+      C.three.forEach(function(v,i){
+        var b=document.createElement('button');b.type='button';b.dataset.v=v;b.dataset.i=i;
+        b.innerHTML='<i>'+roles[i]+'</i><b>'+sizeLabel(v)+'</b><s>'+ACTS[i]+'</s>';
+        if(v===val&&i===acts-1)b.classList.add('on');
+        three.appendChild(b);
+      });
+    }
+    est.innerHTML=estimate(val);
+    more.textContent=free?'three sizes':'more sizes';
+    more.classList.toggle('on',free);
+  }
+  function drawPlate(){
+    sups.forEach(function(s,i){
+      s.querySelector('.tx').innerHTML=C.sup[i];
+      var show=i<acts-1;
+      s.classList.toggle('gone',!show);
+      s.classList.toggle('on',show&&ticks[i]);
+      s.classList.toggle('lapse',signed&&show&&!ticks[i]);
+      s.tabIndex=show&&!signed?0:-1;
+      s.setAttribute('aria-pressed',ticks[i]?'true':'false');
+      s.setAttribute('aria-label',(ticks[i]?'done: ':'hold to tick: ')+s.textContent.trim());
+    });
+    rule.classList.toggle('gone',acts===1);
+  }
+  function drawDW(){
+    var show=C.dw&&!off;
+    dw.classList.toggle('gone',!show);
+    /* the star already carries the length, so the door only offers to start */
+    if(show)dwmin.textContent='';
+  }
+  function paint(){
+    root.classList.toggle('signed',signed);
+    drawStar();drawSizes();drawPlate();drawDW();
+    hold.querySelector('span').textContent=off?C.offHold:'Hold to complete';
+    restLine.textContent=C.rest;
+    offBtn.classList.toggle('show',!!C.offable);
+    offBtn.classList.toggle('on',off);
+  }
+
+  /* --- sizing ------------------------------------------------------------ */
+  function setSizing(v){
+    root.classList.toggle('sizing',v);
+    tok.setAttribute('aria-expanded',v?'true':'false');
+    car.setAttribute('aria-expanded',v?'true':'false');
+    if(!v&&free){free=false;drawSizes();}
+  }
+  function openSizes(){if(signed||off)return;setSizing(!root.classList.contains('sizing'));}
+  tok.addEventListener('click',openSizes);
+  car.addEventListener('click',openSizes);
+  three.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.v!==undefined&&C.fmt){
+      val=+b.dataset.v;
+      /* the three sizes ARE the plate; a fine size behind "more" keeps the
+         plate it was picked from, so freedom never silently changes the day's
+         act count */
+      if(!free&&b.dataset.i!==undefined)acts=+b.dataset.i+1;
+    }else if(b.dataset.i!==undefined){acts=+b.dataset.i+1;}
+    /* a support that folds away loses its tick with it */
+    for(var i=acts-1;i<2;i++)ticks[i]=false;
+    paint();
+  });
+  more.addEventListener('click',function(){free=!free;sizes.classList.toggle('free',free);drawSizes();});
+
+  /* --- the sub-act hold: 450ms, early release aborts ---------------------- */
+  sups.forEach(function(s,i){
+    bindHold(s,s.querySelector('.u1-box i'),SUP,function(){
+      ticks[i]=!ticks[i];paint();
+    },function(){return !signed&&!s.classList.contains('gone')});
+  });
+
+  /* --- the day: 1400ms, the star only ------------------------------------ */
+  function complete(){
+    signed=true;setSizing(false);
+    doneTx.textContent='Done at '+stamp()+'.';
+    paint();
+    beat=setTimeout(function(){beat=null;C.pulse?openPulse():openRest();},BEAT);
+  }
+  /* holding the day with the size sheet still open must not silently do
+     nothing: the press closes the sheet and the hold still counts */
+  bindHold(hold,hfill,HOLD,complete,function(){
+    if(signed)return false;
+    if(root.classList.contains('sizing'))setSizing(false);
+    return true;});
+  undo.addEventListener('click',function(){
+    if(beat){clearTimeout(beat);beat=null;}
+    signed=false;paint();
+  });
+
+  /* --- the deep work room ------------------------------------------------ */
+  function fmtClk(x){var h=Math.floor(x/3600),m=Math.floor(x%3600/60),s=x%60;
+    return (h?h+':'+('0'+m).slice(-2):m)+':'+('0'+s).slice(-2);}
+  function toggle(el,open){
+    el.classList.toggle('open',open);el.setAttribute('aria-hidden',open?'false':'true');
+    el.querySelectorAll('button,input').forEach(function(b){b.tabIndex=open?0:-1});
+  }
+  dw.addEventListener('click',function(){
+    if(signed)return;
+    rmove.textContent=star.textContent.replace(/\s+/g,' ').trim();
+    dwLeft=(C.dwv?C.dwv(val):25)*60;rclk.textContent=fmtClk(dwLeft);
+    toggle(room,true);
+    if(dwT)clearInterval(dwT);
+    dwT=setInterval(function(){if(dwLeft<=0){clearInterval(dwT);dwT=null;return;}
+      dwLeft--;rclk.textContent=fmtClk(dwLeft);},1000);
+  });
+  rout.addEventListener('click',function(){if(dwT){clearInterval(dwT);dwT=null;}toggle(room,false);});
+
+  /* --- the close: the module's one ask ----------------------------------- */
+  function fit(){
+    mirror.textContent=pin.value||pin.placeholder;
+    var w=Math.max(52,Math.ceil(mirror.getBoundingClientRect().width)+6);
+    pin.style.width=w+'px';prule.style.width=w+'px';
+  }
+  function openPulse(){
+    var p=C.pulse;pin.value='';pulse.classList.remove('armed');
+    ask.innerHTML=p.q;tail.innerHTML=p.tail||'';src.innerHTML=p.src;
+    var num=p.kind==='num';
+    pen.classList.toggle('gone',!num);prule.classList.toggle('gone',!num);
+    pick.classList.toggle('on',!num);
+    /* nothing from the last bucket may survive into this one, even hidden:
+       a stale unit or a stale pair of choices must not sit in the DOM */
+    ppre.textContent='';psuf.textContent='';pick.innerHTML='';
+    if(num){ppre.textContent=p.pre;psuf.textContent=p.suf;fit();}
+    else{
+      p.opts.forEach(function(o){
+        var b=document.createElement('button');b.type='button';b.textContent=o;
+        pick.appendChild(b);
+      });
+    }
+    toggle(pulse,true);
+  }
+  pick.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    [].forEach.call(pick.children,function(x){x.classList.remove('on')});
+    b.classList.add('on');pulse.classList.add('armed');
+  });
+  pin.addEventListener('input',function(){
+    var p=C.pulse,t=pin.value.replace(p&&p.dec?/[^0-9.]/g:/[^0-9]/g,''),s=t.split('.');
+    pin.value=s.length>1?s[0]+'.'+s.slice(1).join('').slice(0,1):t;
+    fit();pulse.classList.toggle('armed',pin.value.length>0);
+    if(!pulse.classList.contains('armed'))stopPSave();
+  });
+  pin.addEventListener('focus',function(){pulse.classList.add('focus')});
+  pin.addEventListener('blur',function(){pulse.classList.remove('focus')});
+  var stopPSave=bindHold(psave,pfill,PULSE,function(){openRest();},
+    function(){return pulse.classList.contains('armed')});
+  pskip.addEventListener('click',function(){stopPSave();openRest();});
+  function openRest(){toggle(pulse,false);root.classList.add('closed');toggle(rest,true);}
+
+  again.addEventListener('click',function(){
+    if(beat){clearTimeout(beat);beat=null;}
+    stopPSave();signed=false;ticks=[false,false];
+    root.classList.remove('closed');toggle(pulse,false);toggle(rest,false);
+    paint();
+  });
+
+  /* --- swapping the bucket ----------------------------------------------- */
+  function load(k){
+    C=B[k];off=false;free=false;sizes.classList.remove('free');
+    acts=2;val=C.three[1];ticks=[false,false];signed=false;
+    if(beat){clearTimeout(beat);beat=null;}
+    if(dwT){clearInterval(dwT);dwT=null;}
+    setSizing(false);root.classList.remove('closed');
+    toggle(room,false);toggle(pulse,false);toggle(rest,false);
+    paint();
+  }
+  r.querySelectorAll('.bk button[data-b]').forEach(function(b){
+    b.addEventListener('click',function(){
+      r.querySelectorAll('.bk button[data-b]').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on');load(b.dataset.b);
+    });
+  });
+  /* the off day: the same plate with the star switched off. The supports are
+     still the day, so the layout does not change shape for a rest day. */
+  offBtn.addEventListener('click',function(){
+    if(!C.offable)return;
+    off=!off;signed=false;ticks=[false,false];
+    if(beat){clearTimeout(beat);beat=null;}
+    setSizing(false);root.classList.remove('closed');
+    toggle(pulse,false);toggle(rest,false);paint();
+  });
+
+  load('focus');
+})();</script>
+</section>
+
+</div></section>
 <section class="grp"><h2>The daily loop</h2><p>Thirteen layout architectures on one skeleton: the sentence, the size, the hold, the close.</p><div class="wall">
 <!-- ARCHETYPES, the surviving set: lp-1 full-bleed statement type | lp-6 number on an open writing line | lp-7 poster ceiling number |
      lp-8 hundred-mark field | lp-9 single ruled page | lp-10 receipt tape | lp-12 full-height week columns |

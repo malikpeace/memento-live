@@ -5,12 +5,13 @@ import pathlib, re
 
 ROOT = pathlib.Path(__file__).parent
 FRAG = ROOT / 'frag'
-ORDER = ['ob', 'q', 'ld', 'pu', 'lp', 'mx']
+ORDER = ['ob', 'q', 'ld', 'pu', 'u', 'lp', 'mx']
 TITLES = {
     'ob': ('Onboarding', 'The wall of intent, the one onboarding screen. No forms, just the goal made real.'),
     'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
     'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
     'pu': ('The pulse', 'The module\'s one ask, at the close, at the goal\'s own cadence. No loop screen asks for a number; they all end here.'),
+    'u': ('THE UNIVERSAL LAYOUT', 'One plug-and-play screen for every goal: the star act + up to two supports, size, hold, close. Toggle all eight buckets. If this survives Malik, the costume layouts retire.'),
     'lp': ('The daily loop', 'Thirteen layout architectures on one skeleton: the sentence, the size, the hold, the close.'),
     'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
 }
@@ -22,6 +23,7 @@ REACH = {
     'q-2':  ('10/10', 'everyone, before every plan'),
     'ld-4': ('10/10', 'everyone, every plan build'),
     'pu-1': ('9/10',  'most goals, weekly or better'),
+    'u-1':  ('10/10', 'the candidate: one layout, every bucket, every day'),
     'lp-1': ('9/10',  'money, audience, job hunt, project: the biggest buckets, daily'),
     'lp-9': ('8/10',  'weight is a giant bucket, daily ritual'),
     'lp-18':('8/10',  'quitting, daily, highest emotional stakes'),
