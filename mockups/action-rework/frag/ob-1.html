@@ -8,14 +8,21 @@
 <style>
 /* TYPE LADDER: 16/400 connective, 27/500 words, 64/700 the number. Nothing else exists.
    SPACING: 4 / 8 / 20 / 30. Every gap on this screen is one of those four. */
+/* the halo speaks the ROOM's language now: dots, not lines (Points is the
+   chosen room, 2026-08-16). Same 26px lattice, same press-to-brighten, the
+   pool shape carried by a second mask layered over the dot mask. */
 [data-k=ob-1] .o1-halo{position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
-  background-size:26px 26px;opacity:.10;
-  transition:opacity .6s cubic-bezier(.2,.7,.3,1);
-  -webkit-mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
-  mask-image:radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%)}
-/* the wall lights as it is pressed: line brightness only, never a hue (grid law) */
+  background-image:linear-gradient(rgba(var(--ink),.9) 1.4px,transparent 1.4px);
+  background-size:26px 26px;background-position:12px 12px;
+  opacity:.10;transition:opacity .6s cubic-bezier(.2,.7,.3,1);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 1.4px,transparent 1.4px),
+    radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 1.4px,transparent 1.4px),
+    radial-gradient(circle at 50% 40%,#000 0,rgba(0,0,0,.55) 34%,transparent 66%);
+  -webkit-mask-size:26px 26px,100% 100%;mask-size:26px 26px,100% 100%;
+  -webkit-mask-position:12px 12px,0 0;mask-position:12px 12px,0 0;
+  -webkit-mask-composite:source-in;mask-composite:intersect}
+/* the wall lights as it is pressed: dot brightness only, never a hue (room law) */
 [data-k=ob-1] .ph[data-lit="1"] .o1-halo{opacity:.13}
 [data-k=ob-1] .ph[data-lit="2"] .o1-halo{opacity:.16}
 [data-k=ob-1] .ph[data-lit="3"] .o1-halo{opacity:.20}

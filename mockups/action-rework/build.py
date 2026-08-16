@@ -107,14 +107,34 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
   font-size:10.5px;font-weight:700;color:rgba(var(--ink),.55);background:rgba(var(--ink),.05);
   border-radius:7px;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
 .bk button.on{color:#0b0c10;background:rgba(235,238,248,.92)}
+/* THE ROOM: Points, Malik's pick (2026-08-16). Dots where the grid's lines
+   would have crossed, no lines: the workbench without the cage. Three layers:
+   the full field static, then two sparse offset subsets breathing on long
+   uneven cycles, so scattered dots fade in and out "randomly" with no two
+   pulses in sync. Squares at 1.4px read as dots; no radial, no blur. */
 .grid{position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(var(--ink),1) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(var(--ink),1) 1px,transparent 1px);
-  background-size:26px 26px;opacity:.04}
+  background-image:linear-gradient(rgba(var(--ink),.16) 1.4px,transparent 1.4px);
+  background-size:26px 26px;background-position:12px 12px;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 1.4px,transparent 1.4px);
+  mask-image:linear-gradient(90deg,transparent 0,#000 1.4px,transparent 1.4px);
+  -webkit-mask-size:26px 26px;mask-size:26px 26px;
+  -webkit-mask-position:12px 12px;mask-position:12px 12px;
+  opacity:1}
+.grid::before,.grid::after{content:'';position:absolute;inset:0;
+  background-image:inherit;background-size:78px 78px;
+  -webkit-mask-image:inherit;mask-image:inherit;
+  -webkit-mask-size:78px 78px;mask-size:78px 78px}
+.grid::before{background-position:38px 64px;-webkit-mask-position:38px 64px;mask-position:38px 64px;
+  animation:rmBreatheA 9s ease-in-out infinite alternate}
+.grid::after{background-position:64px 12px;-webkit-mask-position:64px 12px;mask-position:64px 12px;
+  animation:rmBreatheB 13s ease-in-out -5s infinite alternate}
+@keyframes rmBreatheA{from{opacity:0}to{opacity:.9}}
+@keyframes rmBreatheB{from{opacity:.85}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.grid::before,.grid::after{animation:none;opacity:.4}}
 </style></head><body><div class="gal">
 <h1>Action rework: the survivors</h1>
 <p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
-Only the grid survived the teardown. Every intensity control now obeys the three-choice law, exactly three
+The room is Points: the grid's intersections, breathing. Every intensity control now obeys the three-choice law, exactly three
 proposed sizes in front, named and honestly priced, with full freedom behind a small quiet "more".
 mx-11 is the deliberate counter-example: the same design carrying five.
 <a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">Open the Action map: every bucket's path to its screens</a>

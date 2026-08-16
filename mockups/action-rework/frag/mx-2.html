@@ -266,7 +266,7 @@
       var mb=R.querySelector(o.minus), pb=R.querySelector(o.plus);
       mb.className='stepbtn'+(v<=MINV?' off':'');
       pb.className='stepbtn p'+(v>=MAXV?' off':'');
-      R.querySelector(o.grid).style.opacity=(0.034+v/120*0.05).toFixed(3);
+      R.querySelector(o.grid).style.opacity=(0.55+v/120*0.6).toFixed(3);
     }
     R.querySelector(o.sizes).addEventListener('click',function(e){
       var b=e.target.closest('[data-v]'); if(!b) return;
