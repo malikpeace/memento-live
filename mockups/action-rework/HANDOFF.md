@@ -44,3 +44,9 @@
   If it stalls ("the plan changes, the goal doesn't"; fitness: "never twice").
 - The covenant before Fair?: "Your job is the acts. Memento's job is to hold
   the math, ask the questions, and never let a day quietly disappear."
+
+## 2026-08-16 night 3: the M door on The one
+- u-1 carries the bare notched M (canonical mark, never boxed), centered
+  under the island at ~38% ink. It is the door back to The logic ("Why this
+  plan" in the app) and the brand on the day screen. In the gallery, tapping
+  it jumps to lg-1 carrying the current bucket.

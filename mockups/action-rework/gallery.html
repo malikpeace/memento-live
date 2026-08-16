@@ -1515,6 +1515,18 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=u-1] .u1-sp.a{flex:.55}
 [data-k=u-1] .u1-sp.b{flex:.9}
 
+/* --- the M: the door back to The logic. The bare notched mark (the boxed M
+   is dead, v739), quiet enough to be furniture, and it doubles as the brand
+   on the day screen. In the app it opens "Why this plan"; here it jumps the
+   gallery to lg-1 carrying the current bucket. Sits below the island. ----- */
+[data-k=u-1] .u1-m{position:absolute;top:34px;left:50%;transform:translateX(-50%);z-index:5;
+  width:44px;height:30px;display:grid;place-items:center;border:0;background:none;
+  padding:0;cursor:pointer}
+[data-k=u-1] .u1-m svg{width:15px;height:15px;transition:opacity .16s ease-out}
+[data-k=u-1] .u1-m path{fill:rgba(var(--ink),.38)}
+[data-k=u-1] .u1-m:hover path,[data-k=u-1] .u1-m:active path{fill:rgba(var(--ink),.72)}
+[data-k=u-1] .u1-m:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px;border-radius:8px}
+
 /* --- beat 1: SEE IT. the star act owns the screen ----------------------- */
 [data-k=u-1] .u1-star{margin:0;position:relative;z-index:2;font-size:25px;font-weight:700;
   line-height:1.28;letter-spacing:-.028em;color:var(--text-hi);text-wrap:pretty}
@@ -1730,6 +1742,9 @@ mx-11 is the deliberate counter-example: the same design carrying five.
   <div class="grid"></div>
   <div class="u1">
     <div class="u1-wash" aria-hidden="true"></div>
+    <button type="button" class="u1-m" aria-label="Why this plan">
+      <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
+    </button>
     <div class="u1-sp a"></div>
 
     <p class="u1-star"><span class="pre"></span><button type="button" class="u1-tok"
@@ -2149,6 +2164,15 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     if(beat){clearTimeout(beat);beat=null;}
     setSizing(false);root.classList.remove('closed');
     toggle(pulse,false);toggle(rest,false);paint();
+  });
+
+  /* the M: back to The logic, carrying this screen's bucket with it */
+  q('.u1-m').addEventListener('click',function(){
+    var lg=document.getElementById('lg-1');if(!lg)return;
+    var cur=r.querySelector('.bk button[data-b].on'),
+        tb=lg.querySelector('.bk button[data-b="'+(cur?cur.dataset.b:'focus')+'"]');
+    if(tb)tb.click();
+    lg.scrollIntoView({behavior:'smooth',block:'start'});
   });
 
   load('focus');
