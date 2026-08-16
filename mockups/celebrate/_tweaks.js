@@ -972,13 +972,12 @@
       ],
       apply: function (ph, v) {
         var w = wallData(v);
-        /* the goal line, word by word, in beat 2 */
-        var words = esc(v.line).replace(/\s+/g, ' ').trim().split(' ');
-        put(ph, '.ba0-line', words.map(function (word, i) {
-          return '<span class="w" style="--i:' + i + '">' + word + '</span>';
-        }).join(' ') + (/[!?.]$/.test(v.line) ? '' : '!'));
+        /* the goal line in beat 2, one clean line (rises as a whole, no
+           choppy per-word bounce) */
+        var lineText = (v.line || '').replace(/\s+/g, ' ').trim();
+        put(ph, '.ba0-line', esc(lineText) + (/[!?.]$/.test(lineText) ? '' : '!'));
         var ln = Q(ph, '.ba0-line');
-        if (ln) ln.style.fontSize = (words.join(' ').length > 16 ? 30 : 38) + 'px';
+        if (ln) ln.style.fontSize = (lineText.length > 22 ? 27 : lineText.length > 15 ? 32 : 38) + 'px';
         /* the total under the big firework */
         put(ph, '.ba0-total', '<b>' + fmt(w.count) + '</b><span>' + esc(w.unitLabel) + ', every one a spark</span>');
         /* the big firework spark burst (beat 2) */
@@ -988,15 +987,6 @@
           big += '<i class="sp" style="--dx:' + (Math.cos(a) * rr).toFixed(0) + 'px;--dy:' + (Math.sin(a) * rr).toFixed(0) + 'px"></i>';
         }
         var bigEl = Q(ph, '.ba0-big'); if (bigEl) bigEl.insertAdjacentHTML('beforeend', big);
-        /* a few small sky fireworks so the whole sky joins in */
-        var sky = '', pos = [[26, 24], [74, 20], [50, 12], [16, 40], [86, 44]];
-        pos.forEach(function (p, k) {
-          var dot = '';
-          for (var q = 0; q < 10; q++) { var an = (q / 10) * 6.2832, rd = 30 + fwr() * 14; dot += '<i style="--dx:' + (Math.cos(an) * rd).toFixed(0) + 'px;--dy:' + (Math.sin(an) * rd).toFixed(0) + 'px;--t:' + (0.5 + k * 0.28).toFixed(2) + 's"></i>'; }
-          sky += dot;
-        });
-        var skyEl = Q(ph, '.ba0-sky');
-        if (skyEl) { skyEl.innerHTML = sky; skyEl.style.left = '50%'; skyEl.style.top = '48%'; }
         /* stat view A: one spark per move, one tight shell */
         var N = Math.max(1, w.count), W = 286, H = 300, cx = W / 2, cy = H / 2;
         var maxR = Math.min(cx - 6, 30 + Math.sqrt(N) * 8), jit = seeded(N * 7 + 3), dots = '';
