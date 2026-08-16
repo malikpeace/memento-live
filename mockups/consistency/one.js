@@ -120,8 +120,8 @@
     }).join('');
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 22) + '</div>' +
-      '<div class="score__lbl">Score</div>' +
-      '<div class="score__n">' + score + '</div>' +
+      '<div class="score__head"><div class="score__lbl">Score</div>' +
+      '<div class="score__n">' + score + '</div></div>' +
       '<div class="score__hm">' + cells + '</div></div></div>';
   }
 
@@ -342,9 +342,8 @@
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
-    // score sits above the "you've shown up" line
-    return scoreBlock(s, log, A) + hero + '<div class="ev__grid"><div class="ev__col">' + cal + rhythm(s) + '</div>' +
-      '<div class="ev__col">' + tracks(log) + monthBars(s) + ledger(s, log) + '</div></div>';
+    // a flat list of section cards; mobile stacks them, desktop tiles them
+    return scoreBlock(s, log, A) + hero + cal + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log);
   }
 
   /* ---------- render + wiring ---------- */

@@ -306,19 +306,28 @@
   .led__r b { font-size: 14.5px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
     white-space: nowrap; }
 
-  /* ============ desktop: rail + grid (html.vm-desk) ============ */
-  html.vm-desk #snap { height: auto; overflow: visible; scroll-snap-type: none; display: grid;
-    grid-template-columns: 430px 1fr; max-width: 1280px; margin: 0 auto; gap: 0 46px; padding: 0 26px; }
+  /* ============ desktop: a centered dashboard (html.vm-desk) ============ */
+  html.vm-desk #snap { height: auto; overflow: visible; scroll-snap-type: none; display: block;
+    max-width: 1160px; margin: 0 auto; padding: 0 30px; }
   html.vm-desk .pg { min-height: 0; scroll-snap-align: none; }
-  html.vm-desk #pgOne { position: sticky; top: 0; height: 100vh; padding: 40px 10px;
-    display: grid; align-content: center; justify-items: start; }
-  html.vm-desk .one__num { font-size: clamp(120px, 13vw, 190px) !important; }
+  /* the number is a header band, not a full-height rail */
+  html.vm-desk #pgOne { position: static; height: auto; display: block; padding: 46px 4px 2px; }
+  html.vm-desk .one__brand { top: 104px; left: 34px; }
+  html.vm-desk .one__num { font-size: clamp(96px, 12vw, 150px) !important; margin-bottom: 10px; }
+  html.vm-desk .one__sub { font-size: 18px; }
   html.vm-desk .one__hint { display: none; }
-  html.vm-desk #pgTwo { padding: 96px 0 110px; }
-  html.vm-desk .ev { max-width: none; margin: 0; }
+  html.vm-desk #pgTwo { padding: 22px 0 110px; }
   html.vm-desk .ev__hero { display: none; }
-  html.vm-desk .ev__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 34px; align-items: start; }
-  html.vm-desk .ev__col { min-width: 0; }
+  /* the section cards tile into a balanced two-column masonry */
+  html.vm-desk .ev { max-width: none; margin: 0; column-count: 2; column-gap: 26px; }
+  html.vm-desk .ev > .sec { margin: 0 0 22px; break-inside: avoid; width: 100%; }
+  /* the score is a full-width banner across the top, number left, heatmap right */
+  html.vm-desk .sec--score { column-span: all; }
+  html.vm-desk .glance--score { display: grid; grid-template-columns: auto 1fr; align-items: center;
+    gap: 30px; padding: 22px 26px; }
+  html.vm-desk .score__head { display: flex; align-items: baseline; gap: 14px; }
+  html.vm-desk .score__n { font-size: 66px; }
+  html.vm-desk .score__hm { margin-top: 0; grid-template-columns: repeat(30, 1fr); }
 
   /* ============ phone view forced on a wide screen ============ */
   html.vm-framed body { display: flex; justify-content: center; }
