@@ -1021,7 +1021,17 @@
         var lineText = (v.line || '').replace(/\s+/g, ' ').trim();
         put(ph, '.ba0-line', esc(lineText) + (/[!?.]$/.test(lineText) ? '' : '!'));
         var ln = Q(ph, '.ba0-line');
-        if (ln) ln.style.fontSize = (lineText.length > 22 ? 32 : lineText.length > 15 ? 38 : 44) + 'px';
+        if (ln) ln.style.fontSize = (lineText.length > 22 ? 30 : lineText.length > 15 ? 35 : 40) + 'px';
+        /* beat 1: the dots pulled into the M (Clarity's nsv2FieldSpiral motion,
+           so the moment rhymes with the rest of Memento). One-time convergence,
+           timed to land as the M finishes colouring in. */
+        var mr = seeded(19), mot = '';
+        for (var m = 0; m < 30; m++) {
+          var ma = (mr() * 360).toFixed(0), mrad = (88 + mr() * 74).toFixed(0),
+              ms = (1.6 + mr() * 2.4).toFixed(1), md = (1.9 + mr() * 0.7).toFixed(2), mdl = (mr() * 0.6).toFixed(2);
+          mot += '<i style="--a:' + ma + 'deg;--r:' + mrad + 'px;--s:' + ms + 'px;--d:' + md + 's;--del:' + mdl + 's"></i>';
+        }
+        put(ph, '.ba0-field', mot);
         /* the big firework spark burst (beat 2), no count text on this page */
         var fwr = seeded(53), big = '';
         for (var s = 0; s < 44; s++) {
