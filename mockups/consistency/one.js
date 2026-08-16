@@ -111,7 +111,7 @@
       var bg = st === 'kept' ? tone : st === 'sup' ? 'rgba(47,178,66,.3)' : 'rgba(8,19,10,.08)';
       return '<b style="background:' + bg + '"></b>';
     }).join('');
-    return '<div class="sec">' +
+    return '<div class="sec sec--score">' +
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 22) + '</div>' +
       '<div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + '</div>' +
@@ -397,6 +397,12 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  el('fxChips').innerHTML = '<button data-fx="flat" class="on">Flat</button><button data-fx="glass">Glass</button>';
+  el('fxChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    document.documentElement.classList.toggle('glass', b.getAttribute('data-fx') === 'glass');
+    [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+  });
   el('viewChips').innerHTML = '<button data-v="desk">Desktop</button><button data-v="phone">Phone</button>';
   el('viewChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
