@@ -134,18 +134,70 @@
   .sheetCta{margin-top:18px;display:flex;justify-content:center;padding:15px 0;border-radius:999px;background:#fff;color:#0b1112;
     font-size:15.5px;font-weight:700}
   .payoff{margin-top:14px;text-align:center;color:var(--acc);font-size:13.5px;font-weight:650}
+
+  /* ---- LIGHT MODE (additive .lt scope, mirrors the shipped recipe:
+     off-white canvas, nebula hidden, ink 24,26,33, white pill flips to dark solid.
+     The star scene itself stays dark by design in both themes, like the app.) ---- */
+  .inner.lt{background:#eef0f3}
+  .lt .neb{display:none}
+  .lt .lab,.lt .eyebrow{color:rgba(24,26,33,.5)}
+  .lt .num,.lt .why{color:rgba(24,26,33,.96)}
+  .lt .num .unit{color:#0d8ca6}
+  .lt .asof{color:rgba(24,26,33,.45)}
+  .lt .divider{background:rgba(24,26,33,.18)}
+  .lt .track{background:rgba(24,26,33,.1)}
+  .lt .track i{background:linear-gradient(90deg,#3fb6cd,#0d8ca6)}
+  .lt .pts{color:rgba(24,26,33,.45)}
+  .lt .rem{color:#0d8ca6}
+  .lt .rem s{color:rgba(24,26,33,.45)}
+  .lt .upd{background:rgba(24,26,33,.07);color:rgba(24,26,33,.9)}
+  .lt .upd svg{stroke:#0d8ca6}
+  .lt .anti{color:rgba(24,26,33,.55)}
+  .lt .tweak{background:rgba(24,26,33,.06);color:rgba(24,26,33,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+  .lt .dots i{background:rgba(24,26,33,.2)}
+  .lt .dots i.on{background:#0d8ca6;box-shadow:0 0 10px rgba(13,140,166,.4)}
+  .lt .addBtn{background:rgba(13,140,166,.1);color:#0d8ca6;box-shadow:inset 0 0 0 1px rgba(13,140,166,.3)}
+  .lt .nTag{color:#0d8ca6}
+  .lt .nTxt{color:rgba(24,26,33,.94)}
+  .lt .nSig{color:rgba(24,26,33,.42)}
+  .lt .nEntry + .nEntry{box-shadow:inset 0 1px 0 rgba(24,26,33,.1)}
+  .lt .nEntry.founding::before{background:linear-gradient(180deg,#0d8ca6,transparent)}
+  .lt .emptyMsg{color:rgba(24,26,33,.75)}
+  .lt .ghost .nTxt,.lt .ghost .nSig{color:rgba(24,26,33,.8)}
+  .lt .ghostTag{color:rgba(24,26,33,.4)}
+  .lt .dim{background:rgba(0,0,0,.22)}
+  .lt .sheet{background:#fff;box-shadow:0 -18px 50px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.9)}
+  .lt .grab{background:rgba(24,26,33,.2)}
+  .lt .sheet .slab{color:rgba(24,26,33,.9)}
+  .lt .bignum{background:rgba(24,26,33,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+  .lt .bignum b{color:rgba(24,26,33,.96)}
+  .lt .bignum b .cursorbar{background:#0d8ca6}
+  .lt .bignum span{color:rgba(24,26,33,.6)}
+  .lt .was{color:rgba(24,26,33,.45)}
+  .lt .sheetCta{background:#181a21;color:#fff}
+  .lt .payoff{color:#0d8ca6}
+  /* tweak sheet options */
+  .optRow{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+  .opt{padding:15px 16px;border-radius:13px;background:rgba(255,255,255,.07);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);font-size:15px;font-weight:650;color:#fff;text-align:center}
+  .opt--danger{color:#ffb4a8}
+  .warn{margin-top:14px;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.45);text-align:center}
+  .lt .opt{background:rgba(24,26,33,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);color:rgba(24,26,33,.9)}
+  .lt .opt--danger{color:#b3402f}
+  .lt .warn{color:rgba(24,26,33,.5)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Clarity, three pages</h1>
-    <p>The whole module after the port. Swipe: the Neutron Star, the summary (standing, why, anti-vision, Tweak), your notes. Toggles below: the identity switch settles the accent + label-case question by letting you look at all three; the shape switch proves every page works for every goal type. Notes: delete yes, edit never (past-you is an artifact). Dated goals get no Update button, the wall moves on its own.</p>
+    <p>The whole module after the port. Swipe: the Neutron Star, the summary (standing, why, anti-vision, Tweak), your notes. Toggles below: the identity switch settles the accent + label-case question by letting you look at all three; the shape switch proves every page works for every goal type. Notes: delete yes, edit never (past-you is an artifact). Dated goals get no Update button, the wall moves on its own. Message-beat placement, locked: the star animation finishes, Continue appears, and Continue prompts the Before-we-continue screen; skipping or finishing both land back on the normal summary with Add to your Memento.</p>
   </header>
 
   <div class="togglebar">
     <div class="tg" id="tgId"><span class="tlab">Identity</span></div>
     <div class="tg" id="tgShape"><span class="tlab">Goal</span></div>
+    <div class="tg" id="tgTheme"><span class="tlab">Theme</span></div>
   </div>
 
   <div class="row" id="grid"></div>
@@ -179,7 +231,7 @@ const NOTES=[
  {tag:'A promise', txt:'I show up on the days nobody claps. Boring Tuesdays are where this is actually won.', date:'July 14, 2026'},
 ];
 
-let curId=IDS[0], curShape=SHAPES[0];
+let curId=IDS[0], curShape=SHAPES[0], curTheme='dark';
 
 function dots(n){return `<div class="dots">${[0,1,2].map(i=>`<i class="${i===n?'on':''}"></i>`).join('')}</div>`}
 const editSvg='<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
@@ -256,27 +308,52 @@ function updateSheet(s){
   </div>`;
 }
 
+function tweakSheet(s){
+  return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
+  <div class="stage top" style="text-align:center;align-items:center;filter:blur(1px);opacity:.55">
+    <div class="eyebrow">Where you stand</div>
+    <div class="num" style="margin-top:12px">${s.id==='num'?s.cur:'112'}<span class="unit">${s.id==='num'?s.unit:'days'}</span></div></div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="slab">Tweak your Neutron Star</div>
+    <div class="optRow">
+      <div class="opt">Refine your Neutron Star</div>
+      <div class="opt opt--danger">Completely change it</div>
+    </div>
+    <div class="warn">Completely changing your Neutron Star changes your entire Memento. It is the foundation everything else is built on: your plan, your pages, and your card all rebuild around the new goal. Your notes and history stay.</div>
+  </div>`;
+}
+
 const CELLS=[
  {cap:'Page 1 · The Neutron Star', sub:'The star, the goal, the timeframe. Untouched, uncluttered.', render:s=>page1(s)},
  {cap:'Page 2 · The summary', sub:'Standing (number, wall, or why-led for maintain), the why, the anti-vision, Tweak at the bottom. Dated goals get no Update button, the wall moves itself.', render:s=>page2(s)},
  {cap:'Page 3 · Your notes', sub:'Add at the top. Founding message pinned. Delete allowed, editing never, past-you is an artifact.', render:()=>page3filled()},
  {cap:'Page 3 · Empty (the skipper)', sub:'First visit after skipping the message: an invitation plus one faint ghost note that teaches the feature in a glance.', render:()=>page3empty()},
  {cap:'The update sheet', sub:'Number goals only. Slides up prefilled with the last number, they nudge it, Save, and the rail animates to the new spot. The payoff IS the update.', render:s=>updateSheet(s.id==='num'?s:SHAPES[0])},
+ {cap:'The Tweak sheet', sub:'What the page-2 button opens: Refine (reword, same foundation) or Completely change it, with the warning that the star is the foundation the whole Memento rebuilds around.', render:s=>tweakSheet(s)},
 ];
 
 function render(){
-  document.getElementById('grid').innerHTML = CELLS.map((c,i)=>`
-    <div class="cell"><p class="cap">${c.cap}</p><p class="capsub">${c.sub}</p>
+  document.getElementById('grid').innerHTML = CELLS.map((c,i)=>{
+    const lt = (curTheme==='light' && i!==0) ? ' lt' : '';
+    const note = (curTheme==='light' && i===0) ? '<p class="capsub" style="min-height:0;margin:-8px 0 14px;color:#0d8ca6">Stays dark in light mode by design, like the shipped star scene.</p>' : '';
+    return `
+    <div class="cell"><p class="cap">${c.cap}</p><p class="capsub">${c.sub}</p>${note}
       <div class="phone"><div class="screen"><div class="notch"></div>
-        <div class="inner ${curId.cls}">${c.render(curShape)}</div></div></div></div>`).join('');
+        <div class="inner ${curId.cls}${lt}">${c.render(curShape)}</div></div></div></div>`}).join('');
   document.querySelectorAll('#tgId button').forEach(b=>b.classList.toggle('on', b.dataset.id===curId.id));
   document.querySelectorAll('#tgShape button').forEach(b=>b.classList.toggle('on', b.dataset.id===curShape.id));
+  document.querySelectorAll('#tgTheme button').forEach(b=>b.classList.toggle('on', b.dataset.id===curTheme));
 }
 const tgId=document.getElementById('tgId'), tgShape=document.getElementById('tgShape');
 tgId.innerHTML += IDS.map(x=>`<button data-id="${x.id}" style="--accSwatch:${x.swatch}">${x.label}</button>`).join('');
 tgShape.innerHTML += SHAPES.map(x=>`<button data-id="${x.id}" style="--accSwatch:#8be9fa">${x.label}</button>`).join('');
 tgId.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curId=IDS.find(x=>x.id===b.dataset.id); render();});
 tgShape.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curShape=SHAPES.find(x=>x.id===b.dataset.id); render();});
+const tgTheme=document.getElementById('tgTheme');
+tgTheme.innerHTML += '<button data-id="dark" style="--accSwatch:#8be9fa">Dark</button><button data-id="light" style="--accSwatch:#8be9fa">Light</button>';
+tgTheme.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curTheme=b.dataset.id; render();});
 render();
 </script>
 </body>
