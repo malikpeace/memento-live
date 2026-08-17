@@ -72,3 +72,15 @@
 - u-1 rail v2: the naked line is dead. Now a graduation ladder: one small
   tick per size on the right edge, named sizes slightly longer, the current
   size a long bright mark. Same drag/tap/keys, same one-state with the sheet.
+
+## 2026-08-16 night 6: full refresher, rail-only sizing, flat Deep work, inputs law
+- The refresher drawer now holds the FULL Clarity walkthrough: four staged
+  scales (tilted / willpower push with the hand / removal shrink / the flip)
+  each with a one-line caption, all animated as in Clarity.
+- u-1: tapping the number no longer opens anything; the rail is the only
+  size control (the sheet code is parked, display:none).
+- u-1 deep work door: flat bare text "Deep work" with a hairline underline,
+  same label in every bucket.
+- lg-1: the inputs law on every brief, before the plate: "You cannot force
+  an outcome. You can only supply inputs... stacked until missing the goal
+  becomes the unreasonable result." Also added to THE CREED in CONTRACT.md.

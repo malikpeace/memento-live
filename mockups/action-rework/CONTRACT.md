@@ -208,3 +208,7 @@ space, no abstract art, no motion, no mouse-following, nothing "AI".
   numerals, result emphasized); derived numbers say "our estimate"/"likely".
 - LEVERAGE: a few actions carry most of the result. ENVIRONMENT beats
   willpower. SHOWING UP compounds. REMEMBER WHY YOU STARTED.
+- INPUTS, NOT OUTCOMES (Malik, 2026-08-16): you cannot force an outcome,
+  you can only supply inputs. Plans and briefs assign inputs, the highest
+  leverage acts available, stacked until missing the goal becomes the
+  unreasonable result. The logic page states this on every brief.

@@ -970,40 +970,59 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=lg-1] .lg1-ref.open>button svg{transform:rotate(180deg)}
 [data-k=lg-1] .lg1-ref>button:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=lg-1] .lg1-ref .bd{overflow:hidden;max-height:0;transition:max-height .3s ease-out}
-[data-k=lg-1] .lg1-ref.open .bd{max-height:230px}
-[data-k=lg-1] .lg1-ref .cap2{margin:0 0 10px;font-size:12px;line-height:1.52;
-  color:rgba(var(--ink),.85);text-align:center;max-width:230px;margin-left:auto;margin-right:auto}
+[data-k=lg-1] .lg1-ref.open .bd{max-height:760px}
+[data-k=lg-1] .lg1-ref .cap2{margin:0 auto 16px;font-size:12px;line-height:1.52;
+  color:rgba(var(--ink),.88);text-align:center;max-width:236px}
 @media (prefers-reduced-motion:reduce){[data-k=lg-1] .lg1-ref .bd{transition:none}}
-/* THE SCALE from Clarity's opening, ported small: fulcrum, beam, the red
-   distraction weight, the cyan purpose weight. The flip animation IS the
-   argument: the purpose side grows and the beam tips. Real elements, real
-   colors (the one deliberate colour on this page, it is a Clarity callback). */
-[data-k=lg-1] .lgs{position:relative;width:200px;height:106px;margin:14px auto 12px}
+/* THE SCALE, the full Clarity walkthrough, small: four stages, each the
+   real gs element (fulcrum/beam/red distraction weight/cyan purpose weight)
+   with its own Clarity animation: tilted, the willpower push, the removal
+   shrink, the flip. The one deliberate colour on the page, a callback. */
+[data-k=lg-1] .lgs{position:relative;width:170px;height:92px;margin:14px auto 8px}
 [data-k=lg-1] .lgs__f{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;
-  border-bottom:17px solid rgba(var(--ink),.94)}
-[data-k=lg-1] .lgs__beam{position:absolute;bottom:17px;left:5px;right:5px;height:3px;
-  background:rgba(var(--ink),.94);border-radius:2px;transform-origin:center bottom;
-  animation:lgsFlip 5s ease-in-out infinite}
-[data-k=lg-1] .lgs__red,[data-k=lg-1] .lgs__cyan{position:absolute;bottom:5px;border-radius:6px}
-[data-k=lg-1] .lgs__red{left:-2px;width:44px;height:36px;background-color:#ec4227;
+  width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;
+  border-bottom:14px solid rgba(var(--ink),.94)}
+[data-k=lg-1] .lgs__beam{position:absolute;bottom:14px;left:5px;right:5px;height:3px;
+  background:rgba(var(--ink),.94);border-radius:2px;transform-origin:center bottom}
+[data-k=lg-1] .lgs__red,[data-k=lg-1] .lgs__cyan{position:absolute;bottom:4px;border-radius:5px}
+[data-k=lg-1] .lgs__red{left:-2px;width:38px;height:31px;background-color:#ec4227;
   background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,0) 46%,rgba(0,0,0,.24) 100%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -3px 6px rgba(0,0,0,.28),0 8px 16px rgba(0,0,0,.5);
-  transform-origin:bottom center;animation:lgsDim 5s ease-in-out infinite}
-[data-k=lg-1] .lgs__cyan{right:-1px;width:19px;height:15px;background-color:#4ecdec;
+  transform-origin:bottom center}
+[data-k=lg-1] .lgs__cyan{right:-1px;width:16px;height:13px;background-color:#4ecdec;
   background-image:linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,0) 46%,rgba(0,20,30,.26) 100%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 5px rgba(0,20,30,.3),0 6px 14px rgba(0,0,0,.45);
-  animation:lgsGrow 5s ease-in-out infinite}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 5px rgba(0,20,30,.3),0 6px 14px rgba(0,0,0,.45)}
+/* the willpower hand: a press on the purpose side */
+[data-k=lg-1] .lgs__hand{position:absolute;right:20px;bottom:44px;width:2px;height:22px;
+  border-radius:1px;background:rgba(var(--ink),.85);animation:lgsHand 3.5s ease-in-out infinite}
+[data-k=lg-1] .lgs__hand::after{content:'';position:absolute;left:50%;bottom:-5px;
+  transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;
+  border-right:4px solid transparent;border-top:6px solid rgba(var(--ink),.85)}
+[data-k=lg-1] .lgs__beam.tilt{animation:lgsTilt 4s ease-in-out infinite}
+[data-k=lg-1] .lgs__beam.push{animation:lgsPush 3.5s ease-in-out infinite}
+[data-k=lg-1] .lgs__beam.shrinkb{animation:lgsShrinkB 4s ease-in-out infinite}
+[data-k=lg-1] .lgs__beam.flip{animation:lgsFlip 5s ease-in-out infinite}
+[data-k=lg-1] .lgs__red.shrink{animation:lgsShrinkW 4s ease-in-out infinite}
+[data-k=lg-1] .lgs__red.dim{animation:lgsDim 5s ease-in-out infinite}
+[data-k=lg-1] .lgs__cyan.grow{animation:lgsGrow 5s ease-in-out infinite}
+@keyframes lgsTilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-5deg)}}
+@keyframes lgsPush{0%,100%{transform:rotate(-6deg)}35%{transform:rotate(1deg)}55%{transform:rotate(-7deg)}}
+@keyframes lgsHand{0%,100%{transform:translateY(0)}35%{transform:translateY(9px)}55%{transform:translateY(-2px)}}
+@keyframes lgsShrinkB{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(-3deg)}}
+@keyframes lgsShrinkW{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(.6);opacity:.55}}
 @keyframes lgsFlip{0%,43%{transform:rotate(-6deg)}56%,90%{transform:rotate(9deg)}100%{transform:rotate(-6deg)}}
 @keyframes lgsDim{0%,40%{transform:scale(1);opacity:.85}55%{transform:scale(.55);opacity:.3}
   65%,88%{transform:scale(.5);opacity:.25}100%{transform:scale(1);opacity:.85}}
-@keyframes lgsGrow{0%,40%{width:19px;height:15px;background-color:#4ecdec}
-  52%{width:50px;height:41px;background-color:#4db8ff}60%,88%{width:46px;height:38px;background-color:#4db8ff}
-  100%{width:19px;height:15px;background-color:#4ecdec}}
+@keyframes lgsGrow{0%,40%{width:16px;height:13px;background-color:#4ecdec}
+  52%{width:42px;height:35px;background-color:#4db8ff}60%,88%{width:39px;height:32px;background-color:#4db8ff}
+  100%{width:16px;height:13px;background-color:#4ecdec}}
 @media (prefers-reduced-motion:reduce){
-  [data-k=lg-1] .lgs__beam{animation:none;transform:rotate(9deg)}
-  [data-k=lg-1] .lgs__red{animation:none;transform:scale(.5);opacity:.25}
-  [data-k=lg-1] .lgs__cyan{animation:none;width:46px;height:38px;background-color:#4db8ff}}
+  [data-k=lg-1] .lgs__beam,[data-k=lg-1] .lgs__red,[data-k=lg-1] .lgs__cyan,
+  [data-k=lg-1] .lgs__hand{animation:none!important}
+  [data-k=lg-1] .lgs__beam{transform:rotate(-6deg)}
+  [data-k=lg-1] .lgs__beam.flip{transform:rotate(9deg)}
+  [data-k=lg-1] .lgs__red.dim{transform:scale(.5);opacity:.25}
+  [data-k=lg-1] .lgs__cyan.grow{width:39px;height:32px;background-color:#4db8ff}}
 /* the hold: same law as everywhere, an early release does nothing */
 [data-k=lg-1] .lg1-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
   border:0;border-radius:14px;overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;
@@ -1211,13 +1230,26 @@ mx-11 is the deliberate counter-example: the same design carrying five.
     }
     c.ps.forEach(function(p,i){
       h+='<p class="b">'+p+'</p>';
-      if(i===0&&c.scale)h+='<div class="lg1-ref">'
-        +'<button type="button" aria-expanded="false"><span>A refresher on focus</span>'
-        +'<svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>'
-        +'<div class="bd"><div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
-        +'<div class="lgs__beam"><b class="lgs__red"></b><b class="lgs__cyan"></b></div></div>'
-        +'<p class="cap2">The heaviest side wins automatically. The plan shrinks the left and grows the right, until the scale flips.</p></div></div>';
+      if(i===0&&c.scale){
+        var SC=function(beam,red,cyan,hand){
+          return '<div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
+            +'<div class="lgs__beam '+beam+'"><b class="lgs__red '+red+'"></b>'
+            +'<b class="lgs__cyan '+cyan+'"></b>'+(hand?'<u class="lgs__hand"></u>':'')
+            +'</div></div>';
+        };
+        h+='<div class="lg1-ref">'
+          +'<button type="button" aria-expanded="false"><span>A refresher on focus</span>'
+          +'<svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>'
+          +'<div class="bd">'
+          +SC('tilt','','')+'<p class="cap2">Your attention is a scale. It tips toward the heaviest thing on it, and distractions are heavy and easy to reach.</p>'
+          +SC('push','','',true)+'<p class="cap2">Willpower is a push on the beam. It works for a burst, then it burns out.</p>'
+          +SC('shrinkb','shrink','')+'<p class="cap2">Removing distractions shrinks the left side. It helps, but while it still outweighs the right, the scale stays tipped.</p>'
+          +SC('flip','dim','grow')+'<p class="cap2">The real fix is a heavier right side: a goal that matters, with progress you can see. The scale flips, and focus becomes automatic.</p>'
+          +'</div></div>';
+      }
     });
+    /* the inputs law (Malik): outcomes cannot be forced, inputs can be done */
+    h+='<p class="b">You cannot force an outcome. You can only supply inputs. So every day hands you inputs, the highest leverage acts available, stacked until missing the goal becomes the unreasonable result.</p>';
     /* the plate: the act, then the supports with the line that earns each */
     h+='<div class="lg1-mv"><p>'+c.act+'</p>'
       +c.sup.map(function(x){return '<div class="sup"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>'}).join('')
@@ -1591,14 +1623,13 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 /* --- beat 1: SEE IT. the star act owns the screen ----------------------- */
 [data-k=u-1] .u1-star{margin:0;position:relative;z-index:2;font-size:25px;font-weight:700;
   line-height:1.28;letter-spacing:-.028em;color:var(--text-hi);text-wrap:pretty}
-[data-k=u-1] .u1-tok{display:inline;padding:0 1px 2px;margin:0;border:0;background:none;
-  box-shadow:inset 0 -2px 0 rgba(var(--ink),.32);color:var(--text-hi);
-  font:700 25px/1.28 var(--font);letter-spacing:-.028em;font-variant-numeric:tabular-nums;
-  cursor:pointer;transition:box-shadow .16s ease-out}
-[data-k=u-1] .u1.sizing .u1-tok{box-shadow:inset 0 -2px 0 #3fd94e}
+/* the number is just part of the sentence now: the rail owns sizing */
+[data-k=u-1] .u1-tok{display:inline;padding:0;margin:0;border:0;background:none;
+  box-shadow:none;color:var(--text-hi);pointer-events:none;cursor:default;
+  font:700 25px/1.28 var(--font);letter-spacing:-.028em;font-variant-numeric:tabular-nums}
 /* the star that has no number still needs the plate control, so the sentence
    ends in the same affordance the token carries, at label scale */
-[data-k=u-1] .u1-car{display:inline-flex;align-items:center;justify-content:center;
+[data-k=u-1] .u1-car{display:none!important;align-items:center;justify-content:center;
   width:22px;height:22px;margin-left:6px;vertical-align:2px;border:0;border-radius:8px;
   background:rgba(var(--ink),.08);box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:pointer}
 [data-k=u-1] .u1-car svg{width:10px;height:10px;fill:none;stroke:rgba(var(--ink),.82);
@@ -1609,7 +1640,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 
 /* --- beat 2: SIZE IT. three sizes, and each one IS a plate -------------- */
 [data-k=u-1] .u1-sizes{display:none;margin-top:12px;position:relative;z-index:2}
-[data-k=u-1] .u1.sizing .u1-sizes{display:block}
+[data-k=u-1] .u1.sizing .u1-sizes{display:none}
 /* one glass track, three cells, the chosen one raised. The role/act captions
    left the buttons: the single consequence line below carries them, so the
    control stopped being nine competing labels (Malik: make it look better). */
@@ -1637,12 +1668,15 @@ mx-11 is the deliberate counter-example: the same design carrying five.
 [data-k=u-1] .u1-sizes.free .u1-three button{flex:0 0 calc(33% - 2px)}
 
 /* --- beat 3: the deep work door, only when the star is session shaped ---- */
-[data-k=u-1] .u1-dw{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;
-  margin-top:14px;position:relative;z-index:2;height:30px;padding:0 11px 0 9px;border:0;border-radius:9px;
-  background:rgba(22,25,31,.95);-webkit-backdrop-filter:blur(24px) saturate(1.4);
-  backdrop-filter:blur(24px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(var(--ink),.09);
-  color:rgba(var(--ink),.92);font-family:var(--font);cursor:pointer}
-[data-k=u-1] .u1-dw b{font-size:12px;font-weight:500}
+/* flat, Malik's call: bare text, hairline underline, says "Deep work" */
+[data-k=u-1] .u1-dw{display:inline-flex;align-items:center;align-self:flex-start;
+  margin-top:16px;position:relative;z-index:2;border:0;padding:2px 0;background:none;
+  color:rgba(var(--ink),.85);font-family:var(--font);cursor:pointer;
+  transition:color .16s ease-out}
+[data-k=u-1] .u1-dw:hover,[data-k=u-1] .u1-dw:active{color:rgba(var(--ink),.98)}
+[data-k=u-1] .u1-dw svg{display:none}
+[data-k=u-1] .u1-dw b{font-size:12.5px;font-weight:500;padding-bottom:2px;
+  box-shadow:inset 0 -1px 0 rgba(var(--ink),.30)}
 [data-k=u-1] .u1-dw em{font-style:normal;font-size:11.5px;color:rgba(var(--ink),.72);
   font-variant-numeric:tabular-nums}
 [data-k=u-1] .u1-dw svg{width:13px;height:13px;color:rgba(var(--ink),.82)}
@@ -1841,7 +1875,7 @@ mx-11 is the deliberate counter-example: the same design carrying five.
         <circle cx="6.5" cy="7.2" r="5" stroke="currentColor" stroke-width="1.2"/>
         <path d="M6.5 4.4V7.2H8.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
         <path d="M4.9 1.3h3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-      </svg><b>Start the timer</b><em></em>
+      </svg><b>Deep work</b><em></em>
     </button>
 
     <div class="u1-sp b"></div>
