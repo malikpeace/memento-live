@@ -119,7 +119,7 @@
       return '<b style="background:' + bg + '"></b>';
     }).join('');
     return '<div class="sec sec--score">' +
-      '<div class="glance glance--score"><div class="score__m">' + mMark('', 22) + '</div>' +
+      '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + '</div></div>' +
       '<div class="score__hm">' + cells + '</div></div></div>';
