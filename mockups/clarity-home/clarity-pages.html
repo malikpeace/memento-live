@@ -185,6 +185,39 @@
   .lt .opt{background:rgba(24,26,33,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);color:rgba(24,26,33,.9)}
   .lt .opt--danger{color:#b3402f}
   .lt .warn{color:rgba(24,26,33,.5)}
+
+  /* full-screen update + tweak (no more bottom sheets) */
+  .fsq{font-size:clamp(21px,6vw,25px);font-weight:800;line-height:1.28;margin:0;text-wrap:balance;max-width:280px}
+  .fsWas{margin-top:12px;color:rgba(255,255,255,.45);font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums}
+  .fsNum{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-top:30px;padding:20px 26px;border-radius:16px;
+    background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .fsNum b{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;color:#fff}
+  .fsNum b .cursorbar{display:inline-block;width:2px;height:.95em;background:var(--acc);vertical-align:-3px;margin-left:2px;animation:blink 1.1s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+  .fsNum span{color:var(--mid);font-size:16px;font-weight:600}
+  .pillCta{display:flex;align-items:center;justify-content:center;width:100%;max-width:420px;margin:0 auto;
+    padding:17px 22px;border-radius:999px;background:#fff;color:#0b1112;font-size:16px;font-weight:700;
+    box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .quiet{display:block;text-align:center;margin:16px auto 0;color:rgba(255,255,255,.4);font-size:14px;font-weight:600}
+  .payoffLine{margin-top:16px;text-align:center;color:var(--acc);font-size:13.5px;font-weight:650}
+  .fsOpts{display:flex;flex-direction:column;gap:11px;width:100%;max-width:320px;margin:30px auto 0}
+  .fsOpt{padding:17px 16px;border-radius:14px;background:rgba(255,255,255,.07);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);font-size:15.5px;font-weight:650;color:#fff;text-align:center}
+  .fsOpt--danger{color:#ffb4a8}
+  .fsWarn{margin:18px auto 0;font-size:13px;line-height:1.55;color:rgba(255,255,255,.45);text-align:center;max-width:290px}
+  /* light */
+  .lt .fsWas{color:rgba(24,26,33,.45)}
+  .lt .fsNum{background:rgba(24,26,33,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+  .lt .fsNum b{color:rgba(24,26,33,.96)}
+  .lt .fsNum b .cursorbar{background:#0d8ca6}
+  .lt .fsNum span{color:rgba(24,26,33,.6)}
+  .lt .fsq{color:rgba(24,26,33,.96)}
+  .lt .pillCta{background:#181a21;color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.2)}
+  .lt .quiet{color:rgba(24,26,33,.45)}
+  .lt .payoffLine{color:#0d8ca6}
+  .lt .fsOpts .fsOpt{background:rgba(24,26,33,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);color:rgba(24,26,33,.9)}
+  .lt .fsOpts .fsOpt--danger{color:#b3402f}
+  .lt .fsWarn{color:rgba(24,26,33,.5)}
 </style>
 </head>
 <body>
@@ -293,35 +326,30 @@ function page3empty(){
 }
 function updateSheet(s){
   return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
-  <div class="stage top" style="text-align:center;align-items:center;filter:blur(1px);opacity:.55">
-    <div class="eyebrow">Where you stand</div>
-    <div class="num" style="margin-top:12px">${s.cur}<span class="unit">${s.unit}</span></div>
-    <div class="asof">${s.asOf}</div></div>
-  <div class="dim"></div>
-  <div class="sheet">
-    <div class="grab"></div>
-    <div class="slab">Where are you now?</div>
-    <div class="bignum"><b>12,900<span class="cursorbar"></span></b><span>${s.unit}</span></div>
-    <div class="was">was ${s.cur}, ${s.asOf}</div>
-    <div class="sheetCta">Save</div>
-    <div class="payoff">the rail slides to the new spot, +87,100 counts down</div>
+  <div class="stage top" style="text-align:center;align-items:center">
+    <div class="eyebrow">Update progress</div>
+    <div class="fsq" style="margin-top:26px">Where are you now?</div>
+    <div class="fsNum"><b>12,900<span class="cursorbar"></span></b><span>${s.unit}</span></div>
+    <div class="fsWas">was ${s.cur}, ${s.asOf}</div>
+    <div class="payoffLine">on Save, the rail slides to the new spot and +87,100 counts down</div>
+    <div class="spacer"></div>
+    <div class="pillCta">Save</div>
+    <div class="quiet">Cancel</div>
   </div>`;
 }
 
 function tweakSheet(s){
   return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
-  <div class="stage top" style="text-align:center;align-items:center;filter:blur(1px);opacity:.55">
-    <div class="eyebrow">Where you stand</div>
-    <div class="num" style="margin-top:12px">${s.id==='num'?s.cur:'112'}<span class="unit">${s.id==='num'?s.unit:'days'}</span></div></div>
-  <div class="dim"></div>
-  <div class="sheet">
-    <div class="grab"></div>
-    <div class="slab">Tweak your Neutron Star</div>
-    <div class="optRow">
-      <div class="opt">Refine your Neutron Star</div>
-      <div class="opt opt--danger">Completely change it</div>
+  <div class="stage top" style="text-align:center;align-items:center">
+    <div class="eyebrow">Tweak your Neutron Star</div>
+    <div class="fsq" style="margin-top:26px">What do you want to do with it?</div>
+    <div class="fsOpts">
+      <div class="fsOpt">Refine your Neutron Star</div>
+      <div class="fsOpt fsOpt--danger">Completely change it</div>
     </div>
-    <div class="warn">Completely changing your Neutron Star changes your entire Memento. It is the foundation everything else is built on: your plan, your pages, and your card all rebuild around the new goal. Your notes and history stay.</div>
+    <div class="fsWarn">Completely changing your Neutron Star changes your entire Memento. It is the foundation everything else is built on: your plan, your pages, and your card all rebuild around the new goal. Your notes and history stay.</div>
+    <div class="spacer"></div>
+    <div class="quiet">Cancel</div>
   </div>`;
 }
 
@@ -330,8 +358,8 @@ const CELLS=[
  {cap:'Page 2 · The summary', sub:'Standing (number, wall, or why-led for maintain), the why, the anti-vision, Tweak at the bottom. Dated goals get no Update button, the wall moves itself.', render:s=>page2(s)},
  {cap:'Page 3 · Your notes', sub:'Add at the top. Founding message pinned. Delete allowed, editing never, past-you is an artifact.', render:()=>page3filled()},
  {cap:'Page 3 · Empty (the skipper)', sub:'First visit after skipping the message: an invitation plus one faint ghost note that teaches the feature in a glance.', render:()=>page3empty()},
- {cap:'The update sheet', sub:'Number goals only. Slides up prefilled with the last number, they nudge it, Save, and the rail animates to the new spot. The payoff IS the update.', render:s=>updateSheet(s.id==='num'?s:SHAPES[0])},
- {cap:'The Tweak sheet', sub:'What the page-2 button opens: Refine (reword, same foundation) or Completely change it, with the warning that the star is the foundation the whole Memento rebuilds around.', render:s=>tweakSheet(s)},
+ {cap:'Update progress, full screen', sub:'Number goals only. Opens full screen prefilled with the last number, they nudge it, Save, and the rail animates to the new spot. The payoff IS the update.', render:s=>updateSheet(s.id==='num'?s:SHAPES[0])},
+ {cap:'Tweak, full screen', sub:'What the page-2 button opens, full screen: Refine (reword, same foundation) or Completely change it, with the warning that the star is the foundation the whole Memento rebuilds around.', render:s=>tweakSheet(s)},
 ];
 
 function render(){
