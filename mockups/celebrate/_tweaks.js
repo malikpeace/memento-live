@@ -156,9 +156,9 @@
     var startX = 0, startY = 0, dragging = false, moved = 0;
     function pageTo(i) {
       var track = ph.querySelector('.ba0-track'); if (!track) return;
-      ph._page = Math.max(0, Math.min(1, i));
-      track.style.transform = 'translateX(' + (ph._page * -50) + '%)';
-      var dots = ph.querySelectorAll('.ba0-dot');
+      var dots = ph.querySelectorAll('.ba0-dot'), N = dots.length || 2, step = 100 / N;
+      ph._page = Math.max(0, Math.min(N - 1, i));
+      track.style.transform = 'translateX(' + (ph._page * -step) + '%)';
       [].forEach.call(dots, function (d, k) { d.classList.toggle('on', k === ph._page); });
     }
     ph.addEventListener('pointerdown', function (e) {
@@ -1068,8 +1068,9 @@
            consistency (days you showed up). The rest is volume. */
         var cells = [];
         var isT = (v.shape === 'target' && +v.start !== +v.value);
+        var down = false, delta = 0;
         if (isT) {
-          var down = +v.value < +v.start, delta = Math.abs(+v.start - +v.value);
+          down = +v.value < +v.start; delta = Math.abs(+v.start - +v.value);
           var verb = down ? (w.money ? 'paid off' : 'down') : 'gained';
           var span = (w.money && down) ? (w.mf(delta) + ' paid off')
                                        : (w.mf(delta) + ' ' + esc(v.unit) + ' ' + verb);
@@ -1085,7 +1086,17 @@
         if (w.hasMoves) cells.push(['<b>' + fmt(w.days) + '</b><span>' + plural(w.days, 'day', 'days') + ' start to finish</span>', '']);
         else cells.push(['<b>' + fmt(w.days) + '</b><span>days it took</span>', '']);
         if (w.streak > 0) cells.push(['<b>' + fmt(w.streak) + '</b><span>day best streak</span>', '']);
-        if (w.perWeek > 0) cells.push(['<b>' + fmt(w.perWeek) + '</b><span>' + esc(unitFor(2, w.noun)) + ' a week</span>', '']);
+        /* pace: how fast they moved. For a target goal that is progress TOWARD
+           it (per week); otherwise it is their volume per week. */
+        if (isT && w.weeks > 0) {
+          var pace = delta / w.weeks;
+          var paceStr = w.money ? w.mf(Math.round(pace)) : fmt(Math.round(pace * 10) / 10);
+          cells.push(['<b>' + paceStr + '</b><span>' + (w.money ? '' : esc(v.unit) + ' ') + 'a week' + (down ? ', toward it' : '') + '</span>', '']);
+        } else if (w.perWeek > 0) {
+          cells.push(['<b>' + fmt(w.perWeek) + '</b><span>' + esc(unitFor(2, w.noun)) + ' a week</span>', '']);
+        }
+        /* milestones cleared on the way (the chooser's real marks) */
+        if (w.marks > 1) cells.push(['<b>' + fmt(w.marks) + '</b><span>milestones passed</span>', '']);
         put(ph, '.ba0-wall', cells.map(function (c) { return '<div class="ba0-cell ' + c[1] + '">' + c[0] + '</div>'; }).join(''));
         /* wire the swipe pager (once) */
         wirePager(ph);
