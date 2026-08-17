@@ -153,41 +153,64 @@
      and stops it whenever a swipe just happened. */
   function wirePager(ph) {
     if (ph._pagerWired) return; ph._pagerWired = true;
-    var startX = 0, startY = 0, dragging = false, moved = 0;
-    function pageTo(i) {
+    var sx = 0, sy = 0, drag = false, dx = 0, base = 0, pw = 1, horiz = false;
+    function slideN() { var d = ph.querySelectorAll('.ba0-dot').length; return d || 2; }
+    function stepPct() { return 100 / slideN(); }
+    function setDots() {
+      [].forEach.call(ph.querySelectorAll('.ba0-dot'), function (d, k) { d.classList.toggle('on', k === ph._page); });
+    }
+    /* ALWAYS snap to a whole page: transform is page * -step, never a partial */
+    function pageTo(i, anim) {
       var track = ph.querySelector('.ba0-track'); if (!track) return;
-      var dots = ph.querySelectorAll('.ba0-dot'), N = dots.length || 2, step = 100 / N;
-      ph._page = Math.max(0, Math.min(N - 1, i));
-      track.style.transform = 'translateX(' + (ph._page * -step) + '%)';
-      [].forEach.call(dots, function (d, k) { d.classList.toggle('on', k === ph._page); });
+      ph._page = Math.max(0, Math.min(slideN() - 1, i));
+      track.style.transition = (anim === false) ? 'none' : '';
+      track.style.transform = 'translateX(' + (ph._page * -stepPct()) + '%)';
+      setDots();
     }
     ph.addEventListener('pointerdown', function (e) {
-      if (!e.target.closest || !e.target.closest('.ba0-pager')) return;
-      dragging = true; moved = 0; startX = e.clientX; startY = e.clientY;
+      var pg = e.target.closest && e.target.closest('.ba0-pager');
+      if (!pg) return;
+      drag = true; horiz = false; dx = 0; sx = e.clientX; sy = e.clientY;
+      pw = pg.getBoundingClientRect().width || 1;
+      base = -(ph._page || 0) * stepPct();
+      try { pg.setPointerCapture && pg.setPointerCapture(e.pointerId); } catch (_) {}
     });
     ph.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      moved = e.clientX - startX;
-    });
-    ph.addEventListener('pointerup', function (e) {
-      if (!dragging) return; dragging = false;
-      if (Math.abs(moved) > 36 && Math.abs(moved) > Math.abs(e.clientY - startY)) {
-        pageTo((ph._page || 0) + (moved < 0 ? 1 : -1));
-        ph._pagerJustSwiped = true;
-        setTimeout(function () { ph._pagerJustSwiped = false; }, 350);
+      if (!drag) return;
+      var mx = e.clientX - sx, my = e.clientY - sy;
+      if (!horiz) {
+        if (Math.abs(mx) < 6 && Math.abs(my) < 6) return;
+        horiz = Math.abs(mx) > Math.abs(my);
+        if (!horiz) { drag = false; return; }   // a vertical move: let the page scroll
       }
+      dx = mx;
+      var track = ph.querySelector('.ba0-track'); if (!track) return;
+      var pct = base + (mx / pw) * stepPct();
+      pct = Math.max(-(slideN() - 1) * stepPct(), Math.min(0, pct));   // rubber-stop at the ends
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(' + pct + '%)';
+      if (e.cancelable) e.preventDefault();
     });
+    function end() {
+      if (!drag) return; drag = false;
+      if (!horiz) return;
+      /* snap to the NEAREST page: past ~18% of a slide flips, else spring back */
+      var cur = ph._page || 0, target = cur;
+      if (dx < -pw * 0.18) target = cur + 1;
+      else if (dx > pw * 0.18) target = cur - 1;
+      pageTo(target, true);
+      if (Math.abs(dx) > 8) { ph._pagerJustSwiped = true; setTimeout(function () { ph._pagerJustSwiped = false; }, 350); }
+      dx = 0;
+    }
+    ph.addEventListener('pointerup', end);
+    ph.addEventListener('pointercancel', end);
     ph.addEventListener('click', function (e) {
       var d = e.target.closest && e.target.closest('.ba0-dot');
-      if (d) { var dd = [].indexOf.call(ph.querySelectorAll('.ba0-dot'), d); pageTo(dd); ph._pagerJustSwiped = true; setTimeout(function () { ph._pagerJustSwiped = false; }, 50); e.stopPropagation(); return; }
+      if (d) { var dd = [].indexOf.call(ph.querySelectorAll('.ba0-dot'), d); pageTo(dd, true); ph._pagerJustSwiped = true; setTimeout(function () { ph._pagerJustSwiped = false; }, 50); e.stopPropagation(); return; }
       if (ph._pagerJustSwiped) { e.stopPropagation(); return; }
       /* a replay tap: normalise the pager back to slide 0 before the kit
-         clones the stage, so the next run starts on the dots view */
-      if (ph.classList.contains('done')) {
-        var tr = ph.querySelector('.ba0-track'); if (tr) tr.style.transform = '';
-        ph._page = 0;
-        [].forEach.call(ph.querySelectorAll('.ba0-dot'), function (d, k) { d.classList.toggle('on', k === 0); });
-      }
+         clones the stage, so the next run starts on the first view */
+      if (ph.classList.contains('done')) { pageTo(0, false); }
     }, true);
   }
 
