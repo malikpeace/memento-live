@@ -1,0 +1,75 @@
+<!-- ARCHETYPE (difference law): lg-3 named-section workbook.
+     lg-1 flows as one document, lg-2 splits by speed; here the brief is a
+     WORKBOOK: named ruled sections you can jump between, each short. -->
+<section class="cell" data-k="lg-3">
+<!-- LAYOUT VARIANT (Malik, 2026-08-16): "a perfect little summary workbook."
+     Same weight persona and content, cut into titled sections with the
+     equation and plate as their own chapters. Static comparison mockup. -->
+<style>
+[data-k=lg-3] .w{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:50px 20px 18px;font-variant-numeric:tabular-nums}
+[data-k=lg-3] .w-sc{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+[data-k=lg-3] .w-sc::-webkit-scrollbar{display:none}
+[data-k=lg-3] .w-star{margin:0 0 20px;font-size:21px;font-weight:700;line-height:1.32;
+  letter-spacing:-.025em;color:var(--text-hi);text-wrap:pretty}
+/* a chapter: hairline, bold sentence-case title, tight body */
+[data-k=lg-3] .w-h{margin:0 0 10px;padding-top:12px;font-size:13.5px;font-weight:700;
+  letter-spacing:-.012em;color:var(--text-hi);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.16)}
+[data-k=lg-3] .w p.b{margin:0 0 16px;font-size:13px;line-height:1.58;
+  color:rgba(var(--ink),.92);text-wrap:pretty}
+[data-k=lg-3] .w p.b b{font-weight:600;color:var(--text-hi)}
+[data-k=lg-3] .w-eq{display:flex;flex-direction:column;gap:8px;margin:0 0 16px}
+[data-k=lg-3] .w-eq div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+[data-k=lg-3] .w-eq s{text-decoration:none;font-size:12px;color:rgba(var(--ink),.78)}
+[data-k=lg-3] .w-eq b{font-size:14px;font-weight:700;color:var(--text-hi);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+[data-k=lg-3] .w-eq .r{padding-top:9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.13)}
+[data-k=lg-3] .w-eq .r b{font-size:16.5px}
+[data-k=lg-3] .w-pl{margin:0 0 16px}
+[data-k=lg-3] .w-pl .a{font-size:14.5px;font-weight:700;letter-spacing:-.014em;
+  color:var(--text-hi);margin:0 0 10px;line-height:1.32}
+[data-k=lg-3] .w-pl .s{padding:9px 0 0;margin:9px 0 0;box-shadow:inset 0 1px 0 rgba(var(--ink),.09)}
+[data-k=lg-3] .w-pl .s b{display:block;font-size:12.5px;font-weight:600;color:var(--text-hi)}
+[data-k=lg-3] .w-pl .s span{display:block;margin-top:1px;font-size:11px;color:rgba(var(--ink),.78)}
+[data-k=lg-3] .w-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
+  border:0;border-radius:14px;background:rgba(235,238,248,.94);color:#0b0c10;
+  font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:-.012em}
+</style>
+<h3>The logic: the workbook</h3>
+<p class="cap">The brief cut into named ruled chapters: The math, Why this plan, The plate, How it runs, The deal. Skimmable by title alone, robust underneath. Weight persona, same content, different structure.</p>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="w">
+    <div class="w-sc">
+      <p class="w-star">&#8220;Lose 50lbs in 6 months so I look good for summer.&#8221;</p>
+
+      <p class="w-h">The math</p>
+      <div class="w-eq">
+        <div><s>To lose</s><b>50 lbs in 180 days</b></div>
+        <div><s>50 &#215; 3,500 cal</s><b>175,000 cal</b></div>
+        <div><s>Over 180 days</s><b>&#8776; 1,000 a day</b></div>
+        <div><s>Maintenance, our estimate</s><b>&#8776; 3,500 cal</b></div>
+        <div class="r"><s>So you eat, per day</s><b>&#8776; 2,500 cal</b></div>
+      </div>
+
+      <p class="w-h">Why this plan</p>
+      <p class="b">The struggle you named is diet, so that is where it aims. You cannot force an outcome, only supply inputs: hold the daily number and the goal arrives on schedule. The first weeks are the worst of it, habits move before the scale does, so the log is where progress shows first.</p>
+
+      <p class="w-h">The plate</p>
+      <div class="w-pl">
+        <p class="a">Build a meal plan of 2,000 to 2,500 calories and 200 to 250g of protein you can comfortably keep.</p>
+        <div class="s"><b>A 40 minute walk after dinner</b><span>it sits exactly where you said the day breaks</span></div>
+        <div class="s"><b>Log every meal in MyFitnessPal</b><span>the log shows progress before the scale does</span></div>
+      </div>
+
+      <p class="w-h">How it runs</p>
+      <p class="b"><b>Every day.</b> one screen: the walk, the log, a hold. <b>Each morning.</b> the scale number, typed at your own ritual. <b>First look.</b> two weeks. <b>If it stalls.</b> the plan changes, the goal doesn&#8217;t.</p>
+
+      <p class="w-h">The deal</p>
+      <p class="b">Your job is the acts. Memento&#8217;s job is to hold the math, ask the questions, and never let a day quietly disappear. Fair?</p>
+    </div>
+    <button type="button" class="w-go">Hold to agree. Start today.</button>
+  </div>
+</div>
+</section>

@@ -84,3 +84,16 @@
 - lg-1: the inputs law on every brief, before the plate: "You cannot force
   an outcome. You can only supply inputs... stacked until missing the goal
   becomes the unreasonable result." Also added to THE CREED in CONTRACT.md.
+
+## 2026-08-17: rest day copy, the inversion hold, tap supports, logic variants
+- u-1 rest day: "Rest day. / Enjoy :)" (his words verbatim).
+- u-1 THE INVERSION: holding the day raises a white difference layer from
+  the bottom, inverting the screen as the hold fills (the sync box gesture,
+  here for completeness); on completion it crests, holds a beat, and falls
+  away into the green signed state. Early release drains it. Reduced motion
+  disables it.
+- u-1 supports: LAW AMENDED by Malik: sub-acts are now PLAIN TAPS with tiny
+  minimal boxes; done = green tick + strikethrough. The DAY keeps the hold.
+- lg-2/3/4: three layout variants of the logic page (same weight content):
+  glance strip over full prose / named-chapter workbook / asked-and-answered.
+  Marked n/a reach, comparison only.

@@ -146,19 +146,20 @@
   transition:height .26s cubic-bezier(.2,.7,.2,1),opacity .18s ease-out}
 [data-k=u-1] .u1-sup.gone{height:0;opacity:0;pointer-events:none}
 [data-k=u-1] .u1-sup .in{display:flex;align-items:center;gap:11px;height:42px;padding:0 6px}
-[data-k=u-1] .u1-box{position:relative;flex:0 0 auto;width:17px;height:17px;border-radius:6px;overflow:hidden;
-  background:rgba(var(--ink),.09);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
-/* the short hold, drawn: the tick fills, an early release drains it */
-[data-k=u-1] .u1-box i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.62)}
-[data-k=u-1] .u1-box svg{position:absolute;inset:0;margin:auto;width:11px;height:11px;fill:none;
-  stroke:#0b1a0d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0;
+/* minimal tap boxes (Malik, 2026-08-16: supports are simple taps, the HOLD
+   stays reserved for the day itself). Done = tick + a strike through. */
+[data-k=u-1] .u1-box{position:relative;flex:0 0 auto;width:14px;height:14px;border-radius:4.5px;
+  overflow:hidden;background:rgba(var(--ink),.08)}
+[data-k=u-1] .u1-box i{display:none}
+[data-k=u-1] .u1-box svg{position:absolute;inset:0;margin:auto;width:9px;height:9px;fill:none;
+  stroke:#0b1a0d;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;
   transition:opacity .12s ease-out}
 [data-k=u-1] .u1-sup .tx{font-size:13.5px;font-weight:400;line-height:1.25;color:rgba(var(--ink),.90);
   transition:color .2s ease-out}
-[data-k=u-1] .u1-sup.on .u1-box{background:#3fd94e;box-shadow:none}
-[data-k=u-1] .u1-sup.on .u1-box i{width:0}
+[data-k=u-1] .u1-sup.on .u1-box{background:#3fd94e}
 [data-k=u-1] .u1-sup.on .u1-box svg{opacity:1}
-[data-k=u-1] .u1-sup.on .tx{color:var(--text-hi)}
+[data-k=u-1] .u1-sup.on .tx{color:rgba(var(--ink),.60);text-decoration:line-through;
+  text-decoration-color:rgba(var(--ink),.45)}
 /* lapsed: after the day is held, an unticked support just stops asking.
    No red, no strike, no word about it. */
 [data-k=u-1] .u1-sup.lapse{pointer-events:none}
@@ -190,6 +191,12 @@
 [data-k=u-1] .u1-wash{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;pointer-events:none;
   background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.16));
   transition:height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease-out}
+/* the sync box gesture, here too: holding the day inverts the screen from
+   the bottom up (a white difference layer rising with the hold), and on
+   completion the wave crests and falls away. */
+[data-k=u-1] .u1-inv{position:absolute;left:0;right:0;bottom:0;height:0;z-index:20;
+  pointer-events:none;background:#ebeef8;mix-blend-mode:difference;opacity:1}
+@media (prefers-reduced-motion:reduce){[data-k=u-1] .u1-inv{display:none}}
 [data-k=u-1] .u1.signed .u1-wash{height:44%}
 [data-k=u-1] .u1.closed .u1-wash{height:0;opacity:0}
 
@@ -290,6 +297,7 @@
   <div class="grid"></div>
   <div class="u1">
     <div class="u1-wash" aria-hidden="true"></div>
+    <div class="u1-inv" aria-hidden="true"></div>
     <button type="button" class="u1-m" aria-label="Why this plan">
       <svg viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
     </button>
@@ -442,7 +450,7 @@
       three:[0,0,0],all:null,
       dw:false,sup:['Protein first at every meal','Sleep by 11'],
       pulse:null,rest:'Back Thursday.',
-      offable:true,offStar:'Rest day.',offHold:'Hold to close the day'},
+      offable:true,offStar:'Rest day.<br>Enjoy :)',offHold:'Hold to close the day'},
     money:{pre:'Message ',post:' potential clients.',
       fmt:function(v){return String(v)},one:' potential client.',
       three:[1,2,3],all:[1,2,3,5,8,12],
@@ -638,11 +646,12 @@
   });
   more.addEventListener('click',function(){free=!free;sizes.classList.toggle('free',free);drawSizes();});
 
-  /* --- the sub-act hold: 450ms, early release aborts ---------------------- */
+  /* --- the sub-acts: plain taps (Malik's call; the day keeps the hold) ---- */
   sups.forEach(function(s,i){
-    bindHold(s,s.querySelector('.u1-box i'),SUP,function(){
+    s.addEventListener('click',function(){
+      if(signed||s.classList.contains('gone'))return;
       ticks[i]=!ticks[i];paint();
-    },function(){return !signed&&!s.classList.contains('gone')});
+    });
   });
 
   /* --- the day: 1400ms, the star only ------------------------------------ */
@@ -652,12 +661,26 @@
     paint();
     beat=setTimeout(function(){beat=null;C.pulse?openPulse():openRest();},BEAT);
   }
+  var inv=q('.u1-inv');
+  function invStart(){inv.style.transition='height '+(HOLD/1000)+'s linear';inv.style.height='100%';}
+  function invAbort(){inv.style.transition='height .2s ease-out';inv.style.height='0';}
+  function invCrest(){
+    inv.style.transition='none';inv.style.height='100%';
+    setTimeout(function(){
+      inv.style.transition='opacity .45s ease-out';inv.style.opacity='0';
+      setTimeout(function(){inv.style.transition='none';inv.style.height='0';inv.style.opacity='1';},480);
+    },520);
+  }
   /* holding the day with the size sheet still open must not silently do
      nothing: the press closes the sheet and the hold still counts */
-  bindHold(hold,hfill,HOLD,complete,function(){
+  bindHold(hold,hfill,HOLD,function(){invCrest();complete();},function(){
     if(signed)return false;
     if(root.classList.contains('sizing'))setSizing(false);
+    invStart();
     return true;});
+  ['pointerup','pointerleave','pointercancel','keyup','blur'].forEach(function(ev){
+    hold.addEventListener(ev,function(){if(!signed)invAbort();});
+  });
   undo.addEventListener('click',function(){
     if(beat){clearTimeout(beat);beat=null;}
     signed=false;paint();
