@@ -224,18 +224,24 @@
     color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft)}
   .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09)}
 
-  .holdCircle{width:74px;height:74px;border-radius:50%;margin:0 auto;background:rgba(255,255,255,.12);
-    position:relative;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
-    transition:transform .15s ease-out}
-  .holdCircle.holding{transform:scale(.92)}
-  .holdCircle::before{content:"";position:absolute;inset:0;border-radius:50%;
-    background:conic-gradient(rgba(255,255,255,.95) calc(var(--hp,0)*1turn), transparent 0)}
-  .holdCircle.done{background:rgba(255,255,255,.95)}
-  .holdCircle.done::before{display:none}
+  .holdCircle{width:86px;height:86px;margin:0 auto;position:relative;cursor:pointer;touch-action:none;
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .holdCircle svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+  .holdCircle .ringTrack{fill:none;stroke:rgba(255,255,255,.1);stroke-width:2}
+  .holdCircle .ringDraw{fill:none;stroke:rgba(255,255,255,.92);stroke-width:2;stroke-linecap:round;transition:stroke .3s ease;
+    stroke-dasharray:245.04;stroke-dashoffset:245.04}
+  .holdCircle .dot{position:absolute;left:50%;top:50%;width:15px;height:15px;margin:-7.5px 0 0 -7.5px;border-radius:50%;
+    background:rgba(255,255,255,.5);transition:transform .35s cubic-bezier(.22,.61,.36,1), background .35s ease}
+  .holdCircle.holding .dot{transform:scale(.62);background:rgba(255,255,255,.85)}
+  .holdCircle.done .dot{transform:scale(1.75);background:rgba(255,255,255,.95)}
+  .holdCircle.done .ringDraw{stroke-dashoffset:0;stroke:#fff}
+  .lt .holdCircle.done .ringDraw{stroke:rgba(24,26,33,.95)}
+  .lt .holdCircle .ringTrack{stroke:rgba(24,26,33,.13)}
+  .lt .holdCircle .ringDraw{stroke:rgba(24,26,33,.9)}
+  .lt .holdCircle .dot{background:rgba(24,26,33,.45)}
+  .lt .holdCircle.holding .dot{background:rgba(24,26,33,.8)}
+  .lt .holdCircle.done .dot{background:rgba(24,26,33,.92)}
   .holdHint{margin-top:14px;text-align:center;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600}
-  .lt .holdCircle{background:rgba(24,26,33,.14)}
-  .lt .holdCircle::before{background:conic-gradient(rgba(24,26,33,.92) calc(var(--hp,0)*1turn), transparent 0)}
-  .lt .holdCircle.done{background:rgba(24,26,33,.92)}
   .lt .holdHint{color:rgba(24,26,33,.45)}
 
   .dlgWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:34px}
@@ -396,7 +402,7 @@ function fulfilConfirm(){
     <div class="fsq" style="margin-top:22px">Did you really reach it?</div>
     <div class="fsWarn" style="margin-top:16px">This is the most serious button in Memento. Fulfilling your Neutron Star closes this chapter: the star you forged, the pages, and the plan are sealed into your history, and Memento will walk you toward forging your next one. This cannot be tapped by accident, and it should never be tapped lightly.</div>
     <div class="spacer"></div>
-    <div class="holdCircle"></div>
+    <div class="holdCircle"><svg viewBox="0 0 86 86"><circle class="ringTrack" cx="43" cy="43" r="39"/><circle class="ringDraw" cx="43" cy="43" r="39"/></svg><span class="dot"></span></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
     <div class="quiet">Not yet</div>
   </div>`;
@@ -409,7 +415,7 @@ function changeConfirm(){
     <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
     <div class="fsWarn" style="margin-top:16px">Your current star, plan, and pages will be rebuilt around a new goal from scratch. Your notes and history stay, but everything else starts over. If you only want to reword the goal, move the date, or adjust the number, go back and choose Refine instead.</div>
     <div class="spacer"></div>
-    <div class="holdCircle"></div>
+    <div class="holdCircle"><svg viewBox="0 0 86 86"><circle class="ringTrack" cx="43" cy="43" r="39"/><circle class="ringDraw" cx="43" cy="43" r="39"/></svg><span class="dot"></span></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
     <div class="quiet">Go back</div>
   </div>`;
@@ -465,30 +471,35 @@ tgTheme.innerHTML += '<button data-id="dark" style="--accSwatch:#8be9fa">Dark</b
 tgTheme.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curTheme=b.dataset.id; render();});
 render();
 
-/* press-and-hold: JS steps the fill every 40ms; release before 3s resets */
+/* press-and-hold: the ring closes around the dot over 3s; release before that unwinds it */
+const RING_LEN = 2 * Math.PI * 39;   // 245.04
 function startHold(el){
   if(!el || el.classList.contains('done') || el._holding) return;
   el._holding=true; el.classList.add('holding');
+  const draw=el.querySelector('.ringDraw');
   const hint=el.parentElement.querySelector('.holdHint');
   const t0=Date.now();
   el._timer=setInterval(()=>{
     const p=Math.min((Date.now()-t0)/3000,1);
-    el.style.setProperty('--hp',p);
+    if(draw) draw.style.strokeDashoffset = (RING_LEN*(1-p)).toFixed(2);
     if(p>=1){ clearInterval(el._timer); el._holding=false;
       el.classList.remove('holding'); el.classList.add('done');
       if(hint) hint.textContent='Held. In the app, this is the moment it happens.'; }
-  },40);
+  },30);
 }
 function endHold(el){
   if(!el || !el._holding) return;
-  clearInterval(el._timer); el._holding=false;
-  el.classList.remove('holding'); el.style.setProperty('--hp',0);
+  clearInterval(el._timer); el._holding=false; el.classList.remove('holding');
+  const draw=el.querySelector('.ringDraw');
+  if(draw){ draw.style.transition='stroke-dashoffset .3s ease-out';
+    draw.style.strokeDashoffset=RING_LEN;
+    setTimeout(()=>{ draw.style.transition=''; },320); }
 }
 document.addEventListener('pointerdown',e=>{const el=e.target.closest('.holdCircle'); if(el){e.preventDefault(); startHold(el);}});
 document.addEventListener('touchstart',e=>{const el=e.target.closest('.holdCircle'); if(el){e.preventDefault(); startHold(el);}},{passive:false});
 document.addEventListener('mousedown',e=>{const el=e.target.closest('.holdCircle'); if(el) startHold(el);});
 ['pointerup','pointercancel','touchend','touchcancel','mouseup','mouseleave'].forEach(t=>
-  document.addEventListener(t,e=>{document.querySelectorAll('.holdCircle').forEach(endHold);}));
+  document.addEventListener(t,()=>{document.querySelectorAll('.holdCircle').forEach(endHold);}));
 document.addEventListener('contextmenu',e=>{ if(e.target.closest('.holdCircle')) e.preventDefault(); });
 </script>
 </body>
