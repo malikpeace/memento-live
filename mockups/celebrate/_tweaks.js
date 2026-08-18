@@ -308,49 +308,35 @@
         else { cnt(ph, '.qu1-hero', cur); cnt(ph, '.qu1-hero2', cur); }
         put(ph, '.b1 .sub', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)) + '.');
         put(ph, '.qu1-sub2', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)));
-        /* THE AXIS (Malik 2026-08-16): pure DISTANCE. ~10 sharp ticks spread
-           evenly along the span, each one's height grown by its VALUE (the
-           left of the road reads small, the right reads tall), a baseline
-           with weight, the accent line for today (no "today" text), and
-           labels only at the quarters, in a font sized to fit the numbers. */
-        var rail = Q(ph, '.qu1-rail');
-        if (rail) {
-          var frac100 = frac * 100;
-          var html = '<div class="qu1-base"></div><div class="qu1-gone" style="width:' + frac100.toFixed(1) + '%"></div>';
-          var TICKS = 10, di = 0;
-          for (var ti = 0; ti <= TICKS; ti++) {
-            var p = ti / TICKS * 100;
-            if (Math.abs(p - frac100) < 3.5) continue;         // the accent line owns this spot
-            var hh = Math.round(6 + (ti / TICKS) * 19);        // value-proportional height
-            html += '<div class="qu1-t' + (p < frac100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
-                    '%;height:' + hh + 'px;--d:' + (di++ * 0.05).toFixed(2) + 's"></div>';
-          }
-          html += '<div class="qu1-t is-now" style="left:' + frac100.toFixed(1) + '%;height:' +
-                  Math.round(10 + frac * 19 + 6) + 'px;--d:' + (di * 0.05).toFixed(2) + 's"></div>';
-          rail.innerHTML = html;
+        /* THE GAP LAYOUT (Malik 2026-08-16, ported from rf-gap verbatim):
+           dotted road, the closed ground as THE coloured thing, a ghost tick
+           at the last mark passed, the white tick where they stand, then
+           "X closed / Y to go" and the pace of the last leg. */
+        put(ph, '.gp__scale', '<span>' + mf(start) + '</span><span>' + mf(goal) + '</span>');
+        /* the ghost tick is the mark BEFORE where they stand: when today sits
+           exactly on a mark, "was" is the previous one, like the gap. */
+        var below = marks.filter(function (m) { return m < cur; });
+        var wasV = below.length ? below[below.length - 1] : start;
+        var f = Q(ph, '.gp__fill');
+        var wasF = Math.abs(wasV - start) / span;
+        if (f) {
+          f.style.width = (frac * 100).toFixed(1) + '%';
+          f.style.setProperty('--gpFrom', frac > 0 ? Math.max(0, Math.min(1, wasF / frac)).toFixed(4) : '1');
         }
-        /* labels: the quarters only (start / 25 / 50 / 75 / goal), dates under
-           the ones already passed. Today's own number is NOT repeated here
-           (Malik 2026-08-16: it is big above; the accent tick marks it). */
-        var lwrap = Q(ph, '.qu1-labels');
-        if (lwrap) {
-          var lfs = String(mf(goal)).length >= 7 ? 10 : String(mf(goal)).length >= 5 ? 11 : 13;
-          lwrap.style.setProperty('--lfs', lfs + 'px');
-          var lab = '';
-          [0, 0.25, 0.5, 0.75, 1].forEach(function (q) {
-            var p = q * 100, valQ = Math.round(start + span * q);
-            var isPastQ = frac >= q && q > 0;
-            var when = isPastQ ? dateBack(Math.round(days * (1 - q / Math.max(frac, 0.0001)))) : '';
-            var edge = q === 0 ? ' qu1-l--a' : q === 1 ? ' qu1-l--z' : '';
-            lab += '<div class="qu1-l' + edge + (isPastQ ? ' is-past' : '') + '" style="left:' + p + '%">' +
-                   '<div class="qu1-num">' + mf(valQ) + '</div>' +
-                   (when ? '<div class="qu1-date">' + when + '</div>' : '') + '</div>';
-          });
-          lwrap.innerHTML = lab;
+        var wm = Q(ph, '.gp__was');
+        if (wm) { wm.style.left = (wasF * 100).toFixed(1) + '%'; wm.style.display = wasV === start ? 'none' : ''; }
+        var nm = Q(ph, '.gp__now'); if (nm) nm.style.left = (frac * 100).toFixed(1) + '%';
+        put(ph, '.gp__row', '<span><b>' + mf(cur - start) + '</b> closed</span><span><b>' + mf(goal - cur) + '</b> to go</span>');
+        /* the pace of the last leg, from overall pace (the app uses REAL
+           mark-crossing dates here, never this simulation) */
+        var leg = cur - wasV, moved = cur - start;
+        var cost = Q(ph, '.gp__cost');
+        if (cost) {
+          if (leg > 0 && moved > 0) {
+            cost.style.display = '';
+            cost.innerHTML = '<b>' + fmt(Math.max(1, Math.round(days * leg / moved))) + ' days</b> closed the last ' + mf(leg) + '.';
+          } else cost.style.display = 'none';
         }
-        var mult = start > 0 ? cur / start : 0;
-        put(ph, '.qu1-cap', mf(goal - cur) + ' to go.'
-          + (mult >= 2 ? ' ' + (mult >= 10 ? Math.round(mult) : (Math.round(mult * 10) / 10)) + '&times; where you started.' : ''));
         put(ph, '.b3 .deposit', nowMark === null
           ? (cur > start
             ? 'The first move is in: <b>' + mf(cur - start) + '</b> already, from ' + mf(start) + '. The first mark waits at ' + mf(marks[0]) + '.'
@@ -474,46 +460,38 @@
         if (money) { put(ph, '.qd1-hero', mf(cur)); put(ph, '.qd1-hero2', mf(cur)); }
         else { cnt(ph, '.qd1-hero', cur, start); cnt(ph, '.qd1-hero2', cur, start); }
         put(ph, '.qd1-sub2', esc(money ? (v.unit.replace(/^\$\s*/, '') || 'dollars') : v.unit));
-        /* THE AXIS (mirror of qu-1): ~10 sharp OPAQUE ticks by pure DISTANCE,
-           heights growing along the road, quarter labels with dates for the
-           passed ones, the accent tick at today, NO number on the line. */
-        var frac100 = frac * 100;
-        var rail = Q(ph, '.qd1-rail');
-        if (rail) {
-          var html = '<div class="qd1-base"></div><div class="qd1-gone" style="width:' + frac100.toFixed(1) + '%"></div>';
-          var TICKS = 10, di = 0;
-          for (var ti = 0; ti <= TICKS; ti++) {
-            var p = ti / TICKS * 100;
-            if (Math.abs(p - frac100) < 3.5) continue;
-            var hh = Math.round(6 + (ti / TICKS) * 19);
-            html += '<div class="qd1-t' + (p < frac100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
-                    '%;height:' + hh + 'px;--d:' + (di++ * 0.05).toFixed(2) + 's"></div>';
-          }
-          html += '<div class="qd1-t is-now" style="left:' + frac100.toFixed(1) + '%;height:' +
-                  Math.round(10 + frac * 19 + 6) + 'px;--d:' + (di * 0.05).toFixed(2) + 's"></div>';
-          rail.innerHTML = html;
+        /* THE GAP LAYOUT, reversed (Malik 2026-08-16, ported from rf-gap):
+           the road runs start -> goal left to right, the closed ground is
+           the distance already dropped, ghost tick at the last mark, white
+           tick where the number stands today. */
+        put(ph, '.gp__scale', '<span>' + mf(start) + '</span><span>' + mf(goal) + '</span>');
+        /* the ghost tick is the mark BEFORE where they stand (strictly above
+           cur on the way down); today-on-a-mark keeps its own white tick. */
+        var before = marks.filter(function (m) { return m > cur; });
+        var wasV = before.length ? before[before.length - 1] : start;
+        var wasF = Math.abs(wasV - start) / span;
+        var f = Q(ph, '.gp__fill');
+        if (f) {
+          f.style.width = (frac * 100).toFixed(1) + '%';
+          f.style.setProperty('--gpFrom', frac > 0 ? Math.max(0, Math.min(1, wasF / frac)).toFixed(4) : '1');
         }
-        var lwrap = Q(ph, '.qd1-labels');
-        if (lwrap) {
-          var lfs = String(mf(start)).length >= 7 ? 10 : String(mf(start)).length >= 5 ? 11 : 13;
-          lwrap.style.setProperty('--lfs', lfs + 'px');
-          var lab = '';
-          [0, 0.25, 0.5, 0.75, 1].forEach(function (q) {
-            var p = q * 100, valQ = Math.round(start + (goal - start) * q);
-            var isPastQ = frac >= q && q > 0;
-            var when = isPastQ ? dateBack(Math.round(days * (1 - q / Math.max(frac, 0.0001)))) : '';
-            var edge = q === 0 ? ' qd1-l--a' : q === 1 ? ' qd1-l--z' : '';
-            lab += '<div class="qd1-l' + edge + (isPastQ ? ' is-past' : '') + '" style="left:' + p + '%">' +
-                   '<div class="qd1-num">' + mf(valQ) + '</div>' +
-                   (when ? '<div class="qd1-date">' + when + '</div>' : '') + '</div>';
-          });
-          lwrap.innerHTML = lab;
-        }
+        var wm = Q(ph, '.gp__was');
+        if (wm) { wm.style.left = (wasF * 100).toFixed(1) + '%'; wm.style.display = wasV === start ? 'none' : ''; }
+        var nm = Q(ph, '.gp__now'); if (nm) nm.style.left = (frac * 100).toFixed(1) + '%';
         /* the words follow the unit: a scale is only a scale for weight.
            Money reads as paying down; anything else stays neutral. */
         var weighty = /lb|kg|pound|kilo/i.test(v.unit || '');
+        var downWord = money ? 'paid off' : 'down';
+        put(ph, '.gp__row', '<span><b>' + mf(Math.abs(cur - start)) + '</b> ' + downWord + '</span><span><b>' + mf(Math.abs(cur - goal)) + '</b> to go</span>');
+        var leg = Math.abs(cur - wasV), moved = Math.abs(cur - start);
+        var cost = Q(ph, '.gp__cost');
+        if (cost) {
+          if (leg > 0 && moved > 0) {
+            cost.style.display = '';
+            cost.innerHTML = '<b>' + fmt(Math.max(1, Math.round(days * leg / moved))) + ' days</b> for the last ' + mf(leg) + '.';
+          } else cost.style.display = 'none';
+        }
         put(ph, '.b1 .sub', weighty ? 'on the scale today.' : money ? 'still to pay off.' : esc(v.unit) + ' today.');
-        put(ph, '.qd1-cap', mf(Math.abs(cur - goal)) + ' to go.');
         var downBy = mf(Math.abs(start - cur));
         put(ph, '.b3 .deposit', cur === start
           ? 'Day one. The road runs ' + mf(start) + ' to ' + mf(goal) + '; the first mark is <b>' + mf(marks[0]) + '</b>.'

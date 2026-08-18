@@ -1,49 +1,46 @@
 <style>
-/* qu-1. the marker posts. Fifths of a target, each one dated. */
+/* qu-1 RESTYLED to The Gap (Malik 2026-08-16: "much more minimal and
+   simple", liked it more than the axis). The gap's exact recipe, ported
+   verbatim: a 2px dotted road, the closed ground as THE one coloured thing,
+   a thin ghost tick at the last mark, the white tick standing where they
+   are. His frame kept: the big number on top, what's left at the bottom. */
 [data-c="qu-1"] .qu1-hero{font-size:104px}
 [data-c="qu-1"] .qu1-hero2{font-size:72px}
-[data-c="qu-1"] .qu1-sub2{margin-bottom:26px}
-[data-c="qu-1"] .qu1-sub{max-width:24ch}
-[data-c="qu-1"] .qu1-cap{max-width:24ch}
-/* THE AXIS, rebuilt to Malik's 2026-08-16 notes: a LINEAR distance axis
-   (~10 ticks spread by real distance, labels only at the quarters), SHARP
-   ticks (no radius) whose height grows with the value (10,000 reads small
-   next to 90,000), a baseline with real weight, and the accent line for
-   today with NO "today" text under it. Big goals shrink the label font so
-   100,000-scale numbers never collide. */
-[data-c="qu-1"] .qu1-axis{position:relative;width:302px;margin:2px auto 24px}
-[data-c="qu-1"] .qu1-rail{position:relative;height:34px}
-[data-c="qu-1"] .qu1-base{position:absolute;left:0;right:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.16)}
-[data-c="qu-1"] .qu1-gone{position:absolute;left:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.48)}
-/* ticks are ROOTED at the axis floor (bottom:0) and FULLY OPAQUE (Malik
-   2026-08-16: no see-through crossover where a tick meets the line). The
-   growing height carries the distance; the accent tick marks today. */
-[data-c="qu-1"] .qu1-t{position:absolute;bottom:0;width:2px;transform:translateX(-50%);
-  background:var(--tick,#6b7180)}
-[data-c="qu-1"] .qu1-t.is-past{background:var(--tick-past,#9aa0ad)}
-[data-c="qu-1"] .qu1-t.is-now{width:3px;background:var(--accent)}
-@media (prefers-color-scheme:light){
-  [data-c="qu-1"]{--tick:#c2c7d0;--tick-past:#8b93a1}
-}
-[data-c="qu-1"] .qu1-labels{position:relative;height:36px;margin-top:8px;
-  font-size:var(--lfs,13px)}
-[data-c="qu-1"] .qu1-l{position:absolute;top:0;transform:translateX(-50%);text-align:center;
-  white-space:nowrap}
-[data-c="qu-1"] .qu1-l--a{transform:none;text-align:left}
-[data-c="qu-1"] .qu1-l--z{transform:translateX(-100%);text-align:right}
-[data-c="qu-1"] .qu1-num{font-size:inherit;font-weight:650;font-variant-numeric:tabular-nums;
-  letter-spacing:-.02em;color:var(--text-lo)}
-[data-c="qu-1"] .qu1-l.is-past .qu1-num{color:rgba(var(--ink),.62)}
-[data-c="qu-1"] .qu1-l.is-now .qu1-num{color:var(--text-hi);font-weight:750}
-[data-c="qu-1"] .qu1-date{font-size:10.5px;color:var(--text-lo);margin-top:4px;
-  font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .qu1-sub2{margin-bottom:34px}
+
+[data-c="qu-1"] .gp{width:100%;max-width:302px;display:flex;flex-direction:column;align-items:center}
+[data-c="qu-1"] .gp__scale{display:flex;justify-content:space-between;width:100%;
+  margin:0 0 10px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .gp__rail{position:relative;width:100%;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    rgba(var(--ink),.20) 0 3px, rgba(var(--ink),0) 3px 8px)}
+/* the ground already closed. THE one coloured thing on this screen. */
+[data-c="qu-1"] .gp__fill{position:absolute;left:0;top:-1px;bottom:-1px;width:60%;
+  border-radius:2px;background:var(--accent);
+  transform-origin:left center;transform:scaleX(var(--gpFrom,.6667))}
+[data-c="qu-1"] .b2.on .gp__fill{animation:qu1GapFill 950ms cubic-bezier(.2,.85,.25,1) .3s forwards}
+@keyframes qu1GapFill{from{transform:scaleX(var(--gpFrom,.6667))}to{transform:scaleX(1)}}
+[data-c="qu-1"] .gp__was{position:absolute;left:40%;top:-5px;width:1px;height:12px;
+  background:rgba(var(--ink),.45)}
+[data-c="qu-1"] .gp__now{position:absolute;left:60%;top:-8px;width:2px;height:18px;
+  margin-left:-1px;border-radius:1px;background:var(--text-hi);
+  opacity:0;transform:scaleY(.25);transform-origin:center}
+[data-c="qu-1"] .b2.on .gp__now{animation:qu1GapTick 420ms cubic-bezier(.2,.85,.25,1) 1.15s forwards}
+@keyframes qu1GapTick{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:scaleY(1)}}
+[data-c="qu-1"] .gp__row{display:flex;justify-content:space-between;width:100%;
+  margin-top:19px;font-size:14.5px;color:var(--text-mid);letter-spacing:-.01em;opacity:0}
+[data-c="qu-1"] .gp__row b{color:var(--text-hi);font-weight:700;font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .b2.on .gp__row{animation:qu1GapUp 460ms ease-out 1.28s forwards}
+[data-c="qu-1"] .gp__cost{margin-top:30px;opacity:0}
+[data-c="qu-1"] .b2.on .gp__cost{animation:qu1GapUp 460ms ease-out 1.5s forwards}
+@keyframes qu1GapUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 [data-c="qu-1"] .b3{padding-bottom:96px}
 
-[data-c="qu-1"] .b.on .qu1-t{animation:qu1Rise .44s cubic-bezier(.2,.8,.3,1) var(--d,0s) both}
-@keyframes qu1Rise{from{opacity:0;transform:translateX(-50%) translateY(6px)}
-  to{opacity:1;transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="qu-1"] .gp__fill{transform:scaleX(1);animation:none}
+  [data-c="qu-1"] .gp__now{opacity:1;transform:scaleY(1);animation:none}
+  [data-c="qu-1"] .gp__row,[data-c="qu-1"] .gp__cost{opacity:1;transform:none;animation:none}
+}
 </style>
 
 <div class="ph" data-c="qu-1">
@@ -57,14 +54,19 @@
     <div class="b b2">
       <div class="n qu1-hero2" data-count="0|60">60</div>
       <div class="sub qu1-sub2">paying users</div>
-      <div class="qu1-axis">
-        <div class="qu1-rail">
-          <div class="qu1-base"></div>
-          <div class="qu1-gone"></div>
+      <div class="gp">
+        <div class="gp__scale"><span>0</span><span>100</span></div>
+        <div class="gp__rail">
+          <span class="gp__fill"></span>
+          <span class="gp__was"></span>
+          <span class="gp__now"></span>
         </div>
-        <div class="qu1-labels"></div>
+        <div class="gp__row">
+          <span><b>60</b> closed</span>
+          <span><b>40</b> to go</span>
+        </div>
+        <div class="sub gp__cost"><b>26 days</b> closed the last 20.</div>
       </div>
-      <div class="cap qu1-cap">40 to go.</div>
     </div>
 
     <div class="b b3">
