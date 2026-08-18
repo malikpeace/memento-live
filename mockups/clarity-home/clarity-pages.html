@@ -222,6 +222,16 @@
   .reached{margin-top:26px;display:inline-flex;align-items:center;padding:10px 16px;border-radius:999px;
     color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft);box-shadow:inset 0 0 0 1px var(--accRing)}
   .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09);box-shadow:inset 0 0 0 1px rgba(13,140,166,.28)}
+
+  .holdPill{position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:420px;margin:0 auto;
+    padding:17px 22px;border-radius:999px;background:rgba(255,255,255,.09);color:#fff;font-size:16px;font-weight:700;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);overflow:hidden}
+  .holdPill i{position:absolute;left:0;top:0;bottom:0;width:38%;background:rgba(255,255,255,.16)}
+  .holdPill span{position:relative}
+  .holdHint{margin-top:12px;text-align:center;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600}
+  .lt .holdPill{background:rgba(24,26,33,.08);color:rgba(24,26,33,.92);box-shadow:inset 0 0 0 1px rgba(24,26,33,.16)}
+  .lt .holdPill i{background:rgba(24,26,33,.14)}
+  .lt .holdHint{color:rgba(24,26,33,.45)}
 </style>
 </head>
 <body>
@@ -337,7 +347,7 @@ function updateSheet(s){
     <div class="fsNum"><b>12,900<span class="cursorbar"></span></b><span>${s.unit}</span></div>
     <div class="fsWas">was ${s.cur}, ${s.asOf}</div>
     <div class="payoffLine">Updating will also update the slider.</div>
-    <div class="reached">I reached my goal</div>
+    <div class="reached"><svg viewBox="0 0 24 24" style="width:12px;height:12px;margin-right:7px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Neutron Star Fulfilled</div>
     <div class="spacer"></div>
     <div class="pillCta">Save</div>
     <div class="quiet">Cancel</div>
@@ -360,13 +370,42 @@ function tweakSheet(s){
   </div>`;
 }
 
+function fulfilConfirm(){
+  return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
+  <div class="stage" style="text-align:center;align-items:center">
+    <div class="spacer"></div>
+    <div class="eyebrow">Neutron Star Fulfilled</div>
+    <div class="fsq" style="margin-top:22px">Did you really reach it?</div>
+    <div class="fsWarn" style="margin-top:16px">This is the most serious button in Memento. Fulfilling your Neutron Star closes this chapter: the star you forged, the pages, and the plan are sealed into your history, and Memento will walk you toward forging your next one. This cannot be tapped by accident, and it should never be tapped lightly.</div>
+    <div class="spacer"></div>
+    <div class="holdPill"><i></i><span>Hold to fulfil</span></div>
+    <div class="holdHint">Press and hold for 3 seconds</div>
+    <div class="quiet">Not yet</div>
+  </div>`;
+}
+function changeConfirm(){
+  return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
+  <div class="stage" style="text-align:center;align-items:center">
+    <div class="spacer"></div>
+    <div class="eyebrow">Completely change it</div>
+    <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
+    <div class="fsWarn" style="margin-top:16px">Your current star, plan, and pages will be rebuilt around a new goal from scratch. Your notes and history stay, but everything else starts over. If you only want to reword the goal, move the date, or adjust the number, go back and choose Refine instead.</div>
+    <div class="spacer"></div>
+    <div class="holdPill"><i></i><span>Hold to forge a new star</span></div>
+    <div class="holdHint">Press and hold for 3 seconds</div>
+    <div class="quiet">Go back</div>
+  </div>`;
+}
+
 const CELLS=[
  {cap:'Page 1 · The Neutron Star', sub:'The star, the goal, the timeframe. Untouched, uncluttered.', render:s=>page1(s)},
  {cap:'Page 2 · The summary', sub:'Standing (number, wall, or why-led for maintain), the why, the anti-vision, Tweak at the bottom. Dated goals get no Update button, the wall moves itself.', render:s=>page2(s)},
  {cap:'Page 3 · Your notes', sub:'Add at the top. Founding message pinned. Delete allowed, editing never, past-you is an artifact.', render:()=>page3filled()},
  {cap:'Page 3 · Empty (the skipper)', sub:'First visit after skipping the message: an invitation plus one faint ghost note that teaches the feature in a glance.', render:()=>page3empty()},
  {cap:'Update progress, full screen', sub:'Number goals only. Opens full screen prefilled with the last number, they nudge it, Save, and the rail animates to the new spot. The payoff IS the update. The quiet I-reached-my-goal chip is the completion door: it triggers the arrival ceremony, never a settings-style toggle.', render:s=>updateSheet(s.id==='num'?s:SHAPES[0])},
- {cap:'Tweak, full screen', sub:'What the page-2 button opens, full screen: Refine (reword, same foundation) or Completely change it, with the warning that the star is the foundation the whole Memento rebuilds around.', render:s=>tweakSheet(s)},
+ {cap:'Tweak, full screen', sub:'What the page-2 button opens, full screen: Refine (reword, same foundation) or Completely change it. Picking either leads to its own confirm, nothing major happens in one tap.', render:s=>tweakSheet(s)},
+ {cap:'Fulfilled, the confirm', sub:'The gate behind the lock chip. Two gates deep already (chip, then this), and the pill is hold-to-confirm, 3 seconds. Impossible to hit by accident.', render:()=>fulfilConfirm()},
+ {cap:'Complete change, the confirm', sub:'The gate behind Completely change it. Hold-to-confirm, with the escape hatch pointing back to Refine for anyone who only meant to adjust wording, date, or number.', render:()=>changeConfirm()},
 ];
 
 function render(){
