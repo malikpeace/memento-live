@@ -204,7 +204,7 @@
   .fsOpt{padding:17px 16px;border-radius:999px;background:#fff;
     font-size:15.5px;font-weight:700;color:#0b1112;text-align:center;
     box-shadow:0 14px 34px rgba(0,0,0,.4)}
-  .fsOpt--danger{background:#b3362a;color:#fff;box-shadow:0 14px 34px rgba(179,54,42,.28)}
+  .fsOpt--danger{background:#ff3b30;color:#fff;box-shadow:0 14px 34px rgba(255,59,48,.3)}
   .fsWarn{margin:18px auto 0;font-size:13px;line-height:1.55;color:rgba(255,255,255,.45);text-align:center;max-width:290px}
   /* light */
   .lt .fsWas{color:rgba(24,26,33,.45)}
@@ -217,20 +217,30 @@
   .lt .quiet{color:rgba(24,26,33,.45)}
   .lt .payoffLine{color:#0d8ca6}
   .lt .fsOpts .fsOpt{background:#181a21;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.18)}
-  .lt .fsOpts .fsOpt--danger{background:#b3362a;color:#fff;box-shadow:0 12px 28px rgba(179,54,42,.22)}
+  .lt .fsOpts .fsOpt--danger{background:#ff3b30;color:#fff;box-shadow:0 12px 28px rgba(255,59,48,.24)}
   .lt .fsWarn{color:rgba(24,26,33,.5)}
 
   .reached{margin-top:26px;display:inline-flex;align-items:center;padding:10px 16px;border-radius:999px;
     color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft)}
   .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09)}
 
-  .holdCircle{width:82px;height:82px;border-radius:50%;margin:0 auto;position:relative;
-    background:conic-gradient(rgba(255,255,255,.92) 0 132deg, rgba(255,255,255,.12) 132deg 360deg)}
-  .holdCircle::after{content:"";position:absolute;inset:5px;border-radius:50%;background:#070a0f}
+  .holdCircle{width:74px;height:74px;border-radius:50%;margin:0 auto;background:rgba(255,255,255,.12)}
   .holdHint{margin-top:14px;text-align:center;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600}
-  .lt .holdCircle{background:conic-gradient(rgba(24,26,33,.9) 0 132deg, rgba(24,26,33,.14) 132deg 360deg)}
-  .lt .holdCircle::after{background:#eef0f3}
+  .lt .holdCircle{background:rgba(24,26,33,.14)}
   .lt .holdHint{color:rgba(24,26,33,.45)}
+
+  .dlgWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:34px}
+  .dlg{width:100%;max-width:290px;border-radius:18px;padding:24px 22px 18px;background:#101319;
+    box-shadow:0 30px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);text-align:center}
+  .dlg h4{margin:0 0 8px;font-size:17px;font-weight:800;color:#fff}
+  .dlg p{margin:0 0 18px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.55)}
+  .dlgBtn{display:flex;justify-content:center;padding:13px 0;border-radius:999px;font-size:14.5px;font-weight:700}
+  .dlgBtn--danger{background:#ff3b30;color:#fff}
+  .dlgBtn--quiet{color:rgba(255,255,255,.5);font-weight:600;margin-top:6px}
+  .lt .dlg{background:#fff;box-shadow:0 24px 60px rgba(0,0,0,.22)}
+  .lt .dlg h4{color:rgba(24,26,33,.96)}
+  .lt .dlg p{color:rgba(24,26,33,.55)}
+  .lt .dlgBtn--quiet{color:rgba(24,26,33,.5)}
 </style>
 </head>
 <body>
@@ -396,6 +406,22 @@ function changeConfirm(){
   </div>`;
 }
 
+function finalCheck(){
+  return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
+  <div class="stage" style="filter:blur(2px);opacity:.45;text-align:center;align-items:center">
+    <div class="spacer"></div>
+    <div class="eyebrow">Completely change it</div>
+    <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
+    <div class="spacer"></div>
+  </div>
+  <div class="dlgWrap"><div class="dlg">
+    <h4>Last check.</h4>
+    <p>Your Memento rebuilds around a new goal. There is no undo.</p>
+    <div class="dlgBtn dlgBtn--danger">Forge a new star</div>
+    <div class="dlgBtn dlgBtn--quiet">Cancel</div>
+  </div></div>`;
+}
+
 const CELLS=[
  {cap:'Page 1 · The Neutron Star', sub:'The star, the goal, the timeframe. Untouched, uncluttered.', render:s=>page1(s)},
  {cap:'Page 2 · The summary', sub:'Standing (number, wall, or why-led for maintain), the why, the anti-vision, Tweak at the bottom. Dated goals get no Update button, the wall moves itself.', render:s=>page2(s)},
@@ -405,6 +431,7 @@ const CELLS=[
  {cap:'Tweak, full screen', sub:'What the page-2 button opens, full screen: Refine (reword, same foundation) or Completely change it. Picking either leads to its own confirm, nothing major happens in one tap.', render:s=>tweakSheet(s)},
  {cap:'Fulfilled, the confirm', sub:'The gate behind the lock chip. Two gates deep already (chip, then this), and the pill is hold-to-confirm, 3 seconds. Impossible to hit by accident.', render:()=>fulfilConfirm()},
  {cap:'Complete change, the confirm', sub:'The gate behind Completely change it. Hold-to-confirm, with the escape hatch pointing back to Refine for anyone who only meant to adjust wording, date, or number.', render:()=>changeConfirm()},
+ {cap:'Complete change, last check', sub:'After the 3-second hold, one final dialog. Three gates total for forging a new star: the menu, the hold, and this. Nothing this big happens by momentum.', render:()=>finalCheck()},
 ];
 
 function render(){
