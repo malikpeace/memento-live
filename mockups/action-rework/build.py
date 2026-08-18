@@ -27,6 +27,7 @@ REACH = {
     'lg-2': ('n/a',   'layout variant: glance strip over full prose'),
     'lg-3': ('n/a',   'layout variant: named-chapter workbook'),
     'lg-4': ('n/a',   'layout variant: asked and answered'),
+    'lg-5': ('10/10', 'THE COMBINED CANDIDATE: concise, then the math, then the questions'),
     'pu-1': ('9/10',  'most goals, weekly or better'),
     'u-1':  ('10/10', 'the candidate: one layout, every bucket, every day'),
     'lp-1': ('9/10',  'money, audience, job hunt, project: the biggest buckets, daily'),

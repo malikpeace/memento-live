@@ -97,3 +97,13 @@
 - lg-2/3/4: three layout variants of the logic page (same weight content):
   glance strip over full prose / named-chapter workbook / asked-and-answered.
   Marked n/a reach, comparison only.
+
+## 2026-08-18: lg-5 THE COMBINED CANDIDATE + the background-generation flag
+- lg-5 = Malik's merge, the new logic candidate: part 1 CONCISE (star,
+  commitment line, three context rows, the plate), part 2 "How Memento got
+  here" (equation + reasoning + inputs law), part 3 "Questions you might
+  have" (three Q&A), then Fair? + hold. Each part skims alone.
+- PORT REQUIREMENT flagged: plan generation must move SERVER-SIDE (edge
+  function + stored result + push "your plan is ready") so leaving Memento
+  during the 30-60s load still ends with a finished plan. Client-side
+  generation dies when iOS suspends the page.
