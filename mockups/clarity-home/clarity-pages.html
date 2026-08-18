@@ -326,12 +326,13 @@ function page3empty(){
 }
 function updateSheet(s){
   return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
-  <div class="stage top" style="text-align:center;align-items:center">
+  <div class="stage" style="text-align:center;align-items:center">
+    <div class="spacer"></div>
     <div class="eyebrow">Update progress</div>
-    <div class="fsq" style="margin-top:26px">Where are you now?</div>
+    <div class="fsq" style="margin-top:22px">Where are you now?</div>
     <div class="fsNum"><b>12,900<span class="cursorbar"></span></b><span>${s.unit}</span></div>
     <div class="fsWas">was ${s.cur}, ${s.asOf}</div>
-    <div class="payoffLine">on Save, the rail slides to the new spot and +87,100 counts down</div>
+    <div class="payoffLine">Updating will also update the slider.</div>
     <div class="spacer"></div>
     <div class="pillCta">Save</div>
     <div class="quiet">Cancel</div>
@@ -340,9 +341,10 @@ function updateSheet(s){
 
 function tweakSheet(s){
   return `<div class="neb"><div class="neb1"></div><div class="neb2"></div></div>
-  <div class="stage top" style="text-align:center;align-items:center">
+  <div class="stage" style="text-align:center;align-items:center">
+    <div class="spacer"></div>
     <div class="eyebrow">Tweak your Neutron Star</div>
-    <div class="fsq" style="margin-top:26px">What do you want to do with it?</div>
+    <div class="fsq" style="margin-top:22px">What do you want to do with it?</div>
     <div class="fsOpts">
       <div class="fsOpt">Refine your Neutron Star</div>
       <div class="fsOpt fsOpt--danger">Completely change it</div>
