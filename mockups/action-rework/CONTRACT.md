@@ -212,3 +212,13 @@ space, no abstract art, no motion, no mouse-following, nothing "AI".
   you can only supply inputs. Plans and briefs assign inputs, the highest
   leverage acts available, stacked until missing the goal becomes the
   unreasonable result. The logic page states this on every brief.
+
+## THE READING LAW (Malik, 2026-08-18) — every generated word
+All AI-generated text a customer reads (the logic page, questions, the
+action screens, pulses, closes) must sit at a 5th-grade reading level or
+below. Short sentences. Everyday words. One idea per sentence. Terms of
+art only when the person used them first (their "GPA", their "maintenance
+calories" get explained in the same breath). ENFORCEMENT AT THE PORT: the
+judge pass grades readability (Flesch-Kincaid <= 5.9 or equivalent) and a
+failing plan regenerates with "say it simpler" notes. Mockup copy models
+the law.

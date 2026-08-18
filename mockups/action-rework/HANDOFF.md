@@ -107,3 +107,13 @@
   function + stored result + push "your plan is ready") so leaving Memento
   during the 30-60s load still ends with a finished plan. Client-side
   generation dies when iOS suspends the page.
+
+## 2026-08-18 pt 2: THE READING LAW + lg-5 all eight buckets
+- THE READING LAW in CONTRACT.md: all generated customer text <= 5th-grade
+  level; the port's judge pass grades readability (FK <= 5.9) and failing
+  plans regenerate with "say it simpler" notes.
+- lg-5 rebuilt data-driven with the bucket toggle: all eight buckets carry
+  the full three-part structure, copy rewritten to the reading law (avg 7.8
+  words/sentence measured). Per-bucket Q&As (fitness: what counts as a
+  session; money: what if nobody replies; projects: what happens when the
+  module is done; etc).
