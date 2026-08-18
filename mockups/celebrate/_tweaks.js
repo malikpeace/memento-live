@@ -467,44 +467,53 @@
         var cur = Math.max(Math.min(+v.cur, Math.max(start, goal)), Math.min(start, goal));
         if (start === goal) return;
         var marks = C.milestones({ target: goal, baseline: start }, 'down');
-        var passed = marks.filter(function (m) { return cur <= m; });
-        var nowMark = passed.length ? passed[passed.length - 1] : null;
         var span = Math.abs(goal - start), frac = Math.abs(cur - start) / span;
-        cnt(ph, '.b1 .n', cur, start);
-        put(ph, '.b1 .of', esc(unitFor(cur, v.unit)));
-        var mid = '<div class="sl__track"></div><div class="sl__gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
-        /* THE AXIS (Malik 2026-08-16, same law as qu-1): ~10 sharp ticks by
-           pure DISTANCE, heights growing with the road travelled, numbers
-           only at the quarters, never within 9% of today's own number. */
-        var TICKS = 10;
-        for (var ti = 1; ti < TICKS; ti++) {
-          var p = ti / TICKS * 100;
-          if (Math.abs(p - frac * 100) < 4) continue;           // the accent post owns this spot
-          var q4 = ti / TICKS;                                   // fraction of the road
-          var showLbl = (ti === 2 || ti === 5 || ti === 8) && Math.abs(p - frac * 100) > 9;
-          var valQ = Math.round(start + (goal - start) * q4);
-          var lbl = showLbl ? '<small>' + fmt(valQ) + '</small>' : '';
-          mid += '<div class="sl__t' + (p < frac * 100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
-                 '%;--th:' + Math.round(7 + q4 * 11) + 'px">' + lbl + '</div>';
+        var money = isMoney(v.unit);
+        var mf = function (n) { return (money ? '$' : '') + fmt(n); };
+        /* the current number rides big on top in BOTH beats, like qu-1 */
+        if (money) { put(ph, '.qd1-hero', mf(cur)); put(ph, '.qd1-hero2', mf(cur)); }
+        else { cnt(ph, '.qd1-hero', cur, start); cnt(ph, '.qd1-hero2', cur, start); }
+        put(ph, '.qd1-sub2', esc(money ? (v.unit.replace(/^\$\s*/, '') || 'dollars') : v.unit));
+        /* THE AXIS (mirror of qu-1): ~10 sharp OPAQUE ticks by pure DISTANCE,
+           heights growing along the road, quarter labels with dates for the
+           passed ones, the accent tick at today, NO number on the line. */
+        var frac100 = frac * 100;
+        var rail = Q(ph, '.qd1-rail');
+        if (rail) {
+          var html = '<div class="qd1-base"></div><div class="qd1-gone" style="width:' + frac100.toFixed(1) + '%"></div>';
+          var TICKS = 10, di = 0;
+          for (var ti = 0; ti <= TICKS; ti++) {
+            var p = ti / TICKS * 100;
+            if (Math.abs(p - frac100) < 3.5) continue;
+            var hh = Math.round(6 + (ti / TICKS) * 19);
+            html += '<div class="qd1-t' + (p < frac100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
+                    '%;height:' + hh + 'px;--d:' + (di++ * 0.05).toFixed(2) + 's"></div>';
+          }
+          html += '<div class="qd1-t is-now" style="left:' + frac100.toFixed(1) + '%;height:' +
+                  Math.round(10 + frac * 19 + 6) + 'px;--d:' + (di * 0.05).toFixed(2) + 's"></div>';
+          rail.innerHTML = html;
         }
-        mid += '<div class="sl__now" style="left:' + (frac * 100).toFixed(1) + '%"></div>';
-        /* big numbers shrink the type so nothing ever collides */
-        var digits = String(fmt(Math.max(Math.abs(start), Math.abs(goal)))).length;
-        var sl = Q(ph, '.sl');
-        if (sl) {
-          sl.style.setProperty('--lfs', (digits >= 6 ? 9.5 : 11) + 'px');
-          sl.style.setProperty('--efs', (digits >= 6 ? 12.5 : 15) + 'px');
+        var lwrap = Q(ph, '.qd1-labels');
+        if (lwrap) {
+          var lfs = String(mf(start)).length >= 7 ? 10 : String(mf(start)).length >= 5 ? 11 : 13;
+          lwrap.style.setProperty('--lfs', lfs + 'px');
+          var lab = '';
+          [0, 0.25, 0.5, 0.75, 1].forEach(function (q) {
+            var p = q * 100, valQ = Math.round(start + (goal - start) * q);
+            var isPastQ = frac >= q && q > 0;
+            var when = isPastQ ? dateBack(Math.round(days * (1 - q / Math.max(frac, 0.0001)))) : '';
+            var edge = q === 0 ? ' qd1-l--a' : q === 1 ? ' qd1-l--z' : '';
+            lab += '<div class="qd1-l' + edge + (isPastQ ? ' is-past' : '') + '" style="left:' + p + '%">' +
+                   '<div class="qd1-num">' + mf(valQ) + '</div>' +
+                   (when ? '<div class="qd1-date">' + when + '</div>' : '') + '</div>';
+          });
+          lwrap.innerHTML = lab;
         }
-        put(ph, '.sl',
-          '<div class="sl__endcol"><b>' + fmt(start) + '</b><span>started, ' + dateBack(days) + '</span></div>'
-          + '<div class="sl__mid">' + mid + '</div>'
-          + '<div class="sl__endcol"><b>' + fmt(goal) + '</b><span>the goal</span></div>');
-        var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[0]) subs[0].innerHTML = 'Started at ' + fmt(start) + ', ' + fmt(days) + ' days ago.';
-        if (subs[1]) subs[1].innerHTML = fmt(goal) + ' is ' + fmt(Math.abs(cur - goal)) + ' away.';
+        put(ph, '.b1 .sub', 'on the scale today.');
+        put(ph, '.qd1-cap', mf(Math.abs(cur - goal)) + ' to go.');
         put(ph, '.b3 .deposit', cur === start
-          ? 'Day one. The road runs ' + fmt(start) + ' to ' + fmt(goal) + '; the first mark is <b>' + fmt(marks[0]) + '</b>.'
-          : 'On this day, the scale read <b>' + fmt(cur) + '</b>. Down ' + fmt(Math.abs(start - cur)) + ' from where you started.');
+          ? 'Day one. The road runs ' + mf(start) + ' to ' + mf(goal) + '; the first mark is <b>' + mf(marks[0]) + '</b>.'
+          : 'On this day, the scale read <b>' + mf(cur) + '</b>. Down ' + mf(Math.abs(start - cur)) + ' from where you started.');
       }
     },
 
@@ -825,85 +834,6 @@
       }
     },
 
-    /* ================= MILESTONE ================= */
-    'ms-1': {
-      c: [
-        { k: 'event', t: 't', l: 'The event', v: 'You got the job!' },
-        { k: 'n', t: 'r', l: 'Count', v: 47, min: 1, max: 900 },
-        { k: 'word', t: 't', l: 'Count word', v: 'applications' },
-        { k: 'days', t: 'r', l: 'Days of looking', v: 271, min: 1, max: 900 }
-      ],
-      apply: function (ph, v) {
-        put(ph, '.ms1-word', esc(v.event));
-        cnt(ph, '.ms1-num', +v.n);
-        put(ph, '.b2 .sub', esc(unitFor(+v.n, v.word)) + ' since ' + dateBack(+v.days) + '.');
-        put(ph, '.ms1-cost', '6 final rounds.<br>' + fmt(+v.days) + ' days of looking.');
-        put(ph, '.b3 .deposit', 'On this day, <b>' + esc(v.event.charAt(0).toLowerCase() + v.event.slice(1)) + '</b>');
-      }
-    },
-
-    'ms-2': {
-      c: [
-        { k: 'sess', t: 'r', l: 'Sessions', v: 118, min: 1, max: 1000 },
-        { k: 'len', t: 'r', l: 'Minutes each (avg)', v: 152, min: 5, max: 300 },
-        { k: 'what', t: 't', l: 'Of what', v: 'studying for the boards' },
-        { k: 'since', t: 'r', l: 'Days since the first', v: 220, min: 1, max: 900 },
-        { k: 'out', t: 'r', l: 'Days to the event', v: 41, min: 0, max: 400 }
-      ],
-      apply: function (ph, v) {
-        var sess = +v.sess, len = +v.len, hours = Math.round(sess * len / 60);
-        cnt(ph, '.b1 .n', hours);
-        put(ph, '.b1 .sub', 'hours of ' + esc(v.what) + '.');
-        var ticks = Math.min(sess, 120), rail = '';
-        for (var i = 0; i < ticks; i++) rail += '<i class="ms2-t' + (i === ticks - 1 ? ' ms2-t--now' : '') + '"></i>';
-        put(ph, '.ms2-rail', rail);
-        var railSubs = ph.querySelectorAll('.b2 .sub');
-        if (railSubs[0]) railSubs[0].innerHTML = fmt(sess) + ' ' + plural(sess, 'session', 'sessions') + ' since ' + dateBack(+v.since) + '. About ' + durLong(len) + ' each.' + (sess > ticks ? ' (Last ' + ticks + ' drawn.)' : '');
-        put(ph, '.ms2-ahead', +v.out === 0 ? 'The event is here.' : 'The event is ' + fmt(+v.out) + ' ' + plural(+v.out, 'day', 'days') + ' out.');
-        put(ph, '.b3 .deposit', 'On this day, you crossed <b>' + fmt(hours) + ' hours</b> of ' + esc(v.what) + '.');
-        put(ph, '.ms2-open', +v.out === 0 ? 'Today is the day it was for.' : 'The event is still ahead.');
-      }
-    },
-
-    'ms-3': {
-      c: [
-        { k: 'ahead', t: 'r', l: 'Days ahead', v: 9, min: 0, max: 400 },
-        { k: 'days', t: 'r', l: 'Days of work', v: 246, min: 1, max: 900 },
-        { k: 'what', t: 't', l: 'The thing', v: 'the manuscript' },
-        { k: 'cost', t: 't', l: 'Cost line', v: '71,400 words' }
-      ],
-      apply: function (ph, v) {
-        var a = +v.ahead, onTime = a === 0;
-        put(ph, '.ms3-calc',
-          '<div class="ms3-row"><span>Your deadline</span><span class="ms3-v">' + dateAhead(a) + '</span></div>'
-          + '<div class="ms3-row"><span>You finished</span><span class="ms3-v">' + dateBack(0) + '</span></div>'
-          + '<div class="ms3-hr"></div>'
-          + (onTime
-            ? '<div class="ms3-row ms3-row--sum"><span></span><span class="ms3-sum">Right on time!</span></div>'
-            : '<div class="ms3-row ms3-row--sum"><span>Days ahead</span><span class="ms3-sum">' + fmt(a) + '</span></div>'));
-        put(ph, '.ms3-cost', fmt(+v.days) + ' days of work. ' + esc(v.cost) + '.');
-        put(ph, '.b3 .deposit', onTime ? 'On this day, <b>you finished ' + esc(v.what) + '</b>. Right on time!' : 'On this day, <b>you finished ' + esc(v.what) + '</b>, ' + fmt(a) + ' ' + plural(a, 'day', 'days') + ' before your deadline.');
-      }
-    },
-
-    'ms-5': {
-      c: [
-        { k: 'time', t: 't', l: 'The minute', v: '4:12pm' },
-        { k: 'days', t: 'r', l: 'Days since day one', v: 874, min: 1, max: 2000 },
-        { k: 'hours', t: 'r', l: 'Hours logged', v: 1140, min: 0, max: 5000 }
-      ],
-      apply: function (ph, v) {
-        put(ph, '.ms5-stamp', esc(v.time));
-        cnt(ph, '.b2 .n', +v.days);
-        /* the hours made visible: one bar per ~50 hours (Malik 2026-08-14) */
-        var bars = Math.max(1, Math.min(40, Math.round(+v.hours / 50))), viz = '';
-        for (var i = 0; i < bars; i++) viz += '<i></i>';
-        put(ph, '.ms5-viz', viz);
-        put(ph, '.ms5-cost', fmt(+v.hours) + ' hours logged. Each bar is 50.<br>Your third sitting.');
-        put(ph, '.b3 .deposit', 'On this day at <b>' + esc(v.time) + '</b>, <b>you passed the bar!</b>');
-      }
-    },
-
     /* ================= OPEN ================= */
     'op-1': {
       c: [{ k: 'days', t: 'r', l: 'Days apart', v: 90, min: 1, max: 500 }],
@@ -1195,10 +1125,6 @@
     'mt-2': function (v) { if (+v.held >= +v.total) return '<b>The promised date arrived with the rule intact.</b> Fires as a FINAL; the grand finale outranks it.'; if (+v.held === Math.round(+v.total / 2)) return '<b>Halfway.</b> The 50% mark of the promise fires (Malik 2026-08-14).'; return dayFire(+v.held); },
     'mt-3': function (v) { return dayFire(+v.days); },
     'mt-4': function (v) { return '<b>Day 7 exactly.</b> The first-seven moment fires once, then the weekly rhythm takes over.'; },
-    'ms-1': function (v) { return '<b>Fires when they mark it done.</b> A binary event has no partial credit.'; },
-    'ms-2': function (v) { return '<b>Fires when they mark it done.</b> The engine numbers are whatever they actually logged.'; },
-    'ms-3': function (v) { return '<b>Fires on arrival</b>, ' + fmt(+v.days) + ' days before the date they set.'; },
-    'ms-5': function (v) { return '<b>Fires when they mark it done;</b> the minute is stamped from the actual tap.'; },
     'op-1': function (v) { var d = +v.days; return d < 28 ? 'Before day 28 there is no "then" worth holding up; silent.' : (ladderHit(d) === d ? '<b>Day ' + fmt(d) + ' is a rung:</b> the then-vs-now moment fires.' : 'Day ' + fmt(d) + ' is not a rung; the pair waits.'); },
     'op-2': function (v) { return dayFire(+v.days); },
     'op-4': function (v) { return dayFire(+v.days); },
@@ -1235,10 +1161,6 @@
     'mt-1': function () { return { days: 1 }; },
     'mt-2': function () { return { held: 1 }; },
     'mt-3': function () { return { days: 1, hard: 0 }; },
-    'ms-1': function () { return { n: 1, days: 1 }; },
-    'ms-2': function () { return { n: 1 }; },
-    'ms-3': function () { return { days: 1 }; },
-    'ms-5': function () { return { days: 1, hours: 1 }; },
     'op-1': function () { return { days: 1 }; },
     'op-2': function () { return { days: 1 }; },
     'op-4': function () { return { days: 1, entries: 1 }; },

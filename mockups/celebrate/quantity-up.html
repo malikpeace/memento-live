@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quantity up</title>
-<link rel="stylesheet" href="_kit.css?v=tw36">
+<link rel="stylesheet" href="_kit.css?v=tw37">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -29,12 +29,16 @@
   background:rgba(var(--ink),.16)}
 [data-c="qu-1"] .qu1-gone{position:absolute;left:0;bottom:0;height:2.5px;
   background:rgba(var(--ink),.48)}
-/* ticks are ROOTED at the axis floor (bottom:0), so they grow straight out
-   of the baseline like a real graph, touching it with no gap */
+/* ticks are ROOTED at the axis floor (bottom:0) and FULLY OPAQUE (Malik
+   2026-08-16: no see-through crossover where a tick meets the line). The
+   growing height carries the distance; the accent tick marks today. */
 [data-c="qu-1"] .qu1-t{position:absolute;bottom:0;width:2px;transform:translateX(-50%);
-  background:rgba(var(--ink),.22)}
-[data-c="qu-1"] .qu1-t.is-past{background:rgba(var(--ink),.55)}
+  background:var(--tick,#6b7180)}
+[data-c="qu-1"] .qu1-t.is-past{background:var(--tick-past,#9aa0ad)}
 [data-c="qu-1"] .qu1-t.is-now{width:3px;background:var(--accent)}
+@media (prefers-color-scheme:light){
+  [data-c="qu-1"]{--tick:#c2c7d0;--tick-past:#8b93a1}
+}
 [data-c="qu-1"] .qu1-labels{position:relative;height:36px;margin-top:8px;
   font-size:var(--lfs,13px)}
 [data-c="qu-1"] .qu1-l{position:absolute;top:0;transform:translateX(-50%);text-align:center;
@@ -250,6 +254,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">No target at all, so the only thing to beat is the last time you were best. The new week takes the <b>top seat</b> and pushes the old records down, and the caption says the one it beat stood 22 weeks, which is what makes it mean something. A personal record rewards the fact instead of a fraction, so a goal with no end still gets a real moment.</p></div></div></div>
-<script src="chooser.js?v=tw36"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw37"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

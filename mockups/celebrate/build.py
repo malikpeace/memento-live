@@ -16,7 +16,6 @@ PAGES = [
   ('quantity-down', 'qd', 'Quantity down', 'A number falling. Lose 20 lbs, pay off $8,000, screen time under an hour. The most emotionally loaded type in the set, so the voice stays matter of fact and never coaches at them.'),
   ('frequency',     'fr', 'Frequency',     'A rate of behaviour. Run 4x a week, write daily. Frequency is tolerant by definition, so a missed week is not a broken goal and none of these build streak-loss anxiety.'),
   ('maintenance',   'mt', 'Maintenance',   'A line held. Stay sober, keep under 180, a no-buy year. The design problem: celebrating a long run makes a future break hurt more, so days held are framed as deposits already banked, never as a tower that can fall.'),
-  ('milestone',     'ms', 'Milestone',     'A binary event. Pass the bar, get the job, ship it. No partial credit, so these can be the boldest screens in the set. One of them celebrates the engine underneath before the event even lands.'),
   ('big-ass',       'ba', 'BIG ASS CELEBRATIONS', 'THE pick (Malik 2026-08-16): one screen, his own fusion. The M gains colour as dots spiral in, a tap detonates a ~9s fireworks show, then three swipeable endings: the sphere of every move, the numbers, and the note. Driven by the sliders across all four goal shapes that can finish. Fires ONCE, outranks everything, and the day it fires nothing else shows. The trigger (how the app knows a goal is finished) is specced in GOAL-REACHED-SPEC.md, not built.'),
   ('open',          'op', 'Open',          'PARKED for now (decided 2026-08-09): these have no honest trigger yet. They would fire only when the AI notices a real shift in their own reflections, a feature that does not exist. The screens stay as reference for that day. Cadence, per Malik 2026-08-10: the then-vs-now moment fires first at day 30 (not 90), and per Malik 2026-08-13 day rungs now come every 7 days (weekly rhythm, chooser.js), so nobody waits a year to see one.'),
   ('refinements',   'rf', 'The three you picked', 'The Gap, The Fall and The Record, rebuilt properly: three beats, tap to advance, the accent driven by their chosen Memento colour, a deposit line, and the M where it earns its place. (The Card Takes It was cut 2026-08-13; its instinct, the Memento owning the moment, lives in the BIG ASS CELEBRATIONS family now.)'),
@@ -40,9 +39,6 @@ VERDICTS = {
   # maintenance: 3 approved IF hard days are really logged (open product
   # question); 5 deleted at his ask
   'mt-1':'g','mt-2':'g','mt-3':'g','mt-4':'g',
-  # milestone: ms-4 (the fork) CUT 2026-08-14 ('feels mid, not a milestone');
-  # the rest approved, ms-2/ms-3/ms-5 re-tuned to his 2026-08-14 notes
-  'ms-1':'g','ms-2':'g','ms-3':'g','ms-5':'g',
   # open: 1 fine but must fire earlier than 90 days (chooser cadence);
   # 3 changed completely (one move + the count); 4 given receipts; 5 loved
   # but needs earlier rungs than a year
@@ -75,7 +71,7 @@ def shell(title, body, back=True):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
-<link rel="stylesheet" href="_kit.css?v=tw36">
+<link rel="stylesheet" href="_kit.css?v=tw37">
 </head><body data-accent="cyan">
 <div class="bar">
   {'<a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>' if back else ''}
@@ -84,7 +80,7 @@ def shell(title, body, back=True):
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
 {body}
-<script src="chooser.js?v=tw36"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw37"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>"""
 

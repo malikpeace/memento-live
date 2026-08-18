@@ -1,88 +1,65 @@
 <style>
-/* qd-1 REBUILT (Malik: the vertical rail did not land; show the numbers on a
-   slider, where they are and where they are going). One horizontal line:
-   the start weight on the left, the target on the right, the real fifths as
-   ticks in between, and the accent post standing where the scale is today.
-   Travel toward the goal reads left to right no matter which way the number
-   moves. */
-[data-c="qd-1"] .lead{display:flex;align-items:baseline;gap:11px}
-[data-c="qd-1"] .lead .of{font-size:24px;font-weight:650;letter-spacing:-.02em;
-  color:var(--text-mid);font-variant-numeric:tabular-nums}
+/* qd-1 REBUILT to mirror qu-1 (Malik 2026-08-16: "basically the same as
+   qu-1 just reversed"). Big current number on top, then the SAME distance
+   axis below: sharp opaque ticks rooted on the baseline, growing along the
+   road, quarter labels, the accent tick at today, no number repeated on the
+   line. The only difference from qu-1 is the road runs from the START weight
+   on the left to the GOAL weight on the right, so travel reads left to right
+   as the number falls. */
+[data-c="qd-1"] .qd1-hero{font-size:104px}
+[data-c="qd-1"] .qd1-hero2{font-size:72px}
+[data-c="qd-1"] .qd1-sub2{margin-bottom:26px}
 
-/* the ends are PART of the line (Malik: 270 at the line's far left, 250 at
-   its far right, never under it): number - line - number, one row, the
-   captions hang quietly beneath their numbers */
-[data-c="qd-1"] .sl{display:flex;align-items:center;gap:12px;width:300px;margin-bottom:26px}
-[data-c="qd-1"] .sl__endcol{position:relative;flex:0 0 auto}
-[data-c="qd-1"] .sl__endcol b{font-size:15px;font-weight:700;letter-spacing:-.02em;
-  color:var(--text-mid);font-variant-numeric:tabular-nums}
-[data-c="qd-1"] .sl__endcol span{position:absolute;top:calc(100% + 4px);left:50%;
-  transform:translateX(-50%);font-size:10.5px;color:var(--text-lo);white-space:nowrap}
-[data-c="qd-1"] .sl__mid{position:relative;flex:1;height:74px}
-/* Malik 2026-08-16: the line carries WEIGHT now, and every tick is SHARP.
-   Ticks sit ON the line and grow with the distance travelled, so the road
-   visibly climbs toward the goal. */
-/* the axis line is centred on 50% and every tick is ROOTED on it (bottom:50%),
-   so the whole thing reads as one connected graph, no gaps (Malik 2026-08-16) */
-[data-c="qd-1"] .sl__track{position:absolute;left:0;right:0;top:50%;height:2.5px;
-  transform:translateY(-50%);background:rgba(var(--ink),.14)}
-[data-c="qd-1"] .sl__gone{position:absolute;left:0;top:50%;height:2.5px;width:40%;
-  transform:translateY(-50%);background:rgba(var(--ink),.46)}
-[data-c="qd-1"] .sl__t{position:absolute;bottom:50%;width:2px;height:var(--th,13px);
-  background:rgba(var(--ink),.22);transform:translateX(-50%)}
-[data-c="qd-1"] .sl__t.is-past{background:rgba(var(--ink),.55)}
-/* interim weights ride ABOVE the line */
-[data-c="qd-1"] .sl__t small{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
-  font-size:var(--lfs,11px);font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
-  font-variant-numeric:tabular-nums}
-[data-c="qd-1"] .sl__t.is-past small{color:rgba(var(--ink),.55)}
-/* today: the accent post, rooted on the line too. No number here anymore
-   (it is big above); the accent post alone marks where they are. */
-[data-c="qd-1"] .sl__now{position:absolute;bottom:50%;width:3px;height:24px;
-  background:var(--accent);transform:translateX(-50%)}
-[data-c="qd-1"] .sl__endcol b{font-size:var(--efs,15px)}
-
-[data-c="qd-1"] .b.on .sl__gone{transform-origin:left;animation:qd1gone .7s cubic-bezier(.2,.8,.3,1) .15s both}
-@keyframes qd1gone{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-[data-c="qd-1"] .b.on .sl__now{animation:qd1now .5s cubic-bezier(.2,.8,.3,1) .55s both}
-@keyframes qd1now{from{opacity:0;transform:translateX(-50%) translateY(6px)}to{opacity:1;transform:translateX(-50%)}}
-
-[data-c="qd-1"] .sub{text-wrap:balance}
-[data-c="qd-1"] .sub + .sub{margin-top:7px}
+[data-c="qd-1"] .qd1-axis{position:relative;width:302px;margin:2px auto 24px}
+[data-c="qd-1"] .qd1-rail{position:relative;height:34px}
+[data-c="qd-1"] .qd1-base{position:absolute;left:0;right:0;bottom:0;height:2.5px;
+  background:rgba(var(--ink),.16)}
+[data-c="qd-1"] .qd1-gone{position:absolute;left:0;bottom:0;height:2.5px;
+  background:rgba(var(--ink),.48)}
+[data-c="qd-1"] .qd1-t{position:absolute;bottom:0;width:2px;transform:translateX(-50%);
+  background:var(--tick,#6b7180)}
+[data-c="qd-1"] .qd1-t.is-past{background:var(--tick-past,#9aa0ad)}
+[data-c="qd-1"] .qd1-t.is-now{width:3px;background:var(--accent)}
+@media (prefers-color-scheme:light){
+  [data-c="qd-1"]{--tick:#c2c7d0;--tick-past:#8b93a1}
+}
+[data-c="qd-1"] .qd1-labels{position:relative;height:36px;margin-top:8px;font-size:var(--lfs,13px)}
+[data-c="qd-1"] .qd1-l{position:absolute;top:0;transform:translateX(-50%);text-align:center;white-space:nowrap}
+[data-c="qd-1"] .qd1-l--a{transform:none;text-align:left}
+[data-c="qd-1"] .qd1-l--z{transform:translateX(-100%);text-align:right}
+[data-c="qd-1"] .qd1-num{font-size:inherit;font-weight:650;font-variant-numeric:tabular-nums;
+  letter-spacing:-.02em;color:var(--text-lo)}
+[data-c="qd-1"] .qd1-l.is-past .qd1-num{color:rgba(var(--ink),.62)}
+[data-c="qd-1"] .qd1-date{font-size:10.5px;color:var(--text-lo);margin-top:4px;font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .b3{padding-bottom:96px}
 [data-c="qd-1"] .deposit{text-wrap:balance}
+
+[data-c="qd-1"] .b.on .qd1-t{animation:qd1Rise .44s cubic-bezier(.2,.8,.3,1) var(--d,0s) both}
+@keyframes qd1Rise{from{opacity:0;transform:translateX(-50%) translateY(6px)}
+  to{opacity:1;transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){
-  [data-c="qd-1"] .b.on .sl__gone,[data-c="qd-1"] .b.on .sl__now{animation:none}
+  [data-c="qd-1"] .b.on .qd1-t{animation:none}
 }
 </style>
 <div class="ph" data-c="qd-1">
   <div class="st">
 
     <div class="b b1">
-      <div class="lead">
-        <span class="n n--hero" data-count="270|262">262</span>
-        <span class="of">lbs</span>
-      </div>
-      <div class="sub">The scale this morning.</div>
+      <div class="n qd1-hero" data-count="270|262">262</div>
+      <div class="sub">on the scale today.</div>
     </div>
 
     <div class="b b2">
-      <!-- the ticks are REAL scale weights on the way down (Malik: real
-           numbers, never "X of Y down" arithmetic). Positions are simple
-           percentages of |start - target|, so any weights land correctly. -->
-      <div class="sl">
-        <div class="sl__endcol"><b>270</b><span>started, Mar 3</span></div>
-        <div class="sl__mid">
-          <div class="sl__track"></div>
-          <div class="sl__gone"></div>
-          <div class="sl__t is-past" style="left:20%"><small>266</small></div>
-          <div class="sl__now" style="left:40%"><b>262</b></div>
-          <div class="sl__t" style="left:60%"><small>258</small></div>
-          <div class="sl__t" style="left:80%"><small>254</small></div>
+      <div class="n qd1-hero2" data-count="270|262">262</div>
+      <div class="sub qd1-sub2">lbs</div>
+      <div class="qd1-axis">
+        <div class="qd1-rail">
+          <div class="qd1-base"></div>
+          <div class="qd1-gone"></div>
         </div>
-        <div class="sl__endcol"><b>250</b><span>the goal</span></div>
+        <div class="qd1-labels"></div>
       </div>
-      <div class="sub">Started at 270, 63 days ago.</div>
-      <div class="sub">250 is 12 away.</div>
+      <div class="cap qd1-cap">12 to go.</div>
     </div>
 
     <div class="b b3">

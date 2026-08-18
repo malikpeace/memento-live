@@ -148,38 +148,6 @@
       ]
     },
     {
-      "job": "ms",
-      "label": "Milestone",
-      "concepts": [
-        {
-          "key": "ms-1",
-          "name": "The turn",
-          "note": "The one screen that inverts. The instant the binary event lands, the whole phone floods to light and the <b>bare M is the only dark shape left</b>, then the line arrives under it. Beats 2 and 3 fall back to black to weigh it and file it. A milestone has no partial credit, so it gets the biggest gesture in the set, and it gets it with light and silence instead of confetti. The single accent moment is the 47 applications on beat 2, not the flood."
-        },
-        {
-          "key": "ms-2",
-          "name": "The engine underneath",
-          "note": "Celebrates the hidden quantity engine <b>before</b> the event, which is the only way this type gets more than one moment in its whole life. 300 hours lands as the hero, then the rail shows all 118 study sessions as marks with today lit at the end of an unfinished row. Beat 3 says the hours are kept and says plainly that the exam is still ahead, so nothing pretends the goal is done."
-        },
-        {
-          "key": "ms-3",
-          "name": "Nine days early",
-          "note": "The deadline variant, drawn as a <b>plain subtraction instead of a bar</b>. Deadline, finish date, a rule, the margin. It reads like a receipt, which is honest, and it dodges every progress meter cliche. The margin is the only coloured thing on the screen because the margin is the entire story."
-        },
-        {
-          "key": "ms-5",
-          "name": "The exact minute",
-          "note": "The record keeps the <b>minute, not just the day</b>. The statement lands white and large, the timestamp signs it underneath as the only accent. Beat 2 is the honest cost, 874 days and a third sitting. Beat 3 is the line Malik asked for, on this day at 4:12pm, with the quiet maker's mark at the foot because that beat is a record."
-        }
-      ],
-      "pass": true,
-      "fixed": 1,
-      "remaining": [
-        "NOT a contract violation, but worth Malik's eye: ms-1 is the only whiteout in the set, and during beat 1 the kit's own `.hint` ('Tap to replay', `rgba(var(--ink),.20)`) sits on the white flood and is invisible. `.keepbtn` is safely hidden on beat 1 (it only shows on `.ph.done`), so nothing functional breaks. This is kit chrome, not fragment content, and `_kit.css` states fragments must not override it; there is also no clean scoped selector for it because `.hint` is a sibling of `.st`, not a descendant of `.b`. Left alone deliberately. If it matters, the fix belongs in `_kit.css` (gallery-only), not in ms-1.",
-        "Observation, not a violation: in ms-2 beat 2 the 118-tick session rail renders as a dense hatch (~4.5px wide ticks, 3 rows), and the brighter `--now` tick (rgba 235,238,248,.7) does not read as distinct at that density. Legal under the contract (grey, not accent, not a percentage bar, not an Apple-Watch ring), and I did not touch it because changing it would be redesigning the concept rather than enforcing the contract."
-      ]
-    },
-    {
       "job": "op",
       "label": "Open",
       "concepts": [
