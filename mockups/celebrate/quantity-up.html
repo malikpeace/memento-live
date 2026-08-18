@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quantity up</title>
-<link rel="stylesheet" href="_kit.css?v=tw35">
+<link rel="stylesheet" href="_kit.css?v=tw36">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -24,13 +24,15 @@
    today with NO "today" text under it. Big goals shrink the label font so
    100,000-scale numbers never collide. */
 [data-c="qu-1"] .qu1-axis{position:relative;width:302px;margin:2px auto 24px}
-[data-c="qu-1"] .qu1-rail{position:relative;height:36px}
+[data-c="qu-1"] .qu1-rail{position:relative;height:34px}
 [data-c="qu-1"] .qu1-base{position:absolute;left:0;right:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.14)}
+  background:rgba(var(--ink),.16)}
 [data-c="qu-1"] .qu1-gone{position:absolute;left:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.45)}
-[data-c="qu-1"] .qu1-t{position:absolute;bottom:2.5px;width:2px;transform:translateX(-50%);
-  background:rgba(var(--ink),.20)}
+  background:rgba(var(--ink),.48)}
+/* ticks are ROOTED at the axis floor (bottom:0), so they grow straight out
+   of the baseline like a real graph, touching it with no gap */
+[data-c="qu-1"] .qu1-t{position:absolute;bottom:0;width:2px;transform:translateX(-50%);
+  background:rgba(var(--ink),.22)}
 [data-c="qu-1"] .qu1-t.is-past{background:rgba(var(--ink),.55)}
 [data-c="qu-1"] .qu1-t.is-now{width:3px;background:var(--accent)}
 [data-c="qu-1"] .qu1-labels{position:relative;height:36px;margin-top:8px;
@@ -248,6 +250,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">No target at all, so the only thing to beat is the last time you were best. The new week takes the <b>top seat</b> and pushes the old records down, and the caption says the one it beat stood 22 weeks, which is what makes it mean something. A personal record rewards the fact instead of a fraction, so a goal with no end still gets a real moment.</p></div></div></div>
-<script src="chooser.js?v=tw35"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw36"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

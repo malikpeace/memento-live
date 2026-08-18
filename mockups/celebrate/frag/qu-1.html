@@ -12,13 +12,15 @@
    today with NO "today" text under it. Big goals shrink the label font so
    100,000-scale numbers never collide. */
 [data-c="qu-1"] .qu1-axis{position:relative;width:302px;margin:2px auto 24px}
-[data-c="qu-1"] .qu1-rail{position:relative;height:36px}
+[data-c="qu-1"] .qu1-rail{position:relative;height:34px}
 [data-c="qu-1"] .qu1-base{position:absolute;left:0;right:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.14)}
+  background:rgba(var(--ink),.16)}
 [data-c="qu-1"] .qu1-gone{position:absolute;left:0;bottom:0;height:2.5px;
-  background:rgba(var(--ink),.45)}
-[data-c="qu-1"] .qu1-t{position:absolute;bottom:2.5px;width:2px;transform:translateX(-50%);
-  background:rgba(var(--ink),.20)}
+  background:rgba(var(--ink),.48)}
+/* ticks are ROOTED at the axis floor (bottom:0), so they grow straight out
+   of the baseline like a real graph, touching it with no gap */
+[data-c="qu-1"] .qu1-t{position:absolute;bottom:0;width:2px;transform:translateX(-50%);
+  background:rgba(var(--ink),.22)}
 [data-c="qu-1"] .qu1-t.is-past{background:rgba(var(--ink),.55)}
 [data-c="qu-1"] .qu1-t.is-now{width:3px;background:var(--accent)}
 [data-c="qu-1"] .qu1-labels{position:relative;height:36px;margin-top:8px;

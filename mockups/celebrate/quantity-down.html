@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quantity down</title>
-<link rel="stylesheet" href="_kit.css?v=tw35">
+<link rel="stylesheet" href="_kit.css?v=tw36">
 </head><body data-accent="cyan">
 <div class="bar">
   <a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>
@@ -34,24 +34,24 @@
 /* Malik 2026-08-16: the line carries WEIGHT now, and every tick is SHARP.
    Ticks sit ON the line and grow with the distance travelled, so the road
    visibly climbs toward the goal. */
+/* the axis line is centred on 50% and every tick is ROOTED on it (bottom:50%),
+   so the whole thing reads as one connected graph, no gaps (Malik 2026-08-16) */
 [data-c="qd-1"] .sl__track{position:absolute;left:0;right:0;top:50%;height:2.5px;
-  background:rgba(var(--ink),.13)}
+  transform:translateY(-50%);background:rgba(var(--ink),.14)}
 [data-c="qd-1"] .sl__gone{position:absolute;left:0;top:50%;height:2.5px;width:40%;
-  background:rgba(var(--ink),.42)}
-[data-c="qd-1"] .sl__t{position:absolute;bottom:calc(50% - 1px);width:2px;height:var(--th,13px);
-  background:rgba(var(--ink),.20);transform:translateX(-50%)}
+  transform:translateY(-50%);background:rgba(var(--ink),.46)}
+[data-c="qd-1"] .sl__t{position:absolute;bottom:50%;width:2px;height:var(--th,13px);
+  background:rgba(var(--ink),.22);transform:translateX(-50%)}
 [data-c="qd-1"] .sl__t.is-past{background:rgba(var(--ink),.55)}
 /* interim weights ride ABOVE the line */
 [data-c="qd-1"] .sl__t small{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);
   font-size:var(--lfs,11px);font-weight:650;letter-spacing:-.02em;color:var(--text-lo);
   font-variant-numeric:tabular-nums}
 [data-c="qd-1"] .sl__t.is-past small{color:rgba(var(--ink),.55)}
-/* today: the accent post, its weight carried above it */
-[data-c="qd-1"] .sl__now{position:absolute;top:calc(50% - 16px);width:3px;height:24px;
+/* today: the accent post, rooted on the line too. No number here anymore
+   (it is big above); the accent post alone marks where they are. */
+[data-c="qd-1"] .sl__now{position:absolute;bottom:50%;width:3px;height:24px;
   background:var(--accent);transform:translateX(-50%)}
-[data-c="qd-1"] .sl__now b{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
-  font-size:var(--nfs,19px);font-weight:750;letter-spacing:-.03em;color:var(--text-hi);
-  font-variant-numeric:tabular-nums}
 [data-c="qd-1"] .sl__endcol b{font-size:var(--efs,15px)}
 
 [data-c="qd-1"] .b.on .sl__gone{transform-origin:left;animation:qd1gone .7s cubic-bezier(.2,.8,.3,1) .15s both}
@@ -306,6 +306,6 @@
   <div class="hint">Tap to replay</div>
 </div>
 <p class="item__note">A threshold goal, so the accent is the 1h line and the week's average sits under it. Beat 2 turns the drop into something you can feel, 15 hours of your week handed back, which is the only reward a falling number can really offer.</p></div></div></div>
-<script src="chooser.js?v=tw35"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v=tw36"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>

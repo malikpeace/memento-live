@@ -320,7 +320,7 @@
           var TICKS = 10, di = 0;
           for (var ti = 0; ti <= TICKS; ti++) {
             var p = ti / TICKS * 100;
-            if (Math.abs(p - frac100) < 4) continue;           // the accent line owns this spot
+            if (Math.abs(p - frac100) < 3.5) continue;         // the accent line owns this spot
             var hh = Math.round(6 + (ti / TICKS) * 19);        // value-proportional height
             html += '<div class="qu1-t' + (p < frac100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
                     '%;height:' + hh + 'px;--d:' + (di++ * 0.05).toFixed(2) + 's"></div>';
@@ -330,8 +330,8 @@
           rail.innerHTML = html;
         }
         /* labels: the quarters only (start / 25 / 50 / 75 / goal), dates under
-           the ones already passed, today's own number bold at its line; any
-           quarter within 9% of today steps aside (the collision law). */
+           the ones already passed. Today's own number is NOT repeated here
+           (Malik 2026-08-16: it is big above; the accent tick marks it). */
         var lwrap = Q(ph, '.qu1-labels');
         if (lwrap) {
           var lfs = String(mf(goal)).length >= 7 ? 10 : String(mf(goal)).length >= 5 ? 11 : 13;
@@ -339,7 +339,6 @@
           var lab = '';
           [0, 0.25, 0.5, 0.75, 1].forEach(function (q) {
             var p = q * 100, valQ = Math.round(start + span * q);
-            if (Math.abs(p - frac * 100) < 9) return;          // today's number wins the spot
             var isPastQ = frac >= q && q > 0;
             var when = isPastQ ? dateBack(Math.round(days * (1 - q / Math.max(frac, 0.0001)))) : '';
             var edge = q === 0 ? ' qu1-l--a' : q === 1 ? ' qu1-l--z' : '';
@@ -347,7 +346,6 @@
                    '<div class="qu1-num">' + mf(valQ) + '</div>' +
                    (when ? '<div class="qu1-date">' + when + '</div>' : '') + '</div>';
           });
-          lab += '<div class="qu1-l is-now" style="left:' + (frac * 100).toFixed(1) + '%"><div class="qu1-num">' + mf(cur) + '</div></div>';
           lwrap.innerHTML = lab;
         }
         var mult = start > 0 ? cur / start : 0;
@@ -489,13 +487,12 @@
           mid += '<div class="sl__t' + (p < frac * 100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
                  '%;--th:' + Math.round(7 + q4 * 11) + 'px">' + lbl + '</div>';
         }
-        mid += '<div class="sl__now" style="left:' + (frac * 100).toFixed(1) + '%"><b>' + fmt(cur) + '</b></div>';
+        mid += '<div class="sl__now" style="left:' + (frac * 100).toFixed(1) + '%"></div>';
         /* big numbers shrink the type so nothing ever collides */
         var digits = String(fmt(Math.max(Math.abs(start), Math.abs(goal)))).length;
         var sl = Q(ph, '.sl');
         if (sl) {
           sl.style.setProperty('--lfs', (digits >= 6 ? 9.5 : 11) + 'px');
-          sl.style.setProperty('--nfs', (digits >= 6 ? 14 : 19) + 'px');
           sl.style.setProperty('--efs', (digits >= 6 ? 12.5 : 15) + 'px');
         }
         put(ph, '.sl',
