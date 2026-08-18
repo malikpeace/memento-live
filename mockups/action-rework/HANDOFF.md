@@ -129,3 +129,18 @@
   minimum, every day, on the migration."). Explanation + answers indented
   under their headers with a left rule. All 8 buckets rewritten; the same
   13 aphorism reasons purged from lg-1.
+
+## 2026-08-18 pt 4: lg-5 v3, his line edits + the unreasonable walk-through
+- Renames (his words): "How to make it unreasonable you don't get there:" /
+  "The math behind this" / "Your current stats" / "Estimated calories burned
+  daily" / "Ideal total calories, per day". NEVER "guess": always "estimate"
+  (added to voice awareness).
+- Weight math reordered: stats first, workout frequency second (the estimate
+  leans on it), then the burn estimate, then the arithmetic.
+- CLARITY HARVEST REQUIREMENT (his call): Clarity/refine MUST ask how often
+  the person works out / moves. The calorie plan changes a lot between a
+  5-day lifter and a never-trained person. Add to the Clarity question pass.
+- Every bucket's part two now ends with a "Now walk it through." paragraph:
+  the acts tied mechanically to the goal until missing it reads as the
+  unreasonable ending (his make-it-unreasonable frame, per bucket: 90
+  chances vs 3 clients, 60 aimed hours at the two weak classes, etc).
