@@ -21,11 +21,6 @@
           "note": "A deadline goal reached early, where the reward is the <b>time handed back</b>. The run from Feb 1 to Dec 31 is drawn once, and the lit tail is the 53 days you set aside and never needed. Beating a date is worth more than hitting a number, and this is the only way to show it without a countdown. One accent: the unused stretch."
         },
         {
-          "key": "qu-4",
-          "name": "Twenty marks",
-          "note": "20 of 100 and nothing empty is ever drawn. It counts <b>what exists</b>, one stroke per person, grouped in fives like a tally, instead of showing 80 blank slots. 46 days ago there were none, and 80 still open sits under it as a plain fact, not a scold. This is the screen for someone a long way out, and the only colour is a soft bloom behind the number."
-        },
-        {
           "key": "qu-5",
           "name": "The record board",
           "note": "No target at all, so the only thing to beat is the last time you were best. The new week takes the <b>top seat</b> and pushes the old records down, and the caption says the one it beat stood 22 weeks, which is what makes it mean something. A personal record rewards the fact instead of a fraction, so a goal with no end still gets a real moment."
@@ -205,86 +200,6 @@
       "remaining": [
         "rf-fall.html line 45: .fl__day uses rgba(var(--ink),.52), a custom alpha instead of a token. Not a dim-text violation (brighter than --text-lo, and it is a 12.5px label, not a sentence), and normalizing it to --text-mid would erase the contrast that marks the current row. Left as-is, flagged only.",
         "Verification caveat: the browser pane was at its tab cap (parallel agents holding all 9 tabs), so all 12 beats were rendered via headless Chrome at end state in cyan, amber and rose rather than driven live. Beat timing was checked by reading delay stacks against the kit's 1900/2300ms dwells (longest chain, rf-gap beat 2 settling at 1.96s, fits its window)."
-      ]
-    },
-    {
-      "job": "ev",
-      "label": "Card evolution, 1 to 5",
-      "concepts": [
-        {
-          "key": "ev-1",
-          "name": "The stack thickens",
-          "note": "The card is a stack and every day you hold lays down one sheet, so day 300 is a physically thicker object than day 30 and nothing under the top sheet ever moves again. Across all five, the accumulated base is grey and <b>the accent is only ever today</b>, which is the both layers model in one picture."
-        },
-        {
-          "key": "ev-2",
-          "name": "The grain fills in",
-          "note": "One mark cut into the face for every day done, so the surface goes from a few scratches at day 7 to a woven material by the end of a year. You can <b>count a single day</b> if you look for it, and days you missed leave no mark at all, so the card stays an honest record without ever showing a hole."
-        },
-        {
-          "key": "ev-3",
-          "name": "The rim laps inward",
-          "note": "The edge light steps forward one day per day kept, a hundred days closes a lap, and the next lap draws inside the one before it. It <b>never finishes</b>, it just coils tighter every hundred days, and today is a visible step you can find at the frontier."
-        },
-        {
-          "key": "ev-4",
-          "name": "Months settle as strata",
-          "note": "Each month settles into a band as thick as the days you actually kept in it, so a year reads like rock: fat layers where you were solid, thin ones where you were not. This is the only one that <b>shows the shape of your history</b> and not just how much of it there is."
-        },
-        {
-          "key": "ev-5",
-          "name": "The core lights up",
-          "note": "The light inside reaches as far as the days behind it, so the card goes from an inert wafer to something that lights the surface it sits on around the one year mark. This one is the <b>least countable on purpose</b>, for the person who wants to feel the accumulation instead of auditing it."
-        }
-      ],
-      "pass": true,
-      "fixed": 3,
-      "remaining": [
-        "ev-3 puts a static filter: drop-shadow(0 0 3px rgba(var(--accent-rgb),.7)) on the accent rim step. Not a rule-9 violation, the only animated property is opacity and the filter itself never animates, but it is the one filtered element in the set and an SVG stroke cannot take a box-shadow. Flagging it since Malik has an iOS filter history; safe to leave, and the swap would be a wider low-alpha accent stroke behind the step.",
-        "ev-3's concept is an edge light that fills and laps. It is a rounded-rectangle rim, not a circle, and it matches the app's own shipped skin-tinted rim (v1151), so I did not treat it as a banned Apple-Watch progress ring. Calling it out as the one judgment call in the set.",
-        "All five use .state for a closing sentence at 11px / var(--text-lo). The letter of the rule allows --text-lo at 11-12px and the sibling ex-* fragments do the same at 11.5px, so I left it for set cohesion. A stricter reading would call these supporting sentences and bump them to --text-mid; that is Malik's call, not mine to make unilaterally across half the gallery.",
-        "ev-1 through ev-5 carry no .keepbtn, while the ex-1..ex-5 fragments sharing the evolution page each render a 'Close' control. Correct in principle (these are explainers, not ceremonies, so there is nothing to dismiss) but the merged page will look slightly uneven at the bottom edge between the two halves."
-      ]
-    },
-    {
-      "job": "ex",
-      "label": "Card evolution, 6 to 10",
-      "concepts": [
-        {
-          "key": "ex-1",
-          "name": "The colour is earned",
-          "note": "Every day held drops one bead of colour into the glass. A bead stays sharp about a week, then gives itself up to the body and never leaves. So the base layer is <b>how saturated the material is</b>, permanent, and the surface layer is the handful of beads not soaked in yet, today's the sharpest. Fits <b>maintenance</b>: nothing to count but days, and at a week you can literally count them on the card, while at 300 the whole body carries them."
-        },
-        {
-          "key": "ex-2",
-          "name": "The core",
-          "note": "A light inside the glass. Its <b>size is every rep ever done</b> and never shrinks. Its <b>brightness is the last thirty days</b>, so a quiet month dims the card and takes nothing off it. Two different facts on one object, which is what separates it from a glow that only grows. Fits <b>frequency</b>, where the honest question is not the lifetime total, it is whether you are still running."
-        },
-        {
-          "key": "ex-3",
-          "name": "It stops being see through",
-          "note": "On day one the card is nearly not there and the room reads straight through it. Marks give it body until at 300 days it is opaque and blocks the light behind it. Fits an <b>open goal</b> exactly, because there is no number to show and no meter that would not be a lie. The reward is that the thing became undeniable, and you can see that in one glance without counting anything."
-        },
-        {
-          "key": "ex-4",
-          "name": "Growth rings",
-          "note": "The material lays down one contour every thirty days, outward from the middle, and the ring being drawn is dotted for the days not yet lived. Count the rings for the months, look at the bright tip for today. Twelve rings reaches the rim, so a year is unmistakable. Fits <b>quantity down</b>, where the weight moves slowly and the person needs proof that time has actually passed underneath it."
-        },
-        {
-          "key": "ex-5",
-          "name": "The glass clears",
-          "note": "A milestone shows nothing until the day it happens, so the engine underneath does the showing: every session wipes one patch of fog off the pane. At a week the card is milk and you cannot read it. At 300 days it says what it is, and today wipes the last corner. Fits <b>milestone</b>, the one type where the goal itself gives you nothing to look at for years."
-        }
-      ],
-      "pass": true,
-      "fixed": 7,
-      "remaining": [
-        "JUDGEMENT CALL for Malik, not a fix I made: ex-1 and ex-2 paint accent inside all four cards (day 7, day 90, day 300 and today). I read that as ONE accent moment shown at four ages, since the colour in the glass IS the concept in both, and nothing else on either screen is coloured. If he reads the age row as separate accent moments, the three small cards in ex-1 and ex-2 need desaturating to grey and only the today card keeps colour.",
-        "JUDGEMENT CALL: ex-4's growth rings are concentric rounded RECTANGLES in neutral grey with a single accent tick, so I judged them clear of the Apple-Watch progress-ring ban. But the day-7 card does draw a partial contour (stroke-dasharray=\"7 30\") which is a progress arc in rectangular form. Removing it would rewrite the concept, so I left it and am flagging it.",
-        "ex-3's .exwall room lines read as horizontal streaks running across the full width of the three-card row at gallery size. It is faithful to the concept (a day-7 card you can see straight through), but it is the least Apple-grade moment in the set and is worth a look.",
-        "ex-5's accent glint rests at opacity .38 and is the faintest accent in the set. It reads at 1440px but may disappear on a real phone. Needs an on-device check.",
-        "NOT VERIFIABLE HERE: the celebration gallery is dark-only by construction (_kit.css defines no light mode and the phone frame is #000), so the four-cell light/dark matrix does not apply to these fragments. I verified at 1440x1000 in cyan, amber and rose. I did NOT verify at 390px width or on a real device.",
-        "ENVIRONMENT NOTE, not a fragment defect: I left a python http.server running on port 8231 rooted at mockups/celebrate. The 12 console 404s it produces are _kit.css requesting ../fonts/geist-*.otf, which resolves above that server root; the font files do exist at mockups/fonts and load correctly when served one level up."
       ]
     },
     {

@@ -149,6 +149,19 @@
       return ev;
     }
 
+    /* ---- unit-count goals (100 sessions, 50 runs): L9's count ladder.
+       Fires when the TOTAL crosses a rung of COUNT_LADDER, once ever per
+       rung; the ladder was always defined here, this branch makes
+       evaluate() actually fire it (found in the 2026-08-16 review: the rig
+       used countHit directly, so the gap only showed on the wiring path). */
+    if (opts.count != null) {
+      var cTot = opts.count;
+      var cHit = countHit(cTot);
+      if (cHit === null) return null;
+      fam = 'fr';
+      return fire('count', 'count-' + cHit, { milestone: cHit, count: cTot });
+    }
+
     /* ---- day-count goals (maintenance): L9, weeks + months + bold ---- */
     if (opts.days != null) {
       var d = opts.days;

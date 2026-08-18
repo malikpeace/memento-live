@@ -119,11 +119,15 @@
       }
     }
 
-    /* milestone: the chooser is the single source of truth (L1-L11) */
+    /* milestone: the chooser is the single source of truth (L1-L11).
+       Count and duration shapes hand it their own totals, so their mid-goal
+       rungs fire through the same ladder that the rig proves. */
     var ev = null;
     try {
       var co = { gp: o.gp, star: o.star, ledger: o.ledger || {}, today: today,
                  prevValue: o.prevValue };
+      if ((o.shape || '') === 'count' && o.count != null) co.count = o.count;
+      if ((o.shape || '') === 'duration' && o.daysHeld != null) co.days = o.daysHeld;
       if (o.chooserOpts) for (var k in o.chooserOpts) co[k] = o.chooserOpts[k];
       ev = C.evaluate(co);
     } catch (e) { ev = null; }
