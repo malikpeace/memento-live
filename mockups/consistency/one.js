@@ -215,10 +215,10 @@
     var seen = {};
     log.forEach(function (d) { var s = stateOf(A, d.date); if (s) seen[s] = 1; });
     var chips = [];
-    if (seen.kept) chips.push('<span><u class="a"></u>showed up</span>');
-    if (seen.sup) chips.push('<span><u class="b"></u>something smaller</span>');
-    if (seen.missed) chips.push('<span><u class="c"></u>missed</span>');
-    if (seen.rest) chips.push('<span><u class="r"></u>rest, the goal did not ask</span>');
+    if (seen.kept) chips.push('<span><u class="a"></u>Action</span>');
+    if (seen.sup) chips.push('<span><u class="b"></u>Other</span>');
+    if (seen.missed) chips.push('<span><u class="c"></u>Missed</span>');
+    if (seen.rest) chips.push('<span><u class="r"></u>Rest</span>');
     return chips.length >= 2 ? '<div class="key">' + chips.join('') + '</div>' : '';
   }
 
@@ -238,7 +238,8 @@
         anyIn = true;
         if (e) { monthDays++; if (e.st === 'kept') monthKept++; }
         var st = e ? e.st : 'ahead';
-        wk += '<div class="d ' + st + (e && sameDay(d, today) ? ' today' : '') + '">' + d.getDate() + '</div>';
+        wk += '<div class="d ' + st + (e && sameDay(d, today) ? ' today' : '') + '"' +
+          (e ? ' data-k="' + dkey(d) + '"' : '') + '>' + d.getDate() + '</div>';
       }
       var met = SHAPE === 'frequency' && weekKept >= A.target;
       var wc = !anyIn ? '' : (SHAPE === 'frequency' ? weekKept + '/' + A.target : String(weekKept));
@@ -348,7 +349,7 @@
   function pageTwo(s, log, A) {
     var pill = '<div class="sec sec--pill"><div class="heropill">You’ve shown up <b>' +
       s.total.toLocaleString() + '</b> of ' + plural(s.N, 'day') + ' since ' +
-      K.MON[log[0].date.getMonth()] + ' ' + log[0].date.getDate() + '</div></div>';
+      K.MON[log[0].date.getMonth()] + '&nbsp;' + log[0].date.getDate() + '</div></div>';
     var body = SCALE === 'week' ? weekView(log, s, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
     var cal = '<div class="sec"><div class="sec__h"><b>The calendar</b><span class="scale" id="scale">' +
       ['week', 'month', 'year'].map(function (sc) {
@@ -357,6 +358,42 @@
     // a flat list of section cards; mobile stacks them, desktop tiles them
     return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log);
   }
+
+  /* ---------- tap a day: a small receipt of what you did ---------- */
+  var LASTA = null;
+  function closeDaypop() { var p = document.querySelector('.daypop'); if (p) p.remove(); }
+  function openDaypop(cell) {
+    closeDaypop();
+    if (!LASTA) return;
+    var e = LASTA.map[cell.getAttribute('data-k')];
+    if (!e) return;
+    var d = e.d.date;
+    var word = e.st === 'kept' ? 'Action completed' : e.st === 'sup' ? 'Something smaller'
+      : e.st === 'missed' ? 'Missed' : 'Rest, nothing was asked';
+    var items = [];
+    if (e.st === 'kept' && e.d.min) items.push(Math.round(e.d.min) + 'm on it');
+    if (e.d.sup.deepwork) items.push('Deep work');
+    if (e.d.sup.reflection) items.push('Reflection');
+    if (e.d.sup.checkin) items.push('Check-in');
+    if (e.d.sup.vivere) items.push('Vivere');
+    var pop = document.createElement('div');
+    pop.className = 'daypop';
+    pop.innerHTML = '<div class="daypop__d">' + K.MONF[d.getMonth()] + ' ' + d.getDate() + '</div>' +
+      '<div class="daypop__s ' + e.st + '">' + word + '</div>' +
+      (items.length ? '<ul>' + items.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>' : '');
+    document.body.appendChild(pop);
+    var r = cell.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+    var left = Math.max(10, Math.min(window.innerWidth - pr.width - 10, r.left + r.width / 2 - pr.width / 2));
+    var top = r.top - pr.height - 10;
+    if (top < 60) top = r.bottom + 10;
+    pop.style.left = left + 'px'; pop.style.top = top + 'px';
+  }
+  document.addEventListener('click', function (e) {
+    var cell = e.target.closest('.cal .d[data-k]');
+    if (cell) { e.stopPropagation(); openDaypop(cell); return; }
+    if (!e.target.closest('.daypop')) closeDaypop();
+  });
+  window.addEventListener('scroll', closeDaypop, true);
 
   /* ---------- render + wiring ---------- */
   function render() {
@@ -373,6 +410,7 @@
     }
     var s = K.stats(log, SHAPE, PERSONA.cadence);
     var A = annotate(log, SHAPE, PERSONA.cadence);
+    LASTA = A; closeDaypop();
     el('day').textContent = 'Day ' + N;
     el('pgOne').innerHTML = pageOne(s, log);
     el('ev').innerHTML = pageTwo(s, log, A);
@@ -440,6 +478,8 @@
     var a = ACCENTS[+b.getAttribute('data-a')];
     document.documentElement.style.setProperty('--acc', a[0]);
     document.documentElement.style.setProperty('--acc-rgb', a[1]);
+    document.documentElement.style.setProperty('--accent', a[0]);
+    document.documentElement.style.setProperty('--accent-rgb', a[1]);
     [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
   });
   el('fxChips').innerHTML = '<button data-fx="flat" class="on">Flat</button><button data-fx="glass">Glass</button><button data-fx="glassplus">Glass +</button>';
