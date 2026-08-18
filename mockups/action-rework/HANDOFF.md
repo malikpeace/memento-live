@@ -162,3 +162,13 @@
 - NAMING: "the plate" is dead; it is THE DAY.
 - Lead-domino rule for projects noted for the AI selection rules: pick the
   blocker whose clearing unlocks the most others, tie-break smallest.
+
+## 2026-08-18 pt 6: his line edits round 2
+- "NO list:" on the day screen (was "NO:"). "Ready?" (was "Fair?").
+- "You said" everywhere (never "You typed"). Star on lg-5: bigger (24px),
+  quotation marks removed. Keep-line: "You can always return to this page."
+- Screen-time normal-day answer rewritten to his sketch (wake up, leave the
+  phone alone, hours go into the thing you care about, love of progress
+  fades the pull).
+- lg-2/3/4 layout variants DELETED (the combined page is the one). The
+  logic section = lg-1 (original) + lg-5 (the candidate) only.
