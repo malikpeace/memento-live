@@ -224,11 +224,10 @@
     color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft)}
   .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09)}
 
-  @property --hp{syntax:'<number>';inherits:false;initial-value:0}
   .holdCircle{width:74px;height:74px;border-radius:50%;margin:0 auto;background:rgba(255,255,255,.12);
     position:relative;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
-    --hp:0;transition:--hp .25s ease-out}
-  .holdCircle.holding{--hp:1;transition:--hp 3s linear}
+    transition:transform .15s ease-out}
+  .holdCircle.holding{transform:scale(.92)}
   .holdCircle::before{content:"";position:absolute;inset:0;border-radius:50%;
     background:conic-gradient(rgba(255,255,255,.95) calc(var(--hp,0)*1turn), transparent 0)}
   .holdCircle.done{background:rgba(255,255,255,.95)}
@@ -466,19 +465,30 @@ tgTheme.innerHTML += '<button data-id="dark" style="--accSwatch:#8be9fa">Dark</b
 tgTheme.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curTheme=b.dataset.id; render();});
 render();
 
-/* press-and-hold: CSS transition drives the fill, a 3s timer confirms; release resets */
-let holdTimer=null;
-document.addEventListener('pointerdown',e=>{
-  const el=e.target.closest('.holdCircle'); if(!el || el.classList.contains('done')) return;
-  e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){}
-  el.classList.add('holding');
+/* press-and-hold: JS steps the fill every 40ms; release before 3s resets */
+function startHold(el){
+  if(!el || el.classList.contains('done') || el._holding) return;
+  el._holding=true; el.classList.add('holding');
   const hint=el.parentElement.querySelector('.holdHint');
-  holdTimer=setTimeout(()=>{ el.classList.remove('holding'); el.classList.add('done');
-    if(hint) hint.textContent='Held. In the app, this is the moment it happens.'; },3000);
-  const cancel=()=>{ clearTimeout(holdTimer); el.classList.remove('holding');
-    el.removeEventListener('pointerup',cancel); el.removeEventListener('pointercancel',cancel); el.removeEventListener('pointerleave',cancel); };
-  el.addEventListener('pointerup',cancel); el.addEventListener('pointercancel',cancel); el.addEventListener('pointerleave',cancel);
-});
+  const t0=Date.now();
+  el._timer=setInterval(()=>{
+    const p=Math.min((Date.now()-t0)/3000,1);
+    el.style.setProperty('--hp',p);
+    if(p>=1){ clearInterval(el._timer); el._holding=false;
+      el.classList.remove('holding'); el.classList.add('done');
+      if(hint) hint.textContent='Held. In the app, this is the moment it happens.'; }
+  },40);
+}
+function endHold(el){
+  if(!el || !el._holding) return;
+  clearInterval(el._timer); el._holding=false;
+  el.classList.remove('holding'); el.style.setProperty('--hp',0);
+}
+document.addEventListener('pointerdown',e=>{const el=e.target.closest('.holdCircle'); if(el){e.preventDefault(); startHold(el);}});
+document.addEventListener('touchstart',e=>{const el=e.target.closest('.holdCircle'); if(el){e.preventDefault(); startHold(el);}},{passive:false});
+document.addEventListener('mousedown',e=>{const el=e.target.closest('.holdCircle'); if(el) startHold(el);});
+['pointerup','pointercancel','touchend','touchcancel','mouseup','mouseleave'].forEach(t=>
+  document.addEventListener(t,e=>{document.querySelectorAll('.holdCircle').forEach(endHold);}));
 document.addEventListener('contextmenu',e=>{ if(e.target.closest('.holdCircle')) e.preventDefault(); });
 </script>
 </body>
