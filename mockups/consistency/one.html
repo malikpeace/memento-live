@@ -59,10 +59,9 @@
     background: radial-gradient(circle, rgba(var(--acc-rgb),0.6), transparent 68%); }
   /* the panels themselves are BLACK glass, letting the green glow through */
   html.glassplus .sec:not(.sec--score):not(.sec--pill) {
-    background: rgba(6,9,10,0.44); border-radius: 20px; padding: 18px;
-    border: 1px solid rgba(255,255,255,0.11);
+    background: rgba(6,9,10,0.44); border-radius: 20px; padding: 18px; border: 0;
     -webkit-backdrop-filter: blur(40px) saturate(1.7); backdrop-filter: blur(40px) saturate(1.7);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 16px 44px rgba(0,0,0,0.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 16px 44px rgba(0,0,0,0.4);
   }
   html.glassplus .sec:not(.sec--score):not(.sec--pill) .sec__h { margin-top: 0; }
   html.glassplus .wkstat, html.glassplus .wkc b { background: rgba(255,255,255,0.05); }
@@ -86,8 +85,8 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); }
   html.light .cal .d { color: rgba(10,14,10,0.36); }
   html.light .cal .d.kept { color: var(--acc); }
-  html.light .cal .d.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.14); color: rgba(10,14,10,0.34); }
-  html.light .cal .d.rest { color: rgba(10,14,10,0.2); }
+  html.light .cal .d.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.28); color: rgba(10,14,10,0.55); }
+  html.light .cal .d.rest { color: rgba(10,14,10,0.15); }
   html.light .cal .d.ahead { color: rgba(10,14,10,0.15); }
   html.light .trk__c b, html.light .mlog__g b, html.light .glance__strip b { background: rgba(10,14,10,0.07); }
   html.light .mlog__g b.ahead { background: rgba(10,14,10,0.045); }
@@ -101,10 +100,10 @@
   html.light .score__n { color: #f4fff7; }
   html.light .score__hm b.e { background: rgba(255,255,255,0.1); }
   html.light .score__note { color: rgba(244,255,247,0.55); }
-  html.light .one__brand { color: rgba(10,14,10,0.3); }
+  html.light .one__crown { color: rgba(10,14,10,0.35); }
   html.light .one__today.off u { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.3); }
   html.light .one__hint { color: rgba(10,14,10,0.45); }
-  html.light .key u.c { background: rgba(10,14,10,0.09); }
+  html.light .key u.c { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.28); }
   html.light .key u.r { background: rgba(10,14,10,0.03); box-shadow: inset 0 0 0 1px rgba(10,14,10,0.16); }
   html.light .heropill { color: rgba(10,14,10,0.74); }
   html.light .heropill b { color: #0c0e0c; }
@@ -136,6 +135,14 @@
   html.light.glassplus .cal .d { color: rgba(255,255,255,0.3); }
   html.light.glassplus .cal .d.kept { color: var(--acc); }
   html.light.glassplus .trk__c b, html.light.glassplus .mlog__g b { background: rgba(255,255,255,0.05); }
+
+  .nav__today { font: inherit; font-size: 11.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
+    background: rgba(255,255,255,0.05); border: 0; border-radius: 9px; padding: 0 11px; height: 27px; cursor: pointer; }
+  html.light .nav__today { background: rgba(10,14,10,0.06); color: rgba(10,14,10,0.74); }
+  /* for the hard days: the record talking back */
+  .hard p { font-size: 14.5px; line-height: 1.55; color: var(--text-mid, rgba(255,255,255,0.8)); margin: 0 0 13px; }
+  .hard p:last-child { margin-bottom: 0; }
+  .hard b { color: var(--text-hi, #fff); font-weight: 700; font-variant-numeric: tabular-nums; }
 
   /* tap a past day: a small honest receipt of that day */
   .daypop { position: fixed; z-index: 300; min-width: 168px; max-width: 240px; padding: 12px 14px;
@@ -182,7 +189,7 @@
   /* page one: the number, left aligned */
   #pgOne { display: grid; align-content: center; justify-items: start; text-align: left;
     padding: calc(var(--barh, 92px) + 26px) 26px 70px; position: relative; }
-  .one__brand { position: absolute; top: calc(var(--barh, 92px) + 26px); left: 26px; color: rgba(255,255,255,0.22); }
+  .one__crown { line-height: 0; margin: 0 0 6px 7px; color: rgba(255,255,255,0.34); }
   .one__num { font-weight: 700; color: var(--text-hi, #fff); line-height: 0.86; letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums; margin: 0 0 14px; }
   .one__sub { font-size: 17px; color: var(--text-mid, rgba(255,255,255,0.8)); line-height: 1.45; max-width: 320px; }
@@ -268,9 +275,9 @@
   /* kept days are not filled; the green line under them does the marking */
   .cal .d.kept { color: var(--acc); font-weight: 800; }
   .cal .d.sup { color: rgba(var(--acc-rgb),0.72); font-weight: 650; }
-  .cal .d.missed { color: rgba(255,255,255,0.24); }
+  .cal .d.missed { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.22); color: rgba(255,255,255,0.5); }
   /* a day the goal never asked for is not a miss: no fill, just a quiet number */
-  .cal .d.rest { background: transparent; color: rgba(255,255,255,0.2); }
+  .cal .d.rest { background: transparent; color: rgba(255,255,255,0.15); }
   .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
   .cal .d.today { outline: 2px solid rgba(var(--acc-rgb),0.95); outline-offset: -2px; }
   .key u.r { background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
@@ -285,7 +292,7 @@
   .key u { width: 10px; height: 10px; border-radius: 3px; display: block; flex: 0 0 auto; }
   .key u.a { background: rgba(var(--acc-rgb),0.55); }
   .key u.b { background: rgba(var(--acc-rgb),0.2); }
-  .key u.c { background: rgba(255,255,255,0.05); }
+  .key u.c { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.22); }
   .runline { font-size: 13.5px; color: var(--text-mid, rgba(255,255,255,0.8)); margin-top: 14px; }
   .runline b { color: var(--text-hi, #fff); font-weight: 700; font-variant-numeric: tabular-nums; }
   /* earlier months log */
@@ -300,6 +307,7 @@
   .mlog__g b.sup { background: rgba(var(--acc-rgb),0.2); }
   .mlog__g b.kept { background: rgba(var(--acc-rgb),0.55); }
   .mlog__g b.rest { background: rgba(255,255,255,0.02); }
+  .mlog__g b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
   .mlog__g b.ahead { background: rgba(255,255,255,0.032); }
   .mlog__g b.pad { background: transparent; }
   /* week view: a real detailed week */
@@ -419,7 +427,7 @@
   /* the lab bar is fixed, so the page reserves its height (set by JS) plus air */
   html.vm-desk #pgOne { position: static; height: auto; display: block;
     padding: calc(var(--barh, 90px) + 34px) 4px 2px; }
-  html.vm-desk .one__brand { top: calc(var(--barh, 90px) + 36px); left: 34px; }
+  html.vm-desk .one__crown { margin-left: 10px; }
   html.vm-desk .one__num { font-size: clamp(96px, 12vw, 150px) !important; margin-bottom: 10px; }
   html.vm-desk .one__sub { font-size: 18px; }
   html.vm-desk .one__hint { display: none; }

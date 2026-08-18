@@ -91,8 +91,9 @@
   }
 
 
-  function arrows(id, canBack, canFwd) {
+  function arrows(id, canBack, canFwd, offToday) {
     return '<span class="nav" id="' + id + '">' +
+      (offToday ? '<button type="button" class="nav__today" data-today>Today</button>' : '') +
       '<button type="button" data-step="-1"' + (canBack ? '' : ' disabled') + ' aria-label="Back">' +
       '<svg width="7" height="11" viewBox="0 0 7 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 1L1.5 5.5 6 10"/></svg></button>' +
       '<button type="button" data-step="1"' + (canFwd ? '' : ' disabled') + ' aria-label="Forward">' +
@@ -105,8 +106,8 @@
     var size = n < 100 ? 132 : n < 1000 ? 112 : 92;
     var word = PERSONA.sub;
     var counted = log[log.length - 1].on;
-    return '<div class="one__brand">' + mMark('m-mark', 26) + '</div>' +
-      '<div><div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
+    return '<div><div class="one__crown">' + mMark('', 22) + '</div>' +
+      '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
       (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div></div>' +
@@ -180,7 +181,7 @@
     if (checks) did.push(checks + ' check in' + (checks === 1 ? '' : 's'));
     var didLine = did.length ? '<div class="wkdid">Also this week: ' + did.join(', ') + '.</div>' : '';
     var label = K.MON[ws.getMonth()] + ' ' + ws.getDate();
-    return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd) + '</div>' +
+    return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd, WOFF !== 0) + '</div>' +
       '<div class="wkstrip">' + strip + '</div>' +
       '<div class="wkstats">' + keptStat + hoursStat + usualStat + '</div>' + didLine;
   }
@@ -261,7 +262,7 @@
       (s.best > s.current ? '. Your longest is <b>' + plural(s.best, 'day') + '</b>.' : ', the longest you have had.') + '</div>';
     return '<div class="mh"><b>' + K.MONF[base.getMonth()] + '</b>' +
       '<span style="display:flex;align-items:center;gap:12px"><i><em>' + g.kept + '</em> of ' + plural(g.days, 'day') + '</i>' +
-      arrows('navMonth', canBack, canFwd) + '</span></div>' +
+      arrows('navMonth', canBack, canFwd, MOFF !== 0) + '</span></div>' +
       '<div class="cal">' + head + g.rows + '</div>' + legend(A, log) + run;
   }
 
@@ -292,7 +293,7 @@
       '<span style="display:flex;align-items:center;gap:10px"><i><em>' + total + '</em> days</i>' +
       '<span class="yrsw" id="yrsw"><button type="button" data-y="cal"' + (YRMODE === 'cal' ? ' class="on"' : '') + '>Year</button>' +
       '<button type="button" data-y="roll"' + (YRMODE === 'roll' ? ' class="on"' : '') + '>Rolling</button></span>' +
-      arrows('navYear', canBack, canFwd) + '</span></div>' +
+      arrows('navYear', canBack, canFwd, YOFF !== 0) + '</span></div>' +
       '<div class="yrgrid">' + cells + '</div>' + legend(A, log);
   }
 
@@ -331,18 +332,19 @@
       }).join('') + '</div></div>';
   }
 
-  function ledger(s, log) {
-    var rows = [];
-    if (s.hours > 0) rows.push(['Hours on it', s.hours + 'h']);
-    if (s.avgSession > 0 && s.total >= 7) rows.push(['An average day you showed up', s.avgSession + 'm']);
-    if (s.comebacks > 0) rows.push(['Times you came back', s.comebacks]);
-    if (SHAPE === 'frequency' && s.weeks >= 3) rows.push(['Weeks you hit the rate', s.metWeeks + ' of ' + s.weeks]);
-    // deep work and reflections live in The record; best month lives in By month;
-    // the start date lives in the pill. Said once, each.
-    ['checkin', 'vivere'].forEach(function (k) { if ((s.sup[k] || 0) > 0) rows.push([K.SUPNAME[k], s.sup[k] + ' ' + K.SUPUNIT[k]]); });
-    if (rows.length < 2) return '';
-    return '<div class="sec"><div class="sec__h"><b>The rest of the record</b></div><div class="led">' +
-      rows.map(function (r) { return '<div class="led__r"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>'; }).join('') + '</div></div>';
+  /* the record talking back: evidence for the day you want to quit */
+  function hardDays(s, log) {
+    var lines = [];
+    if (s.comebacks > 0) lines.push('You have come back <b>' + plural(s.comebacks, 'time') +
+      '</b>. Every gap in this record ended the same way: you returned.');
+    if (s.best >= 3) lines.push('Your longest run is <b>' + plural(s.best, 'day') +
+      '</b>. Nobody did that for you. That capacity does not expire.');
+    if (s.hours > 0) lines.push('<b>' + s.hours + ' hours</b> of your life are already inside this goal. ' +
+      'Every day you show up, that number grows. It never shrinks.');
+    if (!lines.length) lines.push('The record is young. Everything you add now is the ' +
+      'foundation you will stand on during a harder week.');
+    return '<div class="sec"><div class="sec__h"><b>For the hard days</b></div>' +
+      '<div class="hard">' + lines.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</div></div>';
   }
 
   /* ---------- page two ---------- */
@@ -356,7 +358,7 @@
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
     // a flat list of section cards; mobile stacks them, desktop tiles them
-    return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log);
+    return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + hardDays(s, log);
   }
 
   /* ---------- tap a day: a small receipt of what you did ---------- */
@@ -389,6 +391,7 @@
     pop.style.left = left + 'px'; pop.style.top = top + 'px';
   }
   document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-today]')) { MOFF = 0; WOFF = 0; YOFF = 0; render(); return; }
     var cell = e.target.closest('.cal .d[data-k]');
     if (cell) { e.stopPropagation(); openDaypop(cell); return; }
     if (!e.target.closest('.daypop')) closeDaypop();
