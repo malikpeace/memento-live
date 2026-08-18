@@ -186,3 +186,10 @@
 - The refresher-on-focus drawer now lives in lg-5 too (screen + focus
   buckets), same four-stage scale walkthrough as lg-1.
 - NOTE: map.html still references retired fragments; it is historical now.
+
+## 2026-08-18 pt 8: the M's + the trust line
+- ld-4: the bare M breathing (4s opacity fade, .14 to .5) bottom center
+  while the plan writes. Reduced motion: static.
+- lg-5: quiet static M top center under the island (same spot as u-1, the
+  module reads as one place), plus the one lg-1 element the combined page
+  lacked: "Every line above came from what you told Memento." before Ready?

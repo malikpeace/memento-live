@@ -73,11 +73,20 @@
   [data-k=ld-4] .fact,[data-k=ld-4] .arr,[data-k=ld-4] .cta button{transition:opacity .2s linear}
   [data-k=ld-4] .fact{transform:none}
 }
+/* the M, breathing: quiet brand while the plan is written. Slow fade in
+   and out, meaning: something alive is working. */
+[data-k=ld-4] .ld-m{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);
+  z-index:5;width:16px;height:16px;pointer-events:none}
+[data-k=ld-4] .ld-m path{fill:rgba(var(--ink),.9)}
+[data-k=ld-4] .ld-m{animation:ldMBreathe 4s ease-in-out infinite alternate}
+@keyframes ldMBreathe{from{opacity:.14}to{opacity:.5}}
+@media (prefers-reduced-motion:reduce){[data-k=ld-4] .ld-m{animation:none;opacity:.3}}
 </style>
 <h3>The working list</h3><p class="cap">The wait shows only what Memento already knows, one line at a time and held for six seconds each: your star, your why, your date, and what you said you have already done. The clock is real elapsed time, and it stays on as the receipt when the plan lands.</p>
 <div class="bk"><i>All seven buckets</i></div>
 <div class="ph">
   <div class="grid"></div>
+  <svg class="ld-m" viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
   <div class="col">
     <div class="head">
       <h4>Writing your plan.</h4>
