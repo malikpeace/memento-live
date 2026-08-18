@@ -509,11 +509,19 @@
           });
           lwrap.innerHTML = lab;
         }
-        put(ph, '.b1 .sub', 'on the scale today.');
+        /* the words follow the unit: a scale is only a scale for weight.
+           Money reads as paying down; anything else stays neutral. */
+        var weighty = /lb|kg|pound|kilo/i.test(v.unit || '');
+        put(ph, '.b1 .sub', weighty ? 'on the scale today.' : money ? 'still to pay off.' : esc(v.unit) + ' today.');
         put(ph, '.qd1-cap', mf(Math.abs(cur - goal)) + ' to go.');
+        var downBy = mf(Math.abs(start - cur));
         put(ph, '.b3 .deposit', cur === start
           ? 'Day one. The road runs ' + mf(start) + ' to ' + mf(goal) + '; the first mark is <b>' + mf(marks[0]) + '</b>.'
-          : 'On this day, the scale read <b>' + mf(cur) + '</b>. Down ' + mf(Math.abs(start - cur)) + ' from where you started.');
+          : weighty
+            ? 'On this day, the scale read <b>' + mf(cur) + '</b>. Down ' + downBy + ' from where you started.'
+            : money
+              ? 'On this day, it stood at <b>' + mf(cur) + '</b>. ' + downBy + ' paid off since you started.'
+              : 'On this day, you were at <b>' + mf(cur) + '</b>. Down ' + downBy + ' from where you started.');
       }
     },
 
