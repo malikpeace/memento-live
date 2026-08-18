@@ -201,9 +201,10 @@
   .quiet{display:block;text-align:center;margin:16px auto 0;color:rgba(255,255,255,.4);font-size:14px;font-weight:600}
   .payoffLine{margin-top:16px;text-align:center;color:var(--acc);font-size:13.5px;font-weight:650}
   .fsOpts{display:flex;flex-direction:column;gap:11px;width:100%;max-width:320px;margin:30px auto 0}
-  .fsOpt{padding:17px 16px;border-radius:14px;background:rgba(255,255,255,.07);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);font-size:15.5px;font-weight:650;color:#fff;text-align:center}
-  .fsOpt--danger{color:#ffb4a8}
+  .fsOpt{padding:17px 16px;border-radius:999px;background:#fff;
+    font-size:15.5px;font-weight:700;color:#0b1112;text-align:center;
+    box-shadow:0 14px 34px rgba(0,0,0,.4)}
+  .fsOpt--danger{background:#b3362a;color:#fff;box-shadow:0 14px 34px rgba(179,54,42,.28)}
   .fsWarn{margin:18px auto 0;font-size:13px;line-height:1.55;color:rgba(255,255,255,.45);text-align:center;max-width:290px}
   /* light */
   .lt .fsWas{color:rgba(24,26,33,.45)}
@@ -215,22 +216,20 @@
   .lt .pillCta{background:#181a21;color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.2)}
   .lt .quiet{color:rgba(24,26,33,.45)}
   .lt .payoffLine{color:#0d8ca6}
-  .lt .fsOpts .fsOpt{background:rgba(24,26,33,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.6);color:rgba(24,26,33,.9)}
-  .lt .fsOpts .fsOpt--danger{color:#b3402f}
+  .lt .fsOpts .fsOpt{background:#181a21;color:#fff;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+  .lt .fsOpts .fsOpt--danger{background:#b3362a;color:#fff;box-shadow:0 12px 28px rgba(179,54,42,.22)}
   .lt .fsWarn{color:rgba(24,26,33,.5)}
 
   .reached{margin-top:26px;display:inline-flex;align-items:center;padding:10px 16px;border-radius:999px;
-    color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft);box-shadow:inset 0 0 0 1px var(--accRing)}
-  .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09);box-shadow:inset 0 0 0 1px rgba(13,140,166,.28)}
+    color:var(--acc);font-size:13.5px;font-weight:650;background:var(--accSoft)}
+  .lt .reached{color:#0d8ca6;background:rgba(13,140,166,.09)}
 
-  .holdPill{position:relative;display:flex;align-items:center;justify-content:center;width:100%;max-width:420px;margin:0 auto;
-    padding:17px 22px;border-radius:999px;background:rgba(255,255,255,.09);color:#fff;font-size:16px;font-weight:700;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);overflow:hidden}
-  .holdPill i{position:absolute;left:0;top:0;bottom:0;width:38%;background:rgba(255,255,255,.16)}
-  .holdPill span{position:relative}
-  .holdHint{margin-top:12px;text-align:center;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600}
-  .lt .holdPill{background:rgba(24,26,33,.08);color:rgba(24,26,33,.92);box-shadow:inset 0 0 0 1px rgba(24,26,33,.16)}
-  .lt .holdPill i{background:rgba(24,26,33,.14)}
+  .holdCircle{width:82px;height:82px;border-radius:50%;margin:0 auto;position:relative;
+    background:conic-gradient(rgba(255,255,255,.92) 0 132deg, rgba(255,255,255,.12) 132deg 360deg)}
+  .holdCircle::after{content:"";position:absolute;inset:5px;border-radius:50%;background:#070a0f}
+  .holdHint{margin-top:14px;text-align:center;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600}
+  .lt .holdCircle{background:conic-gradient(rgba(24,26,33,.9) 0 132deg, rgba(24,26,33,.14) 132deg 360deg)}
+  .lt .holdCircle::after{background:#eef0f3}
   .lt .holdHint{color:rgba(24,26,33,.45)}
 </style>
 </head>
@@ -378,7 +377,7 @@ function fulfilConfirm(){
     <div class="fsq" style="margin-top:22px">Did you really reach it?</div>
     <div class="fsWarn" style="margin-top:16px">This is the most serious button in Memento. Fulfilling your Neutron Star closes this chapter: the star you forged, the pages, and the plan are sealed into your history, and Memento will walk you toward forging your next one. This cannot be tapped by accident, and it should never be tapped lightly.</div>
     <div class="spacer"></div>
-    <div class="holdPill"><i></i><span>Hold to fulfil</span></div>
+    <div class="holdCircle"></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
     <div class="quiet">Not yet</div>
   </div>`;
@@ -391,7 +390,7 @@ function changeConfirm(){
     <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
     <div class="fsWarn" style="margin-top:16px">Your current star, plan, and pages will be rebuilt around a new goal from scratch. Your notes and history stay, but everything else starts over. If you only want to reword the goal, move the date, or adjust the number, go back and choose Refine instead.</div>
     <div class="spacer"></div>
-    <div class="holdPill"><i></i><span>Hold to forge a new star</span></div>
+    <div class="holdCircle"></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
     <div class="quiet">Go back</div>
   </div>`;
