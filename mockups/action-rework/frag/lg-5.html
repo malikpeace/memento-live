@@ -60,6 +60,65 @@
 [data-k=lg-5] .c p.qa{margin:0 0 15px;padding-left:11px;font-size:12.5px;line-height:1.56;
   color:rgba(var(--ink),.92);text-wrap:pretty;box-shadow:inset 2px 0 0 rgba(var(--ink),.10)}
 [data-k=lg-5] .c p.qa b{font-weight:600;color:var(--text-hi)}
+/* the refresher drawer + THE SCALE walkthrough, ported from lg-1 */
+[data-k=lg-5] .c-ref{margin:2px 0 14px}
+[data-k=lg-5] .c-ref>button{display:flex;align-items:center;width:100%;border:0;background:none;
+  padding:11px 0;cursor:pointer;font-family:var(--font);text-align:left;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.12), inset 0 -1px 0 rgba(var(--ink),.12);
+  color:rgba(var(--ink),.92);font-size:12.5px;font-weight:600}
+[data-k=lg-5] .c-ref>button svg{width:11px;height:11px;margin-left:auto;fill:none;
+  stroke:rgba(var(--ink),.72);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .22s ease-out}
+[data-k=lg-5] .c-ref.open>button svg{transform:rotate(180deg)}
+[data-k=lg-5] .c-ref .bd{overflow:hidden;max-height:0;transition:max-height .3s ease-out}
+[data-k=lg-5] .c-ref.open .bd{max-height:760px}
+[data-k=lg-5] .c-ref .cap2{margin:0 auto 16px;font-size:12px;line-height:1.52;
+  color:rgba(var(--ink),.88);text-align:center;max-width:236px}
+[data-k=lg-5] .lgs{position:relative;width:170px;height:92px;margin:14px auto 8px}
+[data-k=lg-5] .lgs__f{position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;
+  border-bottom:14px solid rgba(var(--ink),.94)}
+[data-k=lg-5] .lgs__beam{position:absolute;bottom:14px;left:5px;right:5px;height:3px;
+  background:rgba(var(--ink),.94);border-radius:2px;transform-origin:center bottom}
+[data-k=lg-5] .lgs__red,[data-k=lg-5] .lgs__cyan{position:absolute;bottom:4px;border-radius:5px}
+[data-k=lg-5] .lgs__red{left:-2px;width:38px;height:31px;background-color:#ec4227;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,0) 46%,rgba(0,0,0,.24) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -3px 6px rgba(0,0,0,.28),0 8px 16px rgba(0,0,0,.5);
+  transform-origin:bottom center}
+[data-k=lg-5] .lgs__cyan{right:-1px;width:16px;height:13px;background-color:#4ecdec;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,0) 46%,rgba(0,20,30,.26) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 5px rgba(0,20,30,.3),0 6px 14px rgba(0,0,0,.45)}
+[data-k=lg-5] .lgs__hand{position:absolute;right:20px;bottom:44px;width:2px;height:22px;
+  border-radius:1px;background:rgba(var(--ink),.85);animation:lg5Hand 3.5s ease-in-out infinite}
+[data-k=lg-5] .lgs__hand::after{content:'';position:absolute;left:50%;bottom:-5px;
+  transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;
+  border-right:4px solid transparent;border-top:6px solid rgba(var(--ink),.85)}
+[data-k=lg-5] .lgs__beam.tilt{animation:lg5Tilt 4s ease-in-out infinite}
+[data-k=lg-5] .lgs__beam.push{animation:lg5Push 3.5s ease-in-out infinite}
+[data-k=lg-5] .lgs__beam.shrinkb{animation:lg5ShrinkB 4s ease-in-out infinite}
+[data-k=lg-5] .lgs__beam.flip{animation:lg5Flip 5s ease-in-out infinite}
+[data-k=lg-5] .lgs__red.shrink{animation:lg5ShrinkW 4s ease-in-out infinite}
+[data-k=lg-5] .lgs__red.dim{animation:lg5Dim 5s ease-in-out infinite}
+[data-k=lg-5] .lgs__cyan.grow{animation:lg5Grow 5s ease-in-out infinite}
+@keyframes lg5Tilt{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-5deg)}}
+@keyframes lg5Push{0%,100%{transform:rotate(-6deg)}35%{transform:rotate(1deg)}55%{transform:rotate(-7deg)}}
+@keyframes lg5Hand{0%,100%{transform:translateY(0)}35%{transform:translateY(9px)}55%{transform:translateY(-2px)}}
+@keyframes lg5ShrinkB{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(-3deg)}}
+@keyframes lg5ShrinkW{0%,100%{transform:scale(1);opacity:.95}50%{transform:scale(.6);opacity:.55}}
+@keyframes lg5Flip{0%,43%{transform:rotate(-6deg)}56%,90%{transform:rotate(9deg)}100%{transform:rotate(-6deg)}}
+@keyframes lg5Dim{0%,40%{transform:scale(1);opacity:.85}55%{transform:scale(.55);opacity:.3}
+  65%,88%{transform:scale(.5);opacity:.25}100%{transform:scale(1);opacity:.85}}
+@keyframes lg5Grow{0%,40%{width:16px;height:13px;background-color:#4ecdec}
+  52%{width:42px;height:35px;background-color:#4db8ff}60%,88%{width:39px;height:32px;background-color:#4db8ff}
+  100%{width:16px;height:13px;background-color:#4ecdec}}
+@media (prefers-reduced-motion:reduce){
+  [data-k=lg-5] .c-ref .bd{transition:none}
+  [data-k=lg-5] .lgs__beam,[data-k=lg-5] .lgs__red,[data-k=lg-5] .lgs__cyan,
+  [data-k=lg-5] .lgs__hand{animation:none!important}
+  [data-k=lg-5] .lgs__beam{transform:rotate(-6deg)}
+  [data-k=lg-5] .lgs__beam.flip{transform:rotate(9deg)}
+  [data-k=lg-5] .lgs__red.dim{transform:scale(.5);opacity:.25}
+  [data-k=lg-5] .lgs__cyan.grow{width:39px;height:32px;background-color:#4db8ff}}
 [data-k=lg-5] .c-fair{margin:4px 0 0;font-size:17px;font-weight:700;letter-spacing:-.018em;
   color:var(--text-hi)}
 [data-k=lg-5] .c-go{position:relative;flex:0 0 auto;width:100%;height:50px;margin-top:14px;
@@ -103,6 +162,7 @@
       day:[['Delete TikTok, Instagram and Reddit. Today.',null],
            ['Phone away at 8:00pm','this is what keeps the hours down each night'],
            ['Audiobook at lunch, not YouTube','fills the midday break without a screen']],
+      scale:true,
       nos:'TikTok, short form video, scrolling in bed.',
       eq:null,
       ps:['Remember the scale from Clarity. Your attention goes to the heaviest thing on it, and right now that is the phone. You named the big three apps yourself. Deleting them helps. But if nothing better takes their place, a bored brain crawls right back.',
@@ -201,6 +261,7 @@
       day:[['90 minutes of deep work, minimum, every day, on the migration.',null],
            ['Phone in another room','so the phone cannot pull at you mid block'],
            ['Single tab only','one thing on the screen at a time']],
+      scale:true,
       nos:'anything that is not the migration during the block. Work, or do nothing.',
       eq:null,
       ps:['Focus runs on the scale from Clarity. Your attention goes to the heaviest thing on it, and email wins your mornings because it pays off in seconds.',
@@ -227,13 +288,37 @@
       h+='<div class="c-eq">'+c.eq.map(function(x){return '<div><s>'+x[0]+'</s><b>'+x[1]+'</b></div>'}).join('')
         +'<div class="r"><s>'+c.res[0]+'</s><b>'+c.res[1]+'</b></div></div>';
     }
-    h+=c.ps.map(function(p){return '<p class="b ind">'+p+'</p>'}).join('');
+    c.ps.forEach(function(pp,i){
+      h+='<p class="b ind">'+pp+'</p>';
+      if(i===0&&c.scale){
+        var SC=function(beam,red,cyan,hand){
+          return '<div class="lgs" aria-hidden="true"><div class="lgs__f"></div>'
+            +'<div class="lgs__beam '+beam+'"><b class="lgs__red '+red+'"></b>'
+            +'<b class="lgs__cyan '+cyan+'"></b>'+(hand?'<u class="lgs__hand"></u>':'')
+            +'</div></div>';
+        };
+        h+='<div class="c-ref">'
+          +'<button type="button" aria-expanded="false"><span>A refresher on focus</span>'
+          +'<svg viewBox="0 0 12 12"><path d="M2 4.5L6 8.5l4-4"/></svg></button>'
+          +'<div class="bd">'
+          +SC('tilt','','')+'<p class="cap2">Your attention is a scale. It tips toward the heaviest thing on it, and distractions are heavy and easy to reach.</p>'
+          +SC('push','','',true)+'<p class="cap2">Willpower is a push on the beam. It works for a burst, then it burns out.</p>'
+          +SC('shrinkb','shrink','')+'<p class="cap2">Removing distractions shrinks the left side. It helps, but while it still outweighs the right, the scale stays tipped.</p>'
+          +SC('flip','dim','grow')+'<p class="cap2">The real fix is a heavier right side: a goal that matters, with progress you can see. The scale flips, and focus becomes automatic.</p>'
+          +'</div></div>';
+      }
+    });
     h+='<p class="c-h">Questions you might have</p>';
     h+=c.qas.map(function(x){return '<p class="c-q">'+x[0]+'</p><p class="qa">'+x[1]+'</p>'}).join('');
     h+='<p class="c-fair">Ready?</p>';
     box.innerHTML=h;
     box.closest('.c-sc').scrollTop=0;
   }
+  box.addEventListener('click',function(e){
+    var b=e.target.closest('.c-ref>button');if(!b)return;
+    var ref=b.closest('.c-ref'),open=!ref.classList.contains('open');
+    ref.classList.toggle('open',open);b.setAttribute('aria-expanded',open?'true':'false');
+  });
   r.querySelectorAll('.bk button[data-b]').forEach(function(b){
     b.addEventListener('click',function(){
       r.querySelectorAll('.bk button[data-b]').forEach(function(x){x.classList.remove('on')});

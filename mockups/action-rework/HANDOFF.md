@@ -172,3 +172,17 @@
   fades the pull).
 - lg-2/3/4 layout variants DELETED (the combined page is the one). The
   logic section = lg-1 (original) + lg-5 (the candidate) only.
+
+## 2026-08-18 pt 7: THE GREAT CLEANUP (his call)
+- RETIRED: all lp-* daily loops, all mx-* intensity mechanics, and pu-1
+  (the pulse lives as page 4 of the refine step). u-1 is the layout, the
+  rail is the mechanic. Git history keeps every retired fragment.
+- Gallery is now SIX fragments in three sections: The opening (ob-1 + q-2 +
+  ld-4 side by side), The logic (lg-1 original + lg-5 candidate), THE
+  UNIVERSAL LAYOUT (u-1).
+- View toggle (top right, next to Room): Phone / Desktop. Desktop widens
+  the frame to 880x560 and pins every screen layer to a centered 390px
+  column, matching the real app's desktop behavior.
+- The refresher-on-focus drawer now lives in lg-5 too (screen + focus
+  buckets), same four-stage scale walkthrough as lg-1.
+- NOTE: map.html still references retired fragments; it is historical now.

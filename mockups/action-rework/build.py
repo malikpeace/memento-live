@@ -1,54 +1,28 @@
 #!/usr/bin/env python3
 """Assemble mockups/action-rework/frag/*.html into gallery.html.
-Order: ob, q, ld, lp, mx. Each fragment is a self-scoped <section>."""
+2026-08-18 cleanup (Malik): the costume loops, intensity mechanics and the
+standalone pulse are RETIRED (git history keeps them). Six fragments remain:
+the opening three side by side, the logic pair, the universal layout."""
 import pathlib, re
 
 ROOT = pathlib.Path(__file__).parent
 FRAG = ROOT / 'frag'
-ORDER = ['ob', 'q', 'ld', 'lg', 'pu', 'u', 'lp', 'mx']
-TITLES = {
-    'ob': ('Onboarding', 'The wall of intent, the one onboarding screen. No forms, just the goal made real.'),
-    'q':  ('The refine step', 'What is already done + what they think it takes. One question at a time.'),
-    'ld': ('Loading', 'The plan being produced. The wait as visible work, never a spinner, never an invented stage name.'),
-    'lg': ('The logic', 'What the loading lands on: the plan as reasoning, in their own words. Why the first move is the highest leverage one, what the plan does after it. Then it stays, behind a quiet "Why this plan" door on the day screen.'),
-    'pu': ('The pulse', 'The module\'s one ask, at the close, at the goal\'s own cadence. No loop screen asks for a number; they all end here.'),
-    'u': ('THE UNIVERSAL LAYOUT', 'One plug-and-play screen for every goal: the star act + up to two supports, size, hold, close. Toggle all eight buckets. If this survives Malik, the costume layouts retire.'),
-    'lp': ('The daily loop', 'Thirteen layout architectures on one skeleton: the sentence, the size, the hold, the close.'),
-    'mx': ('Intensity mechanics', 'Ways to scale today up or down, phone + desktop each. Three named sizes in front, freedom behind a quiet "more".'),
+ORDER = ['ob', 'q', 'ld', 'lg', 'u']
+# prefix -> section key (ob/q/ld share one row so Malik stops scrolling)
+GROUP = {'ob': 'open', 'q': 'open', 'ld': 'open', 'lg': 'lg', 'u': 'u'}
+SECTIONS = {
+    'open': ('The opening', 'Onboarding, the refine step, and loading, side by side: the road from the wall of intent to the plan. The pulse lives inside the refine step (page 4), not as its own screen.'),
+    'lg': ('The logic', 'What the loading lands on: the plan as reasoning, in their own words. The combined page is the candidate; the original stays for comparison until it dies.'),
+    'u': ('THE UNIVERSAL LAYOUT', 'The one screen every goal lives in: the star act + up to two supports, the rail, the NO list, the hold, the close. The costume layouts and separate mechanics are retired.'),
 }
 
-# REACH x FREQUENCY: Malik's ask. How many people see this screen, how often.
-# 10 = literally everyone. Notes carry the nuance where stakes beat frequency.
 REACH = {
     'ob-1': ('10/10', 'everyone, their first minute'),
-    'q-2':  ('10/10', 'everyone, before every plan'),
+    'q-2':  ('10/10', 'everyone, before every plan (the pulse is page 4)'),
     'ld-4': ('10/10', 'everyone, every plan build'),
-    'lg-1': ('10/10', 'everyone, at every plan reveal, then kept'),
+    'lg-1': ('10/10', 'the original, kept for comparison'),
     'lg-5': ('10/10', 'THE COMBINED CANDIDATE: concise, then the math, then the questions'),
-    'pu-1': ('9/10',  'most goals, weekly or better'),
-    'u-1':  ('10/10', 'the candidate: one layout, every bucket, every day'),
-    'lp-1': ('9/10',  'money, audience, job hunt, project: the biggest buckets, daily'),
-    'lp-9': ('8/10',  'weight is a giant bucket, daily ritual'),
-    'lp-18':('8/10',  'quitting, daily, highest emotional stakes'),
-    'lp-7': ('7/10',  'screen time, nightly'),
-    'lp-12':('7/10',  'gym and posting rhythms, most days'),
-    'lp-10':('7/10',  'school, projects, race blocks, daily'),
-    'lp-6': ('6/10',  'weight, the alternative daily layout'),
-    'lp-17':('6/10',  'screen time, the alternative ceiling'),
-    'lp-15':('6/10',  'runs and study blocks'),
-    'lp-22':('6/10',  'seen once per goal, but it is the best minute: stakes over frequency'),
-    'lp-8': ('5/10',  'saving and unit milestones'),
-    'lp-16':('4/10',  'maintenance, the rarest daily shape'),
-    'lp-21':('3/10',  'open practice, rare by design'),
-    'mx-8': ('9/10',  'the default intensity surface, every count goal'),
-    'mx-1': ('8/10',  'the classic alternative, count goals'),
-    'mx-2': ('6/10',  'session-length goals'),
-    'mx-9': ('6/10',  'count goals, touch-first people'),
-    'mx-5': ('5/10',  'count goals'),
-    'mx-6': ('5/10',  'count goals'),
-    'mx-7': ('5/10',  'count goals'),
-    'mx-10':('4/10',  'desktop-first people'),
-    'mx-11':('n/a',   'comparison variant only: dies once 3 vs 5 is settled'),
+    'u-1':  ('10/10', 'the one layout, every bucket, every day'),
 }
 
 def key_of(p):
@@ -77,29 +51,30 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 .cell{max-width:100%}
 .cell h3{font-size:13px;font-weight:700;margin:0 0 2px}
 .cell .cap{font-size:11.5px;color:var(--text-lo);margin:0 0 9px;max-width:300px;line-height:1.45;min-height:30px}
-.cell:has(.desk) .cap{max-width:720px}
 /* THE PHONE. .ph IS the screen (300x650, the iPhone 390x844 ratio at 77%).
-   The device shell is drawn OUTSIDE it with box-shadow rings, so it costs zero
-   layout and no fragment had to change: bezel, then the polished edge, then the
-   drop shadow. The island and home indicator are the screen's own overlays,
-   which is also what they are on a real phone, so they double as a safe-area
-   check: anything painting under them would paint under them on the device. */
+   The device shell is drawn OUTSIDE it with box-shadow rings: bezel, polished
+   edge, drop shadow. Island + home indicator are the screen's own overlays,
+   doubling as a safe-area check. */
 .ph{position:relative;width:300px;height:650px;border-radius:44px;overflow:hidden;background:#050608;
   box-shadow:
     0 0 0 11px #0b0c0e,
     0 0 0 12.5px rgba(var(--ink),.20),
     0 0 0 13.5px rgba(0,0,0,.9),
     0 26px 64px rgba(0,0,0,.62)}
-/* Dynamic Island */
 .ph::before{content:'';position:absolute;z-index:90;top:9px;left:50%;transform:translateX(-50%);
   width:70px;height:21px;border-radius:999px;background:#000;pointer-events:none;
   box-shadow:inset 0 0 0 .5px rgba(var(--ink),.06)}
-/* home indicator */
 .ph::after{content:'';position:absolute;z-index:90;bottom:7px;left:50%;transform:translateX(-50%);
   width:104px;height:4px;border-radius:999px;background:rgba(var(--ink),.32);pointer-events:none}
-.desk{position:relative;width:720px;max-width:100%;height:420px;border-radius:14px;overflow:hidden;background:#050608;
-  margin-top:16px;box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(var(--ink),.09)}
-/* bucket labels + toggle (ACTION-BUCKETS.md): which of the seven big goals a screen serves */
+/* DESKTOP VIEW (Malik, 2026-08-18): the same fragments in a desktop window.
+   The app is mobile-first with a centered column on desktop, so the toggle
+   widens the frame and pins every screen layer to a centered 390px column,
+   which is exactly what the real app does at 1440. */
+body.vw-desk .ph{width:880px;height:560px;border-radius:16px}
+body.vw-desk .ph::before,body.vw-desk .ph::after{display:none}
+body.vw-desk .ph>:not(.grid){left:50%!important;right:auto!important;width:390px!important;
+  transform:translateX(-50%)}
+/* bucket labels + toggle */
 .reach{display:inline-flex;align-items:baseline;gap:7px;margin:0 0 4px}
 .reach b{font-size:12px;font-weight:700;color:#0b0c10;background:rgba(235,238,248,.92);
   border-radius:7px;padding:3px 8px;font-variant-numeric:tabular-nums}
@@ -113,10 +88,8 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
   border-radius:7px;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
 .bk button.on{color:#0b0c10;background:rgba(235,238,248,.92)}
 /* THE ROOM: Points, Malik's pick (2026-08-16). Dots where the grid's lines
-   would have crossed, no lines: the workbench without the cage. Three layers:
-   the full field static, then two sparse offset subsets breathing on long
-   uneven cycles, so scattered dots fade in and out "randomly" with no two
-   pulses in sync. Squares at 1.4px read as dots; no radial, no blur. */
+   would have crossed: the workbench without the cage. Two sparse offset
+   subsets breathe on uneven cycles. */
 .grid{position:absolute;inset:0;pointer-events:none;
   background-image:linear-gradient(rgba(var(--ink),.16) 1.4px,transparent 1.4px);
   background-size:26px 26px;background-position:12px 12px;
@@ -136,8 +109,6 @@ body{margin:0;background:#0a0b0d;color:var(--text-hi);font-family:var(--font);-w
 @keyframes rmBreatheA{from{opacity:0}to{opacity:.9}}
 @keyframes rmBreatheB{from{opacity:.85}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){.grid::before,.grid::after{animation:none;opacity:.4}}
-/* THE ROOM TOGGLE (Malik, 2026-08-16): dots vs graph paper vs pure black,
-   side by side on the same screens, so the pick is made by looking. */
 body.rm-graph .grid{background-image:
     linear-gradient(rgba(var(--ink),.09) 1px,transparent 1px),
     linear-gradient(90deg,rgba(var(--ink),.09) 1px,transparent 1px);
@@ -155,27 +126,41 @@ body.rm-black .grid{display:none}
   font-size:10.5px;font-weight:700;color:rgba(var(--ink),.55);background:rgba(var(--ink),.05);
   border-radius:7px;padding:4px 9px;box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
 .rm-tg button.on{color:#0b0c10;background:rgba(235,238,248,.92)}
+.rm-tg em{width:1px;height:16px;background:rgba(var(--ink),.16);margin:0 3px}
 </style></head><body>
-<div class="rm-tg"><i>Room</i><button data-rm="dots" class="on">Dots</button><button
-  data-rm="graph">Graph</button><button data-rm="black">Black</button></div>
+<div class="rm-tg">
+  <i>Room</i><button data-rm="dots" class="on">Dots</button><button
+    data-rm="graph">Graph</button><button data-rm="black">Black</button>
+  <em></em>
+  <i>View</i><button data-vw="phone" class="on">Phone</button><button data-vw="desk">Desktop</button>
+</div>
 <script>(function(){
-  var KEY='ar-room',tg=document.currentScript.previousElementSibling;
-  function set(m){
-    document.body.className=m==='dots'?'':'rm-'+m;
-    tg.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.rm===m)});
-    try{localStorage.setItem(KEY,m)}catch(e){}
+  var tg=document.currentScript.previousElementSibling;
+  function setRm(m){
+    document.body.classList.remove('rm-graph','rm-black');
+    if(m!=='dots')document.body.classList.add('rm-'+m);
+    tg.querySelectorAll('button[data-rm]').forEach(function(b){b.classList.toggle('on',b.dataset.rm===m)});
+    try{localStorage.setItem('ar-room',m)}catch(e){}
   }
-  tg.addEventListener('click',function(e){var b=e.target.closest('button');if(b)set(b.dataset.rm)});
-  var saved='dots';try{saved=localStorage.getItem(KEY)||'dots'}catch(e){}
-  set(saved);
+  function setVw(v){
+    document.body.classList.toggle('vw-desk',v==='desk');
+    tg.querySelectorAll('button[data-vw]').forEach(function(b){b.classList.toggle('on',b.dataset.vw===v)});
+    try{localStorage.setItem('ar-view',v)}catch(e){}
+  }
+  tg.addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.rm)setRm(b.dataset.rm);
+    if(b.dataset.vw)setVw(b.dataset.vw);
+  });
+  var rm='dots',vw='phone';
+  try{rm=localStorage.getItem('ar-room')||'dots';vw=localStorage.getItem('ar-view')||'phone'}catch(e){}
+  setRm(rm);setVw(vw);
 })();</script>
 <div class="gal">
 <h1>Action rework: the survivors</h1>
-<p class="sub">The graded set: the designs Malik kept, built out from mockup to something close to shippable.
-The room is Points: the grid's intersections, breathing. Every intensity control now obeys the three-choice law, exactly three
-proposed sizes in front, named and honestly priced, with full freedom behind a small quiet "more".
-mx-11 is the deliberate counter-example: the same design carrying five.
-<a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">Open the Action map: every bucket's path to its screens</a>
+<p class="sub">The settled set, six screens: the opening three, the logic pair, and the universal layout.
+The room is Points (toggle top right, with the desktop view).
+<a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">The Action map</a>
 &nbsp;&middot;&nbsp;
 <a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: eleven backgrounds</a></p>
 """
@@ -186,13 +171,13 @@ def main():
     cur = None
     for f in frags:
         pre = re.match(r'([a-z]+)-', f.stem).group(1)
-        if pre != cur:
+        sec = GROUP.get(pre, pre)
+        if sec != cur:
             if cur is not None: out.append('</div></section>')
-            t, d = TITLES.get(pre, (pre, ''))
+            t, d = SECTIONS.get(sec, (sec, ''))
             out.append(f'<section class="grp"><h2>{t}</h2><p>{d}</p><div class="wall">')
-            cur = pre
+            cur = sec
         frag = f.read_text()
-        # anchor: the fragment's data-k becomes a real id for deep links
         frag = frag.replace('<section class="cell" data-k="' + f.stem + '"',
                             '<section class="cell" id="' + f.stem + '" data-k="' + f.stem + '"', 1)
         r = REACH.get(f.stem)
