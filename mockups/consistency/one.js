@@ -13,6 +13,16 @@
    week you are standing in is never marked missed, it is still open.
 
    No goal distance anywhere. That is Clarity's room.
+
+   PORT CONTRACT (the logic, mockups/the-logic.html). Every generated
+   action carries verb, size, and CADENCE. Cadence is how often the
+   action exists at all: most are daily, a Check can be weekly. So in
+   the real app, "asked" comes from the plan itself: a day counts as
+   asked only if an action existed that day; rest = the plan asked
+   nothing (the beekeeper's six quiet days are rest by design, never
+   misses). annotate() takes the cadence for this reason; the port
+   swaps the mock cadence for the plan's real per-action cadences and
+   keeps every rule downstream unchanged.
    ============================================================ */
 (function () {
   var K = window.CKit;
@@ -26,7 +36,8 @@
     { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit' },
     { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep' },
     { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held' },
-    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number' }
+    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number' },
+    { label: 'Rough patch', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', rough: true }
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
@@ -106,23 +117,26 @@
      heatmap of the window whose green deepens the more consistent you are.
      Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
   function scoreBlock(s, log, A) {
-    var win = Math.min(90, log.length), slice = log.slice(-win);
-    var kept = 0, missed = 0;
-    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'missed') missed++; });
-    var denom = kept + missed, score = denom ? Math.round(100 * kept / denom) : 100;
-    // green deepens with the score; on a white slab the kept cells carry a solid tone
+    var win = Math.min(30, log.length), slice = log.slice(-win);
+    var kept = 0, sup = 0, missed = 0;
+    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
+    // doing something smaller is still progress: the score punishes nothing, not imperfection
+    var denom = kept + sup + missed, score = denom ? Math.round(100 * (kept + 0.5 * sup) / denom) : 100;
     var a = (0.42 + 0.5 * (score / 100)).toFixed(2);
-    var tone = 'rgba(47,178,66,' + a + ')';
+    var tone = 'rgba(var(--acc-rgb),' + a + ')';
     var cells = slice.map(function (d) {
       var st = stateOf(A, d.date);
-      var bg = st === 'kept' ? tone : st === 'sup' ? 'rgba(47,178,66,.3)' : 'rgba(8,19,10,.08)';
-      return '<b style="background:' + bg + '"></b>';
+      if (st === 'kept') return '<b style="background:' + tone + '"></b>';
+      if (st === 'sup') return '<b style="background:rgba(var(--acc-rgb),.3)"></b>';
+      return '<b class="e"></b>';
     }).join('');
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + '</div></div>' +
-      '<div class="score__hm">' + cells + '</div></div></div>';
+      '<div class="score__hm">' + cells + '</div>' +
+      '<div class="score__note">The last 30 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
+      '</div></div>';
   }
 
   /* ---------- calendar: WEEK, a proper detailed view ---------- */
@@ -156,8 +170,9 @@
       (SHAPE === 'frequency' ? (met ? 'rate kept' : 'sessions this week') : 'days kept') + '</span></div>';
     var hoursStat = '<div class="wkstat"><b>' + (mins ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : '0h') + '</b><span>on it this week</span></div>';
     var usual = s.N >= 14 ? Math.round(s.perWeek) : null;
-    var cmp = usual === null ? 'the record is young' : kept > usual ? 'above your usual ' + usual : kept < usual ? 'below your usual ' + usual : 'your usual week';
-    var usualStat = '<div class="wkstat"><b>' + (usual === null ? kept : (kept >= usual ? '↑' : kept === usual ? '=' : '↓')) + '</b><span>' + cmp + '</span></div>';
+    var usualStat = usual === null
+      ? '<div class="wkstat"><b>' + kept + '</b><span>the record is young</span></div>'
+      : '<div class="wkstat"><b>' + usual + '</b><span>days in your usual week</span></div>';
     // what filled the week
     var did = [];
     if (deep) did.push(deep + ' deep work');
@@ -289,7 +304,7 @@
     return '<div class="sec"><div class="sec__h"><b>The record</b><i>last ' + plural(span, 'day') + '</i></div><div class="trk">' +
       defs.map(function (D) {
         var n = 0;
-        var cells = slice.map(function (d) { var h = D[1](d); if (h) n++; return '<b' + (h ? ' style="background:rgba(63,217,78,.6)"' : '') + '></b>'; }).join('');
+        var cells = slice.map(function (d) { var h = D[1](d); if (h) n++; return '<b' + (h ? ' style="background:rgba(var(--acc-rgb),.6)"' : '') + '></b>'; }).join('');
         return '<div class="trk__r"><div class="trk__h"><span class="trk__l">' + D[0] + '</span><span class="trk__n">' + n + '</span></div>' +
           '<div class="trk__c" style="grid-template-columns:repeat(' + span + ',1fr)">' + cells + '</div></div>';
       }).join('') + '</div></div>';
@@ -320,36 +335,42 @@
     if (s.hours > 0) rows.push(['Hours on it', s.hours + 'h']);
     if (s.avgSession > 0 && s.total >= 7) rows.push(['An average day you showed up', s.avgSession + 'm']);
     if (s.comebacks > 0) rows.push(['Times you came back', s.comebacks]);
-    if (s.months.length >= 2) {
-      var bi = 0; s.months.forEach(function (m, i) { if (m.on > s.months[bi].on) bi = i; });
-      rows.push(['Best month', K.MON[bi % 12] + ', ' + plural(s.months[bi].on, 'day')]);
-    }
     if (SHAPE === 'frequency' && s.weeks >= 3) rows.push(['Weeks you hit the rate', s.metWeeks + ' of ' + s.weeks]);
-    Object.keys(K.SUPNAME).forEach(function (k) { if ((s.sup[k] || 0) > 0) rows.push([K.SUPNAME[k], s.sup[k] + ' ' + K.SUPUNIT[k]]); });
-    rows.push(['The record starts', K.MON[log[0].date.getMonth()] + ' ' + log[0].date.getDate()]);
-    if (rows.length < 3) return '';
+    // deep work and reflections live in The record; best month lives in By month;
+    // the start date lives in the pill. Said once, each.
+    ['checkin', 'vivere'].forEach(function (k) { if ((s.sup[k] || 0) > 0) rows.push([K.SUPNAME[k], s.sup[k] + ' ' + K.SUPUNIT[k]]); });
+    if (rows.length < 2) return '';
     return '<div class="sec"><div class="sec__h"><b>The rest of the record</b></div><div class="led">' +
       rows.map(function (r) { return '<div class="led__r"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>'; }).join('') + '</div></div>';
   }
 
   /* ---------- page two ---------- */
   function pageTwo(s, log, A) {
-    var hero = '<div class="ev__hero"><div class="ev__say">You’ve shown up</div>' +
-      '<div class="ev__num">' + s.total.toLocaleString() + '</div>' +
-      '<div class="ev__since">of ' + plural(s.N, 'day') + ' since ' + K.MON[log[0].date.getMonth()] + ' ' + log[0].date.getDate() + '</div></div>';
+    var pill = '<div class="sec sec--pill"><div class="heropill">You’ve shown up <b>' +
+      s.total.toLocaleString() + '</b> of ' + plural(s.N, 'day') + ' since ' +
+      K.MON[log[0].date.getMonth()] + ' ' + log[0].date.getDate() + '</div></div>';
     var body = SCALE === 'week' ? weekView(log, s, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
     var cal = '<div class="sec"><div class="sec__h"><b>The calendar</b><span class="scale" id="scale">' +
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
     // a flat list of section cards; mobile stacks them, desktop tiles them
-    return scoreBlock(s, log, A) + hero + cal + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log);
+    return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + ledger(s, log);
   }
 
   /* ---------- render + wiring ---------- */
   function render() {
     var N = Math.max(1, DAY);
     var log = K.buildLog(N, SHAPE);
+    if (PERSONA.rough) {
+      // ~40% consistency, off the rate for three weeks, a two day comeback underway
+      log.forEach(function (d, i) {
+        var fromEnd = log.length - i;
+        if (fromEnd <= 2) { d.on = true; return; }
+        if (fromEnd <= 21) { d.on = false; if (i % 4 !== 0) d.sup = {}; return; }
+        if (d.on && i % 5 < 3) { d.on = false; if (i % 2 === 0) d.sup = {}; }
+      });
+    }
     var s = K.stats(log, SHAPE, PERSONA.cadence);
     var A = annotate(log, SHAPE, PERSONA.cadence);
     el('day').textContent = 'Day ' + N;
@@ -404,6 +425,23 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  el('modeChips').innerHTML = '<button data-m="dark" class="on">Dark</button><button data-m="light">Light</button>';
+  el('modeChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    document.documentElement.classList.toggle('light', b.getAttribute('data-m') === 'light');
+    [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+  });
+  var ACCENTS = [['#3fd94e', '63,217,78'], ['#3ad9f5', '58,217,245'], ['#7b97ff', '123,151,255'], ['#e87aaa', '232,122,170']];
+  el('accChips').innerHTML = ACCENTS.map(function (a, i) {
+    return '<button class="accdot' + (i === 0 ? ' on' : '') + '" data-a="' + i + '" style="background:' + a[0] + '" aria-label="Accent"></button>';
+  }).join('');
+  el('accChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var a = ACCENTS[+b.getAttribute('data-a')];
+    document.documentElement.style.setProperty('--acc', a[0]);
+    document.documentElement.style.setProperty('--acc-rgb', a[1]);
+    [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+  });
   el('fxChips').innerHTML = '<button data-fx="flat" class="on">Flat</button><button data-fx="glass">Glass</button><button data-fx="glassplus">Glass +</button>';
   el('fxChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
