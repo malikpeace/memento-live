@@ -222,3 +222,13 @@ calories" get explained in the same breath). ENFORCEMENT AT THE PORT: the
 judge pass grades readability (Flesch-Kincaid <= 5.9 or equivalent) and a
 failing plan regenerates with "say it simpler" notes. Mockup copy models
 the law.
+
+## THE APHORISM BAN (Malik, 2026-08-18, caught on lg-5)
+Punchy epigram reasons are BANNED: "the fight is won before it starts",
+"one tab is the whole discipline", "that's the whole game", "X is half the
+Y", any koan-shaped line that sounds wise instead of saying the plain
+reason. Every reason must be LITERAL: "so the phone cannot pull at you
+mid block", "you will see progress here before the scale". If a line would
+fit on a motivational poster, it is banned. Also: labels must be self
+explaining. "The block / The rules / The ask" is banned label-speak; say
+the thing itself ("90 minutes of deep work, minimum, every day").

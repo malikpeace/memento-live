@@ -117,3 +117,15 @@
   words/sentence measured). Per-bucket Q&As (fitness: what counts as a
   session; money: what if nobody replies; projects: what happens when the
   module is done; etc).
+
+## 2026-08-18 pt 3: lg-5 v2 after Malik's phone read + THE APHORISM BAN
+- His catches: "The block / The rules / The ask" = unreadable label-speak;
+  "the fight is won before it starts" / "one tab is the whole discipline" =
+  banned aphorism slop that slipped through.
+- THE APHORISM BAN written into CONTRACT.md: no epigrams, no koans, no
+  poster lines; reasons must be literal; labels must say the thing itself.
+- lg-5 v2: part one is now an arrow line (8 hours a day -> under 3) plus
+  "Your day, every day:" as an arrowed act list ("90 minutes of deep work,
+  minimum, every day, on the migration."). Explanation + answers indented
+  under their headers with a left rule. All 8 buckets rewritten; the same
+  13 aphorism reasons purged from lg-1.
