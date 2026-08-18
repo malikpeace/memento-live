@@ -36,6 +36,12 @@
   color:var(--text-hi);line-height:1.35}
 [data-k=lg-5] .c-acts .row span{display:block;margin-top:1px;font-size:11px;line-height:1.4;
   color:rgba(var(--ink),.75)}
+[data-k=lg-5] .c-st{margin:2px 0 10px;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.92)}
+[data-k=lg-5] .c-st b{font-weight:600;color:var(--text-hi)}
+[data-k=lg-5] .c-no{margin:0 0 4px;padding:11px 0;font-size:12.5px;line-height:1.5;
+  color:rgba(var(--ink),.92);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.16), inset 0 -1px 0 rgba(var(--ink),.16)}
+[data-k=lg-5] .c-no b{font-weight:700;color:var(--text-hi)}
 [data-k=lg-5] .c-h{margin:14px 0 12px;padding-top:13px;font-size:13.5px;font-weight:700;
   letter-spacing:-.012em;color:var(--text-hi);
   box-shadow:inset 0 1px 0 rgba(var(--ink),.16)}
@@ -97,6 +103,7 @@
       day:[['Delete TikTok, Instagram and Reddit. Today.',null],
            ['Phone away at 8:00pm','this is what keeps the hours down each night'],
            ['Audiobook at lunch, not YouTube','fills the midday break without a screen']],
+      nos:'TikTok, short form video, scrolling in bed.',
       eq:null,
       ps:['Remember the scale from Clarity. Your attention goes to the heaviest thing on it, and right now that is the phone. You named the big three apps yourself. Deleting them helps. But if nothing better takes their place, a bored brain crawls right back.',
           'Now walk it through. The big three apps are gone, so the easy hours are gone with them. The phone leaves the room at 8, so the nights are protected. The evenings have your music to go to. Actually do those three things, and it is unreasonable for the number to stay at 8. The hours have nowhere left to live.'],
@@ -109,6 +116,8 @@
       day:[['Eat about 2,500 calories a day. First: build the meal plan that makes that easy.',null],
            ['A 40 minute walk after dinner','you said evenings are where the day breaks'],
            ['Log every meal in MyFitnessPal','you will see progress here before the scale']],
+      nos:'sugar, fast food, a new diet every week.',
+      starter:'open MyFitnessPal and log one meal.',
       eq:[['Your current stats','6&#8217;1, 300 lbs'],['You work out, you said','rarely'],['Estimated calories burned daily','&#8776; 3,500 cal'],['A pound is roughly','3,500 cal'],['50 &#215; 3,500, over 180 days','&#8776; 1,000 a day']],
       res:['Ideal total calories, per day','&#8776; 2,500 cal'],
       ps:['The burn line is an estimate, and it leans on how often you move: someone training 5 days a week gets a very different plan than someone starting fresh. That is why Clarity asks. The scale number you type each morning corrects it over time.',
@@ -122,6 +131,8 @@
       day:[['Message 3 potential clients, every day.',null],
            ['Send the invoice','collect money you already earned'],
            ['30 minutes on the offer page','so your messages point somewhere strong']],
+      nos:'redesigning the website, new logos, busywork that is not outreach.',
+      starter:'open the chat and write the first hello.',
       eq:[['The gap','$1,150'],['One client is worth about','$400 a month']],
       res:['So the gap is','&#8776; 3 clients'],
       ps:['You said every client you have came from someone you reached out to first. That settles the daily act: messages. The website and the logo can wait.',
@@ -135,6 +146,7 @@
       day:[['3 hours of deep work on the product, every day.',null],
            ['Post on 3 platforms','new people can only find work that is posted'],
            ['Write one script','so tomorrow&#8217;s post is already started']],
+      nos:'more polish before posting, new niches, tool shopping.',
       eq:[['The gap','$6,800 a month'],['One project is worth about','$1,600']],
       res:['So the gap is','&#8776; 4 projects a month'],
       ps:['From what you told Clarity, the bottleneck is not the product. It is that nobody sees it. Every project so far came from someone who saw your work.',
@@ -148,6 +160,7 @@
       day:[['Train Monday, Wednesday, Friday. Today: push day.',null],
            ['Protein first at every meal','enough protein keeps the training working'],
            ['Sleep by 11','muscle builds while you sleep']],
+      nos:'a new program every month, all-or-nothing weeks.',
       eq:null,
       ps:['The real enemy is the restart, so the plan removes the choices. Training days are fixed. The floor is low on purpose: a 30 minute session keeps the day. A walk keeps the day.',
           'Now walk it through. Fixed days remove the deciding. The low floor removes the excuse. Never miss twice removes the spiral. Take those three away, and falling off has no door left to come in through. The sessions get counted, and the count is you becoming someone who trains.'],
@@ -160,6 +173,8 @@
       day:[['Study 2 hours a day, phone in another room.',null],
            ['Rewrite one page of notes','the fastest way to check you understood it'],
            ['Email about office hours','ask for help early, not the week of the exam']],
+      nos:'the phone at the desk, cramming instead of daily hours.',
+      starter:'sit down and open the textbook to the right page.',
       eq:null,
       ps:['A grade cannot be done today. It shows up later, as a result. Hours can be done today, and you said the two classes with the heaviest reading are pulling the average down, so the hours aim there first.',
           'Now walk it through. Two focused hours a day, phone in another room, aimed at the two weakest classes, is about 60 hyper focused hours a semester exactly where the average is losing points. With that much aimed work, staying under 3.5 becomes the unreasonable ending. Every session gets counted, so you see the work pile up long before grades arrive.'],
@@ -172,6 +187,8 @@
       day:[['One deep session on the Action module, every day.',null],
            ['Ship one visible thing','seeing progress keeps your brain paid'],
            ['Write tomorrow&#8217;s first step','so tomorrow starts without deciding anything']],
+      nos:'new features before launch, starting a second project.',
+      starter:'open the file where you stopped yesterday.',
       eq:null,
       ps:['You listed what is done and what is left, so nothing here is invented. One module stands between here and shipped, and by your own list it is the tallest thing left.',
           'Now walk it through. A deep session every day on that one module, plus one visible thing shipped each day, is about 30 aimed sessions a month at a single target. Nothing that gets 30 aimed sessions a month stays unfinished for long: missing the ship date would take actively avoiding the work.'],
@@ -184,6 +201,7 @@
       day:[['90 minutes of deep work, minimum, every day, on the migration.',null],
            ['Phone in another room','so the phone cannot pull at you mid block'],
            ['Single tab only','one thing on the screen at a time']],
+      nos:'anything that is not the migration during the block. Work, or do nothing.',
       eq:null,
       ps:['Focus runs on the scale from Clarity. Your attention goes to the heaviest thing on it, and email wins your mornings because it pays off in seconds.',
           'Now walk it through. The phone is in another room, so it cannot interrupt. One tab, so nothing else on screen can. The block runs first thing, before the email flood arrives. Remove every interrupter, and it is unreasonable for the block not to happen. Counted blocks, every day, make the migration a matter of time.'],
@@ -202,6 +220,8 @@
       return '<div class="row'+(i===0?' star':'')+'"><i>&#8594;</i><div><b>'+x[0]+'</b>'
         +(x[1]?'<span>'+x[1]+'</span>':'')+'</div></div>';
     }).join('')+'</div>';
+    if(c.starter)h+='<p class="c-st"><b>The first 2 minutes:</b> '+c.starter+'</p>';
+    h+='<p class="c-no"><b>Say NO to:</b> '+c.nos+'</p>';
     h+='<p class="c-h">The math behind this</p>';
     if(c.eq){
       h+='<div class="c-eq">'+c.eq.map(function(x){return '<div><s>'+x[0]+'</s><b>'+x[1]+'</b></div>'}).join('')

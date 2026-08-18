@@ -168,6 +168,12 @@
 [data-k=u-1] .u1.signed .u1-sup{pointer-events:none}
 [data-k=u-1] .u1-sup:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:1px}
 
+/* the NO line: the plan's refusals, one quiet row under the day (Malik,
+   2026-08-18: the NO list lives on the logic page AND here). */
+[data-k=u-1] .u1-no{margin:8px 0 0;font-size:10.5px;line-height:1.4;
+  color:rgba(var(--ink),.55);font-weight:500}
+[data-k=u-1] .u1-no:empty{display:none}
+
 /* --- beat 4: HOLD IT DONE ----------------------------------------------- */
 [data-k=u-1] .u1-hold{position:relative;width:100%;height:52px;margin-top:14px;border:0;border-radius:14px;
   overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;font-family:var(--font);
@@ -333,6 +339,7 @@
       <button type="button" class="u1-sup" data-s="1"><span class="in">
         <span class="u1-box"><i></i><svg viewBox="0 0 12 12"><path d="M2.4 6.3l2.4 2.4 4.8-5"/></svg></span>
         <span class="tx"></span></span></button>
+      <p class="u1-no"></p>
     </div>
 
     <button type="button" class="u1-hold"><i></i><span>Hold to complete</span></button>
@@ -413,6 +420,7 @@
     focus:{pre:'Deep work on the migration, ',post:'.',fmt:mins,
       three:[45,60,90],all:[30,45,60,75,90,120],
       dw:true,dwv:function(v){return v},
+      nos:'NO: anything that is not the migration',
       sup:['Phone in another room','Single tab only'],
       pulse:null,rest:'See you tomorrow.'},
     screen:{pre:'Phone away at ',post:'.',
@@ -429,6 +437,8 @@
     projects:{pre:'Deep session on the smallest open blocker, ',post:'.',fmt:mins,
       three:[30,45,60],all:[30,45,60,90,120,150],
       dw:true,dwv:function(v){return v},
+      nos:'NO: TikTok &#183; short form &#183; scrolling in bed',
+      nos:'NO: new features &#183; second projects',
       sup:['Ship one visible thing','Write tomorrow&#8217;s first step'],
       pulse:{kind:'choice',q:'Is that blocker cleared?',opts:['Cleared','Not yet'],
         src:'From your own blocker list, asked after each session.'},
@@ -436,6 +446,7 @@
     school:{pre:'Study ',post:', phone in another room.',fmt:mins,
       three:[60,90,120],all:[45,60,90,120,150,180],
       dw:true,dwv:function(v){return v},
+      nos:'NO: the phone at the desk &#183; cramming',
       sup:['Rewrite one page of notes','Email about office hours'],
       pulse:{kind:'num',q:'My GPA is',pre:'',suf:'',tail:'this semester.',dec:true,
         src:'Asked when results exist, never between.'},
@@ -461,6 +472,10 @@
     business:{pre:'Deep work on the product, ',post:'.',fmt:mins,
       three:[60,120,180],all:[60,120,180,240,300,360],
       dw:true,dwv:function(v){return v},
+      nos:'NO: sugar &#183; fast food &#183; new diets',
+      nos:'NO: new programs &#183; all-or-nothing weeks',
+      nos:'NO: website tinkering &#183; logo busywork',
+      nos:'NO: polish before posting &#183; new niches',
       sup:['Post on 3 platforms','Write one script'],
       pulse:{kind:'num',q:'The business made',pre:'$',suf:'',tail:'this week.',dec:false,
         src:'Asked once a week, Sundays.'},
@@ -616,6 +631,7 @@
     root.classList.toggle('signed',signed);
     drawStar();drawSizes();drawPlate();drawDW();railDraw();
     hold.querySelector('span').textContent=off?C.offHold:'Hold to complete';
+    q('.u1-no').innerHTML=off?'':(C.nos||'');
     restLine.textContent=C.rest;
     offBtn.classList.toggle('show',!!C.offable);
     offBtn.classList.toggle('on',off);

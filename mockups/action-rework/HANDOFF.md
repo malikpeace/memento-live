@@ -144,3 +144,21 @@
   the acts tied mechanically to the goal until missing it reads as the
   unreasonable ending (his make-it-unreasonable frame, per bucket: 90
   chances vs 3 clients, 60 aimed hours at the two weak classes, etc).
+
+## 2026-08-18 pt 5: the NO list, starters, anchors (from the books review)
+- Reviewed The ONE Thing + Essentialism (concepts only, never quoted, per
+  Malik). Verdict: the module already carries both cores; three refinements
+  adopted, all in CONTRACT.md:
+- THE NO LIST: schema field noList (2-3 refusals, must trace to their
+  conversation or the bucket's standard enemies). Lives as "Say NO to:" in
+  lg-5 part one AND as one quiet line on u-1 under the supports. His call:
+  logic + day screen.
+- STARTERS: "The first 2 minutes:" line on the logic page for hard-to-start
+  acts (weight/money/school/projects have examples). No day-screen UI;
+  sessions already have the Deep work door.
+- TIME ANCHORS: optional per-act field, AI-with-guardrail: only time-shaped
+  acts with a known schedule get a when. Judge rejects anchors on flexible
+  count-acts.
+- NAMING: "the plate" is dead; it is THE DAY.
+- Lead-domino rule for projects noted for the AI selection rules: pick the
+  blocker whose clearing unlocks the most others, tie-break smallest.

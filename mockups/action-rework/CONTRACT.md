@@ -232,3 +232,22 @@ mid block", "you will see progress here before the scale". If a line would
 fit on a motivational poster, it is banned. Also: labels must be self
 explaining. "The block / The rules / The ask" is banned label-speak; say
 the thing itself ("90 minutes of deep work, minimum, every day").
+
+## THE NO LIST + ANCHORS + STARTERS (Malik, 2026-08-18, from The ONE
+## Thing / Essentialism review. Concepts only, never quote the books.)
+- Naming: "the plate" is DEAD as a term. It is THE DAY (star act + up to
+  two supports + the fold-away sizing).
+- NO LIST (plan schema field noList, 2-3 items): every plan names what the
+  person says NO to, pulled from their own conversation plus the bucket's
+  standard enemies (weight: sugar, fast food; screen: TikTok, short form,
+  scrolling in bed; deep work: anything that is not the goal). Judge pass:
+  every NO must trace to the conversation or the bucket set. Lives on the
+  logic page ("Say NO to:") AND as one quiet line on the day screen.
+  Drift comes from adding, not quitting; the NO list is the wall.
+- TIME ANCHORS (per-act optional field anchor): the AI attaches a when (a
+  clock time or an event trigger) ONLY when the act is time-shaped AND the
+  schedule is known. The judge rejects anchors on flexible count-acts.
+  Never applied to literally everything.
+- STARTERS (optional field starter): hard-to-start acts get "The first 2
+  minutes:" on the logic page only. Sessions already have their starter
+  (the Deep work door). No new day-screen UI.
