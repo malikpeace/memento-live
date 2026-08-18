@@ -160,8 +160,6 @@ body.rm-black .grid{display:none}
 <h1>Action rework: the survivors</h1>
 <p class="sub">The settled set, six screens: the opening three, the logic pair, and the universal layout.
 The room is Points (toggle top right, with the desktop view).
-<a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">The Action map</a>
-&nbsp;&middot;&nbsp;
 <a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: eleven backgrounds</a></p>
 """
 

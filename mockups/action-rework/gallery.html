@@ -128,8 +128,6 @@ body.rm-black .grid{display:none}
 <h1>Action rework: the survivors</h1>
 <p class="sub">The settled set, six screens: the opening three, the logic pair, and the universal layout.
 The room is Points (toggle top right, with the desktop view).
-<a href="map.html" style="color:rgba(235,238,248,.92);font-weight:600">The Action map</a>
-&nbsp;&middot;&nbsp;
 <a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: eleven backgrounds</a></p>
 
 <section class="grp"><h2>The opening</h2><p>Onboarding, the refine step, and loading, side by side: the road from the wall of intent to the plan. The pulse lives inside the refine step (page 4), not as its own screen.</p><div class="wall">
@@ -348,13 +346,10 @@ The room is Points (toggle top right, with the desktop view).
 /* ---- header: back chevron + progress + counter ---- */
 [data-k="q-2"] .q2-top{display:flex;align-items:center;gap:10px;height:30px;flex:none}
 [data-k="q-2"] .q2-back{flex:none;width:30px;height:30px;padding:0;border:0;border-radius:9px;display:flex;
-  align-items:center;justify-content:center;background:rgba(22,25,31,.94);
-  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:background .16s ease,transform .16s ease}
+  align-items:center;justify-content:center;background:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:opacity .16s ease}
 [data-k="q-2"] .q2-back svg{display:block}
-[data-k="q-2"] .q2-back:hover{background:rgba(30,34,42,.95)}
-[data-k="q-2"] .q2-back:active{transform:scale(.94);background:rgba(34,38,47,.96)}
+[data-k="q-2"] .q2-back:active{opacity:.6}
 [data-k="q-2"] .q2-back.ghost{visibility:hidden;pointer-events:none}
 [data-k="q-2"] .q2-bar{display:flex;gap:5px;align-items:center;flex:1;min-width:0}
 /* each segment is a track that FILLS as its question gets answered, so progress is earned, not
@@ -381,23 +376,24 @@ The room is Points (toggle top right, with the desktop view).
   color:rgba(var(--ink),.90)}
 
 /* ---- the answer body: slabs on 1 to 3, the poster field on 4, both optically centred ---- */
-[data-k="q-2"] .q2-as{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:10px}
+[data-k="q-2"] .q2-as{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:0}
 [data-k="q-2"] .q2-as.enter{animation:q2q .36s cubic-bezier(.2,.7,.2,1) .06s both}
-[data-k="q-2"] .q2-a{position:relative;display:flex;align-items:center;width:100%;text-align:left;min-height:56px;
-  padding:14px 16px;border:0;border-radius:14px;font-family:inherit;font-size:15px;font-weight:500;
-  line-height:1.3;letter-spacing:-.014em;color:rgba(var(--ink),.96);cursor:pointer;
-  -webkit-tap-highlight-color:transparent;background:rgba(22,25,31,.94);
-  backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
-  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);
-  transition:background .18s ease,color .18s ease,transform .13s cubic-bezier(.2,.7,.3,1),box-shadow .18s ease}
-[data-k="q-2"] .q2-a:hover{background:rgba(30,34,42,.95)}
-[data-k="q-2"] .q2-a:active{transform:scale(.985);background:rgba(34,38,47,.96)}
-[data-k="q-2"] .q2-a:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
-/* chosen = the same solid white the CTA is made of, near black text, no indicator */
-[data-k="q-2"] .q2-a.on{background:rgba(235,238,248,.94);color:#0b0c10;box-shadow:none;
-  backdrop-filter:none;-webkit-backdrop-filter:none}
-[data-k="q-2"] .q2-a.on:hover{background:rgba(240,243,251,.96)}
-[data-k="q-2"] .q2-a.on:active{background:rgba(214,218,231,.95)}
+/* FLAT (Malik, 2026-08-18): the boxes are gone. Answers are ruled rows,
+   a hairline over each and one under the last. Chosen = the text goes full
+   bright and a short dash lands at the row's end, the rail's language. */
+[data-k="q-2"] .q2-a{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  min-height:52px;padding:15px 2px;border:0;border-radius:0;font-family:inherit;font-size:15px;
+  font-weight:500;line-height:1.3;letter-spacing:-.014em;color:rgba(var(--ink),.80);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;background:none;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.12);
+  transition:color .18s ease}
+[data-k="q-2"] .q2-a:last-child{box-shadow:inset 0 1px 0 rgba(var(--ink),.12), inset 0 -1px 0 rgba(var(--ink),.12)}
+[data-k="q-2"] .q2-a::after{content:'';margin-left:auto;width:16px;height:2.5px;border-radius:2px;
+  background:transparent;transition:background .18s ease}
+[data-k="q-2"] .q2-a:hover{color:rgba(var(--ink),.95)}
+[data-k="q-2"] .q2-a:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:-2px}
+[data-k="q-2"] .q2-a.on{color:var(--text-hi);font-weight:700}
+[data-k="q-2"] .q2-a.on::after{background:rgba(var(--ink),.95)}
 
 /* ---- the pulse field, pu-1's design ported: a pen on a line, not a box ---- */
 [data-k="q-2"] .q2-pulse{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -426,13 +422,11 @@ The room is Points (toggle top right, with the desktop view).
 [data-k="q-2"] .q2-hint{position:absolute;left:0;right:0;top:18px;height:46px;margin:0;display:none;
   align-items:center;justify-content:center;font-size:12.5px;letter-spacing:-.005em;color:rgba(var(--ink),.62)}
 [data-k="q-2"] .q2-hint.show{display:flex}
-[data-k="q-2"] .q2-own{display:flex;align-items:center;gap:9px;padding:0 15px;height:46px;border-radius:14px;
-  background:rgba(18,20,25,.94);backdrop-filter:blur(22px) saturate(1.35);
-  -webkit-backdrop-filter:blur(22px) saturate(1.35);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);
-  transition:box-shadow .18s ease,background .18s ease}
-[data-k="q-2"] .q2-own.lit{background:rgba(24,27,33,.96);box-shadow:inset 0 1px 0 rgba(var(--ink),.10)}
-/* the field answers back: the mark brightens on focus so it reads as a place to write, not a caption */
-[data-k="q-2"] .q2-own:focus-within{background:rgba(26,30,37,.97);box-shadow:inset 0 1px 0 rgba(var(--ink),.13)}
+[data-k="q-2"] .q2-own{display:flex;align-items:center;gap:9px;padding:0 2px;height:46px;border-radius:0;
+  background:none;box-shadow:inset 0 -1px 0 rgba(var(--ink),.16);
+  transition:box-shadow .18s ease}
+[data-k="q-2"] .q2-own.lit{box-shadow:inset 0 -1px 0 rgba(var(--ink),.30)}
+[data-k="q-2"] .q2-own:focus-within{box-shadow:inset 0 -1px 0 rgba(var(--ink),.45)}
 /* hidden, not removed, on the pulse step: the CTA must not move between beats */
 [data-k="q-2"] .q2-own.gone{visibility:hidden;pointer-events:none}
 [data-k="q-2"] .q2-own i{flex:none;display:block;width:1.5px;height:15px;border-radius:1px;
@@ -490,7 +484,6 @@ The room is Points (toggle top right, with the desktop view).
       <div class="q2-bar">
         <div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div>
       </div>
-      <div class="q2-n">1 of 4</div>
     </div>
     <div class="q2-q"></div>
     <p class="q2-unit"></p>
@@ -512,7 +505,7 @@ The room is Points (toggle top right, with the desktop view).
   /* Three refine questions, then the pulse. PROVENANCE: every value here is typed by the
      person on this screen. Memento measures nothing and knows nothing else. */
   var D=[
-    {q:"What have you already done toward this?",
+    {q:"So, what have you already done toward this?",
      a:["Nothing yet, this is day one","I have had the idea a while","I've made a little progress","I do it, just not consistently"]},
     {q:"What do you think it actually takes?",
      a:["Talking to more people","A better offer","Showing up every day","I honestly do not know"]},
@@ -523,7 +516,7 @@ The room is Points (toggle top right, with the desktop view).
   var LAST=D.length; /* index 3 = the pulse step */
   var i=0, picked=[null,null,null], typed=['','',''], pulse='', written=false;
   var wrap=r.querySelector('.q2-wrap'), q=r.querySelector('.q2-q'), unit=r.querySelector('.q2-unit'),
-      as=r.querySelector('.q2-as'), n=r.querySelector('.q2-n'), own=r.querySelector('.q2-own'),
+      as=r.querySelector('.q2-as'), own=r.querySelector('.q2-own'),
       inp=own.querySelector('input'), back=r.querySelector('.q2-back'), cta=r.querySelector('.q2-cta'),
       segs=r.querySelectorAll('.q2-seg'), hint=r.querySelector('.q2-hint'),
       lab=r.querySelector('.q2-lab'), fill=r.querySelector('.q2-fill'),
@@ -639,7 +632,6 @@ The room is Points (toggle top right, with the desktop view).
     wrap.classList.toggle('written',pulseStep&&written);
     if(!pulseStep){ inp.value=typed[i]; own.classList.toggle('lit',typed[i].trim().length>0); }
     back.classList.toggle('ghost', i===0);
-    n.textContent=(i+1)+' of 4';
     syncCta();
   }
   function commit(){
@@ -1439,11 +1431,6 @@ The room is Points (toggle top right, with the desktop view).
   font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:-.012em}
 [data-k=lg-5] .c-keep{margin:9px 0 0;flex:0 0 auto;text-align:center;font-size:10.5px;
   line-height:1.4;color:rgba(var(--ink),.72)}
-/* the M: quiet brand, top center, below the island (same spot as the day
-   screen so the module feels like one place) */
-[data-k=lg-5] .c-m{position:absolute;top:34px;left:50%;transform:translateX(-50%);
-  z-index:5;width:14px;height:14px;pointer-events:none}
-[data-k=lg-5] .c-m path{fill:rgba(var(--ink),.30)}
 </style>
 <h3>The logic: combined</h3><p class="reach"><b>10/10</b><span>THE COMBINED CANDIDATE: concise, then the math, then the questions</span></p>
 <p class="cap">v2 after Malik's read: part one is now dead simple, an arrow line (where you are, where you are going) and "Your day, every day" as an arrowed act list in plain words. No label-speak, no aphorisms, every reason literal. Then the math, then the questions, both indented under their headers.</p>
@@ -1460,7 +1447,6 @@ The room is Points (toggle top right, with the desktop view).
 </div>
 <div class="ph">
   <div class="grid"></div>
-  <svg class="c-m" viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
   <div class="c">
     <div class="c-sc"><div class="c-in"></div></div>
     <button type="button" class="c-go">Hold to agree. Start today.</button>
@@ -1831,10 +1817,12 @@ The room is Points (toggle top right, with the desktop view).
 [data-k=u-1] .u1-hold{position:relative;width:100%;height:52px;margin-top:14px;border:0;border-radius:14px;
   overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;font-family:var(--font);
   cursor:pointer;touch-action:none;z-index:2;transition:background .14s ease-out,transform .09s ease-out}
-[data-k=u-1] .u1-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+/* the button stays PUT (Malik): no fill loads inside it, the screen's
+   inversion is the whole feedback for the hold */
+[data-k=u-1] .u1-hold i{display:none}
 [data-k=u-1] .u1-hold span{position:relative;display:grid;place-items:center;height:100%;
   font-size:15.5px;font-weight:700;letter-spacing:-.012em}
-[data-k=u-1] .u1-hold:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=u-1] .u1-hold:active{background:rgba(235,238,248,.94)}
 [data-k=u-1] .u1-hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=u-1] .u1.signed .u1-hold{display:none}
 /* --- beat 5a: the green beat, undo lives inside it ---------------------- */
@@ -2136,7 +2124,7 @@ The room is Points (toggle top right, with the desktop view).
   };
   var ROLES=['lightest','lighter','today&#8217;s'];
   var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
-  var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
+  var HOLD=3000,SUP=450,BEAT=1500,PULSE=900;
   var C=B.focus,acts=3,val=C.three[2],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
 

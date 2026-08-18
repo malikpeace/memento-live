@@ -178,10 +178,12 @@
 [data-k=u-1] .u1-hold{position:relative;width:100%;height:52px;margin-top:14px;border:0;border-radius:14px;
   overflow:hidden;background:rgba(235,238,248,.94);color:#0b0c10;font-family:var(--font);
   cursor:pointer;touch-action:none;z-index:2;transition:background .14s ease-out,transform .09s ease-out}
-[data-k=u-1] .u1-hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(63,217,78,.55)}
+/* the button stays PUT (Malik): no fill loads inside it, the screen's
+   inversion is the whole feedback for the hold */
+[data-k=u-1] .u1-hold i{display:none}
 [data-k=u-1] .u1-hold span{position:relative;display:grid;place-items:center;height:100%;
   font-size:15.5px;font-weight:700;letter-spacing:-.012em}
-[data-k=u-1] .u1-hold:active{background:rgba(206,211,226,.94);transform:translateY(1px)}
+[data-k=u-1] .u1-hold:active{background:rgba(235,238,248,.94)}
 [data-k=u-1] .u1-hold:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:2px}
 [data-k=u-1] .u1.signed .u1-hold{display:none}
 /* --- beat 5a: the green beat, undo lives inside it ---------------------- */
@@ -483,7 +485,7 @@
   };
   var ROLES=['lightest','lighter','today&#8217;s'];
   var CONSEQ=['Just the star.','The star and one support.','The star and both supports.'];
-  var HOLD=1400,SUP=450,BEAT=1500,PULSE=900;
+  var HOLD=3000,SUP=450,BEAT=1500,PULSE=900;
   var C=B.focus,acts=3,val=C.three[2],free=false,off=false,
       signed=false,ticks=[false,false],beat=null,dwT=null,dwLeft=0;
 

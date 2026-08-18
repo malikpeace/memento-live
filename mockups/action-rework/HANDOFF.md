@@ -193,3 +193,14 @@
 - lg-5: quiet static M top center under the island (same spot as u-1, the
   module reads as one place), plus the one lg-1 element the combined page
   lacked: "Every line above came from what you told Memento." before Ready?
+
+## 2026-08-18 pt 9: refine flat pass, 3s still hold, map dead, MERGE PLAN
+- q-2 FLAT: boxes dead, answers are ruled rows (chosen = bold + bright end
+  dash, the rail's language), free field is an underline, bare back chevron,
+  "1 of 4" removed, Q1 = "So, what have you already done toward this?"
+- u-1: the day hold is now 3 SECONDS, the button stays put (no fill), the
+  full-screen inversion is the only feedback.
+- lg-5: the M removed (no good home on a reading page).
+- map.html DELETED (obsolete since the cleanup).
+- ACTION-MERGE-PLAN.md created at repo root: 6 phases incl. his two
+  flagged items (server-side generation, the close/Clarity data contract).
