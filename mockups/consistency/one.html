@@ -181,8 +181,8 @@
 
   /* page one: the number, left aligned */
   #pgOne { display: grid; align-content: center; justify-items: start; text-align: left;
-    padding: 100px 26px 70px; position: relative; }
-  .one__brand { position: absolute; top: 100px; left: 26px; color: rgba(255,255,255,0.22); }
+    padding: calc(var(--barh, 92px) + 26px) 26px 70px; position: relative; }
+  .one__brand { position: absolute; top: calc(var(--barh, 92px) + 26px); left: 26px; color: rgba(255,255,255,0.22); }
   .one__num { font-weight: 700; color: var(--text-hi, #fff); line-height: 0.86; letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums; margin: 0 0 14px; }
   .one__sub { font-size: 17px; color: var(--text-mid, rgba(255,255,255,0.8)); line-height: 1.45; max-width: 320px; }
@@ -195,7 +195,7 @@
   .one__hint svg { display: block; margin: 5px 0 0; opacity: 0.6; }
 
   /* page two: the evidence room */
-  #pgTwo { padding: 86px 18px 90px; }
+  #pgTwo { padding: calc(var(--barh, 92px) + 14px) 18px 90px; }
   .ev { max-width: 430px; margin: 0 auto; }
   .ev__hero { margin-bottom: 4px; }
   .ev__say { font-size: 15px; color: var(--text-mid, rgba(255,255,255,0.8)); font-weight: 500; }
@@ -416,12 +416,14 @@
     max-width: 1160px; margin: 0 auto; padding: 0 30px; }
   html.vm-desk .pg { min-height: 0; scroll-snap-align: none; }
   /* the number is a header band, not a full-height rail */
-  html.vm-desk #pgOne { position: static; height: auto; display: block; padding: 46px 4px 2px; }
-  html.vm-desk .one__brand { top: 104px; left: 34px; }
+  /* the lab bar is fixed, so the page reserves its height (set by JS) plus air */
+  html.vm-desk #pgOne { position: static; height: auto; display: block;
+    padding: calc(var(--barh, 90px) + 34px) 4px 2px; }
+  html.vm-desk .one__brand { top: calc(var(--barh, 90px) + 36px); left: 34px; }
   html.vm-desk .one__num { font-size: clamp(96px, 12vw, 150px) !important; margin-bottom: 10px; }
   html.vm-desk .one__sub { font-size: 18px; }
   html.vm-desk .one__hint { display: none; }
-  html.vm-desk #pgTwo { padding: 22px 0 110px; }
+  html.vm-desk #pgTwo { padding: 26px 0 110px; }
   html.vm-desk .ev__hero { display: none; }
   /* the section cards tile into a balanced two-column masonry */
   html.vm-desk .ev { max-width: none; margin: 0; column-count: 2; column-gap: 26px; }
@@ -438,11 +440,12 @@
 
   /* ============ phone view forced on a wide screen ============ */
   html.vm-framed body { display: flex; justify-content: center; }
-  html.vm-framed #snap { width: 390px; height: 780px; margin: 118px auto 40px; border-radius: 30px;
+  html.vm-framed #snap { width: 390px; height: 780px; margin: calc(var(--barh, 90px) + 28px) auto 40px; border-radius: 30px;
     outline: 1px solid var(--hairline, rgba(255,255,255,0.09));
     box-shadow: 0 30px 80px rgba(0,0,0,0.55); background: #060708; }
   html.vm-framed .pg { min-height: 780px; }
   html.vm-framed #pgOne { padding-top: 40px; }
+  html.vm-framed #pgTwo { padding-top: 26px; }
 </style>
 </head>
 <body>

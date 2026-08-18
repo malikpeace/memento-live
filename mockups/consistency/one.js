@@ -496,7 +496,14 @@
     var b = e.target.closest('button'); if (!b) return;
     VIEW = b.getAttribute('data-v'); applyView();
   });
-  window.addEventListener('resize', applyView);
+  // the lab bar is fixed and its height changes as chips wrap, so publish it
+  var barEl = document.getElementById('bar');
+  function measureBar() {
+    document.documentElement.style.setProperty('--barh', Math.round(barEl.getBoundingClientRect().height) + 'px');
+  }
+  measureBar();
+  if (window.ResizeObserver) new ResizeObserver(measureBar).observe(barEl);
+  window.addEventListener('resize', function () { measureBar(); applyView(); });
   applyView();
   render();
 })();
