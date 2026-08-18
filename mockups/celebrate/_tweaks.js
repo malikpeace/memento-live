@@ -308,36 +308,48 @@
         else { cnt(ph, '.qu1-hero', cur); cnt(ph, '.qu1-hero2', cur); }
         put(ph, '.b1 .sub', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)) + '.');
         put(ph, '.qu1-sub2', esc(unitFor(cur, money ? v.unit.replace(/^\$\s*/, '') || 'dollars' : v.unit)));
-        function xFor(vv) {
-          var N = marks.length, cx = function (i) { return (i + 0.5) / N * 100; };
-          if (vv <= start) return 0;
-          if (vv <= marks[0]) return (vv - start) / (marks[0] - start) * cx(0);
-          for (var i = 0; i < N - 1; i++) {
-            if (vv <= marks[i + 1]) return cx(i) + (vv - marks[i]) / (marks[i + 1] - marks[i]) * (cx(i + 1) - cx(i));
+        /* THE AXIS (Malik 2026-08-16): pure DISTANCE. ~10 sharp ticks spread
+           evenly along the span, each one's height grown by its VALUE (the
+           left of the road reads small, the right reads tall), a baseline
+           with weight, the accent line for today (no "today" text), and
+           labels only at the quarters, in a font sized to fit the numbers. */
+        var rail = Q(ph, '.qu1-rail');
+        if (rail) {
+          var frac100 = frac * 100;
+          var html = '<div class="qu1-base"></div><div class="qu1-gone" style="width:' + frac100.toFixed(1) + '%"></div>';
+          var TICKS = 10, di = 0;
+          for (var ti = 0; ti <= TICKS; ti++) {
+            var p = ti / TICKS * 100;
+            if (Math.abs(p - frac100) < 4) continue;           // the accent line owns this spot
+            var hh = Math.round(6 + (ti / TICKS) * 19);        // value-proportional height
+            html += '<div class="qu1-t' + (p < frac100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
+                    '%;height:' + hh + 'px;--d:' + (di++ * 0.05).toFixed(2) + 's"></div>';
           }
-          return cx(N - 1);
+          html += '<div class="qu1-t is-now" style="left:' + frac100.toFixed(1) + '%;height:' +
+                  Math.round(10 + frac * 19 + 6) + 'px;--d:' + (di * 0.05).toFixed(2) + 's"></div>';
+          rail.innerHTML = html;
         }
-        var gone = Q(ph, '.qu1-gone'); if (gone) gone.style.width = xFor(cur).toFixed(1) + '%';
-        /* the ladder is dense now: every mark gets a post, only the quarters,
-           the half, today's mark and the goal get NUMBERS, so 14 posts never
-           become 14 labels fighting for 288px */
-        var lblSet = {};
-        [Math.round(start + span * 0.25), Math.round(start + span * 0.5), Math.round(start + span * 0.75), goal].forEach(function (m) { lblSet[m] = 1; });
-        if (nowMark !== null) lblSet[nowMark] = 1;
-        var cells = '', labels = '';
-        marks.forEach(function (m) {
-          var isNow = m === nowMark, isPast = passed.indexOf(m) > -1 && !isNow;
-          var hpx = '';
-          if (isPast) {
-            var k = passed.indexOf(m), n = Math.max(1, passed.length - 1);
-            hpx = ' style="--ph:' + Math.round(16 + 6 * (n === 1 ? 0 : k / (n - 1))) + 'px"';
-          }
-          cells += '<div class="qu1-cell' + (isNow ? ' is-now' : isPast ? ' is-past' : '') + '"' + hpx + '><div class="qu1-p"></div></div>';
-          var lbl = lblSet[m] ? mf(m) : '';
-          var when = lbl && isNow ? 'today' : (lbl && passed.indexOf(m) > -1 ? dateBack(Math.round(days * (1 - (m - start) / span))) : '');
-          labels += '<div class="qu1-lc' + (isNow ? ' is-now' : passed.indexOf(m) > -1 ? ' is-past' : '') + '"><div class="qu1-num">' + lbl + '</div><div class="qu1-date">' + when + '</div></div>';
-        });
-        put(ph, '.qu1-marks', cells); put(ph, '.qu1-labels', labels);
+        /* labels: the quarters only (start / 25 / 50 / 75 / goal), dates under
+           the ones already passed, today's own number bold at its line; any
+           quarter within 9% of today steps aside (the collision law). */
+        var lwrap = Q(ph, '.qu1-labels');
+        if (lwrap) {
+          var lfs = String(mf(goal)).length >= 7 ? 10 : String(mf(goal)).length >= 5 ? 11 : 13;
+          lwrap.style.setProperty('--lfs', lfs + 'px');
+          var lab = '';
+          [0, 0.25, 0.5, 0.75, 1].forEach(function (q) {
+            var p = q * 100, valQ = Math.round(start + span * q);
+            if (Math.abs(p - frac * 100) < 9) return;          // today's number wins the spot
+            var isPastQ = frac >= q && q > 0;
+            var when = isPastQ ? dateBack(Math.round(days * (1 - q / Math.max(frac, 0.0001)))) : '';
+            var edge = q === 0 ? ' qu1-l--a' : q === 1 ? ' qu1-l--z' : '';
+            lab += '<div class="qu1-l' + edge + (isPastQ ? ' is-past' : '') + '" style="left:' + p + '%">' +
+                   '<div class="qu1-num">' + mf(valQ) + '</div>' +
+                   (when ? '<div class="qu1-date">' + when + '</div>' : '') + '</div>';
+          });
+          lab += '<div class="qu1-l is-now" style="left:' + (frac * 100).toFixed(1) + '%"><div class="qu1-num">' + mf(cur) + '</div></div>';
+          lwrap.innerHTML = lab;
+        }
         var mult = start > 0 ? cur / start : 0;
         put(ph, '.qu1-cap', mf(goal - cur) + ' to go.'
           + (mult >= 2 ? ' ' + (mult >= 10 ? Math.round(mult) : (Math.round(mult * 10) / 10)) + '&times; where you started.' : ''));
@@ -463,27 +475,29 @@
         cnt(ph, '.b1 .n', cur, start);
         put(ph, '.b1 .of', esc(unitFor(cur, v.unit)));
         var mid = '<div class="sl__track"></div><div class="sl__gone" style="width:' + (frac * 100).toFixed(1) + '%"></div>';
-        /* the ladder is dense now: every mark keeps its tick, but only the
-           QUARTER marks get numbers, and never within 9% of today's own
-           number (his 2026-08-14 "the text is fucked" catch) */
-        var lblSet = {};
-        [0.25, 0.5, 0.75].forEach(function (q) {
-          var target = start + (goal - start) * q, bestM = null, bestD = Infinity;
-          marks.forEach(function (m) {
-            if (m === goal) return;
-            var dd = Math.abs(m - target);
-            if (dd < bestD) { bestD = dd; bestM = m; }
-          });
-          if (bestM !== null) lblSet[bestM] = 1;
-        });
-        marks.forEach(function (m) {
-          if (m === goal || m === nowMark) return;
-          var p = Math.abs(m - start) / span * 100;
-          var showLbl = lblSet[m] && p > 11 && p < 89 && Math.abs(p - frac * 100) > 9;
-          var lbl = showLbl ? '<small>' + fmt(m) + '</small>' : '';
-          mid += '<div class="sl__t' + (passed.indexOf(m) > -1 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) + '%">' + lbl + '</div>';
-        });
+        /* THE AXIS (Malik 2026-08-16, same law as qu-1): ~10 sharp ticks by
+           pure DISTANCE, heights growing with the road travelled, numbers
+           only at the quarters, never within 9% of today's own number. */
+        var TICKS = 10;
+        for (var ti = 1; ti < TICKS; ti++) {
+          var p = ti / TICKS * 100;
+          if (Math.abs(p - frac * 100) < 4) continue;           // the accent post owns this spot
+          var q4 = ti / TICKS;                                   // fraction of the road
+          var showLbl = (ti === 2 || ti === 5 || ti === 8) && Math.abs(p - frac * 100) > 9;
+          var valQ = Math.round(start + (goal - start) * q4);
+          var lbl = showLbl ? '<small>' + fmt(valQ) + '</small>' : '';
+          mid += '<div class="sl__t' + (p < frac * 100 ? ' is-past' : '') + '" style="left:' + p.toFixed(1) +
+                 '%;--th:' + Math.round(7 + q4 * 11) + 'px">' + lbl + '</div>';
+        }
         mid += '<div class="sl__now" style="left:' + (frac * 100).toFixed(1) + '%"><b>' + fmt(cur) + '</b></div>';
+        /* big numbers shrink the type so nothing ever collides */
+        var digits = String(fmt(Math.max(Math.abs(start), Math.abs(goal)))).length;
+        var sl = Q(ph, '.sl');
+        if (sl) {
+          sl.style.setProperty('--lfs', (digits >= 6 ? 9.5 : 11) + 'px');
+          sl.style.setProperty('--nfs', (digits >= 6 ? 14 : 19) + 'px');
+          sl.style.setProperty('--efs', (digits >= 6 ? 12.5 : 15) + 'px');
+        }
         put(ph, '.sl',
           '<div class="sl__endcol"><b>' + fmt(start) + '</b><span>started, ' + dateBack(days) + '</span></div>'
           + '<div class="sl__mid">' + mid + '</div>'
@@ -517,8 +531,10 @@
         rows += '<div class="lgr lgr--now"><span class="d">this week</span><span class="v">' + dur(now) + '</span></div>';
         put(ph, '.log', rows);
         var subs = ph.querySelectorAll('.b2 .sub');
-        if (subs[0]) subs[0].innerHTML = 'Every row here was a record when you set it.' + (w - 1 > steps ? ' (' + (w - 1 - steps) + ' earlier weeks off-screen.)' : '');
-        put(ph, '.b3 .deposit', 'On this day, your week came in at <b>' + dur(now) + ' a day</b>. A new low.');
+        /* his 2026-08-16 copy: name the record plainly, point forward */
+        if (subs[0]) subs[0].innerHTML = 'A list of your records over time' + (w - 1 > steps ? ' (' + (w - 1 - steps) + ' not shown)' : '') + '.';
+        if (subs[1]) subs[1].innerHTML = 'You reached a new record! Now let\'s go get another one.';
+        put(ph, '.b3 .deposit', 'On this day, your week came in at <b>' + dur(now) + ' a day</b>. A new record.');
       }
     },
 

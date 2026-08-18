@@ -206,14 +206,26 @@ with nothing to say, which is the worst possible moment for that to happen.
 - 2,000 moves: watch for jank, the spark wall animates one element per move.
 - The day a finale fires: confirm no daily and no milestone also fired.
 
+## 8b. The referee is BUILT (2026-08-16)
+
+`referee.js` + `referee-tests.html` (23 tests green) now live next to the
+chooser. Rules R1-R10 in its header implement sections 3-5 of this spec:
+one tier per completion, finale > milestone > daily, receipt-guarded
+once-ever, confirm-first for target/event shapes, direct fire for
+count/duration, the finale pays swallowed milestone marks. Port BOTH files
+verbatim at merge, the same way the chooser ports; the wiring (calling
+`RewardReferee.decide()` from the completion path in js/07 and rendering
+the returned tier) is the only merge-day work left in this layer.
+
 ## 9. Open questions for Malik
 
 1. **ms-5 (the Milestone "cost" screen) is built entirely on hours logged.**
    Hours are not recorded. Either that screen dies, or the app starts capturing
    time per action. Which?
-2. Does the finale fire for the SECOND and third goal too, at full intensity?
-   (If yes, rarity fades. If no, what does goal two get instead?)
-3. Maintenance goals: what is the daily check-in action that proves the line
-   was held? Without one, shape C cannot fire honestly.
+2. ANSWERED (Malik 2026-08-16): yes, goal #2 and every goal after fire the
+   full finale again. A new star is a new climb. (referee rule R6)
+3. ANSWERED (Malik 2026-08-16): the check-in IS the proof, nothing fancier:
+   they log that they held it, that day counts. daysHeld = check-in-credited
+   days. (referee rule R7)
 4. When someone abandons a goal and starts a new star, the old goal's record:
    kept as history, or gone?
