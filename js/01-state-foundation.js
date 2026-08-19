@@ -108,6 +108,17 @@ const DEFAULT_STATE = {
   goalDone: {},
   rewards: { ledger: {}, dailyStyle: 'path', shadow: { ledger: {}, goalDone: {} } },
   dayRecords: {},
+  /* THE ACTION BRAIN stores (ACTION-MERGE Phase 0, 2026-08-19). Three small
+     top-level keys, so cloud sync stamps and merges each on its own:
+     - actionPlan   the generated plan object (ACTION-PLAN-SCHEMA.md v1) or
+                    null. The day screen NEVER writes into it; day state
+                    lives in dayRecords and milestones live in actionParts.
+     - actionParts  the mutable milestone list for the projects bucket.
+     - actionRefine the refine harvest the new Action flow collects and the
+                    generator reads. answers: [{ id, question, chips[], text }]. */
+  actionPlan: null,
+  actionParts: { starHash: '', items: [] },
+  actionRefine: { bucket: '', variant: '', updatedAt: '', answers: [] },
   // Clarity notes (CLARITY-MERGE Phase 2 store, added in the foundation solo
   // window because js/01 is SHARED). One store, two windows: written in
   // Clarity page 3, latest shown read-only on the Memento card. Entries:
@@ -1970,6 +1981,13 @@ function migrateState() {
   if (!state.rewards.shadow.ledger || typeof state.rewards.shadow.ledger !== 'object') state.rewards.shadow.ledger = {};
   if (!state.rewards.shadow.goalDone || typeof state.rewards.shadow.goalDone !== 'object') state.rewards.shadow.goalDone = {};
   if (!state.dayRecords || typeof state.dayRecords !== 'object') state.dayRecords = {};
+  // The Action brain stores. actionPlan stays null until a plan lands; a
+  // stored object from a different schema version is dropped, never patched.
+  if (!state.actionPlan || typeof state.actionPlan !== 'object' || state.actionPlan.v !== 1) state.actionPlan = null;
+  if (!state.actionParts || typeof state.actionParts !== 'object') state.actionParts = { starHash: '', items: [] };
+  if (!Array.isArray(state.actionParts.items)) state.actionParts.items = [];
+  if (!state.actionRefine || typeof state.actionRefine !== 'object') state.actionRefine = { bucket: '', variant: '', updatedAt: '', answers: [] };
+  if (!Array.isArray(state.actionRefine.answers)) state.actionRefine.answers = [];
   // Clarity notes store.
   if (!state.clarityNotes || typeof state.clarityNotes !== 'object') state.clarityNotes = { entries: [], tombstones: [] };
   if (!Array.isArray(state.clarityNotes.entries)) state.clarityNotes.entries = [];
@@ -3129,6 +3147,9 @@ async function goalStateReset() {
     state.action = JSON.parse(JSON.stringify(DEFAULT_STATE.action));
     state.goalProgress = { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [], shape: '', customMarks: [] };
     state.dayRecords = {};
+    state.actionPlan = null;
+    state.actionParts = { starHash: '', items: [] };
+    state.actionRefine = { bucket: '', variant: '', updatedAt: '', answers: [] };
     // 3) Derived structures recompute from the now-empty history.
     try { if (typeof recalculateStreak === 'function') recalculateStreak(); } catch (e) {}
     // 4) Persist: stamps bump, cloud adopts.

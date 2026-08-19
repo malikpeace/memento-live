@@ -3287,6 +3287,17 @@ async function callClaude(messages, systemPrompt, options = {}) {
       throw new Error('The AI service returned an unexpected response. Try again in a moment.');
     }
     const data = await response.json();
+    // options._meta is a dev/diagnostic sink: the caller passes an object and
+    // gets back the model the server ACTUALLY ran (the proxy falls back to a
+    // cheap model for any id outside its allowlist, silently), plus usage and
+    // the stop reason. Never used for control flow.
+    try {
+      if (options._meta && typeof options._meta === 'object') {
+        options._meta.model = data.model || '';
+        options._meta.usage = data.usage || null;
+        options._meta.stopReason = data.stop_reason || '';
+      }
+    } catch (e) {}
     // Safe extraction: content may be missing, empty, or lead with a non-text
     // block (for example a refusal), so never let content[0].text throw a
     // cryptic error that propagates into every generator's catch.
@@ -5105,4 +5116,1343 @@ window.runVoiceGolden = async function (mode) {
   const fails = rows.filter(r => r.pass === 'FAIL').length;
   console.log(fails === 0 ? 'GOLDEN VOICE: all ' + rows.length + ' scenarios clean.' : 'GOLDEN VOICE: ' + fails + ' of ' + rows.length + ' FAILED. See table.');
   return rows;
+};
+
+
+/* ==========================================================================
+   THE ACTION BRAIN  (ACTION-MERGE Phase 0.2, 0.3, 0.4)
+   --------------------------------------------------------------------------
+   One plan per person. The pipeline, in order:
+     1. assemble    the FULL Clarity transcript + the refine answers +
+                    Clarity's goalShape + the bucket this router resolves
+     2. generate    ONE Opus call, strict JSON matching ACTION-PLAN-SCHEMA.md
+     3. judge       ONE cheap-model pass against the canonical judge prompt
+     4. re-check    the client re-runs every eq.compute expr itself and
+                    enforces the safety rails IN CODE (never in judgement)
+     5. land        state.actionPlan + targets into goalProgress + parts
+   Canonical prompt text lives in ACTION-GENERATION-PROMPT.md; the copies in
+   this file must stay in sync with it. Schema field names are FINAL and come
+   from ACTION-PLAN-SCHEMA.md; renderers bind to the same names.
+   Nothing here renders UI. Surfaces call actionPlanGenerate/actionPlanLand.
+   ========================================================================== */
+
+// The eight buckets (ACTION-BUCKETS.md reconciled, REFINE-QUESTIONS.md v2).
+const ACTION_BUCKETS = ['focus', 'screen', 'projects', 'school', 'weight', 'fitness', 'money', 'business'];
+
+// Close cadence per bucket. HARD RULE 11 of the generation prompt binds to
+// this table, and the judge checks the plan against it.
+const ACTION_BUCKET_CADENCE = {
+  weight:   { cadence: 'daily',          kind: 'num',    note: 'a morning scale reading' },
+  screen:   { cadence: 'nightly',        kind: 'num',    note: 'the phone\'s own Screen Time report, typed' },
+  money:    { cadence: 'weekly:sunday',  kind: 'num',    note: 'what came in this week, in dollars' },
+  business: { cadence: 'weekly:sunday',  kind: 'num',    note: 'what the business made this week, in dollars' },
+  school:   { cadence: 'on-results',     kind: 'num',    note: 'asked only when grades or results exist' },
+  projects: { cadence: 'per-session',    kind: 'choice', note: 'a choice at the end of a session' },
+  focus:    { cadence: 'none',           kind: 'num',    note: 'no ask; the logs are the record' },
+  fitness:  { cadence: 'none',           kind: 'num',    note: 'no ask; the logs are the record' }
+};
+
+/* ---- 1. THE BUCKET ROUTER -------------------------------------------------
+   goalShape + the star's own words resolve ONE of the eight. Keyword weight
+   first, goalShape as the tiebreak and the fallback. The money bucket also
+   reports a variant, because a job or a raise takes a different refine set
+   (REFINE-QUESTIONS.md: "MONEY (job / career variant)"). */
+const ACTION_BUCKET_WORDS = {
+  weight: [
+    [/\b(lose|drop|cut|shed)\s+(\d|\w+\s+)?(lb|lbs|pound|pounds|kg|kilos|stone|weight|fat|inches)\b/i, 6],
+    [/\b(lbs?|pounds?|kg|kilograms?)\b/i, 3],
+    [/\bbody\s?fat|\bwaist|\bscale\b|\bcalorie|\bmacro|\bdiet\b|\beating\b|\bslim down|\bleaner?\b/i, 3],
+    [/\bweigh\b|\bweight\b/i, 3],
+    [/\bgain\s+(muscle|mass|\d+\s*(lb|lbs|pounds|kg))\b/i, 2]
+  ],
+  fitness: [
+    [/\b(gym|lift|lifting|squat|bench|deadlift|workout|work out|training|train)\b/i, 5],
+    [/\b(run|running|jog|marathon|half marathon|5k|10k|triathlon|race)\b/i, 5],
+    [/\b(push ?ups?|pull ?ups?|reps?|sets?|cardio|swim|cycling|yoga|boxing|jiu ?jitsu)\b/i, 3],
+    [/\b(\d+\s*(x|times)\s*a\s*week)\b/i, 2]
+  ],
+  screen: [
+    [/\bscreen ?time\b/i, 7],
+    [/\b(tiktok|instagram|twitter|reddit|youtube shorts|snapchat)\b/i, 4],
+    [/\b(doomscroll|doom scroll|scrolling|scroll less|off my phone|phone use|social media)\b/i, 4],
+    [/\b(hours? (a|per) day)\b.*\b(phone|apps?|screen)\b/i, 4],
+    [/\bdelete the apps?\b|\bphone addiction\b/i, 3]
+  ],
+  focus: [
+    [/\b(deep work|focus|focused|concentration|attention span|distracted|distraction)\b/i, 5],
+    [/\b(protected block|focus block|uninterrupted)\b/i, 4],
+    [/\b(lock in|locked in)\b/i, 2]
+  ],
+  projects: [
+    [/\b(launch|ship|release|publish)\b/i, 5],
+    [/\b(finish|complete)\s+(my|the|this)?\s*(app|book|album|game|site|website|course|film|project|draft|portfolio|record|ep)\b/i, 6],
+    [/\b(write (a|my) book|record (an|the) album|build (the|my) app|edit the film)\b/i, 5],
+    [/\b(mvp|beta|version 1|v1|prototype|blockers?|milestones?)\b/i, 3]
+  ],
+  school: [
+    [/\b(gpa|grade|grades|exam|exams|finals|midterm|semester|coursework|dissertation|thesis)\b/i, 6],
+    [/\b(school|college|university|class|classes|study|studying|nursing|degree|certification|cert|licence|license exam|boards|mcat|lsat|bar exam)\b/i, 4],
+    [/\b(graduate|graduation|pass the)\b/i, 3]
+  ],
+  money: [
+    // A dollar sign alone does not separate money from business: both are
+    // dollar goals. It scores low on purpose and the words below decide.
+    [/\$\s?\d/i, 3],
+    [/\b(a raise|promotion|new job|get a job|job offer|hired|salary|resume|interview|applications?)\b/i, 6],
+    [/\b(freelance|clients?|invoices?|side hustle|detailing|commissions?)\b/i, 4],
+    [/\b(save|saving|savings|pay off|debt|credit card|loan)\b/i, 4],
+    [/\b(income|earn|make .*(a|per) month|paid)\b/i, 3]
+  ],
+  business: [
+    // "shop" and "store" are cut on purpose: "the shop" is usually where a
+    // person WORKS, which is a money goal (the persona set caught this).
+    [/\b(business|company|startup|agency|saas|e-?commerce)\b/i, 7],
+    [/\b(mrr|arr|revenue|customers|subscribers|churn|leads|funnel|offer)\b/i, 4],
+    [/\b(scale|grow (it|the business)|first (10|100|1000) customers)\b/i, 3]
+  ]
+};
+
+// The job or career variant of the money set (REFINE-QUESTIONS.md v2).
+const ACTION_MONEY_JOB_RE = /\b(a raise|raise at work|promotion|promoted|new job|another job|get a job|job offer|job hunt|hired|salary|resume|cv|interviews?|applications?|apply to|career change|switch careers|quit my job for)\b/i;
+
+function actionBucketRouter(star, goalShape, refineText) {
+  const hay = [String(star || ''), String(refineText || '')].join(' \n ');
+  const shape = (goalShape && typeof goalShape === 'object') ? goalShape : {};
+  const scores = {};
+  ACTION_BUCKETS.forEach((b) => { scores[b] = 0; });
+  Object.keys(ACTION_BUCKET_WORDS).forEach((bucket) => {
+    ACTION_BUCKET_WORDS[bucket].forEach(([re, weight]) => {
+      // The star's own words count double: refine text is supporting detail.
+      if (re.test(String(star || ''))) scores[bucket] += weight * 2;
+      else if (re.test(hay)) scores[bucket] += weight;
+    });
+  });
+  // goalShape nudges, never decides on its own.
+  const unit = String(shape.unit || '').toLowerCase();
+  if (/\b(lb|lbs|pound|pounds|kg)\b/.test(unit)) scores.weight += 5;
+  if (/\bhours?\b/.test(unit) && /\bscreen|phone\b/i.test(hay)) scores.screen += 4;
+  if (/\$|dollars?|revenue|mrr/.test(unit)) scores[/business|company|startup|agency/i.test(hay) ? 'business' : 'money'] += 3;
+  if (/\bgpa\b/.test(unit)) scores.school += 5;
+  if (shape.type === 'frequency') { scores.fitness += 2; }
+  if (shape.type === 'milestone') { scores.projects += 2; }
+
+  let best = '', bestScore = 0;
+  // Fixed order so a tie always resolves the same way, most specific first.
+  ['weight', 'screen', 'school', 'business', 'money', 'fitness', 'projects', 'focus'].forEach((b) => {
+    if (scores[b] > bestScore) { bestScore = scores[b]; best = b; }
+  });
+
+  if (!best) {
+    // Nothing matched. Fall back on the shape alone.
+    if (/\$|dollars?/.test(unit)) best = 'money';
+    else if (shape.type === 'milestone') best = 'projects';
+    else if (shape.type === 'frequency') best = 'fitness';
+    else if (shape.type === 'quantity_down' && /hours?/.test(unit)) best = 'screen';
+    else if (shape.type === 'quantity_up') best = 'money';
+    else best = 'focus';
+    bestScore = 0;
+  }
+
+  const variant = (best === 'money' && ACTION_MONEY_JOB_RE.test(hay)) ? 'job' : (best === 'money' ? 'clients' : '');
+  return { bucket: best, variant: variant, score: bestScore, scores: scores };
+}
+
+/* ---- 2. INPUT ASSEMBLY ----------------------------------------------------
+   The Clarity conversation persists COMPLETE in state.clarity.answers
+   .aiConversation (js/03 writes it at synthesis and again at completeWizard;
+   js/01 caps it at 400 messages, which a real run never reaches). Assembled
+   verbatim, oldest first, nothing summarised. The safety ceiling below only
+   exists so a pathological transcript can never blow the proxy's request
+   limit; a real Clarity run is nowhere near it. */
+const ACTION_TRANSCRIPT_CHAR_CEILING = 90000;
+
+function actionTranscriptAssemble() {
+  const raw = (state.clarity && state.clarity.answers && Array.isArray(state.clarity.answers.aiConversation))
+    ? state.clarity.answers.aiConversation : [];
+  const lines = [];
+  let chars = 0;
+  let dropped = 0;
+  raw.forEach((m) => {
+    if (!m) return;
+    const who = (m.role === 'user') ? 'Them' : 'Memento';
+    const body = String((m._rawAnswer && m.role === 'user') ? m._rawAnswer : (m.content || m.text || '')).trim();
+    if (!body) return;
+    const line = who + ': ' + body;
+    if (chars + line.length > ACTION_TRANSCRIPT_CHAR_CEILING) { dropped++; return; }
+    chars += line.length + 1;
+    lines.push(line);
+  });
+  return {
+    text: lines.join('\n'),
+    turns: lines.length,
+    rawTurns: raw.length,
+    dropped: dropped,
+    complete: dropped === 0 && lines.length > 0
+  };
+}
+
+/* The refine harvest. The new Action flow (js/30) writes state.actionRefine;
+   this reads it and never writes it. Shape:
+     state.actionRefine = { bucket, variant, updatedAt,
+       answers: [ { id, question, chips: [..], text: '' } ] } */
+function actionRefineAssemble() {
+  const store = (state.actionRefine && typeof state.actionRefine === 'object') ? state.actionRefine : {};
+  const list = Array.isArray(store.answers) ? store.answers : [];
+  const blocks = [];
+  list.forEach((a, i) => {
+    if (!a) return;
+    const q = String(a.question || a.id || ('Question ' + (i + 1))).trim();
+    const chips = Array.isArray(a.chips) ? a.chips.filter(Boolean).map(String) : [];
+    const free = String(a.text || '').trim();
+    if (!chips.length && !free) return;
+    let block = 'Q' + (i + 1) + '. ' + q;
+    if (chips.length) block += '\n  Picked: ' + chips.join(', ');
+    if (free) block += '\n  Wrote: ' + free;
+    blocks.push(block);
+  });
+  return { text: blocks.join('\n'), count: blocks.length, raw: list };
+}
+
+function actionBrainInputs() {
+  const ans = (state.clarity && state.clarity.answers) || {};
+  const star = String(ans.neutronStar || '').trim();
+  const shape = (ans.goalShape && typeof ans.goalShape === 'object') ? ans.goalShape : null;
+  const transcript = actionTranscriptAssemble();
+  const refine = actionRefineAssemble();
+  const stored = (state.actionRefine && String(state.actionRefine.bucket || '')) || '';
+  const routed = actionBucketRouter(star, shape, refine.text);
+  // A bucket the refine step already resolved wins: those questions were
+  // asked for that bucket, so the plan must be written for the same one.
+  const bucket = (ACTION_BUCKETS.indexOf(stored) >= 0) ? stored : routed.bucket;
+  const variant = (state.actionRefine && String(state.actionRefine.variant || '')) || routed.variant;
+  let starHash = '';
+  try {
+    let h = 2166136261;
+    for (let i = 0; i < star.length; i++) { h ^= star.charCodeAt(i); h = Math.imul(h, 16777619); }
+    starHash = (h >>> 0).toString(16);
+  } catch (e) { starHash = ''; }
+  return {
+    star: star,
+    starHash: starHash,
+    goalShape: shape,
+    bucket: bucket,
+    variant: variant,
+    routed: routed,
+    transcript: transcript,
+    refine: refine,
+    today: (typeof actionDayKey === 'function') ? actionDayKey(new Date()) : new Date().toISOString().slice(0, 10),
+    coreWhy: String(ans.coreWhy || '').trim()
+  };
+}
+
+/* ---- 3. THE PROMPTS -------------------------------------------------------
+   ACTION_PLAN_CREED_PROMPT is the canonical system text from
+   ACTION-GENERATION-PROMPT.md, verbatim. Do not edit one without the other. */
+const ACTION_PLAN_CREED_PROMPT = `You write one action plan for one person. You have their full Clarity
+conversation and their refine answers. They already know WHAT they want
+and WHY; Clarity handled that. Your only job is HOW: the few acts that
+matter most, and the honest reasoning that ties those acts to their goal.
+
+THE CREED you reason from (never quote it, argue from it):
+- Focus is a skill. The brain weighs what deserves attention and picks
+  the heaviest thing. Removing distractions helps but leaves a void; the
+  real lever is progress on a worthy goal with markers the brain can see.
+- Pay the brain early. The start is the hardest part because rewards have
+  not arrived. Make progress visible before results exist.
+- Goals are math. Decompose honestly once, then live the daily number.
+- Leverage: a few actions carry most of the result. Find those. Say NO to
+  the rest.
+- Environment beats willpower. Showing up compounds. You are not building
+  a robot; the floor stays low enough to keep the day.
+
+HARD RULES (the judge rejects violations):
+1. ACTS, NEVER OUTCOMES. Every act has a yes/no doneWhen a person can
+   answer tonight. "No bread with dinner" is an act. "Eat 2,400 calories"
+   is an outcome wearing an act's clothes; never assign it.
+2. ONE star act plus at most two supports. Each support carries one
+   LITERAL reason (a plain fact, never a slogan; if a line would fit on a
+   motivational poster, rewrite it as the plain fact underneath it).
+3. PROVENANCE. Every "you said" must quote or tightly paraphrase
+   something actually in the transcript or refine answers. If you do not
+   have a fact, do not claim it. Numbers they gave are bare; numbers you
+   derived say "estimate" (the word "guess" is banned).
+4. READING LEVEL: 5th grade or below, every string. Short sentences.
+   One idea per sentence. No em dashes anywhere. Sentence case.
+5. THE MATH: put numbers in eq.rows / eq.compute, never invent inputs.
+   Every compute expr must be arithmetic on values present in rows or in
+   their answers. The client re-runs your exprs; a wrong figure kills the
+   plan. The reasoning paragraphs may reference the results but any
+   number appearing in prose must match the eq block.
+6. THE WALK-IT-THROUGH: the final reasoning paragraph ties the acts
+   mechanically to the goal until missing it reads as the strange ending.
+   Mechanism, not hype.
+7. NO LIST: 2 or 3 refusals. Each traces to their own words or the
+   bucket's standard enemies. Refusals are things they might actually do
+   instead of the plan (plan-shopping, new programs, busywork).
+8. ANCHORS: attach a when (clock or event) ONLY to time-shaped acts
+   (boundaries, sessions, rituals) AND only when their schedule came up.
+   Flexible count-acts stay unanchored.
+9. STARTERS: only for genuinely hard-to-start acts, "the first 2
+   minutes", a physical opening move.
+10. SIZES: three named sizes, ascending, index 2 = the day you propose in
+    the star sentence. The full ladder extends both ways sensibly.
+11. CADENCE comes from the bucket table: weight=daily morning scale,
+    screen=nightly report, money/business=weekly Sunday, school=on
+    results, projects=per-session choice, focus/fitness=none. The cadence
+    value for projects is "per-session".
+12. SAFETY: never assign a calorie result below a safe floor, never
+    praise restriction, never assign training volume beyond beginner
+    progression, never moralize. If their stated goal implies an unsafe
+    rate, plan the safe rate and say plainly that their date moves.
+13. If the transcript shows the goal is not plannable as stated (no
+    judgeable target, two goals fused, or genuine crisis language), do
+    NOT force a plan: return needsClarity with one plain question.
+
+VOICE: witness with a clock. Plain, direct, second person. No coaching
+pep, no shame, no "It's not X, it's Y" constructions, no aphorisms.
+
+OUTPUT: exactly one JSON object matching the provided schema. No prose
+outside JSON, no markdown fences, the raw object only.`;
+
+// The schema block handed to the model. Field names are FINAL
+// (ACTION-PLAN-SCHEMA.md v1); every renderer binds to these same names.
+const ACTION_PLAN_SCHEMA_TEXT = `THE SCHEMA. Fill exactly these field names. Use null where a field does
+not apply. Values in <> are descriptions, not literals.
+
+{
+  "v": 1,
+  "createdAt": "<today, YYYY-MM-DD, given below>",
+  "starHash": "<the starHash given below>",
+  "bucket": "<the bucket given below>",
+  "star": "<their star, verbatim>",
+  "commitment": "<one or two plain sentences: the goal they picked, and the one thing the plan aims at, traced to something they said>",
+  "arrow": { "from": "<where they are now, with the number>", "to": "<where this plan takes them, with the number and date>" } or null,
+  "acts": [
+    { "role": "star", "text": "<the act>", "doneWhen": "<a yes/no a person answers tonight>",
+      "anchor": null or { "kind": "clock", "value": "20:00" } or { "kind": "event", "value": "after dinner" },
+      "starter": null or "<the first 2 minutes, a physical opening move>",
+      "session": false or { "defaultMin": 90 } },
+    { "role": "support", "text": "<the act>", "reason": "<one literal fact, traced to their words>",
+      "doneWhen": "<yes/no>", "anchor": null or {...}, "starter": null, "session": false }
+  ],
+  "noList": ["<2 or 3 refusals, each traceable>"],
+  "sizes": { "unit": "min" | "count" | "clock" | "role",
+             "ladder": [<ascending values, the full ladder>],
+             "named": [<the three named sizes, index 2 = the day this plan proposes>],
+             "estMinPerUnit": null or <minutes per unit>,
+             "fmt": "min" | "plain" | "clock" },
+  "eq": null or {
+    "rows": [ { "label": "<plain label>", "value": <number or short string>, "source": "said" | "estimate" | "fact" } ],
+    "compute": [ { "expr": "<arithmetic only, e.g. 50 * 3500 / 180>", "label": "<plain label>", "approx": <the exact result>, "shown": <the rounded number you display> } ],
+    "result": { "label": "<plain label>", "value": <number> }
+  },
+  "reasoning": ["<paragraph 1>", "<paragraph 2, the last one is the walk-it-through>"],
+  "scale": false,
+  "qas": [ { "q": "<a question they would actually ask>", "a": "<the plain answer>" } ],
+  "close": { "cadence": "daily" | "nightly" | "weekly:sunday" | "on-results" | "per-session" | "none",
+             "kind": "num" | "choice", "prompt": "<the ask, e.g. The scale said>",
+             "unit": "<lb, hours, dollars>", "prefix": "", "decimals": true or false,
+             "source": "<one plain line saying when it gets asked>",
+             "choices": null or ["<option>", "<option>"] },
+  "checkpoint": "<when the first honest look happens, e.g. two weeks>",
+  "offDays": null or { "trainingDays": ["mon","wed","fri"], "restLine": "Rest day.\\nEnjoy :)" },
+  "sessionsPerWeek": null or <number>,
+  "verb": "do" | "hold",
+  "sendWindow": "morning" | "midday" | "evening",
+  "restLine": "<the line the day ends on>",
+  "deadline": null or "<YYYY-MM-DD, only if a real date exists>",
+  "parts": null or [ { "title": "<milestone>", "doneWhen": "<yes/no>", "done": false } ],
+  "targets": { "target": <number or null>, "unit": "<short unit>", "baseline": <number or null>,
+               "countTarget": <number or null>, "daysTarget": <number or null> }
+}
+
+If the goal is not plannable as stated, return ONLY:
+{ "needsClarity": true, "question": "<one plain question, 5th grade reading level>" }`;
+
+// The judge, canonical text from ACTION-GENERATION-PROMPT.md, verbatim.
+const ACTION_JUDGE_SYSTEM_PROMPT = `You are the judge. You receive: the plan JSON, the Clarity transcript,
+the refine answers, and the schema. You do not rewrite; you verdict.
+Check, in order, and report every failure with the field path:
+1. acts: each doneWhen is answerable yes/no tonight; no outcomes.
+2. provenance: list every "you said"/quoted claim; each must appear in
+   the transcript or refine answers. Flag any orphan claim.
+3. reading level: estimate grade per string; flag anything above 6th.
+4. banned patterns: em dashes, "guess", aphorism/poster lines, "It's not
+   X, it's Y", eyebrow labels, hype words.
+5. math: re-evaluate every eq.compute expr; flag mismatch > 2%. Extract
+   every number from reasoning prose; each must match the eq block or an
+   input.
+6. anchors on non-time-shaped acts; noList items that trace to nothing;
+   sizes.named[2] disagreeing with the star sentence; cadence vs the
+   bucket table.
+7. safety: calorie floors (F<=1200/M<=1500 flags), training volume,
+   restriction language, sensitive-goal tone.
+Return { verdict: "pass" | "fail", failures: [{path, rule, note}] }.`;
+
+function actionPlanSystemPrompt(bucket) {
+  const table = ACTION_BUCKET_CADENCE[bucket] || ACTION_BUCKET_CADENCE.focus;
+  return ACTION_PLAN_CREED_PROMPT
+    + '\n\nTHIS PLAN\'S BUCKET: ' + bucket
+    + '. Its close cadence is "' + table.cadence + '" and its close kind is "'
+    + table.kind + '" (' + table.note + '). Use those exact values.'
+    + '\n\n' + ACTION_PLAN_SCHEMA_TEXT
+    + '\n\n' + MALIK_VOICE_SPEC;
+}
+
+function actionPlanUserBlock(inputs) {
+  const shape = inputs.goalShape || {};
+  const shapeLines = [
+    'type: ' + (shape.type || 'unknown'),
+    'target: ' + (shape.target === undefined || shape.target === null ? 'none' : shape.target),
+    'unit: ' + (shape.unit || 'none'),
+    'deadline: ' + (shape.deadline || 'none'),
+    'deadline in their words: ' + (shape.deadlineText || 'none'),
+    'verb: ' + (shape.verb || 'none'),
+    'sessions per week: ' + (shape.cadence || 0)
+  ].join('\n');
+  const parts = [];
+  parts.push('=== THEIR STAR (verbatim) ===\n' + inputs.star);
+  if (inputs.coreWhy) parts.push('=== WHY IT MATTERS (Clarity synthesis) ===\n' + inputs.coreWhy);
+  parts.push('=== THE CLARITY CONVERSATION (complete, verbatim) ===\n'
+    + (inputs.transcript.text || '(no conversation was recorded)'));
+  parts.push('=== THE REFINE ANSWERS ===\n'
+    + (inputs.refine.text || '(no refine answers were recorded)'));
+  parts.push('=== THE GOAL SHAPE (from Clarity) ===\n' + shapeLines);
+  parts.push('=== THE BUCKET (resolved by the app) ===\n' + inputs.bucket
+    + (inputs.variant ? ' (variant: ' + inputs.variant + ')' : ''));
+  parts.push('=== FOR THE OBJECT ===\ncreatedAt: ' + inputs.today + '\nstarHash: ' + inputs.starHash);
+  parts.push('Write the plan now. Return the raw JSON object only.');
+  return parts.join('\n\n');
+}
+
+/* ---- 4. PARSING -----------------------------------------------------------
+   Strict parse. Fences are stripped defensively even though the prompt
+   forbids them. */
+function actionPlanParse(text) {
+  const obj = parseModelJson(text);
+  if (!obj) return { ok: false, error: 'The plan did not come back as readable JSON.' };
+  if (obj.needsClarity === true) {
+    return { ok: false, needsClarity: true, question: String(obj.question || '').trim(), plan: null };
+  }
+  if (!obj.star || !Array.isArray(obj.acts) || !obj.acts.length) {
+    return { ok: false, error: 'The plan came back without a star act.' };
+  }
+  return { ok: true, plan: obj };
+}
+
+/* ---- 5. THE SAFE ARITHMETIC EVALUATOR -------------------------------------
+   Arithmetic only, never eval(). Numbers (commas and a k/m suffix allowed),
+   + - * / and parentheses. Anything else throws, and a throw is a failure. */
+function actionSafeEvalNumber(token) {
+  let t = String(token).replace(/,/g, '');
+  let mult = 1;
+  const suffix = t.slice(-1).toLowerCase();
+  if (suffix === 'k') { mult = 1e3; t = t.slice(0, -1); }
+  else if (suffix === 'm') { mult = 1e6; t = t.slice(0, -1); }
+  const n = parseFloat(t);
+  if (!isFinite(n)) throw new Error('bad number');
+  return n * mult;
+}
+
+function actionSafeEval(expr) {
+  const src = String(expr == null ? '' : expr).trim();
+  if (!src || src.length > 200) throw new Error('expression is empty or too long');
+  const tokens = [];
+  let i = 0;
+  while (i < src.length) {
+    const c = src[i];
+    if (c === ' ' || c === '\t' || c === '\n') { i++; continue; }
+    if ('+-*/()'.indexOf(c) >= 0) { tokens.push(c); i++; continue; }
+    if ((c >= '0' && c <= '9') || c === '.') {
+      let j = i;
+      while (j < src.length && /[0-9,.]/.test(src[j])) j++;
+      if (j < src.length && /[kKmM]/.test(src[j]) && !/[a-zA-Z]/.test(src[j + 1] || '')) j++;
+      tokens.push(src.slice(i, j));
+      i = j;
+      continue;
+    }
+    throw new Error('unsupported character in expression');
+  }
+  if (!tokens.length || tokens.length > 100) throw new Error('expression is empty or too long');
+
+  let p = 0;
+  const peek = () => tokens[p];
+  const eat = (t) => { if (tokens[p] === t) { p++; return true; } return false; };
+  function primary() {
+    if (eat('(')) {
+      const v = expression();
+      if (!eat(')')) throw new Error('missing closing bracket');
+      return v;
+    }
+    const t = peek();
+    if (t === undefined || '+-*/()'.indexOf(t) >= 0) throw new Error('a number was expected');
+    p++;
+    return actionSafeEvalNumber(t);
+  }
+  function unary() {
+    if (eat('-')) return -unary();
+    if (eat('+')) return unary();
+    return primary();
+  }
+  function term() {
+    let v = unary();
+    for (;;) {
+      if (eat('*')) v *= unary();
+      else if (eat('/')) {
+        const d = unary();
+        if (d === 0) throw new Error('division by zero');
+        v /= d;
+      } else return v;
+    }
+  }
+  function expression() {
+    let v = term();
+    for (;;) {
+      if (eat('+')) v += term();
+      else if (eat('-')) v -= term();
+      else return v;
+    }
+  }
+  const value = expression();
+  if (p !== tokens.length) throw new Error('the expression did not finish');
+  if (!isFinite(value)) throw new Error('the result is not a number');
+  return value;
+}
+
+// Within 2% (or within 0.02 when the true value is about zero).
+function actionNumbersAgree(actual, claimed, tolerance) {
+  const tol = (tolerance === undefined) ? 0.02 : tolerance;
+  if (!isFinite(actual) || !isFinite(claimed)) return false;
+  const scale = Math.max(Math.abs(actual), Math.abs(claimed));
+  if (scale < 1) return Math.abs(actual - claimed) <= 0.02;
+  return Math.abs(actual - claimed) / scale <= tol;
+}
+
+/* "shown" is the number a person READS, so it is allowed to be rounded, and
+   an honest rounding can drift past 2% (the schema doc's own example rounds
+   972 to 1000, which is 2.9%). So shown passes when it is within 2%, or when
+   it is a real rounding of the value: it sits on a round step big enough to
+   cover the gap, and the drift is under 10%. A wrong figure still fails.
+   "approx" is the exact result and keeps the strict 2% rule. */
+const ACTION_ROUND_STEPS = [1, 5, 10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 50000];
+function actionShownAgrees(actual, shown) {
+  if (actionNumbersAgree(actual, shown)) return true;
+  const scale = Math.max(Math.abs(actual), Math.abs(shown));
+  if (scale === 0) return true;
+  const gap = Math.abs(actual - shown);
+  if (gap / scale > 0.10) return false;
+  for (let i = 0; i < ACTION_ROUND_STEPS.length; i++) {
+    const step = ACTION_ROUND_STEPS[i];
+    if (Math.abs(shown) % step !== 0) continue;
+    if (gap <= step / 2) return true;
+  }
+  return false;
+}
+
+// Every number inside a string, with commas and k/m handled the same way
+// the star parser handles them.
+function actionNumbersIn(text) {
+  const out = [];
+  const re = /(\$)?(\d[\d,]*(?:\.\d+)?)\s*(k|m)?\b/gi;
+  let m;
+  const s = String(text || '');
+  while ((m = re.exec(s)) !== null) {
+    let n = parseFloat(m[2].replace(/,/g, ''));
+    if (!isFinite(n)) continue;
+    const suffix = (m[3] || '').toLowerCase();
+    if (suffix === 'k') n *= 1e3;
+    else if (suffix === 'm') n *= 1e6;
+    out.push({ value: n, raw: m[0], index: m.index, hadSuffix: !!suffix, hadDollar: !!m[1] });
+  }
+  return out;
+}
+
+/* ---- 6. THE CLIENT RE-CHECK (runs whatever the judge said) ---------------- */
+function actionPlanArithmeticCheck(plan, inputs) {
+  const failures = [];
+  const eq = plan && plan.eq;
+  const allowed = [];
+  // The magnitude counts too: a compute that lands on -600 is written in
+  // prose as "600 past zero", and that is the same number.
+  const addAllowed = (v) => {
+    const n = Number(v);
+    if (!isFinite(n)) return;
+    allowed.push(n);
+    if (n < 0) allowed.push(-n);
+  };
+
+  if (eq && typeof eq === 'object') {
+    const rows = Array.isArray(eq.rows) ? eq.rows : [];
+    rows.forEach((r) => {
+      if (!r) return;
+      if (typeof r.value === 'number') addAllowed(r.value);
+      else actionNumbersIn(r.value).forEach((x) => addAllowed(x.value));
+    });
+    const computes = Array.isArray(eq.compute) ? eq.compute : [];
+    computes.forEach((c, i) => {
+      if (!c) return;
+      const path = 'eq.compute[' + i + ']';
+      let value;
+      try { value = actionSafeEval(c.expr); } catch (err) {
+        failures.push({ path: path + '.expr', rule: 'math', note: 'The app could not re-run "' + String(c.expr) + '": ' + err.message });
+        return;
+      }
+      addAllowed(value);
+      if (c.approx !== undefined && c.approx !== null) {
+        addAllowed(c.approx);
+        if (!actionNumbersAgree(value, Number(c.approx))) {
+          failures.push({ path: path + '.approx', rule: 'math', note: '"' + c.expr + '" works out to ' + value + ', but approx says ' + c.approx + '.' });
+        }
+      }
+      if (c.shown !== undefined && c.shown !== null) {
+        addAllowed(c.shown);
+        if (!actionShownAgrees(value, Number(c.shown))) {
+          failures.push({ path: path + '.shown', rule: 'math', note: '"' + c.expr + '" works out to ' + value + ', but shown says ' + c.shown + '.' });
+        }
+      }
+    });
+    if (eq.result && eq.result.value !== undefined) addAllowed(eq.result.value);
+  }
+
+  // Everything a number in prose is allowed to be: the eq block, the plan's
+  // own targets and sizes, and anything the person actually said.
+  if (plan && plan.targets) {
+    addAllowed(plan.targets.target); addAllowed(plan.targets.baseline);
+    addAllowed(plan.targets.countTarget); addAllowed(plan.targets.daysTarget);
+  }
+  if (plan && plan.arrow) {
+    actionNumbersIn(plan.arrow.from).forEach((x) => addAllowed(x.value));
+    actionNumbersIn(plan.arrow.to).forEach((x) => addAllowed(x.value));
+  }
+  if (plan && plan.sizes) {
+    (Array.isArray(plan.sizes.ladder) ? plan.sizes.ladder : []).forEach((v) => {
+      if (typeof v === 'number') addAllowed(v); else actionNumbersIn(v).forEach((x) => addAllowed(x.value));
+    });
+    (Array.isArray(plan.sizes.named) ? plan.sizes.named : []).forEach((v) => {
+      if (typeof v === 'number') addAllowed(v); else actionNumbersIn(v).forEach((x) => addAllowed(x.value));
+    });
+    addAllowed(plan.sizes.estMinPerUnit);
+  }
+  if (plan) { addAllowed(plan.sessionsPerWeek); }
+  const inputText = [
+    inputs && inputs.star, inputs && inputs.transcript && inputs.transcript.text,
+    inputs && inputs.refine && inputs.refine.text,
+    inputs && inputs.goalShape ? JSON.stringify(inputs.goalShape) : ''
+  ].filter(Boolean).join('\n');
+  actionNumbersIn(inputText).forEach((x) => addAllowed(x.value));
+
+  // Prose numbers. Small counts, clock times, and years are skipped: they are
+  // sentence furniture, not claims about the math.
+  const prose = [];
+  (Array.isArray(plan && plan.reasoning) ? plan.reasoning : []).forEach((para, i) => {
+    prose.push({ path: 'reasoning[' + i + ']', text: String(para || '') });
+  });
+  if (plan && plan.commitment) prose.push({ path: 'commitment', text: String(plan.commitment) });
+  (Array.isArray(plan && plan.qas) ? plan.qas : []).forEach((qa, i) => {
+    if (qa && qa.a) prose.push({ path: 'qas[' + i + '].a', text: String(qa.a) });
+  });
+
+  prose.forEach((block) => {
+    actionNumbersIn(block.text).forEach((num) => {
+      if (num.value <= 12 && !num.hadSuffix && !num.hadDollar) return;      // small counts
+      const after = block.text.slice(num.index + num.raw.length, num.index + num.raw.length + 4);
+      const inRaw = block.text.slice(num.index, num.index + num.raw.length + 4);
+      if (/^\s*(am|pm)\b/i.test(after)) return;                              // 9 pm
+      if (/:\d\d/.test(inRaw)) return;                                       // 21:00
+      if (!num.hadSuffix && !num.hadDollar && num.value >= 1900 && num.value <= 2099
+          && /^\d{4}$/.test(num.raw.replace(/[^\d]/g, ''))
+          && /\b(by|in|since|until|before|of)\s*$/i.test(block.text.slice(Math.max(0, num.index - 10), num.index))) return;
+      const hit = allowed.some((a) => actionNumbersAgree(a, num.value));
+      if (!hit) {
+        failures.push({ path: block.path, rule: 'math', note: 'The number ' + num.raw.trim() + ' in the text does not match the math block or anything they said.' });
+      }
+    });
+  });
+
+  return { ok: failures.length === 0, failures: failures };
+}
+
+/* ---- 7. THE SAFETY RAILS, IN CODE ----------------------------------------
+   Judgement never decides these. Floors come from the schema doc's judge
+   checklist: calorie floors by sex (with a small allowance for height),
+   a screen time floor, and beginner training volume. */
+function actionPlanSafetyCheck(plan, inputs) {
+  const failures = [];
+  const bucket = String((plan && plan.bucket) || (inputs && inputs.bucket) || '');
+  const hay = [
+    inputs && inputs.refine && inputs.refine.text,
+    inputs && inputs.transcript && inputs.transcript.text
+  ].filter(Boolean).join('\n');
+
+  if (bucket === 'weight') {
+    const female = /\b(female|woman|girl|she\/her)\b/i.test(hay);
+    const male = /\b(male|man|guy|he\/him)\b/i.test(hay);
+    let floor = female ? 1200 : (male ? 1500 : 1200);
+    // Taller bodies need more, so the floor moves with a stated height.
+    const ft = hay.match(/\b([4-7])\s*(?:'|ft|foot|feet)\s*(\d{1,2})?/i);
+    if (ft) {
+      const inches = (parseInt(ft[1], 10) * 12) + (parseInt(ft[2] || '0', 10));
+      if (female && inches >= 68) floor = 1300;
+      if (male && inches >= 72) floor = 1600;
+    }
+    const calorieValues = [];
+    const eq = plan && plan.eq;
+    if (eq && eq.result && /calorie|kcal/i.test(String(eq.result.label || '')) && /eat|intake|target|per day|daily/i.test(String(eq.result.label || ''))) {
+      calorieValues.push({ path: 'eq.result.value', value: Number(eq.result.value) });
+    }
+    (eq && Array.isArray(eq.compute) ? eq.compute : []).forEach((c, i) => {
+      if (c && /calories? to eat|eat on a normal day|daily intake|calories per day to eat/i.test(String(c.label || ''))) {
+        calorieValues.push({ path: 'eq.compute[' + i + '].shown', value: Number(c.shown !== undefined ? c.shown : c.approx) });
+      }
+    });
+    calorieValues.forEach((c) => {
+      if (isFinite(c.value) && c.value < floor) {
+        failures.push({ path: c.path, rule: 'safety', note: 'The plan asks for ' + c.value + ' calories a day. The floor here is ' + floor + '. Plan the safe number and say plainly that the date moves.' });
+      }
+    });
+    const restrict = /\bstarv|\bfast for \d|\bcleanse\b|\bdetox tea|\bskip (all )?meals\b|\bnothing but water\b/i;
+    ['commitment', 'restLine'].forEach((k) => {
+      if (plan && plan[k] && restrict.test(String(plan[k]))) {
+        failures.push({ path: k, rule: 'safety', note: 'This line asks for restriction. Rewrite it.' });
+      }
+    });
+    (Array.isArray(plan && plan.acts) ? plan.acts : []).forEach((a, i) => {
+      if (a && restrict.test(String(a.text || ''))) {
+        failures.push({ path: 'acts[' + i + '].text', rule: 'safety', note: 'This act asks for restriction. Rewrite it.' });
+      }
+    });
+  }
+
+  if (bucket === 'screen') {
+    const t = plan && plan.targets ? Number(plan.targets.target) : NaN;
+    const unit = String((plan && plan.targets && plan.targets.unit) || '').toLowerCase();
+    if (isFinite(t) && /hour|hr/.test(unit) && t < 0.5) {
+      failures.push({ path: 'targets.target', rule: 'safety', note: 'A screen time target under 30 minutes a day is not real. Set a floor of at least 0.5 hours.' });
+    }
+    if (isFinite(t) && /min/.test(unit) && t < 30) {
+      failures.push({ path: 'targets.target', rule: 'safety', note: 'A screen time target under 30 minutes a day is not real. Set a floor of at least 30 minutes.' });
+    }
+  }
+
+  if (bucket === 'fitness') {
+    const spw = Number(plan && plan.sessionsPerWeek);
+    if (isFinite(spw) && spw > 6) {
+      failures.push({ path: 'sessionsPerWeek', rule: 'safety', note: 'Seven training days a week is past beginner progression. Six is the cap.' });
+    }
+    // Never plan more days than they said they could actually train.
+    const said = hay.match(/\b([1-7])\s*(?:days?|x|times)\s*(?:a|per)\s*week\b/i);
+    if (said && isFinite(spw)) {
+      const cap = parseInt(said[1], 10) + 1;
+      if (spw > cap) {
+        failures.push({ path: 'sessionsPerWeek', rule: 'safety', note: 'They said about ' + said[1] + ' days a week. The plan asks for ' + spw + '.' });
+      }
+    }
+    const named = (plan && plan.sizes && Array.isArray(plan.sizes.named)) ? plan.sizes.named : [];
+    const unit = String((plan && plan.sizes && plan.sizes.unit) || '');
+    if (unit === 'min') {
+      named.forEach((v, i) => {
+        if (Number(v) > 120) failures.push({ path: 'sizes.named[' + i + ']', rule: 'safety', note: 'A ' + v + ' minute session is past beginner progression. Cap it at 120.' });
+      });
+    }
+  }
+
+  // The cadence table is law for every bucket.
+  const table = ACTION_BUCKET_CADENCE[bucket];
+  if (table && plan && plan.close && String(plan.close.cadence || '') !== table.cadence) {
+    failures.push({ path: 'close.cadence', rule: 'cadence', note: 'The ' + bucket + ' bucket closes "' + table.cadence + '". The plan says "' + String(plan.close.cadence) + '".' });
+  }
+
+  return { ok: failures.length === 0, failures: failures };
+}
+
+// The voice lint the whole app runs, applied to the strings a person reads.
+function actionPlanVoiceCheck(plan) {
+  const failures = [];
+  const seen = [];
+  const push = (path, text) => { if (text) seen.push({ path: path, text: String(text) }); };
+  push('commitment', plan && plan.commitment);
+  push('restLine', plan && plan.restLine);
+  push('checkpoint', plan && plan.checkpoint);
+  (Array.isArray(plan && plan.acts) ? plan.acts : []).forEach((a, i) => {
+    if (!a) return;
+    push('acts[' + i + '].text', a.text);
+    push('acts[' + i + '].doneWhen', a.doneWhen);
+    push('acts[' + i + '].reason', a.reason);
+    push('acts[' + i + '].starter', a.starter);
+  });
+  (Array.isArray(plan && plan.reasoning) ? plan.reasoning : []).forEach((r, i) => push('reasoning[' + i + ']', r));
+  (Array.isArray(plan && plan.qas) ? plan.qas : []).forEach((qa, i) => {
+    if (!qa) return;
+    push('qas[' + i + '].q', qa.q);
+    push('qas[' + i + '].a', qa.a);
+  });
+  (Array.isArray(plan && plan.noList) ? plan.noList : []).forEach((n, i) => push('noList[' + i + ']', n));
+  seen.forEach((s) => {
+    const hits = voiceLint(s.text);
+    if (hits.length) failures.push({ path: s.path, rule: 'voice', note: 'Banned phrasing: ' + hits.join('; ') });
+    if (/[—–]/.test(s.text)) failures.push({ path: s.path, rule: 'voice', note: 'This line has a dash that is banned. Use a comma or a period.' });
+    if (/\bguess\b/i.test(s.text)) failures.push({ path: s.path, rule: 'voice', note: 'The word "guess" is banned. Say "estimate".' });
+  });
+  return { ok: failures.length === 0, failures: failures };
+}
+
+function actionPlanClientCheck(plan, inputs) {
+  const math = actionPlanArithmeticCheck(plan, inputs);
+  const safety = actionPlanSafetyCheck(plan, inputs);
+  const voice = actionPlanVoiceCheck(plan);
+  const failures = [].concat(math.failures, safety.failures, voice.failures);
+  return { ok: failures.length === 0, failures: failures, math: math, safety: safety, voice: voice };
+}
+
+/* ---- 8. THE JUDGE PASS ---------------------------------------------------- */
+const ACTION_JUDGE_MODEL = 'claude-haiku-4-5';
+
+async function actionPlanJudge(plan, inputs, meta) {
+  const block = [
+    '=== THE PLAN JSON ===',
+    JSON.stringify(plan),
+    '',
+    '=== THE CLARITY TRANSCRIPT ===',
+    inputs.transcript.text || '(none)',
+    '',
+    '=== THE REFINE ANSWERS ===',
+    inputs.refine.text || '(none)',
+    '',
+    '=== THE SCHEMA ===',
+    ACTION_PLAN_SCHEMA_TEXT,
+    '',
+    'Return the verdict JSON only.'
+  ].join('\n');
+  const echo = meta || {};
+  const out = await callClaude(
+    [{ role: 'user', content: block }],
+    ACTION_JUDGE_SYSTEM_PROMPT,
+    {
+      model: ACTION_JUDGE_MODEL,
+      maxTokens: 4000,
+      paidAction: true,
+      noProfile: true,
+      _voiceRetry: true,
+      _meta: echo,
+      thinking: 'off',
+      timeout: 120000
+    }
+  );
+  const parsed = parseModelJson(out);
+  if (!parsed) return { verdict: 'fail', failures: [{ path: '', rule: 'judge', note: 'The judge reply could not be read.' }], model: echo.model || '', raw: out };
+  const failures = Array.isArray(parsed.failures) ? parsed.failures : [];
+  return {
+    verdict: (String(parsed.verdict || '').toLowerCase() === 'pass' && !failures.length) ? 'pass' : 'fail',
+    failures: failures,
+    model: echo.model || '',
+    raw: out
+  };
+}
+
+// The plainest question to ask when two tries failed. Asked of the same cheap
+// model that judged the plan, so the question comes from what it just read.
+async function actionJudgeQuestion(failures) {
+  const fallback = 'What number do you want to hit, and by when?';
+  try {
+    const notes = (failures || []).slice(0, 8).map((f) => '- ' + (f.path ? f.path + ': ' : '') + (f.note || f.rule || '')).join('\n');
+    const out = await callClaude(
+      [{ role: 'user', content: 'A plan for this person failed twice. Here is what was wrong:\n' + notes
+        + '\n\nWrite ONE plain question to ask the person, so a better plan can be written. 5th grade reading level. No dashes. Reply with the question only.' }],
+      'You write one short, plain question. Nothing else.',
+      { model: ACTION_JUDGE_MODEL, maxTokens: 120, paidAction: true, noProfile: true, _voiceRetry: true, thinking: 'off', timeout: 60000 }
+    );
+    const line = String(out || '').replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0].trim();
+    if (line.length >= 8 && line.length <= 160 && !voiceLint(line).length) return line;
+  } catch (e) {}
+  return fallback;
+}
+
+/* ---- 9. THE GENERATION CALL ----------------------------------------------
+   ONE Opus call, then the judge, then at most ONE regeneration carrying the
+   exact failures. A second failure asks the person one question instead. */
+const ACTION_PLAN_MODEL = 'claude-opus-5';
+const ACTION_PLAN_MAX_TOKENS = 6000;
+
+async function actionPlanGenerate(options) {
+  const opts = options || {};
+  const started = Date.now();
+  const inputs = opts.inputs || actionBrainInputs();
+  const report = {
+    ok: false, plan: null, inputs: inputs, attempts: [],
+    needsClarity: false, question: '', ms: 0, model: '', judgeModel: ''
+  };
+  if (!inputs.star) {
+    report.error = 'Memento needs a Neutron Star before it can build a plan.';
+    return report;
+  }
+  const sys = actionPlanSystemPrompt(inputs.bucket);
+  const messages = [{ role: 'user', content: actionPlanUserBlock(inputs) }];
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const echo = {};
+    const attemptRow = { attempt: attempt + 1, ms: 0, model: '', raw: '', clientFailures: [], judge: null };
+    const t0 = Date.now();
+    let raw = '';
+    try {
+      raw = await callClaude(messages, sys, {
+        model: ACTION_PLAN_MODEL,
+        maxTokens: ACTION_PLAN_MAX_TOKENS,
+        paidAction: true,
+        noProfile: true,
+        cache: true,
+        thinking: 'off',
+        _voiceRetry: true,      // the brain runs its own voice check + one regeneration
+        _meta: echo,
+        timeout: opts.timeout || 240000
+      });
+    } catch (err) {
+      attemptRow.ms = Date.now() - t0;
+      attemptRow.error = err && err.message ? err.message : String(err);
+      report.attempts.push(attemptRow);
+      report.error = attemptRow.error;
+      report.ms = Date.now() - started;
+      return report;
+    }
+    attemptRow.ms = Date.now() - t0;
+    attemptRow.model = echo.model || '';
+    attemptRow.stopReason = echo.stopReason || '';
+    attemptRow.usage = echo.usage || null;
+    attemptRow.raw = raw;
+    report.model = echo.model || report.model;
+
+    const parsed = actionPlanParse(raw);
+    if (parsed.needsClarity) {
+      attemptRow.needsClarity = true;
+      report.attempts.push(attemptRow);
+      report.needsClarity = true;
+      report.reason = 'not-plannable';   // rule 13: the goal itself needs one answer
+      report.question = parsed.question || 'What number do you want to hit, and by when?';
+      report.ms = Date.now() - started;
+      return report;
+    }
+    if (!parsed.ok) {
+      attemptRow.error = parsed.error;
+      attemptRow.clientFailures = [{ path: '', rule: 'schema', note: parsed.error }];
+      report.attempts.push(attemptRow);
+      if (attempt === 1) break;
+      messages.push({ role: 'assistant', content: raw });
+      messages.push({ role: 'user', content: parsed.error + ' Return the raw JSON object only, with every field the schema names. Fix exactly this, change nothing else.' });
+      continue;
+    }
+
+    const plan = parsed.plan;
+    const client = actionPlanClientCheck(plan, inputs);
+    attemptRow.clientFailures = client.failures;
+
+    let judge = { verdict: 'pass', failures: [], model: '(skipped)' };
+    if (!opts.skipJudge) {
+      const judgeEcho = {};
+      try {
+        judge = await actionPlanJudge(plan, inputs, judgeEcho);
+      } catch (err) {
+        judge = { verdict: 'fail', failures: [{ path: '', rule: 'judge', note: 'The judge could not be reached: ' + (err && err.message ? err.message : String(err)) }], model: '' };
+      }
+      report.judgeModel = judge.model || report.judgeModel;
+    }
+    attemptRow.judge = judge;
+    report.attempts.push(attemptRow);
+
+    const allFailures = [].concat(judge.failures || [], client.failures);
+    if (judge.verdict === 'pass' && client.ok) {
+      report.ok = true;
+      report.plan = plan;
+      report.ms = Date.now() - started;
+      return report;
+    }
+    if (attempt === 1) {
+      report.failures = allFailures;
+      break;
+    }
+    const notes = allFailures.map((f) => '- ' + (f.path ? f.path + ': ' : '') + (f.note || f.rule || '')).join('\n');
+    messages.push({ role: 'assistant', content: raw });
+    messages.push({ role: 'user', content: 'The plan failed review. Fix exactly these, change nothing else:\n' + notes + '\n\nReturn the whole corrected JSON object only.' });
+  }
+
+  const last = report.attempts[report.attempts.length - 1] || {};
+  const failures = report.failures || [].concat((last.judge && last.judge.failures) || [], last.clientFailures || []);
+  report.needsClarity = true;
+  report.reason = 'failed-twice';        // two plans failed review, so ask instead
+  report.failures = failures;
+  report.question = await actionJudgeQuestion(failures);
+  report.ms = Date.now() - started;
+  return report;
+}
+
+/* ---- 10. LANDING ---------------------------------------------------------
+   state.actionPlan is the plan's own top-level key, so cloud sync stamps and
+   merges it on its own. The day screen never writes into it: day state lives
+   in dayRecords, and the mutable milestone list lives in state.actionParts. */
+function actionPlanNormalize(plan) {
+  const p = (plan && typeof plan === 'object') ? plan : {};
+  const out = JSON.parse(JSON.stringify(p));
+  out.v = 1;
+  out.bucket = (ACTION_BUCKETS.indexOf(String(out.bucket || '')) >= 0) ? String(out.bucket) : 'focus';
+  out.star = String(out.star || '');
+  out.acts = Array.isArray(out.acts) ? out.acts.slice(0, 3) : [];
+  out.noList = Array.isArray(out.noList) ? out.noList.slice(0, 3) : [];
+  out.reasoning = Array.isArray(out.reasoning) ? out.reasoning : [];
+  out.qas = Array.isArray(out.qas) ? out.qas.slice(0, 3) : [];
+  out.scale = out.scale === true;
+  if (!out.sizes || typeof out.sizes !== 'object') out.sizes = { unit: 'count', ladder: [], named: [], estMinPerUnit: null, fmt: 'plain' };
+  if (!Array.isArray(out.sizes.ladder)) out.sizes.ladder = [];
+  if (!Array.isArray(out.sizes.named)) out.sizes.named = [];
+  if (!out.close || typeof out.close !== 'object') out.close = { cadence: 'none', kind: 'num', prompt: '', unit: '', prefix: '', decimals: false, source: '', choices: null };
+  if (!out.targets || typeof out.targets !== 'object') out.targets = { target: null, unit: '', baseline: null, countTarget: null, daysTarget: null };
+  ['target', 'baseline', 'countTarget', 'daysTarget'].forEach((k) => {
+    const n = Number(out.targets[k]);
+    out.targets[k] = isFinite(n) && out.targets[k] !== null && out.targets[k] !== '' ? n : null;
+  });
+  out.targets.unit = String(out.targets.unit || '');
+  out.parts = Array.isArray(out.parts) ? out.parts : null;
+  out.verb = (out.verb === 'hold') ? 'hold' : 'do';
+  out.sendWindow = ['morning', 'midday', 'evening'].indexOf(String(out.sendWindow)) >= 0 ? String(out.sendWindow) : 'morning';
+  out.deadline = (typeof out.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(out.deadline)) ? out.deadline : null;
+  out.offDays = (out.offDays && typeof out.offDays === 'object') ? out.offDays : null;
+  const spw = Number(out.sessionsPerWeek);
+  out.sessionsPerWeek = isFinite(spw) && spw > 0 ? spw : null;
+  return out;
+}
+
+function actionPlanLand(plan, inputs) {
+  try {
+    const ctx = inputs || actionBrainInputs();
+    const p = actionPlanNormalize(plan);
+    p.createdAt = p.createdAt || ctx.today;
+    // The app's own hash of the live star is the key everything else uses
+    // (goalProgress, goalDone, dayRecords). Whatever the model echoed back is
+    // overwritten, or the plan would be keyed to a hash nothing else knows.
+    p.starHash = ctx.starHash;
+    if (!p.star) p.star = ctx.star;
+    p.landedAt = Date.now();
+
+    state.actionPlan = p;
+
+    // targets -> goalProgress. The star-sentence regex becomes a fallback:
+    // an AI-written target wins whenever it exists.
+    const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : (state.goalProgress || null);
+    if (gp) {
+      const t = p.targets || {};
+      if (t.target !== null && t.target !== undefined) {
+        gp.target = t.target;
+        if (t.unit) gp.unit = t.unit;
+        gp.targetSource = 'plan';
+      }
+      // The baseline is a fact they stated, so it lands. current stays null:
+      // a reading only exists once they enter one, and the refine step calls
+      // goalProgressUpdate with their number. Landing must invent nothing.
+      if (t.baseline !== null && t.baseline !== undefined && gp.baseline === null) {
+        gp.baseline = t.baseline;
+      }
+      gp.countTarget = (t.countTarget === null || t.countTarget === undefined) ? null : t.countTarget;
+      gp.daysTarget = (t.daysTarget === null || t.daysTarget === undefined) ? null : t.daysTarget;
+      // The bucket sits ALONGSIDE Clarity's goalShape and never replaces it.
+      gp.bucket = p.bucket;
+      if (p.deadline) gp.deadline = p.deadline;
+    }
+
+    // parts -> the mutable milestone store. The plan object stays frozen in
+    // meaning: checking a part off writes here, never into state.actionPlan.
+    if (Array.isArray(p.parts) && p.parts.length) {
+      state.actionParts = {
+        starHash: p.starHash,
+        items: p.parts.map((x, i) => ({
+          id: 'part' + (i + 1),
+          title: String((x && x.title) || ''),
+          doneWhen: String((x && x.doneWhen) || ''),
+          done: !!(x && x.done)
+        }))
+      };
+    } else {
+      state.actionParts = { starHash: p.starHash, items: [] };
+    }
+
+    try { persistNow(); } catch (e) {}
+    return { ok: true, plan: p };
+  } catch (err) {
+    return { ok: false, error: (err && err.message) ? err.message : String(err) };
+  }
+}
+
+function actionPlanCurrent() {
+  const p = state.actionPlan;
+  return (p && typeof p === 'object' && p.v === 1) ? p : null;
+}
+
+/* ---- 11. NEEDS CLARITY ----------------------------------------------------
+   One plain question, nothing else. Surfaces render this; the brain does no
+   UI work. */
+function actionPlanNeedsClarity(report) {
+  return {
+    needsClarity: true,
+    // 'not-plannable' = the goal needs one answer before any plan is real.
+    // 'failed-twice'  = two plans failed review, so ask rather than ship one.
+    reason: (report && report.reason) || 'not-plannable',
+    question: (report && report.question) || 'What number do you want to hit, and by when?',
+    ms: (report && report.ms) || 0
+  };
+}
+
+try {
+  window.actionBucketRouter = actionBucketRouter;
+  window.actionBrainInputs = actionBrainInputs;
+  window.actionPlanGenerate = actionPlanGenerate;
+  window.actionPlanLand = actionPlanLand;
+  window.actionPlanParse = actionPlanParse;
+  window.actionPlanClientCheck = actionPlanClientCheck;
+  window.actionPlanCurrent = actionPlanCurrent;
+  window.actionSafeEval = actionSafeEval;
+  window.actionPlanNeedsClarity = actionPlanNeedsClarity;
+} catch (e) {}
+
+/* ---- 12. DEV HARNESS ------------------------------------------------------
+   actionBrainSelfTest() runs the arithmetic checker cases and a mocked
+   pipeline (parse, judge skipped, client re-check, land) with zero AI calls.
+   Console only; nothing here ships to a customer surface. */
+window.actionBrainSelfTest = function () {
+  const rows = [];
+  const t = (name, got, want) => rows.push({ test: name, got: String(got), want: String(want), pass: String(got) === String(want) ? 'PASS' : 'FAIL' });
+
+  // The evaluator itself.
+  t('eval simple', actionSafeEval('50 * 3500 / 180').toFixed(2), '972.22');
+  t('eval commas', actionSafeEval('1,225 * 60 / 3,500').toFixed(0), '21');
+  t('eval parens + minus', actionSafeEval('(2900 - 1225) * 2').toFixed(0), '3350');
+  t('eval k suffix', actionSafeEval('10k / 4').toFixed(0), '2500');
+  t('eval m suffix', actionSafeEval('1.5m / 1000').toFixed(0), '1500');
+  let threw = '';
+  try { actionSafeEval('alert(1)'); } catch (e) { threw = 'threw'; }
+  t('eval rejects code', threw, 'threw');
+  threw = '';
+  try { actionSafeEval('5 / 0'); } catch (e) { threw = 'threw'; }
+  t('eval rejects div by zero', threw, 'threw');
+
+  // The checker.
+  const base = {
+    v: 1, bucket: 'weight', star: 'Lose 50lbs in 6 months.',
+    acts: [{ role: 'star', text: 'Walk after dinner.', doneWhen: 'the walk happened' }],
+    noList: [], reasoning: [], qas: [],
+    close: { cadence: 'daily', kind: 'num' },
+    targets: { target: 250, unit: 'lb', baseline: 300, countTarget: null, daysTarget: null },
+    sizes: { unit: 'min', ladder: [20, 30], named: [20, 25, 30], estMinPerUnit: null, fmt: 'min' }
+  };
+  const inputs = { star: base.star, bucket: 'weight', transcript: { text: 'Them: I am 300 lbs and 6 foot 1, male.' }, refine: { text: '' }, goalShape: null };
+
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+
+  const okPlan = clone(base);
+  okPlan.eq = { rows: [{ label: 'A pound is roughly', value: 3500, source: 'fact' }],
+    compute: [{ expr: '50 * 3500 / 180', label: 'Spread over 180 days', approx: 972.22, shown: 1000 }],
+    result: { label: 'Calories to eat on a normal day', value: 2500 } };
+  okPlan.reasoning = ['You are at 300 lbs today. The plan takes you to 250.'];
+  let r = actionPlanClientCheck(okPlan, inputs);
+  t('checker passes a clean plan', r.ok, 'true');
+
+  t('checker allows an honest rounding (972 shown as 1000)', okPlan.eq.compute[0].shown, '1000');
+
+  const badMath = clone(okPlan);
+  badMath.eq.compute[0].shown = 1500;      // 972 vs 1500 is way past 2%
+  r = actionPlanArithmeticCheck(badMath, inputs);
+  t('checker flags >2% mismatch', r.failures.some(f => /shown says 1500/.test(f.note)), 'true');
+
+  const badApprox = clone(okPlan);
+  badApprox.eq.compute[0].approx = 1000;   // approx is exact, so 2.9% fails
+  r = actionPlanArithmeticCheck(badApprox, inputs);
+  t('checker holds approx to 2%', r.failures.some(f => /approx says 1000/.test(f.note)), 'true');
+
+  const nearMiss = clone(okPlan);
+  nearMiss.eq.compute[0].shown = 990;      // 1.8% off, inside the tolerance
+  nearMiss.eq.compute[0].approx = 972.22;
+  r = actionPlanArithmeticCheck(nearMiss, inputs);
+  t('checker allows under 2%', r.ok, 'true');
+
+  const proseBad = clone(okPlan);
+  proseBad.reasoning = ['That works out to about 4,200 calories a day.'];
+  r = actionPlanArithmeticCheck(proseBad, inputs);
+  t('checker flags a prose number', r.failures.some(f => /4,200/.test(f.note)), 'true');
+
+  const proseComma = clone(okPlan);
+  proseComma.reasoning = ['A pound is about 3,500 calories.'];
+  r = actionPlanArithmeticCheck(proseComma, inputs);
+  t('checker reads comma numbers', r.ok, 'true');
+
+  const division = clone(okPlan);
+  division.eq.compute = [{ expr: '3500 / 7', label: 'A day of it', approx: 500, shown: 500 }];
+  division.reasoning = ['That is 500 a day.'];
+  r = actionPlanArithmeticCheck(division, inputs);
+  t('checker handles division', r.ok, 'true');
+
+  const suffix = clone(okPlan);
+  suffix.eq.compute = [{ expr: '10k / 4', label: 'Per quarter', approx: 2500, shown: 2500 }];
+  suffix.reasoning = ['You need 2,500 a quarter.'];
+  r = actionPlanArithmeticCheck(suffix, inputs);
+  t('checker handles a k suffix', r.ok, 'true');
+
+  // Safety rails.
+  const lowCal = clone(okPlan);
+  lowCal.eq.result = { label: 'Calories to eat on a normal day', value: 900 };
+  r = actionPlanSafetyCheck(lowCal, inputs);
+  t('rail flags a calorie floor', r.failures.some(f => f.rule === 'safety'), 'true');
+
+  const wrongCadence = clone(okPlan);
+  wrongCadence.close.cadence = 'weekly:sunday';
+  r = actionPlanSafetyCheck(wrongCadence, inputs);
+  t('rail flags the wrong cadence', r.failures.some(f => f.rule === 'cadence'), 'true');
+
+  // The router.
+  t('router: weight', actionBucketRouter('Lose 50 lbs by summer.', null, '').bucket, 'weight');
+  t('router: screen', actionBucketRouter('Under 2 hours of screen time a day.', null, '').bucket, 'screen');
+  t('router: fitness', actionBucketRouter('Train three times a week, every week.', null, '').bucket, 'fitness');
+  t('router: projects', actionBucketRouter('Launch Memento September 1.', null, '').bucket, 'projects');
+  t('router: school', actionBucketRouter('3.5 GPA by May.', null, '').bucket, 'school');
+  t('router: business', actionBucketRouter('$10,000 a month so I can stop cleaning myself.', null, 'my cleaning business').bucket, 'business');
+  t('router: money', actionBucketRouter('$2,000 a month detailing cars.', null, '').bucket, 'money');
+  t('router: money, not business, for a shop job', actionBucketRouter('$2,000 a month detailing so I can go part time at the shop.', null, 'weekends only').bucket, 'money');
+  t('router: focus', actionBucketRouter('Four hours of deep work every day.', null, '').bucket, 'focus');
+  t('router: job variant', actionBucketRouter('Get a raise to $90,000 this year.', null, '').variant, 'job');
+
+  console.table(rows);
+  const fails = rows.filter(r2 => r2.pass === 'FAIL');
+  console.log(fails.length === 0
+    ? 'ACTION BRAIN: all ' + rows.length + ' checks clean.'
+    : 'ACTION BRAIN: ' + fails.length + ' of ' + rows.length + ' FAILED.');
+  return rows;
+};
+
+/* ---- 13. THE LIVE RUN (dev harness, needs a signed-in paid session) -------
+   actionBrainLiveRun() drives the WHOLE pipeline against two built-in
+   personas: generate on Opus, judge on the cheap model, the client re-check,
+   and the regeneration path if either fails. It builds its inputs literally,
+   so it reads and writes NOTHING in state: running it cannot touch a real
+   goal. Console only.
+     actionBrainLiveRun()            both personas
+     actionBrainLiveRun('weight')    one of 'weight' | 'money'
+   It prints, per run: the raw plan JSON, the judge verdict and failures, the
+   model id the PROXY actually ran (it falls back to a cheap model for any id
+   outside its allowlist, silently), and the wall clock. */
+const ACTION_BRAIN_PERSONAS = {
+  weight: {
+    star: 'Lose 60 pounds by my brother\'s wedding on October 18.',
+    coreWhy: 'You do not want to be the big brother in every photo from that day.',
+    goalShape: { type: 'quantity_down', target: 218, unit: 'lb', deadline: '2026-10-18', deadlineText: 'my brother\'s wedding', verb: 'check', cadence: 0 },
+    bucket: 'weight',
+    transcript: [
+      ['Memento', 'Hello! So, before we start, how do you feel about your current position?'],
+      ['Them', 'Bad. I am 278 and my brother is getting married October 18 and I am the fat one in every picture.'],
+      ['Memento', 'Got it. What have you tried already?'],
+      ['Them', 'Keto. I dropped 22 pounds in a month last year. Then it all came back and 8 more on top.'],
+      ['Memento', 'Okay cool. What does a normal day look like tangibly?'],
+      ['Them', 'I work at a warehouse so I move all day. Two Cokes a day, sometimes three. Then I get home and I am on the couch by 9 and I eat until I go to bed.'],
+      ['Memento', 'So the 9 pm couch is the hard part?'],
+      ['Them', 'The 9 pm couch is the whole ball game. Everything before that is fine.'],
+      ['Memento', 'Let\'s put a number on it. 60 pounds in 60 days is about 3,500 calories a day of deficit, which is more than you burn. Would 25 pounds by the wedding work as the honest checkpoint?'],
+      ['Them', 'No. I want 60. That is the number.'],
+      ['Memento', 'I get that. The date can stay and the number can stay, but the body cannot lose 60 in 60. Do you want the plan built on the pace that actually works?'],
+      ['Them', 'Fine but leave the goal at 60. My coworker takes a fat burner, should I? And I was going to do a 3 day fast the week of the wedding.'],
+      ['Memento', 'Noted. On a bad day, what is the one thing you can still do?'],
+      ['Them', 'There is a 20 minute loop by my house. I can always do that.'],
+      ['Memento', 'Okay, final question... what would you say is the ONE thing that matters to you most above all?'],
+      ['Them', 'Standing next to him in that photo and not hating it.']
+    ],
+    refine: [
+      { q: 'So, what have you actually done to make progress toward this?', chips: ['Tried diets before', 'I lose it, then gain it back'], text: 'Keto, 22 pounds, all back plus 8.' },
+      { q: 'Your height and sex? The math needs both.', chips: ['Male'], text: '5\'10' },
+      { q: 'How often do you move in a normal week?', chips: ['5+ or active job'], text: 'Warehouse, on my feet all day.' },
+      { q: 'What do you think is the biggest problem?', chips: ['Late night eating', 'Sugar drinks'], text: 'The couch at 9 and the Cokes.' },
+      { q: 'What does the scale say this morning?', chips: [], text: '278' }
+    ]
+  },
+  money: {
+    star: '$2,000 a month detailing so I can go part time at the shop.',
+    coreWhy: 'You want your Saturdays to pay you more than the shop does.',
+    goalShape: { type: 'quantity_up', target: 2000, unit: 'dollars a month', deadline: '', deadlineText: '', verb: 'attempt', cadence: 0 },
+    bucket: 'money',
+    transcript: [
+      ['Memento', 'Hello! So, before we start, how do you feel about your current position?'],
+      ['Them', 'Stuck'],
+      ['Memento', 'Okay. What is the thing you keep coming back to?'],
+      ['Them', 'Detailing cars. I do it on weekends.'],
+      ['Memento', 'Nice! How much does it bring in right now?'],
+      ['Them', 'About 400 a month'],
+      ['Memento', 'And what would be ideal?'],
+      ['Them', '2000. Then I can go part time at the shop.'],
+      ['Memento', 'Got it. Where has the work come from so far?'],
+      ['Them', 'People I messaged'],
+      ['Memento', 'How long does one car take you, roughly?'],
+      ['Them', 'Like 3 hours. I charge 150.'],
+      ['Memento', 'When can you actually work on it?'],
+      ['Them', 'Weekends only. The shop has me Monday to Friday.'],
+      ['Memento', 'Okay, final question... what would you say is the ONE thing that matters to you most above all?'],
+      ['Them', 'Not needing the shop']
+    ],
+    refine: [
+      { q: 'So, what have you actually done to make progress toward this?', chips: ['I have had clients before'], text: '' },
+      { q: 'Where has money actually come from before?', chips: ['People I reached out to'], text: '' },
+      { q: 'What is one client or sale worth, roughly?', chips: [], text: '150' },
+      { q: 'What did you bring in last month?', chips: [], text: '400' }
+    ]
+  }
+};
+
+function actionBrainPersonaInputs(key) {
+  const p = ACTION_BRAIN_PERSONAS[key];
+  if (!p) throw new Error('No persona named ' + key);
+  const transcriptText = p.transcript.map((r) => r[0] + ': ' + r[1]).join('\n');
+  const refineText = p.refine.map((a, i) => {
+    let b = 'Q' + (i + 1) + '. ' + a.q;
+    if (a.chips && a.chips.length) b += '\n  Picked: ' + a.chips.join(', ');
+    if (a.text) b += '\n  Wrote: ' + a.text;
+    return b;
+  }).join('\n');
+  let h = 2166136261;
+  for (let i = 0; i < p.star.length; i++) { h ^= p.star.charCodeAt(i); h = Math.imul(h, 16777619); }
+  const routed = actionBucketRouter(p.star, p.goalShape, refineText);
+  return {
+    star: p.star,
+    starHash: (h >>> 0).toString(16),
+    goalShape: p.goalShape,
+    bucket: p.bucket,
+    variant: routed.variant,
+    routed: routed,
+    transcript: { text: transcriptText, turns: p.transcript.length, rawTurns: p.transcript.length, dropped: 0, complete: true },
+    refine: { text: refineText, count: p.refine.length, raw: p.refine },
+    today: (typeof actionDayKey === 'function') ? actionDayKey(new Date()) : new Date().toISOString().slice(0, 10),
+    coreWhy: p.coreWhy
+  };
+}
+
+window.actionBrainLiveRun = async function (which) {
+  const keys = which ? [which] : Object.keys(ACTION_BRAIN_PERSONAS);
+  const results = [];
+  for (const key of keys) {
+    const inputs = actionBrainPersonaInputs(key);
+    console.log('=== LIVE RUN: ' + key + ' (routed bucket ' + inputs.routed.bucket + ', using ' + inputs.bucket + ') ===');
+    const t0 = Date.now();
+    const report = await actionPlanGenerate({ inputs: inputs });
+    const ms = Date.now() - t0;
+    const row = {
+      persona: key,
+      ok: report.ok,
+      needsClarity: report.needsClarity,
+      question: report.question,
+      error: report.error,
+      seconds: (ms / 1000).toFixed(1),
+      planModelEchoed: (report.attempts[0] || {}).model || '',
+      judgeModelEchoed: report.judgeModel,
+      attempts: report.attempts.length
+    };
+    console.log(JSON.stringify(row, null, 1));
+    report.attempts.forEach((a, i) => {
+      console.log('--- attempt ' + (i + 1) + ': ' + (a.ms / 1000).toFixed(1) + 's, model "' + a.model + '", stop "' + (a.stopReason || '') + '"');
+      if (a.judge) console.log('    judge (' + a.judge.model + '): ' + a.judge.verdict + ' ' + JSON.stringify(a.judge.failures));
+      if (a.clientFailures && a.clientFailures.length) console.log('    client re-check: ' + JSON.stringify(a.clientFailures));
+    });
+    if (report.plan) console.log('--- the plan ---\n' + JSON.stringify(report.plan, null, 1));
+    results.push({ row: row, report: report });
+  }
+  console.log('LIVE RUN DONE. Copy everything above.');
+  return results;
 };
