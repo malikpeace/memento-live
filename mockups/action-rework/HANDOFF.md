@@ -218,3 +218,12 @@
   further work runs through ACTION-MERGE-PLAN.md (repo root), including
   Amendment 2's in-app wiring sweep (entry wiring, deep work room binding,
   old-feature retirement map, transcript access, schema-first ordering).
+
+## 2026-08-18 pt 12: lg-1 dead, plan locked, NOTHING STARTED
+- lg-1 killed (Malik's call): the gallery is FIVE screens, lg-5 is THE
+  LOGIC, unqualified.
+- ACTION-MERGE-PLAN v1.0 status: PLAN ONLY. Malik was explicit: nothing
+  begins until he says go. Model = Opus (decided, no blind test). Malik
+  gate added: he approves all eight per-bucket refine question sets before
+  they enter any prompt.
+- Green rise: the background itself (z1 under elements), flat spring.

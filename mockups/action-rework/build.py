@@ -12,7 +12,7 @@ ORDER = ['ob', 'q', 'ld', 'lg', 'u']
 GROUP = {'ob': 'open', 'q': 'open', 'ld': 'open', 'lg': 'lg', 'u': 'u'}
 SECTIONS = {
     'open': ('The opening', 'Onboarding, the refine step, and loading, side by side: the road from the wall of intent to the plan. The pulse lives inside the refine step (page 4), not as its own screen.'),
-    'lg': ('The logic', 'What the loading lands on: the plan as reasoning, in their own words. The combined page is the candidate; the original stays for comparison until it dies.'),
+    'lg': ('The logic', 'What the loading lands on: the plan as reasoning, in their own words. One page, three parts: the day, the math, the questions.'),
     'u': ('THE UNIVERSAL LAYOUT', 'The one screen every goal lives in: the star act + up to two supports, the rail, the NO list, the hold, the close. The costume layouts and separate mechanics are retired.'),
 }
 
@@ -20,7 +20,6 @@ REACH = {
     'ob-1': ('10/10', 'everyone, their first minute'),
     'q-2':  ('10/10', 'everyone, before every plan (the pulse is page 4)'),
     'ld-4': ('10/10', 'everyone, every plan build'),
-    'lg-1': ('10/10', 'the original, kept for comparison'),
     'lg-5': ('10/10', 'THE COMBINED CANDIDATE: concise, then the math, then the questions'),
     'u-1':  ('10/10', 'the one layout, every bucket, every day'),
 }
@@ -158,7 +157,7 @@ body.rm-black .grid{display:none}
 })();</script>
 <div class="gal">
 <h1>Action rework: the survivors</h1>
-<p class="sub">The settled set, six screens: the opening three, the logic pair, and the universal layout.
+<p class="sub">The settled set, five screens: the opening three, the logic pair, and the universal layout.
 The room is Points (toggle top right, with the desktop view).
 <a href="bg.html" style="color:rgba(235,238,248,.92);font-weight:600">The room: eleven backgrounds</a></p>
 """
