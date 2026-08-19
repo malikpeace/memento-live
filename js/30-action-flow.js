@@ -129,14 +129,21 @@
         // v1.1 (round 5): the positive twin of the NO list. Acts and standards,
         // every one traceable to this plan or their own words. `chosen` is
         // CLIENT-written by the logic page's picker; the AI always emits [].
+        //
+        // ROUND 6: SIX LEVERS, NEVER SIX PHRASINGS (rule 8). One per shape, in
+        // order: time boundary, daily act, environment rule, floor, refusal
+        // shaped standard, check-in habit. The pair this set used to carry
+        // ("Weigh in every morning" and "The scale number gets typed in") was
+        // one lever wearing two coats, and "Water with every meal" held the
+        // same object as the sugar drink rule.
         nonNegotiables: {
           candidates: [
             'The walk happens after dinner',
-            'Weigh in every morning',
-            'No sugar drinks in the house',
             'Log the meal before eating it',
-            'Water with every meal',
-            'The scale number gets typed in'
+            'No sugar drinks in the house',
+            'Twenty minutes minimum on hard days',
+            'No fast food on weekdays',
+            'Weigh in every morning'
           ],
           chosen: []
         },
@@ -245,12 +252,15 @@
           }
         ],
         noList: ['more polish before posting', 'new niches', 'tool shopping'],
+        // ROUND 6, same law: one lever per candidate. The old set spent three
+        // slots on daily acts (post, script) and refusals (new niches, ship
+        // before polishing) and had no environment rule and no floor at all.
         nonNegotiables: {
           candidates: [
             'The 3 hours happen before email',
-            'Post on all 3, every day',
-            'One script written the night before',
-            'No new niches this quarter',
+            'Post on all 3 every day',
+            'Notifications off during the 3 hours',
+            'One hour minimum on bad days',
             'Ship before polishing',
             'Sunday the number gets typed in'
           ],
@@ -760,6 +770,24 @@
 
   function shell(name, opts) {
     opts = opts || {};
+    // THE PREVIEW SHELL (opts.into, the swipe door's second page). A screen
+    // built INSIDE a host element instead of taking the room: it never becomes
+    // `root`, never owns `current`, never binds Escape or the exit chip, and
+    // never fades in. It dies when the host does, so it cannot outlive a view.
+    if (opts.into) {
+      var proot = el('div', 'afl' + (opts.cine ? ' afl--cine' : ''));
+      proot.setAttribute('data-screen', name);
+      proot.setAttribute('aria-hidden', 'true');
+      var pcol = el('div', 'afl__col');
+      if (opts.top) {
+        var ptf = el('div', 'afl__top');
+        ptf.setAttribute('aria-hidden', 'true');
+        pcol.appendChild(ptf);
+      }
+      proot.appendChild(pcol);
+      opts.into.appendChild(proot);
+      return pcol;
+    }
     // The outgoing screen's LOGIC dies now; only its pixels linger for the
     // fade, on a timer they cannot outlive.
     var prev = root;
@@ -2013,9 +2041,13 @@
     var plan = opts.plan || livePlan() || fx.plan;
     // top: the only scrolling surface in the flow, so the only one that needs
     // the flow's own top scrim (his "the goal title gets sliced" note).
-    var col = shell('logic', { label: 'Why this plan', top: true });
+    // opts.into = THE PREVIEW BUILD (the swipe door's second page). It renders
+    // the same page into a host element instead of taking the screen, so it
+    // touches none of the live view's bookkeeping: no root, no teardown, no
+    // timers, no entrance. It is a picture that happens to be the real page.
+    var col = shell('logic', { label: 'Why this plan', top: true, into: opts.into || null });
     var lgTimers = [];
-    current.teardown = function () { lgTimers.forEach(clearTimeout); lgTimers = []; };
+    if (!opts.into) current.teardown = function () { lgTimers.forEach(clearTimeout); lgTimers = []; };
 
     var c = el('div', 'afl-lg');
     var sc = el('div', 'afl-lg__sc');
@@ -2100,7 +2132,10 @@
         // THE SUBSTITUTION READS. The written number lands first, then corrects
         // itself once the page has settled, with the same quiet 200ms the rail
         // uses. A silent hard swap on paint would just look like a typo.
-        if (fixed) {
+        // the preview build owns no timers (nothing tears it down but the view
+        // it lives in), so it simply shows the written number; the real page
+        // it hands over to runs the substitution.
+        if (fixed && !opts.into) {
           var vb = rowEl.querySelector('b');
           lgTimers.push(setTimeout(function () { swapText(vb, fixed, 1); }, 520));
         }
@@ -2108,7 +2143,7 @@
       if (plan.eq.result) eqRow(plan.eq.result.label, plan.eq.result.value, 'is-result');
       box.appendChild(eq);
     }
-    ActionFlow._lastEqCheck = eqOk;
+    if (!opts.into) ActionFlow._lastEqCheck = eqOk;
 
     (plan.reasoning || []).forEach(function (p, k) {
       box.appendChild(el('p', 'afl-lg__b afl-lg__b--ind', p));
@@ -2140,7 +2175,15 @@
     var nnCands = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.candidates))
       ? plan.nonNegotiables.candidates.filter(function (t) { return t && String(t).trim(); }).slice(0, 6)
       : [];
-    var nnOn = !opts.standing && nnCands.length > 0;
+    // ---- ROUND 6: THE PAGE HAS TWO LIVES -----------------------------------
+    // FIRST VISIT it asks: the picker is live, the Ready section is there, and
+    // the hold waits on both gates. ONCE AGREED it never asks again. Every way
+    // back in (the M, the swipe door, a resume) lands on a pure REFERENCE: the
+    // non-negotiables they already chose, read only, and one tap out. The
+    // agreement was given once; re-asking for it would make it look undone.
+    var agreed = planAgreed(plan);
+    var refOnly = !!opts.standing || !!opts.into || agreed;
+    var nnOn = !refOnly && nnCands.length > 0;
     var nnChips = [];
     // Already chosen? Show it. This is what makes the standing door (the M) a
     // true reference view of the plan instead of a blank picker, and it means
@@ -2152,9 +2195,30 @@
         if (at > -1 && nnChosen.indexOf(at) < 0 && nnChosen.length < 2) nnChosen.push(at);
       });
     } catch (e) {}
-    if (nnCands.length) {
+    if (refOnly) {
+      // THE REFERENCE VIEW. Only what they actually hold, and nothing to tap.
+      // The five they passed over are not their standard, so they are not on
+      // the page; a plan with nothing chosen renders no section at all.
+      var nnKept = nnChosen.map(function (k) { return nnCands[k]; })
+        .filter(function (t) { return t && String(t).trim(); });
+      if (nnKept.length) {
+        var nnRef = el('div', 'afl-nn');
+        nnRef.appendChild(el('p', 'afl-nn__lead', nnKept.length > 1 ? 'Your non-negotiables.' : 'Your non-negotiable.'));
+        var nnRl = el('div', 'afl-nn__list');
+        nnKept.forEach(function (t) { nnRl.appendChild(el('p', 'afl-nn__held', t)); });
+        nnRef.appendChild(nnRl);
+        box.appendChild(nnRef);
+      }
+    } else if (nnCands.length) {
       var nnWrap = el('div', 'afl-nn');
       nnWrap.appendChild(el('p', 'afl-nn__lead', 'Pick 1 or 2 non-negotiables.'));
+      // ROUND 6 (Malik, verbatim): the quiet line that says what the word
+      // means, so the pick is made against the right bar.
+      var nnSub = el('p', 'afl-nn__sub');
+      nnSub.appendChild(document.createTextNode('These are the things that '));
+      nnSub.appendChild(el('b', null, 'need'));
+      nnSub.appendChild(document.createTextNode(' to get done no matter what. Things that even on your worst day, you will still get done.'));
+      nnWrap.appendChild(nnSub);
       var nnList = el('div', 'afl-nn__list');
       nnCands.forEach(function (t, k) {
         var b = btn('afl-nn__a', t);
@@ -2195,17 +2259,21 @@
       gateSync();
     }
 
-    box.appendChild(el('p', 'afl-lg__fair', 'Ready?'));
+    if (!refOnly) box.appendChild(el('p', 'afl-lg__fair', 'Ready to Start?'));
 
     var nav = navRow();
-    var go = cta(opts.standing ? 'Close' : 'Hold to agree. Start today.');
+    var go = cta(refOnly ? 'Close' : 'I’m ready');
     go.classList.add('afl-cta--hold');
-    var keep = el('p', 'afl-nav__sub', 'You can always return to this page.');
     nav.appendChild(go);
-    nav.appendChild(keep);
+    // THE TRUST LINE IS A PROMISE ABOUT THE FUTURE, so it belongs to the visit
+    // where the future is still ahead. On a re-open the promise has already
+    // been kept (they are standing on the page it promised), and the line
+    // under a Close button would be explaining a door they just walked back
+    // through. First visit only.
+    if (!refOnly) nav.appendChild(el('p', 'afl-nav__sub', 'You can always return to this page.'));
     col.appendChild(nav);
 
-    if (opts.standing) {
+    if (refOnly) {
       // Standing-door mode: the page is a reference, not a commitment. One tap
       // closes it (the agreement was given once, it is not re-asked).
       go.classList.remove('afl-cta--hold');
@@ -2285,10 +2353,14 @@
         if (typeof opts.onAgree === 'function') opts.onAgree();
       }, function () { return gatesPass(); });
     }
-    // the page arrives in two beats: the title, then everything under it.
-    enterFade(starEl, 0);
-    enterFade(rest, 1);
-    enterFade(nav, 1);
+    // the page arrives in two beats: the title, then everything under it. The
+    // preview build is already on the screen the moment it is dragged into
+    // view, so it does not arrive at all.
+    if (!opts.into) {
+      enterFade(starEl, 0);
+      enterFade(rest, 1);
+      enterFade(nav, 1);
+    }
     return root;
   }
 
@@ -2943,6 +3015,13 @@
     current.teardown = function () {
       if (sheetWatch) { clearInterval(sheetWatch); sheetWatch = null; }
       if (undoT) { clearTimeout(undoT); undoT = null; commitDay(); }
+      if (swT) { clearTimeout(swT); swT = null; }
+      // the swipe listens on the window, so it has to stop listening with the
+      // view: nothing in this module outlives its screen.
+      try {
+        window.removeEventListener('pointerup', swUp);
+        window.removeEventListener('pointercancel', swCancel);
+      } catch (e) {}
     };
 
     function toLogic() {
@@ -2950,68 +3029,132 @@
     }
     mBtn.addEventListener('click', toLogic);
 
-    // ---- THE SWIPE DOWN DOOR (v1197, Malik) ---------------------------------
-    // A deliberate downward pull opens the logic page, the same door the M
-    // opens (the M stays; this is a second way in, not a replacement).
+    // ---- THE SWIPE DOWN DOOR (v1197; ROUND 6: A PAGE SNAP) ------------------
+    // The logic page is the SECOND PAGE, sitting directly above this one. The
+    // day follows the finger 1:1 and the logic page comes down with it, and on
+    // release the pair SNAPS: all the way to logic past 40% of the viewport or
+    // on a strong flick, all the way back otherwise. It can NEVER rest between
+    // the two (the app's finger-follow + snap-to-nearest law). The M is
+    // untouched: it is still one tap to the same page.
     //
-    // DELIBERATE IS THE WHOLE POINT. Everything here exists so an accidental
-    // or scroll-ish gesture can never trigger it:
+    // DELIBERATE IS STILL THE POINT:
     //   - it only starts on OPEN BACKGROUND. A pointerdown on the rail, a
-    //     support, the CTA, the M, the deep work door or the signed row is that
-    //     control's gesture and this never sees it.
-    //   - 130px of travel, which is a third of a phone screen, not a flick.
-    //   - it must stay a PULL: more than 55px of horizontal drift cancels, and
-    //     so does any upward correction of more than 30px past the low point.
-    //   - one finger only; a second pointer cancels.
-    //   - pointercancel cancels (iOS fires it when it claims a gesture).
-    // The card follows the finger a little on the way down, so the gesture
-    // shows it is being received without announcing itself. Reduced motion
-    // skips the follow and just opens.
-    var SWIPE_GO = 130, SWIPE_DRIFT = 55, SWIPE_BACK = 30;
-    var swStart = null, swMax = 0, swLive = false;
-    function swipeReset(animate) {
-      swStart = null; swLive = false; swMax = 0;
-      if (!day) return;
-      if (animate && !reduced()) {
-        day.style.transition = 'transform 0.22s var(--ease-out)';
-        day.style.transform = '';
-        setTimeout(function () { if (day) day.style.transition = ''; }, 260);
-      } else {
-        day.style.transition = ''; day.style.transform = '';
+    //     support, the CTA, the M, the deep work door or the signed row is
+    //     that control's gesture and this never sees it.
+    //   - THE AXIS IS DECIDED ONCE, after 10px: a first move that is more
+    //     sideways than down, or upward, is not a pull and nothing moves.
+    //     Travel is measured from the lock, so the page never jumps to catch
+    //     up with the finger.
+    //   - one finger only; a second pointer springs it back, and so does
+    //     pointercancel (iOS fires it when it claims a gesture).
+    // Reduced motion moves nothing: past the threshold it simply swaps.
+    var SNAP_AT = 0.4;        // of the viewport: the point of no return
+    var FLICK_V = 0.65;       // px per ms, a throw rather than a drag
+    var FLICK_MIN = 28;       // ...that still has to have travelled
+    var AXIS_LOCK = 10;       // px before the direction is decided
+    var SNAP_MS = 280;
+    var pager = null;                       // the second page, built on the first pull
+    var swStart = null, swLive = false, swSettling = false;
+    var swDy = 0, swV = 0, swLastY = 0, swLastT = 0, swT = null;
+
+    // THE SECOND PAGE. Built once, on the first pull, and it is the real logic
+    // page rendered by the real function into a host element (shell's preview
+    // branch), never a lookalike. It dies with this view, like everything else
+    // in the module.
+    function pagerBuild() {
+      if (pager || reduced() || !root) return;
+      pager = el('div', 'afl-pg');
+      pager.setAttribute('aria-hidden', 'true');
+      root.appendChild(pager);
+      try { openLogic(key, { plan: plan, standing: true, into: pager }); } catch (e) { pager.innerHTML = ''; }
+    }
+    function swDrag(dy) {
+      if (!root || reduced()) return;
+      root.style.setProperty('--afl-drag', (dy || 0).toFixed(1) + 'px');
+    }
+    function swClear() {
+      if (!root) return;
+      root.classList.remove('is-drag', 'is-snap');
+      root.style.removeProperty('--afl-drag');
+    }
+    function swSettle(toLogicPage) {
+      swStart = null; swLive = false;
+      if (swT) { clearTimeout(swT); swT = null; }
+      if (reduced() || !root) {
+        swClear();
+        if (toLogicPage) toLogic();
+        return;
       }
+      swSettling = true;
+      var H = root.clientHeight || window.innerHeight;
+      root.classList.add('is-snap');
+      swDrag(toLogicPage ? H : 0);
+      swT = setTimeout(function () {
+        swT = null;
+        swSettling = false;
+        // the snap TO logic hands the screen over: openLogic's shell replaces
+        // this root, so nothing here needs unwinding.
+        if (toLogicPage) { toLogic(); return; }
+        swClear();
+      }, SNAP_MS + 20);
     }
     function swipeBlocked(t) {
       if (!t || !t.closest) return true;
       return !!t.closest('.afl-day__rail, .afl-day__sup, .afl-day__hold, .afl-day__m, .afl-day__dw, .afl-day__done, .afl-nav');
     }
     day.addEventListener('pointerdown', function (e) {
-      if (swLive || swStart) { swipeReset(false); return; }   // second finger
+      if (swSettling) return;                               // the snap owns it now
+      if (swStart || swLive) { swSettle(false); return; }   // second finger
       if (swipeBlocked(e.target)) return;
-      swStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
-      swMax = 0;
+      swStart = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0 };
+      swDy = 0; swV = 0; swLastY = e.clientY; swLastT = Date.now();
+      pagerBuild();
     });
-    day.addEventListener('pointermove', function (e) {
-      if (!swStart || e.pointerId !== swStart.id) return;
+    // THE REST OF THE GESTURE IS NOT THE DAY'S. Once the pull is under way the
+    // finger travels over the nav row, the pager, whatever: those are siblings
+    // of the day, not children, so a listener on the day would simply stop
+    // hearing it and the pages would be left mid travel. Pointer capture would
+    // normally retarget them, but it is allowed to fail (and it does, on a
+    // synthetic pointer), and "never lands between" cannot depend on that.
+    // Move is heard on the ROOM, release on the window, so nothing is missed.
+    var swMove = function (e) {
+      if (!swStart || e.pointerId !== swStart.id || swSettling) return;
       var dy = e.clientY - swStart.y, dx = Math.abs(e.clientX - swStart.x);
-      if (dx > SWIPE_DRIFT || dy < -8) { swipeReset(swLive); return; }   // not a pull
-      if (dy > swMax) swMax = dy;
-      if (swMax - dy > SWIPE_BACK) { swipeReset(swLive); return; }        // pulled back
-      if (dy <= 0) return;
-      swLive = true;
-      if (!reduced()) {
-        // a fraction of the travel, easing off: received, never dragged around
-        day.style.transition = 'none';
-        day.style.transform = 'translateY(' + (Math.min(dy, SWIPE_GO * 1.4) * 0.22).toFixed(1) + 'px)';
+      if (!swStart.axis) {
+        if (Math.max(dx, Math.abs(dy)) < AXIS_LOCK) return;
+        if (dy <= 0 || dx > Math.abs(dy)) { swStart = null; swClear(); return; }
+        swStart.axis = 1;
+        swStart.y = e.clientY;             // travel is measured from the lock
+        swLive = true;
+        if (!reduced()) root.classList.add('is-drag');
+        try { day.setPointerCapture(e.pointerId); } catch (z) {}
+        return;
       }
-      if (dy >= SWIPE_GO) {
-        var go = true;
-        swipeReset(false);
-        if (go) toLogic();
-      }
-    });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
-      day.addEventListener(ev, function () { if (swStart) swipeReset(swLive); });
-    });
+      var now = Date.now(), dt = now - swLastT;
+      if (dt > 0) swV = (e.clientY - swLastY) / dt;
+      swLastY = e.clientY; swLastT = now;
+      swDy = Math.max(0, dy);              // 1:1, and never above its own top
+      swDrag(swDy);
+    };
+    var swUp = function (e) {
+      if (swSettling || !swStart || e.pointerId !== swStart.id) return;
+      if (!swLive) { swStart = null; return; }              // a tap, not a pull
+      var H = (root && root.clientHeight) || window.innerHeight;
+      // a flick is a throw AT THE MOMENT OF LETTING GO. A finger that dragged
+      // fast, stopped, held still and then lifted has thrown nothing, so a
+      // stale reading is dropped rather than counted.
+      if (Date.now() - swLastT > 90) swV = 0;
+      var go = swDy >= H * SNAP_AT || (swV >= FLICK_V && swDy >= FLICK_MIN);
+      swSettle(go);
+    };
+    var swCancel = function (e) {
+      if (swSettling || !swStart || (e && e.pointerId !== swStart.id)) return;
+      if (swLive) swSettle(false);
+      else { swStart = null; swClear(); }
+    };
+    root.addEventListener('pointermove', swMove);
+    window.addEventListener('pointerup', swUp);
+    window.addEventListener('pointercancel', swCancel);
 
     // ---- THE CLOSED DAY (merge 3.1, the re-open) ----------------------------
     // Today's record already exists, so this day was held and written. It has

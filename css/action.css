@@ -5462,7 +5462,25 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   margin: 0 0 6px; font-size: 22px; font-weight: 700;
   letter-spacing: -0.02em; color: var(--text-hi);
 }
+/* ROUND 6: the quiet line under the lead that says what the word means. Body
+   copy, so it sits at the page's own body alpha (0.92, never dimmed) and one
+   step down in size from .afl-lg__b. The emphasis is BOLD, never italic. */
+.afl-nn__sub {
+  margin: 0 0 14px; font-size: 16.9px; line-height: 1.5;
+  color: rgba(var(--ink), 0.92); text-wrap: pretty;
+}
+.afl-nn__sub b { font-weight: 700; color: var(--text-hi); }
 .afl-nn__list { margin: 0; }
+/* THE REFERENCE VIEW (round 6). Once agreed, the page never asks again: the
+   ones they hold are stated, in the picked chip's own lit type, and there is
+   nothing to tap. Same ruled rows so the page keeps its rhythm. */
+.afl-nn__held {
+  display: flex; align-items: center; min-height: 58px; margin: 0;
+  padding: 14px 3px; font-size: 17.6px; font-weight: 700; line-height: 1.35;
+  letter-spacing: -0.012em; color: var(--text-hi);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12);
+}
+.afl-nn__held:last-child { box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12), inset 0 -1px 0 rgba(var(--ink), 0.12); }
 .afl-nn__a {
   position: relative; display: flex; align-items: center; gap: 15.6px; width: 100%;
   text-align: left; min-height: 58px; padding: 14px 3px; border: 0; border-radius: 0;
@@ -5578,6 +5596,41 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column;
   padding: max(52px, calc(var(--safe-t) + 10px)) 23px 0;
   -webkit-user-select: none; user-select: none;
+  /* the swipe door follows the finger, so iOS must not keep the press as a
+     candidate pan and hand it away mid pull (the same reason the holds carry
+     it). Nothing on this screen scrolls. */
+  touch-action: none;
+}
+
+/* ---- THE SWIPE DOWN DOOR, the second page (round 6) ---------------------
+   The logic page sits directly ABOVE the day. Both move together by exactly
+   what the finger did (--afl-drag), and on release they SNAP: fully to logic
+   or fully back, never between. The var is the only thing JS touches, so
+   there is no inline transform anywhere and nothing to unwind. */
+.afl-pg {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  transform: translateY(-100%);
+}
+.afl-pg .afl { position: absolute; z-index: 0; }
+/* DIRECT CHILDREN ONLY. The second page is a whole .afl living inside this
+   one, so a descendant selector here would drag the preview's own column
+   along with the room it is painted in. */
+.afl.is-drag > .afl__col, .afl.is-snap > .afl__col,
+.afl.is-drag > .afl__rise, .afl.is-snap > .afl__rise,
+.afl.is-drag > .afl__wash, .afl.is-snap > .afl__wash {
+  transform: translateY(var(--afl-drag, 0px));
+}
+.afl.is-drag > .afl-pg, .afl.is-snap > .afl-pg {
+  transform: translateY(calc(-100% + var(--afl-drag, 0px)));
+}
+.afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
+.afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg {
+  transition: transform 0.28s var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  /* reduced motion never drags the pages: past the threshold it swaps */
+  .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
+  .afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg { transition: none; }
 }
 .afl-day__sp { min-height: 10px; }
 .afl-day__sp.is-a { flex: 0.55; }

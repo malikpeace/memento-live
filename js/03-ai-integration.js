@@ -5419,6 +5419,13 @@ HARD RULES (the judge rejects violations):
    punctuation, no explanation inside the item. At least 3 of the 6 must
    trace to the person's OWN words from the transcript or refine
    answers; the rest trace to the acts and the math in this plan.
+   THE SIX PULL SIX DIFFERENT LEVERS. Each candidate takes a different
+   shape: a time boundary, a daily act, an environment rule, a floor
+   they never go under, a refusal shaped standard, a check in habit.
+   Two candidates that describe the same behavior in other words, or
+   that hold the same object twice (two lines about the scale, two
+   about posting), count as one candidate; write a different lever in
+   the second slot.
 9. ANCHORS: attach a when (clock or event) ONLY to time-shaped acts
    (boundaries, sessions, rituals) AND only when their schedule came up.
    Flexible count-acts stay unanchored.
