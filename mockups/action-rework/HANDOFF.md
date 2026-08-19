@@ -211,3 +211,10 @@
 - q-2: progress bar truly centered (right spacer mirrors the back chevron).
   Question count goes dynamic at the port (3-5, bar renders per question).
 - ob-1: "From Clarity" + button "Confirm".
+
+## 2026-08-18 pt 11: flat green + MOCKUP PHASE CLOSED
+- The hold rise is FLAT spring green (rgba .24), no gradient.
+- State: the mockup phase is DONE pending Malik's on-device grade. All
+  further work runs through ACTION-MERGE-PLAN.md (repo root), including
+  Amendment 2's in-app wiring sweep (entry wiring, deep work room binding,
+  old-feature retirement map, transcript access, schema-first ordering).

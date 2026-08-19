@@ -1841,10 +1841,11 @@ The room is Points (toggle top right, with the desktop view).
 [data-k=u-1] .u1-wash{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;pointer-events:none;
   background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.16));
   transition:height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease-out}
-/* holding the day raises GREEN from the bottom (Malik, 2026-08-18: not the
-   inversion; the rise matches the green daily beat, one language). On
-   completion it crests and falls away into the signed wash. */
-[data-k=u-1] .u1-inv{position:absolute;left:0;right:0;bottom:0;height:0;z-index:20;
+/* holding the day turns the BACKGROUND green from the bottom up (Malik:
+   the room itself goes green, never a mask over the elements). The layer
+   sits under all content (z1, above the wash), flat spring, no gradient.
+   On completion it crests and falls away into the signed wash. */
+[data-k=u-1] .u1-inv{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;
   pointer-events:none;opacity:1;background:rgba(63,217,78,.24)}
 @media (prefers-reduced-motion:reduce){[data-k=u-1] .u1-inv{display:none}}
 [data-k=u-1] .u1.signed .u1-wash{height:44%}
