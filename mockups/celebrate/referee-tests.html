@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Referee tests</title>
+<style>
+  body { background:#0a0b0d; color:#e8ecf5; font:13px/1.6 ui-monospace, Menlo, monospace; padding:24px; }
+  .pass { color:#3fd94e; } .fail { color:#ff6b6b; font-weight:700; }
+  h1 { font:700 18px/1 -apple-system, sans-serif; }
+  #sum { font-weight:700; margin-top:14px; }
+</style>
+</head>
+<body>
+<h1>Referee tests (finale &gt; milestone &gt; daily)</h1>
+<div id="out"></div>
+<div id="sum"></div>
+<script src="chooser.js?v=tw41"></script>
+<script src="referee.js?v=tw41"></script>
+<script>
+var R = RewardReferee, C = MilestoneChooser, out = [], failures = 0;
+function t(name, fn) {
+  try { fn(); out.push('<div class="pass">PASS ' + name + '</div>'); }
+  catch (e) { failures++; out.push('<div class="fail">FAIL ' + name + ' :: ' + e.message + '</div>'); }
+}
+function eq(a, b, why) {
+  var ja = JSON.stringify(a), jb = JSON.stringify(b);
+  if (ja !== jb) throw new Error((why || '') + ' expected ' + jb + ' got ' + ja);
+}
+function gpOf(o) {
+  return Object.assign({ target:null, unit:'', baseline:null, current:null, updatedAt:'', history:[
+    { day:'2026-01-01', value:230 }, { day:'2026-03-01', value:215 }
+  ] }, o);
+}
+var LOSE = 'I am someone who will lose 30 lbs, 230 to 200';
+var RUNS = 'Run 100 runs this year';
+
+/* ---------- R5 + R8: reachedNow per shape ---------- */
+t('R8 target DOWN reached at current <= target', function () {
+  eq(R.reachedNow({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:200 }) }).reached, true);
+  eq(R.reachedNow({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:201 }) }).reached, false);
+});
+t('R8 target UP reached at current >= target', function () {
+  eq(R.reachedNow({ shape:'target', star:'reach 100 users', gp:gpOf({ target:100, baseline:0, current:100 }) }).reached, true);
+});
+t('R5 target and event need confirm; count and duration do not', function () {
+  eq(R.reachedNow({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:200 }) }).needsConfirm, true);
+  eq(R.reachedNow({ shape:'event', userSaysDone:true }).needsConfirm, true);
+  eq(R.reachedNow({ shape:'count', count:100, countTarget:100 }).needsConfirm, false);
+  eq(R.reachedNow({ shape:'duration', daysHeld:365, daysTarget:365 }).needsConfirm, false);
+});
+t('R7 duration counts CHECK-IN days only: 300 held of a 365 target is not done', function () {
+  eq(R.reachedNow({ shape:'duration', daysHeld:300, daysTarget:365 }).reached, false);
+});
+t('R5 event never self-fires: without userSaysDone it is not reached', function () {
+  eq(R.reachedNow({ shape:'event' }).reached, false);
+});
+
+/* ---------- shouldAsk: the quiet confirm ---------- */
+t('shouldAsk: asks when a target crosses the line unconfirmed', function () {
+  eq(R.shouldAsk({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:199 }), today:'2026-08-16' }), true);
+});
+t('shouldAsk: throttled to once a day via askedDay', function () {
+  eq(R.shouldAsk({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:199 }), today:'2026-08-16', askedDay:'2026-08-16' }), false);
+});
+t('shouldAsk: never after the finale fired', function () {
+  var done = {}; done[C.starHash(LOSE)] = { day:'2026-08-10' };
+  eq(R.shouldAsk({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:199 }), today:'2026-08-16', goalDone:done }), false);
+});
+t('shouldAsk: silent below the line', function () {
+  eq(R.shouldAsk({ shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:210 }), today:'2026-08-16' }), false);
+});
+
+/* ---------- R1 + R2: one tier, finale outranks ---------- */
+t('R1 count goal at target: finale, exactly one tier', function () {
+  var d = R.decide({ shape:'count', star:RUNS, count:100, countTarget:100, goalDone:{}, ledger:{}, today:'2026-08-16' });
+  eq(d.tier, 'finale');
+});
+t('R2 confirmed target finale outranks the milestone crossed in the same pulse', function () {
+  var led = {}, done = {};
+  var d = R.decide({ shape:'target', star:LOSE, userSaysDone:true, goalDone:done, ledger:led, today:'2026-08-16',
+    gp:gpOf({ target:200, baseline:230, current:200 }), prevValue:206 });
+  eq(d.tier, 'finale');
+});
+t('R4 ...and that finale still PAYS the crossed marks in the chooser ledger', function () {
+  var led = {}, done = {};
+  R.decide({ shape:'target', star:LOSE, userSaysDone:true, goalDone:done, ledger:led, today:'2026-08-16',
+    gp:gpOf({ target:200, baseline:230, current:200 }), prevValue:206 });
+  var paid = Object.keys(led).length;
+  if (!(paid >= 1)) throw new Error('expected crossed marks paid, ledger has ' + paid);
+});
+t('R5 unconfirmed target at the line is NOT a finale (milestone/daily instead)', function () {
+  var d = R.decide({ shape:'target', star:LOSE, goalDone:{}, ledger:{}, today:'2026-08-16',
+    gp:gpOf({ target:200, baseline:230, current:200 }), prevValue:206 });
+  if (d.tier === 'finale') throw new Error('self-fired without confirm');
+});
+
+/* ---------- R3: once ever, receipt-guarded ---------- */
+t('R3 the finale never re-fires: relaunch next day is daily/milestone, not finale', function () {
+  var done = {}, led = {};
+  var o = { shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:led, today:'2026-08-16' };
+  eq(R.decide(o).tier, 'finale');
+  var later = R.decide(Object.assign({}, o, { today:'2026-08-17' }));
+  if (later.tier === 'finale') throw new Error('re-fired');
+});
+t('R3 un-completing (editing a log below target) cannot re-arm it', function () {
+  var done = {}, led = {};
+  var o = { shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:led, today:'2026-08-16' };
+  R.decide(o);
+  var edited = R.decide({ shape:'count', star:RUNS, count:99, countTarget:100, goalDone:done, ledger:led, today:'2026-08-18' });
+  if (edited.tier === 'finale') throw new Error('receipt ignored');
+  var again = R.decide({ shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:led, today:'2026-08-19' });
+  if (again.tier === 'finale') throw new Error('re-crossed and re-fired');
+});
+t('R2 the finale DAY is spent: a second completion that day shows nothing', function () {
+  var done = {}, led = {};
+  var o = { shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:led, today:'2026-08-16' };
+  R.decide(o);
+  eq(R.decide(o).tier, 'none');
+});
+t('R10 the receipt is written before the finale returns', function () {
+  var done = {};
+  R.decide({ shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:{}, today:'2026-08-16' });
+  var hash = C.starHash(RUNS);
+  if (!done[hash] || done[hash].day !== '2026-08-16') throw new Error('no receipt');
+  eq(done[hash].declaredBy, 'ledger');
+});
+
+/* ---------- R6: goal #2 gets the full finale ---------- */
+t('R6 a NEW star fires its own finale at full intensity', function () {
+  var done = {}, led = {};
+  R.decide({ shape:'count', star:RUNS, count:100, countTarget:100, goalDone:done, ledger:led, today:'2026-08-16' });
+  var d2 = R.decide({ shape:'count', star:'Write 12 essays', count:12, countTarget:12, goalDone:done, ledger:led, today:'2026-11-01' });
+  eq(d2.tier, 'finale');
+});
+
+/* ---------- milestone + daily fallthrough ---------- */
+t('mid-goal pulse crossing a mark: tier milestone, with the chooser event', function () {
+  var d = R.decide({ shape:'target', star:LOSE, goalDone:{}, ledger:{}, today:'2026-08-16',
+    gp:gpOf({ target:200, baseline:230, current:215 }), prevValue:217 });
+  eq(d.tier, 'milestone');
+  if (!d.event || d.event.kind !== 'step') throw new Error('missing chooser event');
+});
+t('R9 a plain completion with nothing crossed: tier daily, never nothing', function () {
+  var led = {};
+  var o = { shape:'target', star:LOSE, goalDone:{}, ledger:led, today:'2026-08-16',
+    gp:gpOf({ target:200, baseline:230, current:216 }), prevValue:217 };
+  R.decide(o);                      // may fire a first mark once...
+  var d = R.decide(Object.assign({}, o, { today:'2026-08-17' }));
+  eq(d.tier, 'daily');
+});
+t('R1 decide always returns exactly one known tier', function () {
+  var tiers = { finale:1, milestone:1, daily:1, none:1 };
+  [{ shape:'count', count:3, countTarget:100 },
+   { shape:'duration', daysHeld:10, daysTarget:365 },
+   { shape:'event' },
+   { shape:'target', star:LOSE, gp:gpOf({ target:200, baseline:230, current:220 }), prevValue:221 }
+  ].forEach(function (o) {
+    o.goalDone = {}; o.ledger = {}; o.today = '2026-08-16';
+    var d = R.decide(o);
+    if (!tiers[d.tier]) throw new Error('unknown tier ' + d.tier);
+  });
+});
+t('count mid-goal at a rung: tier milestone via the count ladder', function () {
+  var d = R.decide({ shape:'count', star:RUNS, count:50, countTarget:100, goalDone:{}, ledger:{}, today:'2026-08-16' });
+  eq(d.tier, 'milestone');
+  eq(d.event.kind, 'count');
+  eq(d.event.milestone, 50);
+});
+t('count between rungs: tier daily', function () {
+  var led = {};
+  R.decide({ shape:'count', star:RUNS, count:50, countTarget:100, goalDone:{}, ledger:led, today:'2026-08-16' });
+  var d = R.decide({ shape:'count', star:RUNS, count:53, countTarget:100, goalDone:{}, ledger:led, today:'2026-08-17' });
+  eq(d.tier, 'daily');
+});
+t('duration mid-goal: weekly rungs fire as milestone through daysHeld', function () {
+  var d = R.decide({ shape:'duration', star:'A no-buy year', daysHeld:30, daysTarget:365, goalDone:{}, ledger:{}, today:'2026-08-16' });
+  eq(d.tier, 'milestone');
+  eq(d.event.kind, 'days');
+});
+t('duration goal held to the end: finale straight from the ledger', function () {
+  var d = R.decide({ shape:'duration', star:'A no-buy year', daysHeld:365, daysTarget:365, goalDone:{}, ledger:{}, today:'2026-08-16' });
+  eq(d.tier, 'finale');
+  eq(d.receipt.declaredBy, 'ledger');
+});
+t('event goal declared done: finale, declaredBy user', function () {
+  var d = R.decide({ shape:'event', star:'Pass the bar', userSaysDone:true, goalDone:{}, ledger:{}, today:'2026-08-16' });
+  eq(d.tier, 'finale');
+  eq(d.receipt.declaredBy, 'user');
+});
+
+document.getElementById('out').innerHTML = out.join('');
+document.getElementById('sum').innerHTML = failures
+  ? '<span class="fail">' + failures + ' FAILING</span>'
+  : '<span class="pass">ALL ' + out.length + ' PASS</span>';
+document.title = (failures ? 'FAIL ' : 'PASS ') + 'Referee tests';
+</script>
+</body>
+</html>

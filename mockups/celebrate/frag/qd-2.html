@@ -1,0 +1,66 @@
+<style>
+[data-c="qd-2"] .lead{display:flex;align-items:baseline;gap:10px}
+/* a duration hero is wider than a bare digit; sized to clear 390px */
+[data-c="qd-2"] .n--hero{font-size:64px}
+[data-c="qd-2"] .lead .u{font-size:26px;font-weight:650;letter-spacing:-.02em;color:var(--text-mid)}
+
+[data-c="qd-2"] .log{width:216px;margin-bottom:10px}
+[data-c="qd-2"] .lgr{display:flex;align-items:baseline;justify-content:space-between;
+  padding:9px 0;opacity:0;transform:translateY(5px)}
+[data-c="qd-2"] .lgr .d{font-size:12.5px;letter-spacing:-.01em;color:var(--text-lo)}
+[data-c="qd-2"] .lgr .v{font-size:17px;font-weight:700;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.56)}
+[data-c="qd-2"] .lgr--now{padding-top:13px}
+[data-c="qd-2"] .lgr--now .d{color:var(--text-mid)}
+[data-c="qd-2"] .lgr--now .v{font-size:23px;color:var(--accent)}
+
+[data-c="qd-2"] .b.on .lgr{animation:qd2row .5s cubic-bezier(.2,.8,.3,1) forwards}
+[data-c="qd-2"] .b.on .lgr:nth-child(1){animation-delay:.05s}
+[data-c="qd-2"] .b.on .lgr:nth-child(2){animation-delay:.12s}
+[data-c="qd-2"] .b.on .lgr:nth-child(3){animation-delay:.19s}
+[data-c="qd-2"] .b.on .lgr:nth-child(4){animation-delay:.26s}
+[data-c="qd-2"] .b.on .lgr:nth-child(5){animation-delay:.36s}
+@keyframes qd2row{to{opacity:1;transform:translateY(0)}}
+
+[data-c="qd-2"] .sub{text-wrap:balance}
+[data-c="qd-2"] .sub + .sub{margin-top:7px}
+[data-c="qd-2"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-2"] .lgr{opacity:1;transform:none}
+}
+</style>
+<div class="ph" data-c="qd-2">
+  <div class="st">
+
+    <!-- Malik: the record book was vague, ground it in ONE concrete case,
+         and his audience fights screen time more than anything. The goal is
+         "less time on my phone", no hard target; the number is the week's
+         daily average, and the only thing to beat is their own lowest week. -->
+    <div class="b b1">
+      <div class="lead">
+        <span class="n n--hero">1h 41m</span>
+      </div>
+      <div class="sub">a day on your phone this week. Your lowest week since you started counting.</div>
+    </div>
+
+    <div class="b b2">
+      <div class="log">
+        <div class="lgr"><span class="d">Week of Mar 4</span><span class="v">6h 20m</span></div>
+        <div class="lgr"><span class="d">Week of Apr 22</span><span class="v">4h 05m</span></div>
+        <div class="lgr"><span class="d">Week of Jun 3</span><span class="v">3h 12m</span></div>
+        <div class="lgr"><span class="d">Week of Jul 15</span><span class="v">2h 18m</span></div>
+        <div class="lgr lgr--now"><span class="d">this week</span><span class="v">1h 41m</span></div>
+      </div>
+      <div class="sub">A list of your records over time.</div>
+      <div class="sub">You reached a new record! Now let's go get another one.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, your week came in at <b>1h 41m a day</b>. A new low.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

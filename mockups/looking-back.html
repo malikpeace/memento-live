@@ -1,0 +1,2835 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Looking back — with colour</title>
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+<style>
+  :root{--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.68);--lo:rgba(255,255,255,.44);
+    --fill:rgba(255,255,255,.045);--clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;
+    --text-hi:rgba(255,255,255,.96);--text-mid:rgba(255,255,255,.66);--text-lo:rgba(255,255,255,.42);
+    --safe-t:0px;--safe-b:0px}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1400px;margin:0 auto;padding:34px 20px 130px}
+  h1{margin:0 0 9px;font-size:26px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 6px;font-size:14.5px;line-height:1.6;color:var(--mid);max-width:82ch}
+  .lede b{color:var(--hi);font-weight:640}
+  .nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;flex-wrap:wrap;margin:18px -20px 0;
+    padding:12px 20px;background:rgba(5,6,9,.9);backdrop-filter:blur(24px)}
+  .nav a{font-size:12.5px;font-weight:620;text-decoration:none;color:var(--mid);
+    padding:8px 13px;border-radius:999px;background:var(--fill)}
+  .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:40px 26px;margin-top:20px}
+  .pg{scroll-margin-top:70px}
+  .pg__hd h2{margin:0 0 6px;font-size:19px;font-weight:720;letter-spacing:-.02em}
+  .pg__th{margin:0 0 8px;font-size:13px;line-height:1.55;color:var(--mid)}
+  .pg__wow{margin:0 0 16px;font-size:13px;line-height:1.55;color:var(--hi)}
+  .pg__wow b{font-weight:660}
+  .phone{position:relative;width:100%;max-width:390px;height:820px;overflow:hidden;border-radius:26px;
+    background:#050609;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 40px rgba(0,0,0,.55)}
+  .phone__in{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .phone__in::-webkit-scrollbar{display:none}
+  .screen{padding:0 20px 60px}
+  .memoir{margin:26px -20px 0}
+  .mori{font-size:19px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .jumpbtn{margin-top:12px;padding:9px 15px;border:0;border-radius:10px;background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--hi);font:inherit;font-size:13px;font-weight:640;cursor:pointer}
+</style>
+<style id="mv">
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+  body{ min-height:100lvh; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
+  .room{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
+
+  /* the chips are the same card, small */
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the customiser sheet. Held open from the card. Glass over a scrim, so
+     the card stays visible behind it and you can see what you are changing. */
+  .hint{ margin:26px 0 0; text-align:center; font-size:12.5px; color:var(--lo); }
+  .sheetwrap{ position:fixed; inset:0; z-index:60; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .sheetwrap__scrim{ position:absolute; inset:0; background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .22s ease-out; }
+  .sheetwrap.is-open .sheetwrap__scrim{ opacity:1; }
+  .sheet{ position:relative; width:100%; max-width:470px;
+    padding:10px 20px calc(20px + var(--safe-b));
+    border-radius:20px 20px 0 0;
+    background:rgba(16,18,23,.82);
+    backdrop-filter:blur(34px) saturate(1.5);
+    -webkit-backdrop-filter:blur(34px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -20px 60px rgba(0,0,0,.6);
+    transform:translateY(102%); transition:transform .26s cubic-bezier(.32,.72,0,1); }
+  .sheetwrap.is-open .sheet{ transform:translateY(0); }
+  .sheet__grab{ display:block; width:38px; height:4px; margin:0 auto 14px;
+    border-radius:999px; background:rgba(255,255,255,.2); }
+  .sheet .strip{ margin:0 -20px; padding:2px 20px 12px; }
+  .sheet__done{ display:block; width:100%; margin:16px 0 0; padding:15px;
+    border:0; border-radius:13px; background:#f2f3f6; color:#0b0c0e;
+    font:inherit; font-size:15.5px; font-weight:650; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){
+    .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
+
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
+
+  .hero__name{ margin:22px 0 7px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  /* a thin clock, not a sentence. Light weight and open tracking so the digits
+     read as a running timer rather than a statistic. */
+  #mori{ font-size:19px; font-weight:250; letter-spacing:.11em; color:var(--hi);
+    font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1; }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
+    color:var(--hi); outline:none; }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
+
+  /* ── 4 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  /* ring + mark: two small choices that ride on top of the material */
+  .tog{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px; }
+  .tog__g{ display:flex; gap:2px; padding:2px; border-radius:999px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .tog__g button{ font:inherit; font-size:12px; font-weight:620; letter-spacing:-.005em;
+    color:var(--mid); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; transition:background .15s ease-out; }
+  .tog__g button.on{ color:#0b0c0e; background:#f2f3f6; }
+
+  /* colour-matched ring: the rim and the room glow take the card's own colour */
+  body.ring-colour .cage .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,.85)),
+                inset 0 0 16px 2px color-mix(in srgb, var(--edge, #fff) 28%, transparent) !important; }
+  body.ring-colour .cage.flat .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  /* the mark, pulled toward the card's colour. Tinted, never fully coloured. */
+  body.mark-tint .cage .daycard-ns__emblem path{
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--edge, #ffffff) 28%) !important; }
+  body.mark-tint .cage .daycard-ns__name{
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--edge, #ffffff) 22%) !important; }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ margin:30px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+
+  .trail{ margin:16px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  /* ── the last block on the screen, and the oldest thing on it. Recessed
+     rather than raised: a well cut into the page, with the date struck INTO
+     the surface the same way the name is struck into the card. Same engraving
+     language, so the beginning and the object agree. */
+  .origin{ position:relative; margin:34px 0 0; padding:30px 22px 28px;
+    border-radius:18px; text-align:center; overflow:hidden;
+    background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.16));
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.55),
+                inset 0 -1px 0 rgba(255,255,255,.07); }
+  /* one soft pool of the card's own light, radial so it never draws an edge */
+  .origin::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--tint, #3ad9f5) 16%, transparent), transparent 72%); }
+  .origin > *{ position:relative; }
+  .origin__k{ display:block; font-size:12px; font-weight:600; color:var(--lo); }
+  .origin__d{ display:block; margin:9px 0 0; font-size:20px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:rgba(228,233,242,.9);
+    text-shadow: 0 -1px 1px rgba(0,0,0,.85), 0 1px 0.5px rgba(255,255,255,.16); }
+  .origin__t{ display:block; margin:9px 0 0; font-size:13px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  
+</style>
+<style id="pages">
+/* cards */
+.mo-cards{
+  background:#050506;
+  color:#f2f4f7;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding:18px 0 140px;
+  overflow-x:hidden;
+}
+.mo-cards *{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- the object ---------- */
+.mo-cards__card{
+  position:relative;
+  width:min(70vw,248px);
+  aspect-ratio:320/452;
+  border-radius:20px;
+  background:linear-gradient(168deg,#15171b 0%,#0a0b0e 48%,#0d0f13 100%);
+  box-shadow:0 26px 58px -30px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+  contain:paint;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mo-cards__glaze{position:absolute;inset:0;border-radius:inherit}
+.mo-cards__m{width:26%;overflow:visible}
+.mo-cards__m path{fill:none;stroke:#fff;stroke-width:5;stroke-linejoin:miter;stroke-linecap:butt}
+.mo-cards__cdate{
+  position:absolute;top:13px;right:14px;
+  font-size:10px;letter-spacing:.03em;font-variant-numeric:tabular-nums;
+  color:rgba(255,255,255,.5);
+}
+.mo-cards__name{
+  position:absolute;left:14px;bottom:13px;
+  font-size:9.5px;letter-spacing:.16em;
+  color:rgba(255,255,255,.3);
+  text-shadow:0 1px 0 rgba(255,255,255,.07);
+}
+
+/* card eras: the earned layers, and only the earned layers */
+.mo-cards__card--dead .mo-cards__m path{stroke-opacity:.10}
+.mo-cards__card--dead .mo-cards__cdate{color:rgba(255,255,255,.26)}
+
+.mo-cards__card--first .mo-cards__glaze{
+  background:radial-gradient(122% 76% at 50% 4%,rgba(58,217,245,.30),rgba(58,217,245,0) 62%);
+}
+.mo-cards__card--first{box-shadow:0 26px 58px -30px rgba(0,0,0,.95),0 0 44px -12px rgba(58,217,245,.22),inset 0 1px 0 rgba(255,255,255,.06)}
+.mo-cards__card--first .mo-cards__m path{stroke-opacity:.62}
+
+.mo-cards__card--layers .mo-cards__glaze{
+  background:
+    radial-gradient(130% 60% at 50% -6%,rgba(238,242,251,.14),rgba(238,242,251,0) 44%),
+    radial-gradient(122% 76% at 50% 4%,rgba(58,217,245,.30),rgba(58,217,245,0) 60%),
+    radial-gradient(130% 62% at 50% 106%,rgba(63,217,78,.28),rgba(63,217,78,0) 62%);
+}
+.mo-cards__card--layers{box-shadow:0 26px 58px -30px rgba(0,0,0,.95),0 0 44px -10px rgba(58,217,245,.22),0 30px 78px -34px rgba(63,217,78,.30),inset 0 1px 0 rgba(255,255,255,.07)}
+.mo-cards__card--layers .mo-cards__m path{stroke-opacity:.84}
+
+.mo-cards__card--cold .mo-cards__glaze{
+  background:
+    radial-gradient(130% 60% at 50% -6%,rgba(238,242,251,.14),rgba(238,242,251,0) 44%),
+    radial-gradient(122% 76% at 50% 4%,rgba(58,217,245,.30),rgba(58,217,245,0) 60%),
+    radial-gradient(130% 62% at 50% 106%,rgba(63,217,78,.28),rgba(63,217,78,0) 62%);
+  filter:saturate(.14) brightness(.46);
+}
+.mo-cards__card--cold{box-shadow:0 26px 58px -30px rgba(0,0,0,.95),inset 0 1px 0 rgba(255,255,255,.04)}
+.mo-cards__card--cold .mo-cards__m path{stroke-opacity:.3}
+
+.mo-cards__card--return .mo-cards__glaze{
+  background:radial-gradient(120% 72% at 50% 6%,rgba(58,217,245,.19),rgba(58,217,245,0) 62%);
+}
+.mo-cards__card--return{box-shadow:0 26px 58px -30px rgba(0,0,0,.95),0 0 38px -12px rgba(58,217,245,.20),inset 0 1px 0 rgba(255,255,255,.05)}
+.mo-cards__card--return .mo-cards__m path{stroke-opacity:.5}
+
+.mo-cards__card--now .mo-cards__glaze{
+  background:
+    radial-gradient(132% 64% at 50% -6%,rgba(238,242,251,.19),rgba(238,242,251,0) 46%),
+    radial-gradient(124% 80% at 50% 4%,rgba(58,217,245,.36),rgba(58,217,245,0) 62%),
+    radial-gradient(132% 66% at 50% 106%,rgba(63,217,78,.32),rgba(63,217,78,0) 64%);
+}
+.mo-cards__card--now{box-shadow:0 26px 58px -30px rgba(0,0,0,.95),0 0 52px -8px rgba(58,217,245,.34),0 34px 96px -34px rgba(63,217,78,.36),inset 0 1px 0 rgba(255,255,255,.09)}
+.mo-cards__card--now .mo-cards__m path{stroke-opacity:.96}
+
+/* ---------- opener ---------- */
+.mo-cards__open{padding:8px 22px 0;text-align:center}
+.mo-cards__pair{display:flex;gap:20px;justify-content:center;align-items:flex-end}
+.mo-cards__pair .mo-cards__card{width:min(29vw,110px);border-radius:12px}
+.mo-cards__pair .mo-cards__cdate{top:9px;right:9px;font-size:8px}
+.mo-cards__pair .mo-cards__name{left:9px;bottom:9px;font-size:7px;letter-spacing:.14em}
+.mo-cards__cap{margin-top:11px;font-size:12px;color:rgba(255,255,255,.58);font-variant-numeric:tabular-nums}
+.mo-cards__then{margin-top:30px;font-size:38px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.mo-cards__sub{margin-top:14px;font-size:16.5px;line-height:1.5;color:rgba(242,244,247,.92);text-wrap:balance}
+.mo-cards__cue{margin-top:22px;opacity:.4}
+
+/* ---------- the spine: colour drains as you travel back ---------- */
+.mo-cards__link{width:1px;height:78px;margin:0 auto}
+.mo-cards__link--open{background:linear-gradient(180deg,rgba(255,255,255,0),rgba(58,217,245,.55))}
+.mo-cards__link--cy{background:linear-gradient(180deg,rgba(58,217,245,.55),rgba(58,217,245,.4))}
+.mo-cards__link--fade{background:linear-gradient(180deg,rgba(58,217,245,.4),rgba(58,217,245,.1))}
+.mo-cards__link--cold{background:linear-gradient(180deg,rgba(58,217,245,.1),rgba(255,255,255,.06))}
+.mo-cards__link--warm{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(63,217,78,.42))}
+.mo-cards__link--back{background:linear-gradient(180deg,rgba(63,217,78,.42),rgba(58,217,245,.34))}
+.mo-cards__link--out{background:linear-gradient(180deg,rgba(58,217,245,.34),rgba(255,255,255,.05))}
+.mo-cards__link--end{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0))}
+
+/* ---------- beats ---------- */
+.mo-cards__beat{padding:0 24px;text-align:center}
+.mo-cards__stage{position:relative;display:flex;justify-content:center;padding:22px 0 34px}
+.mo-cards__stage::before{
+  content:"";position:absolute;left:50%;top:50%;
+  width:min(120vw,460px);height:min(120vw,460px);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.mo-cards__stage--now::before{background:radial-gradient(closest-side,rgba(58,217,245,.15),rgba(58,217,245,0) 72%)}
+.mo-cards__stage--layers::before{background:radial-gradient(closest-side,rgba(63,217,78,.11),rgba(63,217,78,0) 70%)}
+.mo-cards__stage--first::before{background:radial-gradient(closest-side,rgba(58,217,245,.10),rgba(58,217,245,0) 70%)}
+.mo-cards__stage--return::before{background:radial-gradient(closest-side,rgba(58,217,245,.07),rgba(58,217,245,0) 68%)}
+
+.mo-cards__when{font-size:12.5px;letter-spacing:.05em;color:rgba(255,255,255,.56);font-variant-numeric:tabular-nums}
+.mo-cards__when--after{margin-top:17px}
+.mo-cards__star{margin-top:16px;font-size:25px;line-height:1.24;font-weight:600;letter-spacing:-.022em;text-wrap:balance}
+.mo-cards__note{margin-top:16px;font-size:16.5px;line-height:1.55;color:rgba(242,244,247,.93);text-wrap:balance}
+.mo-cards__note--lead{margin-top:18px}
+.mo-cards__figures{margin-top:18px;font-size:15.5px;color:rgba(242,244,247,.86);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.mo-cards__big{font-size:32px;line-height:1.18;font-weight:600;letter-spacing:-.03em;text-wrap:balance}
+.mo-cards__quote{font-size:26px;line-height:1.34;font-weight:500;letter-spacing:-.02em;color:#f2f4f7;text-wrap:balance}
+.mo-cards__quote--day1{margin-top:20px}
+
+.mo-cards__deeds{list-style:none;margin-top:26px;display:inline-flex;flex-direction:column;gap:11px;text-align:left}
+.mo-cards__deeds li{position:relative;padding-left:20px;font-size:15.5px;line-height:1.35;color:rgba(242,244,247,.9)}
+.mo-cards__deeds li::before{content:"";position:absolute;left:0;top:.62em;width:11px;height:1.5px;border-radius:1px;background:var(--m-deed,rgba(255,255,255,.4))}
+.mo-cards__deeds--cy{--m-deed:rgba(58,217,245,.85)}
+.mo-cards__deeds--pl{--m-deed:rgba(238,242,251,.8)}
+
+.mo-cards__retired{margin-top:16px;font-size:25px;line-height:1.24;font-weight:600;letter-spacing:-.022em;color:rgba(242,244,247,.82);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:rgba(255,255,255,.36);text-wrap:balance}
+
+/* a single sentence alone on a screen */
+.mo-cards__solo{min-height:min(46vh,392px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 26px;text-align:center}
+.mo-cards__stamp{margin-top:18px;font-size:13px;color:rgba(255,255,255,.55);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+/* what it asks of you */
+.mo-cards__ask{padding:34px 26px;text-align:center}
+.mo-cards__num{font-size:58px;font-weight:600;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.mo-cards__num--now{color:#eef2fb;text-shadow:0 0 38px rgba(238,242,251,.38)}
+.mo-cards__num--then{color:rgba(255,255,255,.44)}
+.mo-cards__numlab{margin-top:10px;font-size:15px;color:rgba(242,244,247,.9)}
+.mo-cards__rule{width:1px;height:56px;margin:26px auto;background:linear-gradient(180deg,rgba(238,242,251,.4),rgba(255,255,255,.05))}
+
+.mo-cards__closeline{font-size:30px;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+
+.mo-cards__cy{color:#3ad9f5}
+.mo-cards__gr{color:#3fd94e}
+.mo-cards__pl{color:#eef2fb;text-shadow:0 0 20px rgba(238,242,251,.55)}
+
+@media (min-width:760px){
+  .mo-cards__card{width:270px}
+  .mo-cards__pair .mo-cards__card{width:150px;border-radius:14px}
+  .mo-cards__then{font-size:52px}
+  .mo-cards__star{font-size:30px;max-width:20ch;margin-left:auto;margin-right:auto}
+  .mo-cards__retired{font-size:30px;max-width:20ch;margin-left:auto;margin-right:auto}
+  .mo-cards__big{font-size:42px}
+  .mo-cards__quote{font-size:32px;max-width:18ch;margin-left:auto;margin-right:auto}
+  .mo-cards__note,.mo-cards__sub{max-width:34ch;margin-left:auto;margin-right:auto}
+  .mo-cards__num{font-size:76px}
+}
+
+/* moments */
+.mo-moments{
+  --cyan:#3ad9f5;
+  --green:#3fd94e;
+  --plat:#eef2fb;
+  --hi:rgba(255,255,255,.96);
+  --mid:rgba(255,255,255,.92);
+  --lo:rgba(255,255,255,.58);
+  position:relative;
+  background:#050607;
+  color:var(--hi);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+}
+.mo-moments *{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- the card object ---------- */
+.mo-moments__card{
+  position:relative;
+  width:var(--cw,140px);
+  aspect-ratio:.708;
+  border-radius:15px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  background:linear-gradient(168deg,#12151a 0%,#080a0d 58%,#0b0e12 100%);
+  box-shadow:
+    var(--glow,0 0 0 rgba(0,0,0,0)),
+    0 26px 52px -24px rgba(0,0,0,.95),
+    inset 0 1px 0 rgba(255,255,255,.07);
+}
+.mo-moments__card::before{
+  content:"";position:absolute;inset:0;
+  background:var(--bloom,none);
+}
+.mo-moments__card::after{
+  content:"";position:absolute;inset:0;
+  background:var(--sheen,none),linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,0) 30%,rgba(0,0,0,.16));
+}
+.mo-moments__m{
+  position:relative;z-index:2;
+  width:34%;height:auto;
+  opacity:var(--mo,.9);
+}
+.mo-moments__engrave{
+  position:absolute;z-index:2;left:11px;bottom:10px;
+  font-size:9.5px;letter-spacing:.07em;
+  font-variant-numeric:tabular-nums;
+  color:rgba(255,255,255,var(--eo,.42));
+}
+.mo-moments__card--dead{--mo:.11;--eo:.24}
+.mo-moments__card--drained{
+  --mo:.2;--eo:.28;
+  --bloom:radial-gradient(110% 66% at 30% 16%,rgba(58,217,245,.07),rgba(58,217,245,0) 62%);
+}
+.mo-moments__card--cyan{
+  --mo:.95;
+  --glow:0 0 48px -6px rgba(58,217,245,.42);
+  --bloom:radial-gradient(105% 62% at 28% 16%,rgba(58,217,245,.4),rgba(58,217,245,0) 66%);
+}
+.mo-moments__card--plat{
+  --mo:.97;
+  --glow:0 0 46px -8px rgba(58,217,245,.3),0 0 80px -14px rgba(238,242,251,.26);
+  --bloom:
+    radial-gradient(100% 58% at 26% 14%,rgba(58,217,245,.34),rgba(58,217,245,0) 66%),
+    radial-gradient(78% 44% at 84% 94%,rgba(238,242,251,.16),rgba(238,242,251,0) 64%);
+  --sheen:linear-gradient(196deg,rgba(255,255,255,0) 44%,rgba(255,255,255,.15) 61%,rgba(255,255,255,0) 74%);
+}
+.mo-moments__card--full{
+  --mo:1;
+  --glow:0 0 44px -8px rgba(58,217,245,.32),0 0 84px -14px rgba(238,242,251,.24),0 0 58px -4px rgba(63,217,78,.3);
+  --bloom:
+    radial-gradient(96% 54% at 24% 12%,rgba(58,217,245,.36),rgba(58,217,245,0) 64%),
+    radial-gradient(84% 46% at 6% 100%,rgba(63,217,78,.34),rgba(63,217,78,0) 66%);
+  --sheen:linear-gradient(196deg,rgba(255,255,255,0) 46%,rgba(255,255,255,.155) 62%,rgba(255,255,255,0) 76%);
+}
+
+/* ---------- beats ---------- */
+.mo-moments__beat{
+  position:relative;
+  min-height:86vh;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:20px;
+  padding:15vh 26px;
+  max-width:460px;margin:0 auto;
+}
+.mo-moments__beat::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:var(--wash,none);
+  pointer-events:none;
+}
+.mo-moments__beat > *{position:relative;z-index:1}
+.mo-moments__beat--open{min-height:auto;padding-top:5vh;padding-bottom:13vh;gap:24px}
+.mo-moments__beat--tail{min-height:auto;padding-bottom:22vh;gap:26px}
+
+.mo-moments__beat--now{
+  --wash:
+    radial-gradient(58% 26% at 62% 24%,rgba(58,217,245,.2),rgba(58,217,245,0) 76%),
+    radial-gradient(56% 30% at 26% 62%,rgba(63,217,78,.17),rgba(63,217,78,0) 76%),
+    radial-gradient(52% 24% at 50% 42%,rgba(238,242,251,.12),rgba(238,242,251,0) 76%);
+}
+.mo-moments__beat--run{--wash:radial-gradient(64% 40% at 50% 40%,rgba(63,217,78,.18),rgba(63,217,78,0) 74%)}
+.mo-moments__beat--ask{--wash:radial-gradient(62% 38% at 50% 44%,rgba(238,242,251,.13),rgba(238,242,251,0) 74%)}
+.mo-moments__beat--turn{--wash:radial-gradient(66% 44% at 50% 34%,rgba(58,217,245,.15),rgba(58,217,245,0) 74%)}
+.mo-moments__beat--marks{--wash:radial-gradient(58% 40% at 34% 42%,rgba(238,242,251,.15),rgba(238,242,251,0) 74%)}
+.mo-moments__beat--back{--wash:radial-gradient(60% 38% at 50% 44%,rgba(63,217,78,.19),rgba(63,217,78,0) 74%)}
+.mo-moments__beat--ignite{--wash:radial-gradient(66% 44% at 50% 38%,rgba(58,217,245,.2),rgba(58,217,245,0) 74%)}
+
+/* ---------- type ---------- */
+.mo-moments__when{
+  font-size:13.5px;color:var(--lo);
+  font-variant-numeric:tabular-nums;
+}
+.mo-moments__say{
+  font-size:clamp(29px,8.4vw,38px);
+  line-height:1.18;letter-spacing:-.026em;font-weight:600;
+  color:var(--hi);
+}
+.mo-moments__say--quiet{font-weight:500;letter-spacing:-.02em}
+.mo-moments__note{
+  font-size:17px;line-height:1.5;color:var(--mid);font-weight:420;
+  max-width:30ch;
+}
+.mo-moments__figure{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.mo-moments__figure--stack{flex-direction:column;align-items:flex-start;gap:2px}
+.mo-moments__num{
+  font-size:clamp(74px,23vw,102px);
+  line-height:.86;font-weight:600;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums;
+  color:#fff;
+}
+.mo-moments__unit{
+  font-size:17px;font-weight:500;letter-spacing:-.01em;
+  color:var(--unit,var(--mid));
+}
+.mo-moments__unit--green{--unit:var(--green)}
+.mo-moments__unit--plat{--unit:var(--plat)}
+.mo-moments__unit--cold{--unit:rgba(184,198,214,.72)}
+
+/* ---------- opener ---------- */
+.mo-moments__pair{display:flex;gap:26px;justify-content:center;align-items:flex-end}
+.mo-moments__one{display:flex;flex-direction:column;align-items:center;gap:11px}
+.mo-moments__one .mo-moments__card{--cw:132px}
+.mo-moments__cap{font-size:13.5px;color:var(--lo)}
+.mo-moments__lede{
+  text-align:center;font-size:19px;font-weight:500;color:var(--mid);
+  letter-spacing:-.015em;
+}
+
+/* ---------- the turn ---------- */
+.mo-moments__chapters{display:flex;gap:18px;align-items:flex-end}
+.mo-moments__chapters .mo-moments__card{--cw:104px}
+.mo-moments__star{font-size:19px;line-height:1.34;font-weight:560;letter-spacing:-.015em}
+.mo-moments__star--old{color:#7fe4f8}
+.mo-moments__star--new{color:#fff}
+.mo-moments__sub{font-size:14.5px;color:var(--lo);margin-top:5px}
+
+/* ---------- seven marks ---------- */
+.mo-moments__list{display:flex;flex-direction:column;gap:19px}
+.mo-moments__mark{
+  font-size:20px;line-height:1.25;font-weight:500;letter-spacing:-.02em;
+  color:rgba(255,255,255,.95);
+}
+
+/* ---------- expand ---------- */
+.mo-moments__more{margin-top:8px}
+.mo-moments__more summary{
+  list-style:none;cursor:pointer;
+  font-size:14.5px;color:rgba(255,255,255,.66);
+  padding:9px 0;
+  display:flex;align-items:center;gap:8px;
+}
+.mo-moments__more summary::-webkit-details-marker{display:none}
+.mo-moments__more[open] summary{color:rgba(255,255,255,.88)}
+.mo-moments__chev{width:11px;height:11px;flex:none;opacity:.7;transition:transform .22s ease-out}
+.mo-moments__more[open] .mo-moments__chev{transform:rotate(180deg)}
+.mo-moments__body{
+  font-size:16px;line-height:1.55;color:var(--mid);
+  display:flex;flex-direction:column;gap:14px;padding-top:4px;
+}
+.mo-moments__ledger{display:grid;grid-template-columns:1fr auto;gap:11px 16px;font-size:15.5px}
+.mo-moments__ledger span:nth-child(even){
+  font-variant-numeric:tabular-nums;color:#fff;font-weight:560;
+}
+.mo-moments__rule{
+  height:1px;width:100%;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.13),rgba(255,255,255,0));
+}
+
+@media (prefers-reduced-motion:reduce){
+  .mo-moments__chev{transition:none}
+}
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .mo-moments__beat > *{
+      animation:mo-moments-rise linear both;
+      animation-timeline:view();
+      animation-range:entry 12% entry 68%;
+    }
+  }
+}
+@keyframes mo-moments-rise{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:none}
+}
+
+/* twocards */
+.mo-twocards{
+  --cy:#3ad9f5; --gr:#3fd94e; --pl:#eef2fb;
+  --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.80); --lo:rgba(255,255,255,.58);
+  --ac:var(--pl);
+  position:relative; width:100%; max-width:430px; margin:0 auto;
+  padding:0 22px 180px; box-sizing:border-box; overflow-x:clip;
+  background:#000; color:var(--hi);
+  font-family:inherit; text-rendering:optimizeLegibility;
+}
+
+/* ---------- the card object ---------- */
+.mo-twocards .tc-cardwrap{ position:relative; container-type:inline-size; }
+.mo-twocards .tc-cardwrap::before{
+  content:''; position:absolute; z-index:0; pointer-events:none;
+  left:50%; top:48%; width:186%; height:162%; transform:translate(-50%,-50%);
+  background:
+    radial-gradient(closest-side at 50% 40%, var(--h1,transparent), transparent 72%),
+    radial-gradient(closest-side at 34% 74%, var(--h2,transparent), transparent 74%);
+  filter:blur(4px);
+}
+.mo-twocards .tc-card{
+  position:relative; z-index:1; display:block; width:100%;
+  aspect-ratio:320/452; border-radius:15px; overflow:hidden;
+  clip-path:inset(0 round 15px); contain:paint;
+  background:linear-gradient(163deg,#0c0f12 0%,#06080a 58%,#040507 100%);
+  box-shadow:0 20px 44px -20px rgba(0,0,0,.95),
+             inset 0 1px 0 rgba(255,255,255,.07),
+             inset 0 0 0 1px rgba(255,255,255,.045);
+}
+.mo-twocards .tc-card::before{ content:''; position:absolute; inset:0; background-image:var(--face,none); }
+.mo-twocards .tc-m{
+  position:absolute; left:50%; top:47%; transform:translate(-50%,-50%);
+  width:32px; width:32cqw; height:auto; color:rgba(255,255,255,.14); overflow:visible;
+}
+.mo-twocards .tc-name{
+  position:absolute; left:11px; left:7cqw; bottom:10px; bottom:6.5cqw;
+  font-size:9px; font-size:5.4cqw; font-weight:500; letter-spacing:.01em;
+  color:rgba(255,255,255,.30); text-shadow:0 1px 0 rgba(0,0,0,.65);
+}
+
+/* faces: the earned layers */
+.mo-twocards .tc-card--now{
+  --face:
+    radial-gradient(125% 78% at 50% 4%, rgba(58,217,245,.34), rgba(58,217,245,0) 64%),
+    radial-gradient(108% 70% at 10% 106%, rgba(63,217,78,.26), rgba(63,217,78,0) 62%),
+    linear-gradient(118deg, rgba(238,242,251,0) 35%, rgba(238,242,251,.11) 47%, rgba(238,242,251,0) 59%);
+}
+.mo-twocards .tc-card--now .tc-m{ color:rgba(255,255,255,.95); filter:drop-shadow(0 0 10px rgba(58,217,245,.55)); }
+.mo-twocards .tc-card--now .tc-name{ color:rgba(255,255,255,.52); }
+
+.mo-twocards .tc-card--cy{
+  --face:
+    radial-gradient(130% 82% at 50% 2%, rgba(58,217,245,.30), rgba(58,217,245,0) 66%),
+    radial-gradient(90% 60% at 50% 108%, rgba(58,217,245,.07), transparent 60%);
+}
+.mo-twocards .tc-card--cy .tc-m{ color:rgba(255,255,255,.86); filter:drop-shadow(0 0 9px rgba(58,217,245,.5)); }
+.mo-twocards .tc-card--cy .tc-name{ color:rgba(255,255,255,.45); }
+
+.mo-twocards .tc-card--gr{
+  --face:
+    radial-gradient(122% 80% at 50% 106%, rgba(63,217,78,.40), rgba(63,217,78,0) 66%),
+    radial-gradient(120% 70% at 50% -6%, rgba(58,217,245,.18), transparent 62%);
+}
+.mo-twocards .tc-card--gr .tc-m{ color:rgba(255,255,255,.90); filter:drop-shadow(0 0 10px rgba(63,217,78,.5)); }
+.mo-twocards .tc-card--gr .tc-name{ color:rgba(255,255,255,.48); }
+
+.mo-twocards .tc-card--out{
+  --face: radial-gradient(120% 80% at 50% 0%, rgba(58,217,245,.045), transparent 60%);
+  background:linear-gradient(163deg,#090b0d,#050607 62%,#030405);
+}
+.mo-twocards .tc-card--out .tc-m{ color:rgba(255,255,255,.11); }
+.mo-twocards .tc-card--out .tc-name{ color:rgba(255,255,255,.16); }
+
+.mo-twocards .tc-card--dead{
+  background:linear-gradient(163deg,#0a0c0e,#050607 60%,#030405);
+  box-shadow:0 16px 34px -22px rgba(0,0,0,.95),
+             inset 0 1px 0 rgba(255,255,255,.045),
+             inset 0 0 0 1px rgba(255,255,255,.035);
+}
+.mo-twocards .tc-card--dead .tc-m{ color:rgba(255,255,255,.10); }
+.mo-twocards .tc-card--dead .tc-name{ color:rgba(255,255,255,.15); }
+
+/* halos, radial and edge-safe */
+.mo-twocards .tc-h-now{ --h1:rgba(58,217,245,.40); --h2:rgba(63,217,78,.30); }
+.mo-twocards .tc-h-cy { --h1:rgba(58,217,245,.36); --h2:rgba(58,217,245,.10); }
+.mo-twocards .tc-h-gr { --h1:rgba(63,217,78,.34);  --h2:rgba(63,217,78,.12); }
+
+/* ---------- opening ---------- */
+.mo-twocards .tc-open{ padding:30px 0 4px; }
+.mo-twocards .tc-pair{ display:grid; grid-template-columns:1fr 1fr; gap:17px; align-items:start; }
+.mo-twocards .tc-when{
+  margin:0 0 10px; font-size:12.5px; font-weight:500; letter-spacing:.005em;
+  color:var(--lo); font-variant-numeric:tabular-nums;
+}
+.mo-twocards .tc-when--now{ color:rgba(255,255,255,.72); }
+.mo-twocards .tc-between{
+  display:flex; align-items:center; gap:12px; margin:26px 2px 24px;
+  font-size:12.5px; font-weight:500; color:var(--lo); font-variant-numeric:tabular-nums;
+}
+.mo-twocards .tc-between::before,
+.mo-twocards .tc-between::after{
+  content:''; height:1px; flex:1; background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);
+}
+.mo-twocards .tc-said{
+  margin:0; font-size:15.5px; line-height:1.44; font-weight:500;
+  letter-spacing:-.005em; color:rgba(255,255,255,.90); text-wrap:pretty;
+}
+.mo-twocards .tc-said--now{ color:#fff; }
+
+/* ---------- beats ---------- */
+.mo-twocards .tc-beat{ padding:104px 0 0; }
+.mo-twocards .tc-beat--wide{ padding-top:126px; }
+.mo-twocards .tc-big{
+  margin:0; font-size:29px; line-height:1.2; font-weight:600; letter-spacing:-.024em;
+  color:var(--hi); text-wrap:pretty;
+}
+.mo-twocards .tc-big--sm{ font-size:25px; line-height:1.24; }
+.mo-twocards .tc-sub{ margin:14px 0 0; font-size:15px; line-height:1.5; font-weight:450; color:rgba(255,255,255,.80); }
+.mo-twocards .tc-foot{
+  margin:22px 0 0; font-size:13px; font-weight:500; color:var(--lo);
+  font-variant-numeric:tabular-nums;
+}
+
+/* chapter head: the card as an object beside its era */
+.mo-twocards .tc-chap{ display:flex; align-items:center; gap:16px; margin-bottom:26px; }
+.mo-twocards .tc-chap .tc-cardwrap{ width:80px; flex:0 0 80px; }
+.mo-twocards .tc-chap .tc-card{ border-radius:10px; clip-path:inset(0 round 10px); }
+.mo-twocards .tc-chap .tc-name{ display:none; }
+.mo-twocards .tc-chaptxt p{ margin:0; }
+.mo-twocards .tc-chaptxt .tc-when{ margin-bottom:6px; }
+.mo-twocards .tc-chapnote{ font-size:14px; line-height:1.4; color:rgba(255,255,255,.82); font-weight:450; }
+
+/* distance */
+.mo-twocards .tc-prog{ margin-top:34px; }
+.mo-twocards .tc-prognum{
+  font-size:54px; line-height:1; font-weight:600; letter-spacing:-.035em;
+  color:var(--pl); font-variant-numeric:tabular-nums; text-shadow:0 0 26px rgba(238,242,251,.20);
+}
+.mo-twocards .tc-prognum span{ font-size:24px; font-weight:500; color:rgba(255,255,255,.38); letter-spacing:-.02em; }
+.mo-twocards .tc-proglab{ margin:9px 0 0; font-size:14px; font-weight:500; color:rgba(255,255,255,.80); }
+.mo-twocards .tc-progbar{
+  position:relative; height:3px; margin-top:20px; border-radius:2px;
+  background:rgba(255,255,255,.10); overflow:hidden;
+}
+.mo-twocards .tc-progbar i{
+  position:absolute; inset:0 auto 0 0; display:block; border-radius:2px;
+  background:linear-gradient(90deg,rgba(238,242,251,.55),#eef2fb);
+  box-shadow:0 0 14px rgba(238,242,251,.45);
+}
+
+/* marks */
+.mo-twocards .tc-marks{ list-style:none; margin:30px 0 0; padding:0; }
+.mo-twocards .tc-marks li{
+  position:relative; padding-left:20px; margin:0 0 20px;
+  font-size:23px; line-height:1.24; font-weight:500; letter-spacing:-.018em;
+  color:rgba(255,255,255,.95);
+}
+.mo-twocards .tc-marks li:last-child{ margin-bottom:0; }
+.mo-twocards .tc-marks li::before{
+  content:''; position:absolute; left:0; top:.52em; width:7px; height:7px;
+  border-radius:2px; background:var(--ac); box-shadow:0 0 12px var(--ac);
+}
+
+/* a number that carries a whole screen */
+.mo-twocards .tc-hero{ padding:132px 0 0; }
+.mo-twocards .tc-heronum{
+  font-size:96px; line-height:.92; font-weight:600; letter-spacing:-.05em;
+  color:var(--ac); font-variant-numeric:tabular-nums;
+  text-shadow:0 0 44px color-mix(in srgb, var(--ac) 45%, transparent);
+}
+.mo-twocards .tc-herolab{ margin:14px 0 0; font-size:17px; font-weight:500; letter-spacing:-.01em; color:rgba(255,255,255,.88); }
+
+/* the ask */
+.mo-twocards .tc-ask{
+  display:flex; align-items:baseline; gap:14px;
+  font-size:44px; line-height:1; font-weight:600; letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+.mo-twocards .tc-ask .a{ color:rgba(255,255,255,.34); }
+.mo-twocards .tc-ask .b{ color:var(--pl); text-shadow:0 0 30px rgba(238,242,251,.25); }
+.mo-twocards .tc-ask svg{ width:24px; height:14px; color:rgba(255,255,255,.30); flex:0 0 auto; }
+
+/* single card moments */
+.mo-twocards .tc-moment{ display:flex; justify-content:center; margin-bottom:34px; }
+.mo-twocards .tc-moment .tc-cardwrap{ width:120px; }
+.mo-twocards .tc-moment .tc-card{ border-radius:12px; clip-path:inset(0 round 12px); }
+.mo-twocards .tc-first{ display:flex; justify-content:center; margin-bottom:38px; }
+.mo-twocards .tc-first .tc-cardwrap{ width:186px; }
+
+/* a line that owns a screen */
+.mo-twocards .tc-solo{ padding:126px 0 0; }
+.mo-twocards .tc-solo p{
+  margin:0; font-size:27px; line-height:1.26; font-weight:500; letter-spacing:-.022em;
+  color:rgba(255,255,255,.94); text-wrap:pretty;
+}
+.mo-twocards .tc-solo .tc-sub{
+  font-size:16px; line-height:1.5; font-weight:450; letter-spacing:0;
+  color:rgba(255,255,255,.80); margin-top:14px;
+}
+
+.mo-twocards .tc-center{ text-align:center; }
+.mo-twocards .tc-center .tc-when{ margin-bottom:14px; }
+
+/* entrance: the dead card first, then the lit one blooms */
+@media (prefers-reduced-motion:no-preference){
+  .mo-twocards .tc-open .tc-col{ animation:tcRise .62s cubic-bezier(.2,.7,.25,1) both; }
+  .mo-twocards .tc-open .tc-col:nth-child(2){ animation-delay:.34s; }
+  .mo-twocards .tc-cardwrap--now::before{ animation:tcBloom 1.15s ease-out .62s both; }
+  .mo-twocards .tc-between,
+  .mo-twocards .tc-pair--says{ animation:tcRise .7s cubic-bezier(.2,.7,.25,1) .82s both; }
+}
+@keyframes tcRise{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:none;} }
+@keyframes tcBloom{ from{ opacity:0; } to{ opacity:1; } }
+
+/* constellation */
+.m-const{
+  --g:#3fd94e; --c:#3ad9f5; --p:#eef2fb;
+  --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.92); --lo:rgba(214,226,242,.66);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,"Segoe UI",sans-serif;
+  background:#04050700; color:var(--mid);
+  padding:0 0 132px; margin:0 auto; max-width:430px;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+.m-const *{box-sizing:border-box; margin:0; padding:0;}
+.m-const b{font-weight:600;}
+
+/* ---------- the card object ---------- */
+.m-const__cw{position:relative; display:block; flex:0 0 auto;}
+.m-const__cw--md{width:132px;}
+.m-const__cw--sm{width:84px;}
+.m-const__card{
+  position:relative; width:100%; aspect-ratio:320/452;
+  border-radius:15px; clip-path:inset(0 round 15px); contain:paint;
+  background:linear-gradient(168deg,#0d1117 0%,#07090d 52%,#04050a 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+  display:flex; align-items:center; justify-content:center;
+}
+.m-const__card::before,.m-const__card::after{content:""; position:absolute; inset:0; pointer-events:none;}
+.m-const__m{width:30%; height:auto; color:rgba(255,255,255,.94); position:relative; z-index:2;}
+.m-const__engrave{
+  position:absolute; left:9px; bottom:8px; z-index:2;
+  font-size:8.5px; font-weight:500; letter-spacing:.01em;
+  color:rgba(255,255,255,.5); text-shadow:0 1px 0 rgba(0,0,0,.65);
+}
+
+/* dead: pre-Clarity, nothing earned */
+.m-const__cw--dead{box-shadow:none;}
+.m-const__card--dead{background:linear-gradient(168deg,#0b0d11,#050609 70%,#040507);}
+.m-const__card--dead .m-const__m{color:rgba(255,255,255,.13);}
+.m-const__card--dead .m-const__engrave{color:rgba(255,255,255,.22);}
+
+/* cyan: Clarity ignited + first plan revealed */
+.m-const__cw--cyan{filter:drop-shadow(0 14px 34px rgba(58,217,245,.22));}
+.m-const__card--cyan::before{
+  background:
+    radial-gradient(72% 52% at 50% 8%,rgba(58,217,245,.42),rgba(58,217,245,0) 72%),
+    radial-gradient(58% 40% at 22% 96%,rgba(58,217,245,.16),rgba(58,217,245,0) 76%);
+}
+.m-const__card--cyan::after{
+  background:linear-gradient(148deg,rgba(238,242,251,.16) 0%,rgba(238,242,251,.02) 38%,rgba(238,242,251,0) 62%);
+}
+
+/* full: cyan + platinum + green, everything earned */
+.m-const__cw--full{filter:drop-shadow(0 16px 38px rgba(58,217,245,.26)) drop-shadow(0 6px 40px rgba(63,217,78,.16));}
+.m-const__card--full::before{
+  background:
+    radial-gradient(70% 50% at 50% 6%,rgba(58,217,245,.5),rgba(58,217,245,0) 70%),
+    radial-gradient(70% 46% at 50% 100%,rgba(63,217,78,.34),rgba(63,217,78,0) 74%);
+}
+.m-const__card--full::after{
+  background:linear-gradient(148deg,rgba(238,242,251,.2) 0%,rgba(238,242,251,.03) 40%,rgba(238,242,251,0) 64%);
+}
+
+/* ---------- 1. then vs now ---------- */
+.m-const__open{padding:30px 24px 0;}
+.m-const__pair{display:flex; gap:26px; justify-content:center; align-items:flex-start;}
+.m-const__slot{display:flex; flex-direction:column; align-items:center; gap:14px;}
+.m-const__slot figcaption{display:flex; flex-direction:column; align-items:center; gap:3px;}
+.m-const__slot b{font-size:14px; color:var(--hi); font-variant-numeric:tabular-nums;}
+.m-const__slot span{font-size:12.5px; color:var(--lo); font-variant-numeric:tabular-nums;}
+.m-const__openline{margin-top:38px; text-align:center; font-size:19px; font-weight:500; color:var(--mid); letter-spacing:-.01em;}
+
+/* ---------- 2. the whole year ---------- */
+.m-const__sky{padding:112px 24px 0; display:flex; flex-direction:column; align-items:center;}
+.m-const__lead{font-size:22px; font-weight:400; letter-spacing:-.015em; color:var(--mid); margin-bottom:34px; text-align:center;}
+.m-const__lead b{font-weight:600; color:var(--hi); font-variant-numeric:tabular-nums;}
+.m-const__fieldwrap{
+  position:relative;
+  filter:drop-shadow(0 22px 52px rgba(58,217,245,.2)) drop-shadow(0 6px 44px rgba(63,217,78,.13));
+}
+.m-const__field{position:relative; overflow:hidden;}
+.m-const__field i{position:absolute; top:0; left:0; width:2px; height:2px; border-radius:50%; background:none;}
+.m-const__l1g,.m-const__l2g,.m-const__l3g{color:#3fd94ed4;}
+.m-const__l1c,.m-const__l2c,.m-const__l3c{color:#3ad9f5db;}
+.m-const__l1d,.m-const__l2d,.m-const__l3d{color:#b4c7e04d;}
+.m-const__l1w,.m-const__l2w,.m-const__l3w{color:rgba(238,242,251,.55);}
+.m-const__l1wc,.m-const__l2wc,.m-const__l3wc{color:#eef2fbf2;}
+.m-const__field--all{
+  width:318px; height:452px; border-radius:15px; clip-path:inset(0 round 15px); contain:paint;
+  background:
+    radial-gradient(64% 26% at 52% 12%,rgba(58,217,245,.14),rgba(58,217,245,0) 74%),
+    radial-gradient(58% 22% at 46% 34%,rgba(63,217,78,.13),rgba(63,217,78,0) 74%),
+    radial-gradient(60% 20% at 50% 88%,rgba(58,217,245,.07),rgba(58,217,245,0) 76%),
+    linear-gradient(168deg,#0a0d12,#06080c 60%,#04050a);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+}
+.m-const__engrave--field{left:11px; bottom:10px;}
+.m-const__key{list-style:none; display:flex; gap:18px; margin-top:22px;}
+.m-const__key li{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--lo);}
+.m-const__pt{width:6px; height:6px; border-radius:50%; flex:0 0 auto;}
+.m-const__pt--g{background:var(--g); box-shadow:0 0 8px rgba(63,217,78,.75);}
+.m-const__pt--c{background:var(--c); box-shadow:0 0 8px rgba(58,217,245,.75);}
+.m-const__pt--w{background:var(--p); box-shadow:0 0 9px rgba(238,242,251,.85);}
+.m-const__quiet{margin-top:16px; font-size:12.5px; color:var(--lo); text-align:center;}
+
+/* ---------- beats ---------- */
+.m-const__beat{padding:118px 24px 0;}
+.m-const__when{font-size:13px; color:var(--lo); margin-bottom:16px; font-variant-numeric:tabular-nums;}
+.m-const__starrow{display:flex; gap:18px; align-items:center;}
+.m-const__star{font-size:20.5px; line-height:1.32; font-weight:600; letter-spacing:-.015em; color:var(--hi);}
+.m-const__star--past{color:rgba(255,255,255,.9);}
+.m-const__beat .m-const__say{margin-bottom:26px;}
+.m-const__beat .m-const__quiet{text-align:left; margin-top:14px;}
+.m-const__say{font-size:17.5px; line-height:1.45; color:var(--mid); letter-spacing:-.005em;}
+.m-const__figure{display:flex; align-items:baseline; gap:12px; margin-top:34px;}
+.m-const__figure b{
+  font-size:58px; line-height:.9; font-weight:600; letter-spacing:-.045em;
+  color:var(--p); font-variant-numeric:tabular-nums;
+  text-shadow:0 0 34px rgba(238,242,251,.28);
+}
+.m-const__figure span{font-size:14.5px; color:var(--lo);}
+.m-const__figure--lg{margin:0 0 26px;}
+.m-const__figure--lg b{font-size:70px; color:#54dd63; text-shadow:0 0 38px rgba(63,217,78,.3);}
+.m-const__figure--lg span{color:rgba(214,226,242,.72);}
+
+.m-const__field--run{
+  width:318px; height:208px; border-radius:13px; clip-path:inset(0 round 13px); contain:paint;
+  background:
+    radial-gradient(70% 46% at 50% 50%,rgba(63,217,78,.15),rgba(63,217,78,0) 76%),
+    linear-gradient(170deg,#080b0e,#05070a);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* expandable cluster */
+.m-const__open2{margin-top:22px;}
+.m-const__open2 summary{
+  list-style:none; cursor:pointer; display:flex; align-items:center; gap:8px;
+  font-size:15px; color:rgba(214,226,242,.8); padding:6px 0;
+}
+.m-const__open2 summary::-webkit-details-marker{display:none;}
+.m-const__open2 summary svg{width:12px; height:12px; transition:transform .22s ease-out;}
+.m-const__open2[open] summary svg{transform:rotate(180deg);}
+.m-const__deeds{list-style:none; margin-top:10px; display:flex; flex-direction:column; gap:14px;}
+.m-const__deeds li{display:flex; align-items:center; gap:12px; font-size:16.5px; color:var(--mid); letter-spacing:-.005em;}
+
+/* ---------- punctuation ---------- */
+.m-const__punct{padding:132px 30px 0; text-align:center;}
+.m-const__pt--big{width:9px; height:9px; display:block; margin:0 auto 26px;}
+.m-const__end .m-const__pt--big{margin:0 0 22px;}
+.m-const__punct p{font-size:25px; line-height:1.34; font-weight:500; letter-spacing:-.022em; color:var(--hi);}
+.m-const__punct span{display:block; margin-top:18px; font-size:12.5px; color:var(--lo);}
+
+/* ---------- the fall ---------- */
+.m-const__fall{padding:126px 24px 0;}
+.m-const__fallgrid{display:flex; gap:20px; align-items:flex-start;}
+.m-const__field--fall{
+  width:166px; height:306px; flex:0 0 auto; border-radius:13px; clip-path:inset(0 round 13px); contain:paint;
+  background:
+    radial-gradient(76% 18% at 50% 6%,rgba(63,217,78,.16),rgba(63,217,78,0) 76%),
+    linear-gradient(180deg,#080b0f,#050609 46%,#07090d);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+.m-const__notes{position:relative; flex:1 1 auto; height:306px;}
+.m-const__note{position:absolute; left:0; display:flex; flex-direction:column; gap:3px;}
+.m-const__note b{font-size:17px; color:var(--hi); letter-spacing:-.01em; font-variant-numeric:tabular-nums;}
+.m-const__note span{font-size:13px; color:var(--lo);}
+.m-const__note--back{top:6px;}
+.m-const__note--back b{color:var(--p); text-shadow:0 0 22px rgba(238,242,251,.4);}
+.m-const__note--gone{top:216px;}
+.m-const__fall .m-const__say{margin-top:34px;}
+
+/* ---------- the end ---------- */
+.m-const__end{padding:130px 24px 0; display:flex; flex-direction:column; align-items:flex-start;}
+.m-const__end .m-const__cw{margin:6px 0 34px;}
+.m-const__punctline{font-size:25px; line-height:1.34; font-weight:500; letter-spacing:-.022em; color:var(--hi);}
+.m-const__close{margin-top:56px; display:flex; flex-direction:column; gap:7px;}
+.m-const__close span{font-size:16.5px; color:rgba(230,238,248,.86); font-variant-numeric:tabular-nums;}
+.m-const__close b{font-size:19px; color:var(--hi); font-weight:600; font-variant-numeric:tabular-nums; letter-spacing:-.01em;}
+
+/* ---------- the light itself ---------- */
+.m-const__l1w,.m-const__l2w,.m-const__l3w{animation:m-const-breathe 9s ease-in-out infinite;}
+@keyframes m-const-breathe{0%,100%{opacity:.78} 50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  .m-const__l1w,.m-const__l2w,.m-const__l3w{animation:none;}
+  .m-const__open2 summary svg{transition:none;}
+}
+
+.m-const__l1g{box-shadow:
+    199px 444px 2px,172px 443px 2px,82px 442px 2px,206px 442px 2px,125px 439px 2px,225px 437px 2px,106px 433px 2px,171px 434px 2px,201px 431px 2px,167px 429px 2px,197px 430px 2px,127px 430px 2px,246px 426px 2px,204px 425px 2px,125px 425px 2px,175px 423px 2px,83px 420px 2px,156px 420px 2px,82px 420px 2px,177px 418px 2px,178px 416px 2px,255px 415px 2px,216px 412px 2px,158px 408px 2px,213px 408px 2px,112px 403px 2px,143px 402px 2px,57px 402px 2px,122px 398px 2px,158px 399px 2px,92px 398px 2px,194px 395px 2px,190px 389px 2px,300px 386px 2px,224px 387px 2px,161px 387px 2px,135px 387px 2px,225px 385px 2px,213px 382px 2px,127px 380px 2px,174px 379px 2px,121px 374px 2px,47px 373px 2px,158px 370px 2px,120px 367px 2px,102px 368px 2px,124px 368px 2px,197px 364px 2px,199px 364px 2px,113px 361px 2px,221px 361px 2px,221px 359px 2px,121px 359px 2px,165px 357px 2px,169px 355px 2px,244px 352px 2px,235px 352px 2px,94px 351px 2px,149px 347px 2px,192px 346px 2px,214px 341px 2px,168px 342px 2px,177px 340px 2px,164px 337px 2px,44px 336px 2px,187px 334px 2px,230px 331px 2px,124px 330px 2px,191px 328px 2px,126px 329px 2px,159px 303px 2px,99px 298px 2px,120px 296px 2px,172px 295px 2px,160px 293px 2px,225px 290px 2px,107px 285px 2px,129px 285px 2px,186px 284px 2px,137px 281px 2px,230px 281px 2px,227px 276px 2px,207px 273px 2px,85px 273px 2px,167px 271px 2px,168px 263px 2px,197px 259px 2px,191px 254px 2px,174px 249px 2px,166px 248px 2px,163px 238px 2px,229px 237px 2px,180px 236px 2px,192px 233px 2px,254px 230px 2px,123px 231px 2px,151px 230px 2px,141px 229px 2px,85px 227px 2px,134px 226px 2px,121px 227px 2px,114px 224px 2px,153px 221px 2px,104px 223px 2px,121px 222px 2px,157px 221px 2px,138px 219px 2px,235px 219px 2px,219px 218px 2px,229px 214px 2px,253px 214px 2px,204px 213px 2px,48px 212px 2px,186px 212px 2px,74px 211px 2px,104px 210px 2px,199px 208px 2px,184px 207px 2px,117px 205px 2px,71px 204px 2px,222px 204px 2px,192px 203px 2px,159px 203px 2px,117px 201px 2px,210px 199px 2px,151px 198px 2px,218px 196px 2px,150px 198px 2px,134px 195px 2px,163px 194px 2px,209px 193px 2px,167px 194px 2px,116px 192px 2px,148px 192px 2px,112px 191px 2px,71px 189px 2px,167px 190px 2px,150px 188px 2px,112px 187px 2px,100px 186px 2px,131px 184px 2px,112px 185px 2px,205px 184px 2px,127px 183px 2px,184px 183px 2px,113px 180px 2px,87px 180px 2px,61px 178px 2px,79px 178px 2px,46px 175px 2px,127px 175px 2px,116px 175px 2px,162px 174px 2px,208px 174px 2px,118px 173px 2px,117px 172px 2px,153px 173px 2px,137px 171px 2px,80px 171px 2px,231px 170px 2px,153px 169px 2px,83px 170px 2px,88px 170px 2px,133px 167px 2px,237px 168px 2px,207px 167px 2px,175px 167px 2px,161px 165px 2px,88px 163px 2px,192px 162px 2px,152px 164px 2px,245px 161px 2px,238px 162px 2px,180px 161px 2px,188px 158px 2px,134px 158px 2px,177px 156px 2px,90px 155px 2px,39px 152px 2px,161px 151px 2px,201px 151px 2px,179px 149px 2px,133px 147px 2px,195px 148px 2px,108px 147px 2px,185px 145px 2px,146px 144px 2px,109px 144px 2px,217px 143px 2px,251px 142px 2px,152px 140px 2px,172px 141px 2px,113px 139px 2px,163px 139px 2px,231px 138px 2px,190px 137px 2px,174px 136px 2px,213px 135px 2px,129px 134px 2px,68px 133px 2px,174px 131px 2px,134px 127px 2px,99px 129px 2px,121px 128px 2px,165px 125px 2px,196px 122px 2px,154px 122px 2px,176px 120px 2px,175px 121px 2px,139px 119px 2px,215px 117px 2px,136px 118px 2px,137px 116px 2px,76px 115px 2px,129px 115px 2px,247px 113px 2px,239px 112px 2px,154px 110px 2px,89px 109px 2px,203px 110px 2px,161px 109px 2px,94px 106px 2px,91px 107px 2px,196px 105px 2px,155px 104px 2px,132px 104px 2px,159px 101px 2px,160px 100px 2px,126px 98px 2px,170px 97px 2px,141px 95px 2px,225px 94px 2px,160px 90px 2px,178px 92px 2px,125px 91px 2px,206px 88px 2px,138px 88px 2px,131px 85px 2px,188px 85px 2px,57px 84px 2px,101px 83px 2px,171px 82px 2px,197px 82px 2px,129px 82px 2px,173px 80px 2px,158px 81px 2px,110px 80px 2px,119px 79px 2px,135px 78px 2px,214px 77px 2px,134px 77px 2px,178px 76px 2px,142px 73px 2px,139px 72px 2px,103px 71px 2px,152px 72px 2px,189px 70px 2px,175px 70px 2px,177px 69px 2px,112px 68px 2px,216px 67px 2px,124px 64px 2px,86px 65px 2px,160px 65px 2px,223px 62px 2px,209px 63px 2px,196px 64px 2px,180px 60px 2px,203px 59px 2px,152px 57px 2px,213px 56px 2px,162px 55px 2px,198px 54px 2px,233px 53px 2px,153px 53px 2px,176px 49px 2px,211px 47px 2px,135px 45px 2px,254px 45px 2px,239px 45px 2px,154px 44px 2px,108px 43px 2px,59px 42px 2px,202px 42px 2px,182px 42px 2px,81px 41px 2px,145px 38px 2px,115px 36px 2px,201px 37px 2px,193px 35px 2px,149px 34px 2px,195px 33px 2px,187px 34px 2px,219px 33px 2px,242px 31px 2px,222px 30px 2px,169px 31px 2px,141px 28px 2px,172px 26px 2px,179px 26px 2px,130px 23px 2px,104px 23px 2px,56px 19px 2px,138px 18px 2px,191px 18px 2px,146px 19px 2px,120px 19px 2px,170px 17px 2px,130px 16px 2px,202px 14px 2px,250px 14px 2px,136px 13px 2px,71px 12px 2px,170px 12px 2px,219px 12px 2px,118px 10px 2px,127px 9px 2px,203px 8px 2px;}
+.m-const__l1c{box-shadow:
+    210px 447px 2px,258px 442px 2px,127px 439px 2px,218px 433px 2px,140px 429px 2px,192px 415px 2px,157px 401px 2px,146px 394px 2px,224px 390px 2px,98px 383px 2px,206px 382px 2px,113px 373px 2px,157px 369px 2px,187px 357px 2px,158px 339px 2px,181px 332px 2px,138px 330px 2px,249px 257px 2px,158px 242px 2px,123px 236px 2px,92px 233px 2px,147px 225px 2px,135px 225px 2px,163px 224px 2px,69px 216px 2px,64px 198px 2px,113px 195px 2px,205px 192px 2px,204px 186px 2px,120px 183px 2px,176px 176px 2px,144px 163px 2px,140px 162px 2px,109px 154px 2px,179px 150px 2px,133px 146px 2px,147px 147px 2px,92px 146px 2px,154px 140px 2px,128px 132px 2px,138px 129px 2px,216px 124px 2px,115px 125px 2px,211px 122px 2px,199px 122px 2px,142px 118px 2px,186px 102px 2px,208px 101px 2px,92px 98px 2px,154px 91px 2px,237px 88px 2px,123px 86px 2px,241px 78px 2px,206px 74px 2px,195px 75px 2px,185px 72px 2px,90px 72px 2px,290px 67px 2px,75px 62px 2px,107px 61px 2px,57px 60px 2px,163px 55px 2px,164px 53px 2px,248px 51px 2px,186px 49px 2px,112px 42px 2px,175px 40px 2px,188px 40px 2px,153px 39px 2px,160px 30px 2px,169px 29px 2px,213px 24px 2px,152px 10px 2px,154px 6px 2px;}
+.m-const__l1d{box-shadow:
+    77px 441px 1px,107px 439px 1px,170px 413px 1px,179px 410px 1px,113px 407px 1px,173px 399px 1px,96px 397px 1px,169px 368px 1px,148px 366px 1px,69px 344px 1px,78px 299px 1px,184px 266px 1px,177px 263px 1px,204px 258px 1px,180px 233px 1px,249px 220px 1px,188px 214px 1px,111px 210px 1px,144px 209px 1px,272px 208px 1px,102px 207px 1px,69px 204px 1px,188px 200px 1px,160px 201px 1px,183px 199px 1px,68px 181px 1px,179px 178px 1px,200px 176px 1px,60px 174px 1px,91px 172px 1px,148px 170px 1px,154px 156px 1px,113px 142px 1px,119px 139px 1px,257px 133px 1px,209px 131px 1px,184px 126px 1px,177px 120px 1px,93px 118px 1px,158px 116px 1px,130px 108px 1px,145px 106px 1px,63px 102px 1px,142px 104px 1px,122px 86px 1px,154px 81px 1px,261px 76px 1px,118px 73px 1px,198px 66px 1px,151px 59px 1px,161px 58px 1px,113px 55px 1px,185px 53px 1px,245px 48px 1px,124px 45px 1px,93px 37px 1px,209px 35px 1px,129px 20px 1px,145px 16px 1px,117px 13px 1px,279px 7px 1px;}
+.m-const__l1w{box-shadow:
+    215px 404px 9px,120px 377px 9px,182px 347px 9px,168px 306px 9px,120px 276px 9px,111px 246px 9px,153px 219px 9px,76px 190px 9px,59px 161px 9px;}
+.m-const__l1wc{box-shadow:
+    215px 404px 0 1px,120px 377px 0 1px,182px 347px 0 1px,168px 306px 0 1px,120px 276px 0 1px,111px 246px 0 1px,153px 219px 0 1px,76px 190px 0 1px,59px 161px 0 1px;}
+.m-const__l2g{box-shadow:
+    83px 201px 2px,137px 198px 2px,159px 197px 2px,165px 196px 2px,131px 193px 2px,71px 192px 2px,59px 188px 2px,99px 189px 2px,142px 184px 2px,70px 183px 2px,143px 183px 2px,200px 182px 2px,260px 179px 2px,205px 178px 2px,164px 175px 2px,130px 172px 2px,219px 168px 2px,161px 167px 2px,161px 166px 2px,115px 164px 2px,150px 162px 2px,157px 160px 2px,181px 158px 2px,205px 156px 2px,58px 155px 2px,244px 150px 2px,151px 152px 2px,190px 148px 2px,98px 146px 2px,209px 146px 2px,215px 142px 2px,140px 138px 2px,148px 138px 2px,139px 136px 2px,139px 136px 2px,144px 134px 2px,182px 132px 2px,50px 130px 2px,159px 130px 2px,221px 125px 2px,150px 126px 2px,212px 124px 2px,202px 123px 2px,155px 124px 2px,189px 120px 2px,131px 120px 2px,261px 118px 2px,163px 114px 2px,189px 114px 2px,163px 112px 2px,184px 111px 2px,235px 108px 2px,178px 106px 2px,112px 105px 2px,164px 102px 2px,175px 99px 2px,128px 96px 2px,171px 95px 2px,193px 94px 2px,243px 95px 2px,182px 92px 2px,144px 93px 2px,98px 91px 2px,209px 92px 2px,89px 91px 2px,83px 89px 2px,139px 87px 2px,60px 84px 2px,170px 85px 2px,107px 83px 2px,142px 81px 2px,189px 84px 2px,174px 81px 2px,176px 80px 2px,148px 78px 2px,89px 76px 2px,175px 72px 2px,187px 73px 2px,196px 71px 2px,197px 72px 2px,122px 68px 2px,215px 66px 2px,125px 64px 2px,112px 62px 2px,140px 57px 2px,149px 54px 2px,116px 51px 2px,115px 49px 2px,228px 48px 2px,159px 47px 2px,124px 43px 2px,120px 41px 2px,78px 41px 2px,211px 37px 2px,169px 39px 2px,188px 36px 2px,168px 36px 2px,136px 32px 2px,195px 33px 2px,164px 28px 2px,206px 26px 2px,125px 27px 2px,177px 25px 2px,148px 23px 2px,64px 21px 2px,102px 19px 2px,112px 16px 2px,211px 13px 2px,178px 10px 2px,122px 8px 2px,133px 6px 2px;}
+.m-const__l2c{box-shadow:
+    194px 204px 2px,161px 187px 2px,249px 188px 2px,247px 184px 2px,134px 169px 2px,149px 136px 2px,117px 132px 2px,171px 128px 2px,127px 116px 2px,201px 111px 2px,92px 95px 2px,86px 74px 2px,148px 69px 2px,79px 57px 2px,137px 52px 2px,111px 43px 2px,255px 43px 2px,229px 40px 2px,80px 31px 2px,207px 14px 2px,34px 10px 2px;}
+.m-const__l2d{box-shadow:
+    184px 180px 1px,186px 169px 1px,162px 161px 1px,153px 158px 1px,95px 157px 1px,148px 152px 1px,138px 147px 1px,257px 143px 1px,97px 144px 1px,133px 141px 1px,232px 105px 1px,212px 101px 1px,148px 99px 1px,219px 95px 1px,84px 91px 1px,122px 86px 1px,129px 60px 1px,135px 34px 1px,109px 28px 1px,229px 18px 1px,167px 14px 1px,200px 4px 1px;}
+.m-const__l2w{box-shadow:
+    137px 174px 9px,159px 123px 9px,97px 69px 9px;}
+.m-const__l2wc{box-shadow:
+    137px 174px 0 1px,159px 123px 0 1px,97px 69px 0 1px;}
+.m-const__l3g{box-shadow:
+    94px 299px 2px,66px 296px 2px,60px 295px 2px,100px 288px 2px,54px 283px 2px,44px 279px 2px,86px 270px 2px,52px 266px 2px,77px 262px 2px,69px 261px 2px,77px 193px 2px,95px 181px 2px,60px 176px 2px,121px 178px 2px,65px 169px 2px,71px 160px 2px,124px 148px 2px,119px 145px 2px,94px 146px 2px,67px 137px 2px,70px 132px 2px,93px 123px 2px,72px 111px 2px,83px 112px 2px,103px 106px 2px,94px 88px 2px,84px 76px 2px,50px 65px 2px,109px 52px 2px,72px 49px 2px,134px 22px 2px,120px 20px 2px,125px 14px 2px,68px 5px 2px;}
+.m-const__l3c{box-shadow:
+    37px 291px 2px,96px 277px 2px,80px 268px 2px,69px 70px 2px,37px 32px 2px,102px 17px 2px,100px 8px 2px;}
+.m-const__l3d{box-shadow:
+    79px 186px 1px,59px 98px 1px,52px 90px 1px,75px 70px 1px,69px 9px 1px;}
+.m-const__l3w{box-shadow:
+    46px 201px 9px,80px 124px 9px,94px 41px 9px;}
+.m-const__l3wc{box-shadow:
+    46px 201px 0 1px,80px 124px 0 1px,94px 41px 0 1px;}
+
+/* chapters2 */
+.mo-chapters2{
+  --ink:#050506;
+  --hi:rgba(255,255,255,.96);
+  --body:rgba(255,255,255,.94);
+  --meta:rgba(255,255,255,.52);
+  --cyan:#3ad9f5;
+  --green:#3fd94e;
+  --plat:#eef2fb;
+  background:var(--ink);
+  color:var(--body);
+  font-family:-apple-system,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.mo-chapters2 *{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- the card object ---------- */
+.mo-chapters2__card{
+  position:relative;
+  border-radius:16px;
+  aspect-ratio:.68;
+  isolation:isolate;
+}
+.mo-chapters2__card--xs{width:108px;border-radius:12px}
+.mo-chapters2__card--sm{width:132px;border-radius:14px}
+.mo-chapters2__card--md{width:188px}
+.mo-chapters2__card--lg{width:216px;border-radius:18px}
+
+.mo-chapters2__face{
+  position:absolute;inset:0;
+  border-radius:inherit;
+  overflow:hidden;
+  contain:paint;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+}
+.mo-chapters2__mark{
+  position:absolute;left:50%;top:50%;
+  width:34%;height:auto;
+  transform:translate(-50%,-54%);
+  fill:none;stroke:#fff;stroke-width:6.4;
+  stroke-linejoin:miter;stroke-linecap:butt;
+  opacity:.9;
+}
+.mo-chapters2__card--lg .mo-chapters2__mark{stroke-width:5.6}
+.mo-chapters2__engrave{
+  position:absolute;left:11%;bottom:8%;
+  font-size:9.5px;letter-spacing:.06em;
+  color:rgba(255,255,255,.5);
+}
+
+/* dead, pre-Clarity */
+.mo-chapters2__card--dead .mo-chapters2__face{
+  background:
+    radial-gradient(120% 90% at 50% -6%, rgba(255,255,255,.06), transparent 62%),
+    linear-gradient(165deg,#141519 0%,#0b0b0e 55%,#08080a 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 16px 34px -22px rgba(0,0,0,.9);
+}
+.mo-chapters2__card--dead .mo-chapters2__mark{opacity:.15;stroke-width:5.4}
+.mo-chapters2__card--dead .mo-chapters2__engrave{color:rgba(255,255,255,.24)}
+
+/* gone cold: earned colour drained during the silence */
+.mo-chapters2__card--cold .mo-chapters2__face{
+  background:
+    radial-gradient(120% 90% at 30% -6%, rgba(140,170,180,.10), transparent 60%),
+    linear-gradient(165deg,#101316 0%,#0a0c0e 55%,#07080a 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.mo-chapters2__card--cold .mo-chapters2__mark{opacity:.24;stroke-width:5.4}
+.mo-chapters2__card--cold .mo-chapters2__engrave{color:rgba(255,255,255,.26)}
+
+/* clarity cyan era */
+.mo-chapters2__card--cyan .mo-chapters2__face{
+  background:
+    radial-gradient(105% 78% at 20% 0%, rgba(58,217,245,.62), transparent 64%),
+    radial-gradient(90% 65% at 82% 104%, rgba(238,242,251,.18), transparent 62%),
+    linear-gradient(165deg,#10394a 0%,#0a1f28 55%,#060e13 100%);
+}
+.mo-chapters2__card--cyan{
+  box-shadow:0 30px 72px -26px rgba(58,217,245,.55), 0 8px 26px -14px rgba(0,0,0,.8);
+}
+
+/* consistency green era, platinum underneath */
+.mo-chapters2__card--green .mo-chapters2__face{
+  background:
+    radial-gradient(105% 78% at 22% 0%, rgba(63,217,78,.44), transparent 60%),
+    radial-gradient(92% 66% at 84% 104%, rgba(238,242,251,.20), transparent 62%),
+    linear-gradient(165deg,#0e2b16 0%,#07140b 55%,#050a07 100%);
+}
+.mo-chapters2__card--green{
+  box-shadow:0 34px 84px -26px rgba(63,217,78,.5), 0 8px 26px -14px rgba(0,0,0,.8);
+}
+
+/* today: every layer earned */
+.mo-chapters2__card--now .mo-chapters2__face{
+  background:
+    radial-gradient(100% 70% at 16% 2%, rgba(63,217,78,.44), transparent 58%),
+    radial-gradient(85% 58% at 90% 8%, rgba(58,217,245,.30), transparent 62%),
+    radial-gradient(95% 66% at 58% 106%, rgba(238,242,251,.24), transparent 62%),
+    linear-gradient(165deg,#0e2a19 0%,#07130f 55%,#05090b 100%);
+}
+.mo-chapters2__card--now{
+  box-shadow:0 26px 62px -24px rgba(63,217,78,.5), 0 10px 34px -18px rgba(58,217,245,.3);
+}
+
+/* still alive: radial glow, geometrically incapable of an edge */
+.mo-chapters2__card--live::after{
+  content:"";position:absolute;inset:-14%;
+  border-radius:50%;
+  background:radial-gradient(closest-side, rgba(63,217,78,.30), rgba(63,217,78,.08) 55%, transparent 78%);
+  filter:blur(18px);
+  z-index:-1;
+  animation:mo-chapters2-breathe 6.5s ease-in-out infinite;
+}
+@keyframes mo-chapters2-breathe{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* sealed: the colour is still there, the light behind it is not */
+.mo-chapters2__card--sealed .mo-chapters2__face::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(3,4,6,0) 0%, rgba(3,4,6,.34) 100%);
+}
+.mo-chapters2__card--sealed{
+  box-shadow:0 24px 58px -28px rgba(58,217,245,.42), 0 6px 20px -12px rgba(0,0,0,.8);
+}
+.mo-chapters2__card--sealed .mo-chapters2__mark{opacity:.8}
+
+/* ---------- opening ---------- */
+.mo-chapters2__open{padding:34px 24px 108px;text-align:center}
+.mo-chapters2__pair{
+  display:flex;justify-content:center;align-items:flex-start;gap:18px;
+}
+.mo-chapters2__pairitem{display:flex;flex-direction:column;align-items:center}
+.mo-chapters2__when{
+  margin-top:18px;font-size:13px;letter-spacing:.01em;
+  color:var(--meta);font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__when--live{color:var(--hi)}
+
+.mo-chapters2__then{margin-top:54px}
+.mo-chapters2__thenline{
+  font-size:17px;line-height:1.45;color:rgba(255,255,255,.64);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__nowline{
+  margin-top:10px;
+  font-size:26px;line-height:1.25;font-weight:600;letter-spacing:-.02em;
+  color:var(--hi);font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__spine{
+  margin-top:40px;font-size:14px;color:rgba(255,255,255,.62);
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- chapters ---------- */
+.mo-chapters2__ch{
+  position:relative;
+  padding:120px 24px 128px;
+}
+/* washes fade to nothing well inside their own box: never a straight edge */
+.mo-chapters2__ch::before,
+.mo-chapters2__ch::after{
+  content:"";position:absolute;left:50%;
+  width:190%;transform:translateX(-50%);
+  pointer-events:none;z-index:0;
+}
+.mo-chapters2__ch::before{top:-150px;height:840px}
+.mo-chapters2__ch::after{bottom:-240px;height:680px}
+.mo-chapters2__ch--green::before{
+  background:radial-gradient(46% 42% at 50% 50%, rgba(63,217,78,.17), rgba(63,217,78,.055) 46%, transparent 74%);
+}
+.mo-chapters2__ch--green::after{
+  background:radial-gradient(42% 40% at 50% 50%, rgba(63,217,78,.10), rgba(63,217,78,.03) 48%, transparent 76%);
+}
+.mo-chapters2__ch--cyan::before{
+  background:radial-gradient(46% 42% at 50% 50%, rgba(58,217,245,.15), rgba(58,217,245,.05) 46%, transparent 74%);
+}
+.mo-chapters2__ch--cyan::after{
+  background:radial-gradient(42% 40% at 50% 50%, rgba(58,217,245,.09), rgba(58,217,245,.028) 48%, transparent 76%);
+}
+
+.mo-chapters2__ch > *{position:relative;z-index:1}
+
+.mo-chapters2__hero{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;
+}
+.mo-chapters2__state{
+  margin-top:22px;font-size:13px;color:var(--meta);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__state--open{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--green);
+}
+.mo-chapters2__state--open::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 10px rgba(63,217,78,.9);
+}
+
+.mo-chapters2__title{
+  position:relative;z-index:1;
+  margin-top:56px;
+  font-size:30px;line-height:1.16;font-weight:600;letter-spacing:-.024em;
+  color:var(--hi);
+}
+.mo-chapters2__span{
+  position:relative;z-index:1;
+  margin-top:16px;font-size:14px;color:var(--meta);
+  font-variant-numeric:tabular-nums;
+}
+
+.mo-chapters2__stand{position:relative;z-index:1;margin-top:60px}
+.mo-chapters2__figure{
+  font-size:68px;line-height:1;font-weight:600;letter-spacing:-.04em;
+  color:var(--hi);font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__figurelabel{
+  margin-top:10px;font-size:15px;color:rgba(255,255,255,.6);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__track{
+  margin-top:22px;height:2px;width:100%;border-radius:2px;
+  background:rgba(255,255,255,.09);overflow:hidden;
+}
+.mo-chapters2__fill{
+  display:block;height:100%;width:34%;border-radius:2px;
+  background:var(--green);
+  box-shadow:0 0 14px rgba(63,217,78,.7);
+}
+
+.mo-chapters2__deeds{
+  position:relative;z-index:1;
+  margin-top:64px;list-style:none;
+}
+.mo-chapters2__deeds li{
+  font-size:20px;line-height:1.35;font-weight:500;color:var(--body);
+  padding:15px 0 15px 20px;position:relative;
+}
+.mo-chapters2__deeds li+li{box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.mo-chapters2__deeds li::before{
+  content:"";position:absolute;left:0;top:calc(50% - 2px);
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(255,255,255,.32);
+}
+.mo-chapters2__ch--green .mo-chapters2__deeds li::before{background:rgba(63,217,78,.85)}
+.mo-chapters2__ch--cyan .mo-chapters2__deeds li::before{background:rgba(58,217,245,.75)}
+
+.mo-chapters2__said{
+  position:relative;z-index:1;
+  margin-top:78px;
+  font-size:27px;line-height:1.34;font-weight:500;letter-spacing:-.018em;
+  color:var(--hi);
+}
+.mo-chapters2__said--old{color:rgba(255,255,255,.92)}
+.mo-chapters2__saidwhen{
+  margin-top:18px;font-size:13px;color:var(--meta);
+}
+
+.mo-chapters2__ended{
+  position:relative;z-index:1;
+  margin-top:52px;font-size:20px;line-height:1.4;color:var(--body);
+}
+.mo-chapters2__close{
+  position:relative;z-index:1;
+  margin-top:78px;font-size:18px;line-height:1.45;
+  color:var(--body);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__close--green{color:rgba(255,255,255,.94)}
+
+/* ---------- the turn ---------- */
+.mo-chapters2__turn{
+  padding:132px 24px 140px;
+  text-align:center;
+  background:linear-gradient(180deg,#050506 0%,#000 42%,#000 58%,#050506 100%);
+}
+.mo-chapters2__turnmonth{
+  font-size:14px;color:rgba(255,255,255,.55);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__turnbig{
+  margin:22px 0 0;
+  font-size:32px;line-height:1.2;font-weight:600;letter-spacing:-.026em;
+  color:rgba(255,255,255,.9);
+}
+.mo-chapters2__turn .mo-chapters2__card{margin:76px auto 0}
+.mo-chapters2__return{
+  margin-top:76px;
+  font-size:22px;line-height:1.4;font-weight:500;
+  color:#bfeff9;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- day one ---------- */
+.mo-chapters2__first{
+  padding:126px 24px 150px;
+  text-align:center;
+}
+.mo-chapters2__first .mo-chapters2__card{margin:0 auto}
+.mo-chapters2__firstdate{
+  margin-top:34px;font-size:14px;color:var(--meta);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__firstline{
+  margin-top:14px;font-size:24px;font-weight:500;letter-spacing:-.02em;
+  color:rgba(255,255,255,.9);
+}
+
+.mo-chapters2__more{margin-top:86px;text-align:left}
+.mo-chapters2__more summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;border-radius:12px;
+  background:rgba(255,255,255,.045);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  font-size:15px;color:rgba(255,255,255,.72);
+}
+.mo-chapters2__more summary::-webkit-details-marker{display:none}
+.mo-chapters2__more summary::after{
+  content:"";width:9px;height:9px;
+  border-right:1.5px solid rgba(255,255,255,.45);
+  border-bottom:1.5px solid rgba(255,255,255,.45);
+  transform:rotate(45deg) translateY(-2px);
+}
+.mo-chapters2__more[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.mo-chapters2__counts{
+  display:grid;grid-template-columns:1fr 1fr;gap:22px 16px;
+  padding:26px 18px 6px;
+}
+.mo-chapters2__counts div{display:flex;flex-direction:column;gap:4px}
+.mo-chapters2__counts b{
+  font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--hi);
+  font-variant-numeric:tabular-nums;
+}
+.mo-chapters2__counts span{font-size:13px;color:var(--meta)}
+
+.mo-chapters2__last{
+  margin-top:96px;font-size:16px;color:rgba(255,255,255,.58);
+}
+
+@media (min-width:760px){
+  .mo-chapters2__open{padding:56px 24px 140px}
+  .mo-chapters2__ch,.mo-chapters2__first{
+    max-width:520px;margin:0 auto;
+  }
+  .mo-chapters2__turn p{max-width:520px;margin-left:auto;margin-right:auto}
+  .mo-chapters2__title{font-size:36px}
+  .mo-chapters2__said{font-size:30px}
+  .mo-chapters2__card--sm{width:150px}
+  .mo-chapters2__card--md{width:206px}
+  .mo-chapters2__card--lg{width:238px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .mo-chapters2__card--live::after{animation:none;opacity:.85}
+}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="crashguard">
+  /* iOS Safari compositing guard. Sections outside the viewport are not
+     rendered, so ten frames cost about as much as one. */
+  .pg{content-visibility:auto;contain-intrinsic-size:400px 1150px}
+  /* The card's looping glimmer and will-change hints pin a GPU layer per card.
+     On a page of cards that is the whole crash. Nothing here needs them. */
+  .cage .daycard-theme-living *,
+  .cage .daycard-wrap__aura,
+  .cage .daycard-bloom{animation:none!important;will-change:auto!important}
+  /* A cage with no card in it still holds its space, so mounting and
+     unmounting never moves the page under your thumb. */
+  .cage:empty{aspect-ratio:.716;border-radius:16px;
+    background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+  .notesbtn{display:none}
+  @media (max-width:520px){
+    /* On a phone the fake phone frame is a costume, and a 390px frame inside a
+       375px screen squeezes every design narrower than it will ever really be.
+       Drop the frame, render each design at the true device width, and lose ten
+       nested scroll containers while we are at it. */
+    .page{padding-left:0;padding-right:0}
+    .page > h1,.page > .lede,.page > div:not(.row),.pg__hd{padding-left:20px;padding-right:20px}
+    .nav{margin-left:0;margin-right:0;padding-left:20px;padding-right:20px}
+    .phone{max-width:none;height:auto;overflow:visible;border-radius:0;
+      box-shadow:none;background:transparent}
+    .phone__in{position:static;overflow:visible}
+    /* .screen keeps its own 20px, which is the app's real geometry, so the
+       elements that deliberately bleed past it (the bar, a full width deck)
+       land exactly on the screen edge instead of being clipped. */
+    .screen{padding-bottom:30px}
+    .row{gap:34px 0}
+    /* On a phone the notes are a wall of text between you and the screen you
+       came to look at, so they start folded and the design comes first. */
+    .pg__meta,.pg__wow{display:none}
+    body.notes-open .pg__meta{display:grid}
+    body.notes-open .pg__wow{display:block}
+    .notesbtn{display:inline-block}
+  }
+</style>
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+</head><body>
+<div class="wrap">
+  <h1>Looking back, with colour</h1>
+  <p class="lede">Rebuilt on four rules after the last batch read like a receipt:
+    <b>the card is the hero object</b>, colour comes from the earned layers,
+    one idea per screen with space, and cut everything not load-bearing.</p>
+  <p class="lede">Shown inside the real Memento view. Each frame scrolls on its own.</p>
+  <button id="jump" class="jumpbtn" type="button">Scroll all frames to the history</button>
+  <nav class="nav"><a href="#p-cards">The Cards Through Time</a><a href="#p-moments">The Moments</a><a href="#p-twocards">Two Cards</a><a href="#p-constellation">Constellation</a><a href="#p-chapters2">Chapters</a></nav>
+  <div class="row">
+  <section class="pg" id="p-cards">
+    <header class="pg__hd"><h2>The Cards Through Time</h2><p class="pg__th">A reverse-chronological scroll of the person&#x27;s own Memento card, one card per era in its real earned colours, so the object visibly dies as you travel backwards to a black day-one card.</p>
+      <p class="pg__wow"><b>The moment.</b> The October 2025 screen: a full-size card sitting there grey and lightless under &quot;Nineteen days, nothing.&quot;, with the hairline spine below it turning green as it runs down into the alive card from earlier that year, so you watch the object lose and regain its life without reading a single statistic.</p></header>
+    <div class="phone"><div class="phone__in"><div class="screen">
+      <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button><span class="bar__title">Your Memento</span></header>
+      <div class="hero"><div class="cage"></div>
+        <p class="hero__name">Your Memento</p>
+        <p class="hero__sub"><span class="mori">20967:16:41:52</span></p></div>
+      <div class="memoir"><div class="m mo-cards">
+
+  <!-- OPENER: then vs now, no scroll needed -->
+  <section class="mo-cards__open">
+    <div class="mo-cards__pair">
+      <figure>
+        <div class="mo-cards__card mo-cards__card--dead">
+          <div class="mo-cards__glaze"></div>
+          <span class="mo-cards__cdate">Jun 2025</span>
+          <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+          <span class="mo-cards__name">MALIK</span>
+        </div>
+        <figcaption class="mo-cards__cap">12 June 2025</figcaption>
+      </figure>
+      <figure>
+        <div class="mo-cards__card mo-cards__card--now">
+          <div class="mo-cards__glaze"></div>
+          <span class="mo-cards__cdate">Aug 2026</span>
+          <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+          <span class="mo-cards__name">MALIK</span>
+        </div>
+        <figcaption class="mo-cards__cap">Today</figcaption>
+      </figure>
+    </div>
+
+    <p class="mo-cards__then">421 days apart.</p>
+    <p class="mo-cards__sub">One card. Scroll back and watch the colour leave it.</p>
+    <svg class="mo-cards__cue" width="18" height="11" viewBox="0 0 18 11" fill="none" aria-hidden="true"><path d="M1 1l8 8 8-8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--open"></div>
+
+  <!-- NOW -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage mo-cards__stage--now">
+      <div class="mo-cards__card mo-cards__card--now">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Aug 2026</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__when">7 August 2026</p>
+    <h2 class="mo-cards__star">Ship Memento to 100 paying users without abandoning it at 40</h2>
+    <p class="mo-cards__figures">34 of 100. Longest unbroken run, 103 days.</p>
+    <ul class="mo-cards__deeds mo-cards__deeds--cy">
+      <li>Raised the price</li>
+      <li>Called the two churned users</li>
+    </ul>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--cy"></div>
+
+  <!-- PUNCTUATION -->
+  <section class="mo-cards__solo">
+    <p class="mo-cards__quote">&ldquo;Stopped negotiating with myself at 7am.&rdquo;</p>
+    <p class="mo-cards__stamp">2026</p>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--cy"></div>
+
+  <!-- THE STAR CHANGED -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage mo-cards__stage--now">
+      <div class="mo-cards__card mo-cards__card--layers">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Jan 2026</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__when">January 2026</p>
+    <h2 class="mo-cards__retired">Finish the thing I keep restarting</h2>
+    <p class="mo-cards__note">It came down for the only good reason. You finished it.</p>
+    <p class="mo-cards__note">The star you carry now went up the same week.</p>
+    <ul class="mo-cards__deeds mo-cards__deeds--pl">
+      <li>Shipped the paywall</li>
+      <li>Cut the third feature</li>
+    </ul>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--fade"></div>
+
+  <!-- THE RETURN -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage mo-cards__stage--return">
+      <div class="mo-cards__card mo-cards__card--return">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Dec 2025</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__big">You came back.</p>
+    <p class="mo-cards__when mo-cards__when--after">29 December 2025</p>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--cold"></div>
+
+  <!-- THE COLD -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage">
+      <div class="mo-cards__card mo-cards__card--cold">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Oct 2025</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__big">Nineteen days, nothing.</p>
+    <p class="mo-cards__note">Every colour it had earned went out of it.</p>
+    <p class="mo-cards__when mo-cards__when--after">October 2025</p>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--warm"></div>
+
+  <!-- THE LAYERS -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage mo-cards__stage--layers">
+      <div class="mo-cards__card mo-cards__card--layers">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">2025</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__when">Later in 2025</p>
+    <p class="mo-cards__note mo-cards__note--lead">Seven days without breaking, and the bottom of the card went <span class="mo-cards__gr">green</span>.</p>
+    <p class="mo-cards__note">Before that, the first plan landed and left <span class="mo-cards__pl">platinum</span> along the top edge.</p>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--back"></div>
+
+  <!-- IGNITION -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage mo-cards__stage--first">
+      <div class="mo-cards__card mo-cards__card--first">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Jun 2025</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__when">June 2025</p>
+    <h2 class="mo-cards__star">Finish the thing I keep restarting</h2>
+    <p class="mo-cards__note">The first star. The card took its first <span class="mo-cards__cy">colour</span> that night.</p>
+    <ul class="mo-cards__deeds mo-cards__deeds--cy">
+      <li>Said no to the collaboration</li>
+      <li>Recorded the demo in one take</li>
+    </ul>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--out"></div>
+
+  <!-- THE ASK GREW -->
+  <section class="mo-cards__ask">
+    <p class="mo-cards__num mo-cards__num--now">1,000</p>
+    <p class="mo-cards__numlab">words asked of you today</p>
+    <div class="mo-cards__rule"></div>
+    <p class="mo-cards__num mo-cards__num--then">200</p>
+    <p class="mo-cards__numlab">words asked on day one</p>
+  </section>
+
+  <div class="mo-cards__link mo-cards__link--end"></div>
+
+  <!-- DAY ONE -->
+  <section class="mo-cards__beat">
+    <div class="mo-cards__stage">
+      <div class="mo-cards__card mo-cards__card--dead">
+        <div class="mo-cards__glaze"></div>
+        <span class="mo-cards__cdate">Jun 2025</span>
+        <svg class="mo-cards__m" viewBox="0 0 48 44" aria-hidden="true"><path d="M5 39V6l19 21L43 6v33"/></svg>
+        <span class="mo-cards__name">MALIK</span>
+      </div>
+    </div>
+    <p class="mo-cards__when">12 June 2025</p>
+    <p class="mo-cards__quote mo-cards__quote--day1">&ldquo;I don&rsquo;t think I can actually do this.&rdquo;</p>
+  </section>
+
+  <section class="mo-cards__solo">
+    <p class="mo-cards__closeline">462 marks later.</p>
+  </section>
+
+</div></div>
+    </div></div></div>
+  </section>
+  <section class="pg" id="p-moments">
+    <header class="pg__hd"><h2>The Moments</h2><p class="pg__th">The year cut down to ten beats, each one a full screen of black with a single idea in it, told through the Memento card as it gained and lost its colour.</p>
+      <p class="pg__wow"><b>The moment.</b> The first screen, before any scrolling: two real cards side by side, the day-one card near-black and dead beside today&#x27;s card lit with cyan, a platinum sheen and a green glow, under one line, &quot;The same card, 421 days apart&quot; — the whole autobiography lands in one look, in colour, with no numbers at all.</p></header>
+    <div class="phone"><div class="phone__in"><div class="screen">
+      <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button><span class="bar__title">Your Memento</span></header>
+      <div class="hero"><div class="cage"></div>
+        <p class="hero__name">Your Memento</p>
+        <p class="hero__sub"><span class="mori">20967:16:41:52</span></p></div>
+      <div class="memoir"><div class="m mo-moments">
+
+  <!-- OPENER: then vs now, no scroll needed -->
+  <section class="mo-moments__beat mo-moments__beat--open">
+    <div class="mo-moments__pair">
+      <div class="mo-moments__one">
+        <div class="mo-moments__card mo-moments__card--dead">
+          <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+          <span class="mo-moments__engrave">12.06.2025</span>
+        </div>
+        <span class="mo-moments__cap">Day one</span>
+      </div>
+      <div class="mo-moments__one">
+        <div class="mo-moments__card mo-moments__card--full">
+          <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+          <span class="mo-moments__engrave">07.08.2026</span>
+        </div>
+        <span class="mo-moments__cap">Today</span>
+      </div>
+    </div>
+    <p class="mo-moments__lede">The same card, 421 days apart.</p>
+  </section>
+
+  <!-- TODAY -->
+  <section class="mo-moments__beat mo-moments__beat--now">
+    <p class="mo-moments__when">Today. 7 August 2026.</p>
+    <div class="mo-moments__figure">
+      <span class="mo-moments__num">34</span>
+      <span class="mo-moments__unit mo-moments__unit--plat">of 100</span>
+    </div>
+    <p class="mo-moments__say mo-moments__say--quiet">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  </section>
+
+  <!-- REFLECTION AS PUNCTUATION -->
+  <section class="mo-moments__beat">
+    <p class="mo-moments__say">Stopped negotiating with myself at 7am.</p>
+    <p class="mo-moments__when">Written recently.</p>
+  </section>
+
+  <!-- THE LONGEST RUN -->
+  <section class="mo-moments__beat mo-moments__beat--run">
+    <div class="mo-moments__figure">
+      <span class="mo-moments__num">103</span>
+      <span class="mo-moments__unit mo-moments__unit--green">days unbroken</span>
+    </div>
+    <p class="mo-moments__note">The longest run so far. 318 of the 421 days carry a mark.</p>
+  </section>
+
+  <!-- THE ASK GREW -->
+  <section class="mo-moments__beat mo-moments__beat--ask">
+    <p class="mo-moments__when">On day one it asked for 200 words.</p>
+    <div class="mo-moments__figure mo-moments__figure--stack">
+      <span class="mo-moments__num">1,000</span>
+      <span class="mo-moments__unit mo-moments__unit--plat">words, today</span>
+    </div>
+  </section>
+
+  <!-- THE TURN -->
+  <section class="mo-moments__beat mo-moments__beat--turn">
+    <p class="mo-moments__when">January 2026.</p>
+    <p class="mo-moments__say">The first star went out because it was finished.</p>
+    <div class="mo-moments__chapters">
+      <div class="mo-moments__card mo-moments__card--cyan">
+        <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+        <span class="mo-moments__engrave">06.2025</span>
+      </div>
+      <div class="mo-moments__card mo-moments__card--full">
+        <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+        <span class="mo-moments__engrave">01.2026</span>
+      </div>
+    </div>
+    <div>
+      <p class="mo-moments__star mo-moments__star--old">Finish the thing I keep restarting</p>
+      <p class="mo-moments__sub">June 2025 to January 2026. It shipped.</p>
+    </div>
+    <div>
+      <p class="mo-moments__star mo-moments__star--new">Ship Memento to 100 paying users without abandoning it at 40</p>
+      <p class="mo-moments__sub">January 2026 to now.</p>
+    </div>
+    <details class="mo-moments__more">
+      <summary><svg class="mo-moments__chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 L6 8.5 L10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>What changed on the card</summary>
+      <div class="mo-moments__body">
+        <p>Chapter one was cyan and nothing else. Clarity had been lit, the plan had not.</p>
+        <p>Chapter two arrived with platinum, then green at seven unbroken days. The card has not been dark since.</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- SEVEN OF THE 318 -->
+  <section class="mo-moments__beat mo-moments__beat--marks">
+    <p class="mo-moments__when">Seven of the 318.</p>
+    <div class="mo-moments__list">
+      <p class="mo-moments__mark">Sent the pricing email</p>
+      <p class="mo-moments__mark">Called the two churned users</p>
+      <p class="mo-moments__mark">Shipped the paywall</p>
+      <p class="mo-moments__mark">Cut the third feature</p>
+      <p class="mo-moments__mark">Raised the price</p>
+      <p class="mo-moments__mark">Said no to the collaboration</p>
+      <p class="mo-moments__mark">Recorded the demo in one take</p>
+    </div>
+  </section>
+
+  <!-- CAME BACK -->
+  <section class="mo-moments__beat mo-moments__beat--back">
+    <p class="mo-moments__when">29 December 2025.</p>
+    <p class="mo-moments__say">Came back.</p>
+    <p class="mo-moments__note">The card had been dark since October.</p>
+  </section>
+
+  <!-- THE SILENCE -->
+  <section class="mo-moments__beat">
+    <div class="mo-moments__card mo-moments__card--drained" style="--cw:104px">
+      <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+      <span class="mo-moments__engrave">10.2025</span>
+    </div>
+    <div class="mo-moments__figure">
+      <span class="mo-moments__num">19</span>
+      <span class="mo-moments__unit mo-moments__unit--cold">days silent</span>
+    </div>
+    <p class="mo-moments__note">The longest the card ever went without a mark.</p>
+  </section>
+
+  <!-- IGNITION -->
+  <section class="mo-moments__beat mo-moments__beat--ignite">
+    <p class="mo-moments__when">12 June 2025.</p>
+    <div class="mo-moments__card mo-moments__card--cyan" style="--cw:150px">
+      <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+      <span class="mo-moments__engrave">12.06.2025</span>
+    </div>
+    <p class="mo-moments__say">Finish the thing I keep restarting.</p>
+    <p class="mo-moments__note">The first star. The day the card had colour.</p>
+  </section>
+
+  <!-- DAY ONE -->
+  <section class="mo-moments__beat mo-moments__beat--tail">
+    <div class="mo-moments__card mo-moments__card--dead" style="--cw:112px">
+      <svg class="mo-moments__m" viewBox="0 0 100 100" aria-hidden="true"><path d="M11 79 V25 L50 60 L89 25 V79" fill="none" stroke="currentColor" stroke-width="9.5" stroke-linejoin="miter"/></svg>
+      <span class="mo-moments__engrave">12.06.2025</span>
+    </div>
+    <p class="mo-moments__say">I don&rsquo;t think I can actually do this.</p>
+    <p class="mo-moments__when">The first thing written here.</p>
+    <div class="mo-moments__rule"></div>
+    <details class="mo-moments__more">
+      <summary><svg class="mo-moments__chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 L6 8.5 L10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything, counted</summary>
+      <div class="mo-moments__body">
+        <div class="mo-moments__ledger">
+          <span>Days</span><span>421</span>
+          <span>Days with a mark</span><span>318</span>
+          <span>Marks in total</span><span>462</span>
+          <span>Actions</span><span>318</span>
+          <span>Reflections</span><span>74</span>
+          <span>Weekly reviews</span><span>31</span>
+          <span>Vivere</span><span>22</span>
+          <span>Records</span><span>9</span>
+          <span>Mori</span><span>8</span>
+        </div>
+      </div>
+    </details>
+  </section>
+
+</div></div>
+    </div></div></div>
+  </section>
+  <section class="pg" id="p-twocards">
+    <header class="pg__hd"><h2>Two Cards</h2><p class="pg__th">The opening is two real Memento cards side by side, the dead black one of day one against the fully lit one of today, and the rest of the page walks backwards through the few moments that turned one into the other.</p>
+      <p class="pg__wow"><b>The moment.</b> Before a single word is read, the dead card and the glowing card sit next to each other at real size with 421 days written between them, and the whole story is already told in colour.</p></header>
+    <div class="phone"><div class="phone__in"><div class="screen">
+      <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button><span class="bar__title">Your Memento</span></header>
+      <div class="hero"><div class="cage"></div>
+        <p class="hero__name">Your Memento</p>
+        <p class="hero__sub"><span class="mori">20967:16:41:52</span></p></div>
+      <div class="memoir"><div class="m mo-twocards">
+
+  <!-- OPENING: two objects -->
+  <section class="tc-open">
+    <div class="tc-pair">
+      <div class="tc-col">
+        <p class="tc-when">12 June 2025</p>
+        <div class="tc-cardwrap">
+          <div class="tc-card tc-card--dead">
+            <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+            <span class="tc-name">Malik</span>
+          </div>
+        </div>
+      </div>
+      <div class="tc-col">
+        <p class="tc-when tc-when--now">7 August 2026</p>
+        <div class="tc-cardwrap tc-cardwrap--now tc-h-now">
+          <div class="tc-card tc-card--now">
+            <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+            <span class="tc-name">Malik</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tc-between"><span>421 days</span></div>
+
+    <div class="tc-pair tc-pair--says">
+      <p class="tc-said">&ldquo;I don&rsquo;t think I can actually do this.&rdquo;</p>
+      <p class="tc-said tc-said--now">&ldquo;Stopped negotiating with myself at 7am.&rdquo;</p>
+    </div>
+  </section>
+
+  <!-- orientation -->
+  <section class="tc-solo">
+    <p>Read it backwards.</p>
+    <p class="tc-sub">Today at the top. Day one at the bottom.</p>
+  </section>
+
+  <!-- CHAPTER TWO -->
+  <section class="tc-beat tc-beat--wide" style="--ac:var(--gr)">
+    <div class="tc-chap">
+      <div class="tc-cardwrap tc-h-now">
+        <div class="tc-card tc-card--now">
+          <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+          <span class="tc-name">Malik</span>
+        </div>
+      </div>
+      <div class="tc-chaptxt">
+        <p class="tc-when tc-when--now">January 2026 to today</p>
+        <p class="tc-chapnote">Cyan, platinum and green. Every layer lit.</p>
+      </div>
+    </div>
+
+    <h2 class="tc-big">Ship Memento to 100 paying users without abandoning it at 40</h2>
+
+    <div class="tc-prog">
+      <div class="tc-prognum">34<span>/100</span></div>
+      <p class="tc-proglab">paying users</p>
+      <div class="tc-progbar"><i style="width:34%"></i></div>
+    </div>
+  </section>
+
+  <!-- four marks -->
+  <section class="tc-beat" style="--ac:var(--gr)">
+    <ul class="tc-marks">
+      <li>Raised the price</li>
+      <li>Said no to the collaboration</li>
+      <li>Called the two churned users</li>
+      <li>Sent the pricing email</li>
+    </ul>
+    <p class="tc-foot">Four of 318 actions.</p>
+  </section>
+
+  <!-- punctuation -->
+  <section class="tc-solo">
+    <p>318 of the 421 days have something written on them.</p>
+  </section>
+
+  <!-- the run -->
+  <section class="tc-hero" style="--ac:var(--gr)">
+    <div class="tc-heronum">103</div>
+    <p class="tc-herolab">days unbroken</p>
+  </section>
+
+  <!-- the return -->
+  <section class="tc-beat tc-beat--wide tc-center">
+    <div class="tc-moment">
+      <div class="tc-cardwrap tc-h-gr">
+        <div class="tc-card tc-card--gr">
+          <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+          <span class="tc-name">Malik</span>
+        </div>
+      </div>
+    </div>
+    <p class="tc-when tc-when--now">29 December 2025</p>
+    <h2 class="tc-big tc-big--sm">One mark, and the card had colour again.</h2>
+  </section>
+
+  <!-- the silence -->
+  <section class="tc-beat tc-beat--wide tc-center">
+    <div class="tc-moment">
+      <div class="tc-cardwrap">
+        <div class="tc-card tc-card--out">
+          <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+          <span class="tc-name">Malik</span>
+        </div>
+      </div>
+    </div>
+    <p class="tc-when">October 2025</p>
+    <h2 class="tc-big tc-big--sm">Nineteen days before that, nothing.</h2>
+    <p class="tc-foot">The longest silence in 421 days.</p>
+  </section>
+
+  <!-- the ask -->
+  <section class="tc-hero">
+    <div class="tc-ask">
+      <span class="a">200</span>
+      <svg viewBox="0 0 24 14" fill="none" aria-hidden="true"><path d="M1 7h20m0 0l-6-5m6 5l-6 5" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span class="b">1,000</span>
+    </div>
+    <p class="tc-herolab">words asked, day one to this morning</p>
+  </section>
+
+  <!-- CHAPTER ONE -->
+  <section class="tc-beat tc-beat--wide" style="--ac:var(--cy)">
+    <div class="tc-chap">
+      <div class="tc-cardwrap tc-h-cy">
+        <div class="tc-card tc-card--cy">
+          <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+          <span class="tc-name">Malik</span>
+        </div>
+      </div>
+      <div class="tc-chaptxt">
+        <p class="tc-when">June 2025 to January 2026</p>
+        <p class="tc-chapnote">The card had just gone cyan.</p>
+      </div>
+    </div>
+
+    <h2 class="tc-big">Finish the thing I keep restarting</h2>
+    <p class="tc-sub">Replaced in January, when it shipped.</p>
+
+    <ul class="tc-marks">
+      <li>Shipped the paywall</li>
+      <li>Cut the third feature</li>
+      <li>Recorded the demo in one take</li>
+    </ul>
+  </section>
+
+  <!-- DAY ONE -->
+  <section class="tc-beat tc-beat--wide tc-center">
+    <div class="tc-first">
+      <div class="tc-cardwrap">
+        <div class="tc-card tc-card--dead">
+          <svg class="tc-m" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 79 V25 L50 60 L86 25 V79" fill="none" stroke="currentColor" stroke-width="11"/></svg>
+          <span class="tc-name">Malik</span>
+        </div>
+      </div>
+    </div>
+    <p class="tc-when">12 June 2025</p>
+    <h2 class="tc-big">&ldquo;I don&rsquo;t think I can actually do this.&rdquo;</h2>
+    <p class="tc-foot">The first thing written here.</p>
+  </section>
+
+</div></div>
+    </div></div></div>
+  </section>
+  <section class="pg" id="p-constellation">
+    <header class="pg__hd"><h2>Constellation</h2><p class="pg__th">A reverse-chronological life page where the year is rendered as the Memento card itself, made of 462 points of light coloured by what each mark was, and the few moments that mattered are pulled out of the field and named.</p>
+      <p class="pg__wow"><b>The moment.</b> The second screen: 462 marks laid out inside a card-shaped field in the card&#x27;s exact proportions, dense green-and-cyan light at the top where the person was alive, nine white record stars burning through it, a hard black band where nineteen days of October went silent, and their name engraved small in the bottom corner, so the year reads as one object you own rather than a list you scan.</p></header>
+    <div class="phone"><div class="phone__in"><div class="screen">
+      <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button><span class="bar__title">Your Memento</span></header>
+      <div class="hero"><div class="cage"></div>
+        <p class="hero__name">Your Memento</p>
+        <p class="hero__sub"><span class="mori">20967:16:41:52</span></p></div>
+      <div class="memoir"><div class="m m-const">
+
+  <section class="m-const__open">
+    <div class="m-const__pair">
+      <figure class="m-const__slot">
+        <div class="m-const__cw m-const__cw--dead m-const__cw--md"><div class="m-const__card m-const__card--dead"><svg class="m-const__m" viewBox="0 0 28 22" fill="none" aria-hidden="true"><path d="M3 19.5V3.4l11 10.2L25 3.4v16.1" stroke="currentColor" stroke-width="2.7" stroke-linecap="square" stroke-linejoin="miter"/></svg><span class="m-const__engrave">Malik</span></div></div>
+        <figcaption><b>Day 1</b><span>12 June 2025</span></figcaption>
+      </figure>
+      <figure class="m-const__slot">
+        <div class="m-const__cw m-const__cw--full m-const__cw--md"><div class="m-const__card m-const__card--full"><svg class="m-const__m" viewBox="0 0 28 22" fill="none" aria-hidden="true"><path d="M3 19.5V3.4l11 10.2L25 3.4v16.1" stroke="currentColor" stroke-width="2.7" stroke-linecap="square" stroke-linejoin="miter"/></svg><span class="m-const__engrave">Malik</span></div></div>
+        <figcaption><b>Day 421</b><span>7 August 2026</span></figcaption>
+      </figure>
+    </div>
+    <p class="m-const__openline">The same card.</p>
+  </section>
+
+  <section class="m-const__sky">
+    <p class="m-const__lead">You left <b>462</b> marks in there.</p>
+    <div class="m-const__fieldwrap">
+      <div class="m-const__field m-const__field--all">
+        <i class="m-const__l1d"></i><i class="m-const__l1g"></i><i class="m-const__l1c"></i><i class="m-const__l1w"></i><i class="m-const__l1wc"></i>
+        <span class="m-const__engrave m-const__engrave--field">Malik</span>
+      </div>
+    </div>
+    <ul class="m-const__key">
+      <li><span class="m-const__pt m-const__pt--g"></span>you did it</li>
+      <li><span class="m-const__pt m-const__pt--c"></span>you wrote</li>
+      <li><span class="m-const__pt m-const__pt--w"></span>a record</li>
+    </ul>
+    <p class="m-const__quiet">Fourteen months, bottom to top.</p>
+  </section>
+
+  <section class="m-const__beat">
+    <p class="m-const__when">Now</p>
+    <div class="m-const__starrow">
+      <div class="m-const__cw m-const__cw--full m-const__cw--sm"><div class="m-const__card m-const__card--full"><svg class="m-const__m" viewBox="0 0 28 22" fill="none" aria-hidden="true"><path d="M3 19.5V3.4l11 10.2L25 3.4v16.1" stroke="currentColor" stroke-width="2.7" stroke-linecap="square" stroke-linejoin="miter"/></svg><span class="m-const__engrave">Malik</span></div></div>
+      <h2 class="m-const__star">Ship Memento to 100 paying users without abandoning it at 40</h2>
+    </div>
+    <p class="m-const__figure"><b>34</b><span>of 100 paying</span></p>
+  </section>
+
+  <section class="m-const__beat m-const__beat--run">
+    <p class="m-const__figure m-const__figure--lg"><b>103</b><span>days unbroken</span></p>
+    <div class="m-const__field m-const__field--run">
+      <i class="m-const__l2d"></i><i class="m-const__l2g"></i><i class="m-const__l2c"></i><i class="m-const__l2w"></i><i class="m-const__l2wc"></i>
+    </div>
+    <details class="m-const__open2">
+      <summary>What was inside them
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
+      </summary>
+      <ul class="m-const__deeds">
+        <li><span class="m-const__pt m-const__pt--g"></span>Sent the pricing email</li>
+        <li><span class="m-const__pt m-const__pt--g"></span>Called the two churned users</li>
+        <li><span class="m-const__pt m-const__pt--w"></span>Shipped the paywall</li>
+        <li><span class="m-const__pt m-const__pt--g"></span>Cut the third feature</li>
+        <li><span class="m-const__pt m-const__pt--w"></span>Raised the price</li>
+        <li><span class="m-const__pt m-const__pt--g"></span>Said no to the collaboration</li>
+        <li><span class="m-const__pt m-const__pt--g"></span>Recorded the demo in one take</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="m-const__punct">
+    <span class="m-const__pt m-const__pt--c m-const__pt--big"></span>
+    <p>Stopped negotiating with myself at 7am.</p>
+    <span>you wrote that this week</span>
+  </section>
+
+  <section class="m-const__beat">
+    <p class="m-const__when">January 2026</p>
+    <p class="m-const__say">The first star came down. It had shipped.</p>
+    <div class="m-const__starrow">
+      <div class="m-const__cw m-const__cw--cyan m-const__cw--sm"><div class="m-const__card m-const__card--cyan"><svg class="m-const__m" viewBox="0 0 28 22" fill="none" aria-hidden="true"><path d="M3 19.5V3.4l11 10.2L25 3.4v16.1" stroke="currentColor" stroke-width="2.7" stroke-linecap="square" stroke-linejoin="miter"/></svg><span class="m-const__engrave">Malik</span></div></div>
+      <h2 class="m-const__star m-const__star--past">Finish the thing I keep restarting</h2>
+    </div>
+    <p class="m-const__quiet">June 2025 to January 2026</p>
+  </section>
+
+  <section class="m-const__fall">
+    <div class="m-const__fallgrid">
+      <div class="m-const__field m-const__field--fall">
+        <i class="m-const__l3d"></i><i class="m-const__l3g"></i><i class="m-const__l3c"></i><i class="m-const__l3w"></i><i class="m-const__l3wc"></i>
+      </div>
+      <div class="m-const__notes">
+        <p class="m-const__note m-const__note--back"><b>29 December</b><span>you came back</span></p>
+        <p class="m-const__note m-const__note--gone"><b>19 days</b><span>nothing at all</span></p>
+      </div>
+    </div>
+    <p class="m-const__say">That was the longest you were ever gone.</p>
+  </section>
+
+  <section class="m-const__end">
+    <p class="m-const__when">12 June 2025</p>
+    <div class="m-const__cw m-const__cw--dead m-const__cw--md"><div class="m-const__card m-const__card--dead"><svg class="m-const__m" viewBox="0 0 28 22" fill="none" aria-hidden="true"><path d="M3 19.5V3.4l11 10.2L25 3.4v16.1" stroke="currentColor" stroke-width="2.7" stroke-linecap="square" stroke-linejoin="miter"/></svg><span class="m-const__engrave">Malik</span></div></div>
+    <span class="m-const__pt m-const__pt--c m-const__pt--big"></span>
+    <p class="m-const__punctline">I don&rsquo;t think I can actually do this.</p>
+    <p class="m-const__close"><span>That day it asked you for 200 words.</span><b>This morning it asked for 1,000.</b></p>
+  </section>
+
+</div></div>
+    </div></div></div>
+  </section>
+  <section class="pg" id="p-chapters2">
+    <header class="pg__hd"><h2>Chapters</h2><p class="pg__th">Your life in Memento as two named chapters, each one a full-bleed coloured beat led by the card as it looked then, one closed and one still glowing.</p>
+      <p class="pg__wow"><b>The moment.</b> Two cards side by side at the top, the dead near-black one from 12 June 2025 and the green-and-cyan one glowing today, and then the moment the closed cyan chapter appears with its light visibly turned down and the words &quot;Closed January 2026&quot; under it: a piece of your life named, coloured, and finished.</p></header>
+    <div class="phone"><div class="phone__in"><div class="screen">
+      <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button><span class="bar__title">Your Memento</span></header>
+      <div class="hero"><div class="cage"></div>
+        <p class="hero__name">Your Memento</p>
+        <p class="hero__sub"><span class="mori">20967:16:41:52</span></p></div>
+      <div class="memoir"><div class="m mo-chapters2">
+
+  <!-- ============ OPENING: THEN VS NOW ============ -->
+  <section class="mo-chapters2__open">
+    <div class="mo-chapters2__pair">
+
+      <div class="mo-chapters2__pairitem">
+        <div class="mo-chapters2__card mo-chapters2__card--sm mo-chapters2__card--dead">
+          <div class="mo-chapters2__face"></div>
+          <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+          <span class="mo-chapters2__engrave">Malik</span>
+        </div>
+        <p class="mo-chapters2__when">12 June 2025</p>
+      </div>
+
+      <div class="mo-chapters2__pairitem">
+        <div class="mo-chapters2__card mo-chapters2__card--sm mo-chapters2__card--now">
+          <div class="mo-chapters2__face"></div>
+          <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+          <span class="mo-chapters2__engrave">Malik</span>
+        </div>
+        <p class="mo-chapters2__when mo-chapters2__when--live">Today</p>
+      </div>
+
+    </div>
+
+    <div class="mo-chapters2__then">
+      <p class="mo-chapters2__thenline">Day one asked you for 200 words.</p>
+      <p class="mo-chapters2__nowline">Today it asks for 1,000.</p>
+    </div>
+
+    <p class="mo-chapters2__spine">421 days. Two chapters. One still open.</p>
+  </section>
+
+
+  <!-- ============ CHAPTER TWO, OPEN ============ -->
+  <section class="mo-chapters2__ch mo-chapters2__ch--green">
+
+    <div class="mo-chapters2__hero">
+      <div class="mo-chapters2__card mo-chapters2__card--lg mo-chapters2__card--green mo-chapters2__card--live">
+        <div class="mo-chapters2__face"></div>
+        <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+        <span class="mo-chapters2__engrave">Malik</span>
+      </div>
+      <p class="mo-chapters2__state mo-chapters2__state--open">Open</p>
+    </div>
+
+    <h2 class="mo-chapters2__title">Ship Memento to 100 paying users without abandoning it at 40</h2>
+    <p class="mo-chapters2__span">January 2026 to now</p>
+
+    <div class="mo-chapters2__stand">
+      <div class="mo-chapters2__figure">34</div>
+      <p class="mo-chapters2__figurelabel">of 100 paying users</p>
+      <div class="mo-chapters2__track"><span class="mo-chapters2__fill"></span></div>
+    </div>
+
+    <ul class="mo-chapters2__deeds">
+      <li>Raised the price</li>
+      <li>Called the two churned users</li>
+      <li>Shipped the paywall</li>
+    </ul>
+
+    <blockquote class="mo-chapters2__said">Stopped negotiating with myself at 7am.</blockquote>
+    <p class="mo-chapters2__saidwhen">Written in this chapter.</p>
+
+    <p class="mo-chapters2__close mo-chapters2__close--green">103 days unbroken inside this chapter. It has not ended.</p>
+  </section>
+
+
+  <!-- ============ THE TURN ============ -->
+  <section class="mo-chapters2__turn">
+    <p class="mo-chapters2__turnmonth">October 2025.</p>
+    <p class="mo-chapters2__turnbig">Nineteen days of nothing.</p>
+
+    <div class="mo-chapters2__card mo-chapters2__card--xs mo-chapters2__card--cold">
+      <div class="mo-chapters2__face"></div>
+      <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+      <span class="mo-chapters2__engrave">Malik</span>
+    </div>
+
+    <p class="mo-chapters2__return">29 December, you opened it again.</p>
+  </section>
+
+
+  <!-- ============ CHAPTER ONE, CLOSED ============ -->
+  <section class="mo-chapters2__ch mo-chapters2__ch--cyan">
+
+    <div class="mo-chapters2__hero">
+      <div class="mo-chapters2__card mo-chapters2__card--md mo-chapters2__card--cyan mo-chapters2__card--sealed">
+        <div class="mo-chapters2__face"></div>
+        <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+        <span class="mo-chapters2__engrave">Malik</span>
+      </div>
+      <p class="mo-chapters2__state">Closed January 2026</p>
+    </div>
+
+    <h2 class="mo-chapters2__title">Finish the thing I keep restarting</h2>
+    <p class="mo-chapters2__span">June 2025 to January 2026</p>
+
+    <p class="mo-chapters2__ended">It ended the way you wanted it to end. It shipped.</p>
+
+    <ul class="mo-chapters2__deeds">
+      <li>Cut the third feature</li>
+      <li>Said no to the collaboration</li>
+      <li>Recorded the demo in one take</li>
+    </ul>
+
+    <blockquote class="mo-chapters2__said mo-chapters2__said--old">I don&rsquo;t think I can actually do this.</blockquote>
+    <p class="mo-chapters2__saidwhen">Written on day one of this chapter.</p>
+  </section>
+
+
+  <!-- ============ DAY ONE ============ -->
+  <section class="mo-chapters2__first">
+    <div class="mo-chapters2__card mo-chapters2__card--sm mo-chapters2__card--dead">
+      <div class="mo-chapters2__face"></div>
+      <svg class="mo-chapters2__mark" viewBox="0 0 64 64" aria-hidden="true"><path d="M12 50 V18 L32 40 L52 18 V50"/></svg>
+      <span class="mo-chapters2__engrave">Malik</span>
+    </div>
+
+    <p class="mo-chapters2__firstdate">12 June 2025</p>
+    <p class="mo-chapters2__firstline">Nothing on it yet.</p>
+
+    <details class="mo-chapters2__more">
+      <summary><span>The full count</span></summary>
+      <div class="mo-chapters2__counts">
+        <div><b>462</b><span>marks</span></div>
+        <div><b>318</b><span>actions</span></div>
+        <div><b>74</b><span>reflections</span></div>
+        <div><b>31</b><span>weekly reviews</span></div>
+        <div><b>22</b><span>vivere</span></div>
+        <div><b>9</b><span>records</span></div>
+        <div><b>8</b><span>mori</span></div>
+        <div><b>318</b><span>active days</span></div>
+      </div>
+    </details>
+
+    <p class="mo-chapters2__last">Everything above came after.</p>
+  </section>
+
+</div></div>
+    </div></div></div>
+  </section></div>
+</div>
+<script>
+/* ── the app's real card markup, lifted verbatim ─────────────────────────── */
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+/* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
+   plan is revealed, green on the first completed move. ─────────────────── */
+/* all three pillars are held; the card renders fully lit. */
+const earned = {clar:true, act:true, cons:true};
+
+/* ── the record. Only event types the app actually writes
+   (action-complete, proof, reflection-save, vivere, mori-moment,
+   weekly-review, new-record, distraction-log, deepwork-commit).
+   Generated across the whole 47 days so the page shows ALL of it: the volume
+   IS the argument, and a "show more" button hides exactly the thing that makes
+   the record hard to walk away from. ───────────────────────────────────── */
+const MOVES = [
+  'Sent the pricing email', 'Cut the third feature', 'Called the two churned users',
+  'Shipped the waitlist page', 'Wrote the first offer', 'Rewrote the landing headline',
+  'Recorded the demo in one take', 'Deleted the settings screen nobody opened',
+  'Asked ten people what they would pay', 'Fixed the signup that dropped 40%',
+  'Wrote to the four people who replied', 'Closed the tab and finished the migration',
+  'Shipped the paywall', 'Answered every support email', 'Cut the onboarding to three screens',
+  'Moved the deadline in instead of out', 'Wrote the follow-up nobody wanted to write',
+  'Killed the feature I spent a week on', 'Published the thing before it was ready',
+  'Turned off notifications until noon', 'Did the hard call first',
+  'Shipped the fix on the phone', 'Wrote the second offer', 'Raised the price',
+  'Sat with the numbers instead of guessing', 'Said no to the collaboration',
+  'Rebuilt the card render', 'Took the whole afternoon on one paragraph',
+  'Sent the cold email to the list of nine', 'Shipped without asking anyone first'
+];
+const REFLECTIONS = [
+  'Stopped negotiating with myself at 7am.', 'Wanted to quit at 3pm and did not.',
+  'The work was boring today. Did it anyway.', 'Realised I was busy, not working.',
+  'Two hours of real focus beats a full day of touching things.',
+  'I keep reaching for the easy task first.', 'Nobody is coming. That is fine.',
+  'The fear was about being seen, not about the work.',
+  'Shipped something I would have sat on a month ago.',
+  'Tired is not the same as done.', 'Did it badly and it still counted.',
+  'I do not need to feel ready.'
+];
+const OTHER = [
+  ['weekly-review', 'Weekly review', ['Four moves done, one dropped', 'Five moves, none dropped', 'Three moves. Slower week.']],
+  ['distraction-log', 'Distraction logged', ['Opened the analytics tab 9 times before noon', 'Two hours gone to a rabbit hole', 'Phone in the other room from now on']],
+  ['vivere', 'Vision board', ['Added: the room with one desk in it', 'Added: the first thousand', 'Added: a morning nobody else owns']],
+  ['deepwork-commit', 'Deep work booked', ['Two hours, no phone', 'Ninety minutes before anyone was awake']],
+  ['mori-moment', 'Memento Mori', ['Looked at the weeks left', 'Twenty thousand days is not many']]
+];
+const MARKS = {
+  '2026-06-19': ['clar', 'Ignition', 'You signed and ignited your Neutron Star'],
+  '2026-06-21': ['mark', 'The platinum arrived', 'Your first plan was revealed'],
+  '2026-07-04': ['mark', 'The green arrived', 'Seven days unbroken. The card changed.'],
+  '2026-07-18': ['mark', 'New longest run', '14 days, past the old record of 9'],
+  '2026-08-01': ['mark', 'New longest run', '21 days, past the old record of 14']
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August',
+  'September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function buildTrail(){
+  const r = rng(hash('trail-v2'));
+  const start = new Date(2026, 5, 19), today = new Date(2026, 7, 4);
+  const out = [];
+  for (let d = new Date(today); d >= start; d.setDate(d.getDate() - 1)){
+    const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+              + '-' + String(d.getDate()).padStart(2,'0');
+    const stamp = DAYS[d.getDay()] + ' ' + d.getDate();
+    const day = [];
+    if (MARKS[iso]){
+      const [k, t, m] = MARKS[iso];
+      day.push({k, t, m, d: stamp});
+    }
+    // the move for the day, on most days
+    if (r() > 0.19) day.push({k:'act', t: MOVES[Math.floor(r()*MOVES.length)],
+      m:'Action · the move for the day', d: stamp});
+    // a reflection now and then
+    if (r() > 0.72) day.push({k:'', t:'Reflection',
+      m:'\u201c' + REFLECTIONS[Math.floor(r()*REFLECTIONS.length)] + '\u201d', d: stamp});
+    // everything else, sparsely
+    if (r() > 0.79){
+      const o = OTHER[Math.floor(r()*OTHER.length)];
+      day.push({k:'', t:o[1], m:o[2][Math.floor(r()*o[2].length)], d: stamp});
+    }
+    if (day.length) out.push({mon: MONTHS[d.getMonth()], evs: day});
+  }
+  // group consecutive days under one month heading
+  const groups = [];
+  out.forEach(day=>{
+    const last = groups[groups.length-1];
+    if (last && last.mon === day.mon) last.evs.push(...day.evs);
+    else groups.push({mon: day.mon, evs: day.evs.slice()});
+  });
+  return groups;
+}
+const TRAIL = buildTrail();
+
+let cur = 0;
+
+function paint(){
+  const m = MATS[cur];
+  const n = (earned.clar?1:0) + (earned.act?1:0) + (earned.cons?1:0);
+  /* The app's own gate: before the star is lit the card emits nothing at all.
+     Turning the cyan off here does exactly what a blank pre-Clarity card does. */
+  document.body.classList.toggle('ns-bloom', earned.clar);
+  document.body.classList.toggle('is-void', m.n === 'Void');
+  /* the chosen material lights the whole page */
+  document.documentElement.style.setProperty('--tint', m.tint || '#3ad9f5');
+
+  const cage = document.getElementById('heroCard');
+  cage.innerHTML = realCard(matVars(m, earned), {name:'Malik Peace'});
+  cage.className = 'cage ' + (m.cls||'') + (m.stock ? ' is-stock' : '');
+
+  document.getElementById('matNote').textContent = m.note;
+
+  /* The layers section has to stay true whichever material is on. On the stock
+     card the three ARE the colour. On any other, they still set how much light
+     it gives off, so the dates never become a claim about a colour that is not
+     on screen. */
+  document.querySelectorAll('.chip').forEach((c,i)=>
+    c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
+}
+
+/* the strip */
+document.getElementById('strip').innerHTML = MATS.map((m,i)=>
+  `<button class="chip" type="button" aria-pressed="false" data-i="${i}">
+     <span class="chipcage ${m.cls||''}${m.stock?' is-stock':''}">${realCard(matVars(m), {name:''})}</span>
+     <span class="chip__n">${m.n}</span>
+   </button>`).join('');
+document.getElementById('strip').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  cur = +b.dataset.i; paint();
+});
+
+/* the layers */
+/* the trail, all of it */
+/* Collapsed by month, newest open. The full weight still reads at a glance,
+   because a closed month carries its count AND a dot for every mark in it, so
+   nothing is hidden, it is compressed. Scrolling past 66 rows to reach the
+   bottom of the screen was the problem; losing the evidence would be worse. */
+const TOTAL_MARKS = TRAIL.reduce((n,g)=>n+g.evs.length,0);
+const evHtml = e =>
+  `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
+     <span class="ev__b"><span class="ev__t">${e.t}</span>
+       <span class="ev__m">${e.m}</span></span>
+     <span class="ev__d">${e.d}</span></div>`;
+
+document.getElementById('trail').innerHTML = TRAIL.map((g,i)=>
+  `<section class="mo${i===0?' is-open':''}">
+     <button class="mo__h" type="button">
+       <span class="mo__n">${g.mon}</span>
+       <span class="mo__dots">${g.evs.map(e=>
+         `<i class="mo__dot ${e.k?'is-'+e.k:''}"></i>`).join('')}</span>
+       <span class="mo__c">${g.evs.length}</span>
+       <svg class="mo__x" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+     </button>
+     <div class="mo__b">${g.evs.map(evHtml).join('')}</div>
+   </section>`).join('');
+
+document.getElementById('trail').addEventListener('click', e=>{
+  const h = e.target.closest('.mo__h'); if(!h) return;
+  h.parentElement.classList.toggle('is-open');
+});
+
+/* ── Memento Mori. The app already models birth year and life expectancy
+   (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
+   total days plus the clock: two figures, both of them falling. ─────────── */
+const BIRTH_YEAR = 2004, LIFE_EXPECTANCY = 80;
+const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1).getTime();
+const moriEl = document.getElementById('mori');
+function tickMori(){
+  const ms = Math.max(0, END - Date.now());
+  const rest = ms % 86400000;
+  const p = n => String(n).padStart(2, '0');
+  moriEl.textContent = Math.floor(ms / 86400000)
+    + ':' + p(Math.floor(rest/3600000))
+    + ':' + p(Math.floor(rest%3600000/60000))
+    + ':' + p(Math.floor(rest%60000/1000));
+}
+tickMori();
+setInterval(tickMori, 1000);
+
+/* ── hold the card to open the customiser. The card gives under the finger so
+   the gesture is felt before the sheet arrives. A plain tap does nothing, or
+   every scroll that starts on the card would open it.
+
+   Why this is not just pointerdown/pointerup: on iOS a long press competes with
+   the selection callout, and pointerleave fires on a pixel of jitter, which
+   killed the hold before it ever completed. So the press cancels on real
+   MOVEMENT (12px) rather than on leaving the element, listens to touch events
+   as well as pointer events, and takes contextmenu as a second way in. */
+const wrap = document.getElementById('sheetWrap');
+const cage = document.getElementById('heroCard');
+const HOLD_MS = 380, SLOP = 12;
+let holdT = null, sx = 0, sy = 0, armed = false;
+
+function openSheet(){
+  holdT = null; armed = false;
+  cage.classList.remove('is-pressing');
+  wrap.hidden = false;
+  /* force a reflow so the closed transform is committed before the open class
+     lands, otherwise the sheet jumps into place with no slide. rAF is not
+     reliable here: a throttled or non-painting frame swallows it. */
+  void wrap.offsetHeight;
+  wrap.classList.add('is-open');
+  try{ navigator.vibrate && navigator.vibrate(8); }catch(e){}
+}
+function closeSheet(){
+  wrap.classList.remove('is-open');
+  setTimeout(()=>{ wrap.hidden = true; }, 280);
+}
+function pressStart(x, y){
+  if (armed) return;
+  armed = true; sx = x; sy = y;
+  cage.classList.add('is-pressing');
+  clearTimeout(holdT);
+  holdT = setTimeout(openSheet, HOLD_MS);
+}
+function pressMove(x, y){
+  if (!armed) return;
+  if (Math.abs(x - sx) > SLOP || Math.abs(y - sy) > SLOP) pressEnd();
+}
+function pressEnd(){
+  armed = false;
+  cage.classList.remove('is-pressing');
+  clearTimeout(holdT); holdT = null;
+}
+
+/* touch first: iOS fires these reliably even when pointer events get cancelled */
+cage.addEventListener('touchstart', e=>{
+  const t = e.touches[0]; if(t) pressStart(t.clientX, t.clientY);
+}, {passive:true});
+cage.addEventListener('touchmove', e=>{
+  const t = e.touches[0]; if(t) pressMove(t.clientX, t.clientY);
+}, {passive:true});
+['touchend','touchcancel'].forEach(ev=>
+  cage.addEventListener(ev, pressEnd, {passive:true}));
+
+/* mouse/pen for everything else. pointerdown is ignored for touch so the two
+   paths can never both arm the same press. */
+cage.addEventListener('pointerdown', e=>{
+  if (e.pointerType === 'touch') return;
+  pressStart(e.clientX, e.clientY);
+});
+addEventListener('pointermove', e=>{
+  if (e.pointerType === 'touch') return;
+  pressMove(e.clientX, e.clientY);
+});
+['pointerup','pointercancel'].forEach(ev=>
+  addEventListener(ev, e=>{ if(e.pointerType !== 'touch') pressEnd(); }));
+
+/* if a platform gets to its own long-press menu first, take that as the hold */
+cage.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  if (wrap.hidden) openSheet();
+});
+
+/* and a plain tappable way in, so the customiser is never gesture-only */
+document.getElementById('hintBtn').addEventListener('click', openSheet);
+
+document.getElementById('sheetScrim').addEventListener('click', closeSheet);
+document.getElementById('sheetDone').addEventListener('click', closeSheet);
+addEventListener('keydown', e=>{ if(e.key === 'Escape' && !wrap.hidden) closeSheet(); });
+
+/* ring + mark toggles */
+[['ringTog','ring-colour'], ['markTog','mark-tint']].forEach(([id, cls])=>{
+  const g = document.getElementById(id);
+  g.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.body.classList.toggle(cls, b.dataset.v === '1');
+    g.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b));
+  });
+});
+
+/* the promise: the meta line has nothing to report until something is written */
+const pT = document.getElementById('promiseT'), pM = document.getElementById('promiseM');
+function promiseState(){
+  const has = pT.textContent.trim().length > 0;
+  pM.textContent = has ? '19 June' : '';
+}
+pT.addEventListener('input', promiseState);
+promiseState();
+
+/* the bar title arrives once the card has gone */
+const bar = document.getElementById('bar');
+addEventListener('scroll', ()=>{
+  bar.classList.toggle('is-scrolled', scrollY > 230);
+}, {passive:true});
+
+paint();
+</script>
+<script>
+(function(){var m=MATS[0];
+  /* Build on approach, destroy on leave. At most ONE card is alive on a phone
+     and three on a desktop, so the page can never hold ten compositing stacks. */
+  var CARD=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  var cages=[].slice.call(document.querySelectorAll('.cage'));
+  cages.forEach(function(c){c.className='cage is-stock';});
+  var touch=(('ontouchstart' in window)||navigator.maxTouchPoints>0);
+  var LIVE=(window.innerWidth<900||touch)?1:3;
+  var live=[];
+  function mount(c){
+    if(c.getAttribute('data-on'))return;
+    c.setAttribute('data-on','1'); c.innerHTML=CARD; live.push(c);
+    while(live.length>LIVE){var o=live.shift(); if(o!==c) drop(o);}
+  }
+  function drop(c){
+    if(!c.getAttribute('data-on'))return;
+    c.removeAttribute('data-on'); c.innerHTML='';
+    var i=live.indexOf(c); if(i>-1) live.splice(i,1);
+  }
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){mount(e.target);} else {drop(e.target);} });
+    },{rootMargin:'260px 0px'});
+    cages.forEach(function(c){io.observe(c);});
+  } else {
+    cages.slice(0,LIVE).forEach(mount);
+  }
+
+ document.body.classList.add('ns-bloom');
+ document.getElementById('jump').addEventListener('click',function(){
+   var on=this.dataset.on==='1';
+   document.querySelectorAll('.phone__in').forEach(function(f){
+     var mo=f.querySelector('.memoir');
+     f.scrollTo({top:on?0:(mo.offsetTop-6),behavior:'smooth'});});
+   this.dataset.on=on?'0':'1';
+   this.textContent=on?'Scroll all frames to the history':'Back to the top of each frame';});
+})();
+</script>
+</body></html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clarity, after the star — five directions</title>
+<style>
+  :root{
+    --ink:#060708; --hi:rgba(255,255,255,.96); --mid:rgba(255,255,255,.60); --lo:rgba(255,255,255,.38);
+    --hair:rgba(255,255,255,.09); --cyan:#3ad9f5; --green:#3fd94e;
+    --glass:rgba(255,255,255,.05); --glassbrd:rgba(255,255,255,.10);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--hi);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.8rem,4.4vw,2.4rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:.98rem;margin:0 0 4px;max-width:76ch}
+  header .sub{color:var(--lo);font-size:.86rem;max-width:76ch}
+  nav{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 34px;position:sticky;top:0;z-index:50;
+    padding:10px 0;background:color-mix(in srgb, var(--ink) 88%, transparent);backdrop-filter:blur(14px)}
+  nav a{color:var(--mid);text-decoration:none;font-size:.78rem;font-weight:650;padding:6px 12px;border-radius:9px;background:rgba(128,128,128,.10)}
+  nav a:hover{color:var(--hi)}
+
+  .dir{margin:0 0 64px;scroll-margin-top:70px}
+  .dir h2{font-size:1.3rem;font-weight:700;letter-spacing:-.02em;margin:0 0 4px}
+  .dir .blurb{color:var(--mid);font-size:.92rem;margin:0 0 6px;max-width:78ch}
+  .dir .job{color:var(--lo);font-size:.84rem;margin:0 0 20px;max-width:78ch}
+  .dir .job b{color:var(--mid);font-weight:650}
+
+  .row{display:flex;gap:34px;align-items:flex-start;flex-wrap:wrap}
+  .phone{flex:0 0 auto;width:330px;border-radius:50px;padding:11px;
+    background:linear-gradient(180deg,#15171c,#0a0b0e);
+    box-shadow:0 36px 100px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  .screen{position:relative;border-radius:40px;overflow:hidden;height:696px;background:#05060a}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:110px;height:30px;border-radius:18px;background:#000;z-index:9}
+  .scroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+  .scroll::-webkit-scrollbar{display:none}
+  .notes{flex:1;min-width:260px;max-width:430px}
+  .notes h3{font-size:.95rem;font-weight:700;margin:0 0 8px}
+  .notes ul{margin:0 0 18px;padding-left:18px;color:var(--mid);font-size:.88rem}
+  .notes li{margin:5px 0}
+  .notes .keep{color:var(--lo);font-size:.82rem}
+
+  /* ---------- shared in-phone pieces ---------- */
+  .sky{position:relative;min-height:100%;padding:0 22px 40px;
+    background:
+      radial-gradient(120% 60% at 50% -6%, rgba(58,217,245,.10), transparent 55%),
+      radial-gradient(90% 50% at 80% 108%, rgba(58,217,245,.05), transparent 60%),
+      #05060a}
+  .stars{position:absolute;inset:0;pointer-events:none;opacity:.5;
+    background-image:radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.7) 50%, transparent 51%),
+      radial-gradient(1px 1px at 78% 9%, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 55% 24%, rgba(255,255,255,.6) 50%, transparent 51%),
+      radial-gradient(1px 1px at 30% 36%, rgba(255,255,255,.4) 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 30%, rgba(255,255,255,.5) 50%, transparent 51%),
+      radial-gradient(1.2px 1.2px at 8% 52%, rgba(255,255,255,.35) 50%, transparent 51%),
+      radial-gradient(1px 1px at 65% 44%, rgba(255,255,255,.3) 50%, transparent 51%)}
+  .star{position:relative;width:130px;height:130px;margin:64px auto 6px}
+  .star::before{content:"";position:absolute;inset:-46px;border-radius:999px;
+    background:radial-gradient(circle, rgba(58,217,245,.34) 0%, rgba(58,217,245,.10) 42%, transparent 68%)}
+  .star::after{content:"";position:absolute;inset:14px;border-radius:999px;
+    background:radial-gradient(circle at 42% 38%, #eafcff 0%, #9feefc 34%, #3ad9f5 62%, #0a6d84 100%);
+    box-shadow:0 0 44px rgba(58,217,245,.55), 0 0 110px rgba(58,217,245,.28)}
+  .star.small{width:84px;height:84px;margin-top:56px}
+  .star.small::before{inset:-30px}
+  .star.small::after{inset:9px}
+  .eyebrow{text-align:center;color:var(--lo);font-size:.66rem;font-weight:650;letter-spacing:.14em;text-transform:uppercase;margin:18px 0 8px}
+  .goal{text-align:center;font-size:1.24rem;font-weight:700;letter-spacing:-.015em;line-height:1.32;margin:0 0 10px;text-wrap:balance}
+  .goal .num{color:var(--cyan);font-weight:750}
+  .time{display:flex;justify-content:center;align-items:center;gap:7px;color:var(--mid);font-size:.82rem;margin-bottom:6px}
+  .time svg{opacity:.7}
+  .hr{width:34px;height:1px;background:rgba(255,255,255,.16);margin:14px auto}
+  .card{background:var(--glass);backdrop-filter:blur(24px) saturate(1.4);border-radius:15px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);padding:15px 16px;margin:0 0 12px}
+  .card .lab{color:var(--lo);font-size:.78rem;font-weight:650;margin-bottom:6px}
+  .card .txt{color:rgba(255,255,255,.92);font-size:.9rem;line-height:1.5}
+  .cta{display:flex;justify-content:center;align-items:center;gap:8px;height:52px;border-radius:13px;margin:16px 0 0;
+    background:rgba(255,255,255,.09);backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    color:var(--hi);font-size:.95rem;font-weight:650}
+  .ghost{display:flex;justify-content:center;align-items:center;height:44px;border-radius:12px;margin-top:10px;color:var(--mid);font-size:.88rem;font-weight:600}
+  .hint{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;color:var(--lo);font-size:.72rem;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Clarity, after the star</h1>
+    <p>What tapping Clarity becomes once someone has finished it. Today it shows the star, the sentence, the timeframe, and one CTA. But the synthesis already generated their why, their future, their anti-vision, their identity, and the tension underneath, all sitting in state, never shown again. These are five directions for what this surface could be. Same star hero in all five; they differ in what lives beneath it.</p>
+    <p class="sub">Persona everywhere: Maya, "Grow the channel to <b>100,000</b> subscribers", 6 months, 41 days in, currently at 12,400.</p>
+  </header>
+
+  <nav>
+    <a href="#full">1 · The Full Picture</a>
+    <a href="#distance">2 · The Distance</a>
+    <a href="#fire">3 · The Fire</a>
+    <a href="#story">4 · The Story</a>
+    <a href="#check">5 · The Check</a>
+  </nav>
+
+  <!-- ============ 1. FULL PICTURE ============ -->
+  <section class="dir" id="full">
+    <h2>1 · The Full Picture</h2>
+    <p class="blurb">The star stays the hero. Scroll and their own material unfolds beneath it: the why, the future, the anti-vision, the identity. Nothing new is generated; the hidden synthesis finally gets shown, in their words.</p>
+    <p class="job"><b>The job:</b> the goal's shrine. One place where the whole picture of what they chose lives, reachable any time.</p>
+    <div class="row">
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="sky"><div class="stars"></div>
+        <div class="star"></div>
+        <div class="eyebrow">Your Neutron Star</div>
+        <div class="goal">Grow the channel to <span class="num">100,000</span> subscribers.</div>
+        <div class="time"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>6 months</span></div>
+        <div class="hr"></div>
+        <div class="card"><div class="lab">Why this one</div><div class="txt">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</div></div>
+        <div class="card"><div class="lab">If it works</div><div class="txt">A channel strangers open every week because it actually changes their day.</div></div>
+        <div class="card"><div class="lab">If nothing changes</div><div class="txt">Another year of edits sitting in drafts while the ideas go stale.</div></div>
+        <div class="card"><div class="lab">Who this makes you</div><div class="txt">The kind of creator who finishes, not the one who keeps planning.</div></div>
+        <div class="ghost">Refine answers</div>
+      </div></div><div class="hint">scroll ↓</div></div></div>
+      <div class="notes">
+        <h3>Why this direction</h3>
+        <ul>
+          <li>Zero new AI cost. The material already exists in state, it just renders.</li>
+          <li>The five fields ARE the Clarity product; hiding four of them undersells the run.</li>
+          <li>Re-reading your own anti-vision is a quiet gut-punch that never wears out.</li>
+        </ul>
+        <h3>Risk</h3>
+        <ul><li>It walks back the v600 "one glance, not a manifesto" call, though as an opt-in scroll, the first glance stays identical.</li></ul>
+        <p class="keep">Star scene, sentence, timeframe, dots menu all keep their current geometry. The cards only exist below the fold.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. DISTANCE ============ -->
+  <section class="dir" id="distance">
+    <h2>2 · The Distance</h2>
+    <p class="blurb">Clarity becomes the goal's dashboard. Under the star: where they actually are against the number, the pace, the days in. The star stops being a poster and starts being a position.</p>
+    <p class="job"><b>The job:</b> answer "how is it actually going?" in one glance, honest numbers only, nothing invented.</p>
+    <div class="row">
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="sky"><div class="stars"></div>
+        <div class="star small"></div>
+        <div class="eyebrow">Your Neutron Star</div>
+        <div class="goal">Grow the channel to <span class="num">100,000</span> subscribers.</div>
+        <div class="hr"></div>
+        <div class="card">
+          <div class="lab">The distance</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:4px 0 10px">
+            <span style="font-size:1.7rem;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums">12,400</span>
+            <span style="color:var(--lo);font-size:.86rem">of 100,000</span>
+          </div>
+          <div style="height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden">
+            <div style="width:12.4%;height:100%;border-radius:99px;background:linear-gradient(90deg, rgba(58,217,245,.7), #3ad9f5)"></div>
+          </div>
+          <div class="txt" style="margin-top:10px;color:var(--mid);font-size:.84rem">Started at 8,100. Up 4,300 in 41 days.</div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div class="card" style="flex:1;margin:0"><div class="lab">Days in</div><div style="font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums">41</div></div>
+          <div class="card" style="flex:1;margin:0"><div class="lab">Days showed up</div><div style="font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums">33</div></div>
+        </div>
+        <div class="card" style="margin-top:12px"><div class="lab">The pace</div><div class="txt">At this rate you cross 100k in about 14 months. Holding 6 months means roughly doubling the weekly climb.</div></div>
+        <div class="cta">Today’s move</div>
+      </div></div><div class="hint">scroll ↓</div></div></div>
+      <div class="notes">
+        <h3>Why this direction</h3>
+        <ul>
+          <li>The distance engine already exists (goalProgress, the 62/100 chip, the pace line). This gives it a home.</li>
+          <li>Turns Clarity from a one-time ceremony into a place you check.</li>
+          <li>The honest pace line is exactly the no-BS voice the app promises.</li>
+        </ul>
+        <h3>Risk</h3>
+        <ul><li>Overlaps with Consistency and the Memento card. Needs a clean answer to "what do I check where."</li><li>Only works for goals with numbers; open goals need a fallback.</li></ul>
+        <p class="keep">Star shrinks but keeps its exact material. Numbers tabular. Green stays reserved for consistency surfaces.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. FIRE ============ -->
+  <section class="dir" id="fire">
+    <h2>3 · The Fire</h2>
+    <p class="blurb">A re-entry built to re-light, not inform. Two beats: the future they chose, the default they refused, then out. Closer to a ceremony than a page, using only motion, scale, and darkness.</p>
+    <p class="job"><b>The job:</b> the thing you tap on a low day. Ninety seconds, leave burning.</p>
+    <div class="row">
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="sky" style="display:flex;flex-direction:column;justify-content:center;min-height:100%"><div class="stars"></div>
+        <div class="star" style="margin-top:0"></div>
+        <div class="goal" style="margin-top:26px">Grow the channel to <span class="num">100,000</span> subscribers.</div>
+        <div class="hr"></div>
+        <div style="text-align:center;color:rgba(255,255,255,.92);font-size:.95rem;line-height:1.6;max-width:250px;margin:0 auto">
+          A channel strangers open every week because it actually changes their day.
+        </div>
+        <div style="text-align:center;color:var(--lo);font-size:.8rem;margin:22px 0 4px">or</div>
+        <div style="text-align:center;color:rgba(255,255,255,.5);font-size:.9rem;line-height:1.6;max-width:250px;margin:0 auto">
+          Another year of edits sitting in drafts while the ideas go stale.
+        </div>
+        <div style="text-align:center;color:var(--mid);font-size:.86rem;font-weight:650;margin-top:30px">You already chose. Keep choosing.</div>
+        <div class="cta" style="max-width:220px;margin:22px auto 0">Back to today</div>
+      </div></div></div></div>
+      <div class="notes">
+        <h3>Why this direction</h3>
+        <ul>
+          <li>The one thing the app can't do yet: give you the feeling back on demand.</li>
+          <li>Future vs anti-vision side by side is the strongest contrast the synthesis owns.</li>
+          <li>In the live build the two visions fade in as beats, star breathing between them. No new colors, no new fonts, per the special-moments law.</li>
+        </ul>
+        <h3>Risk</h3>
+        <ul><li>If it plays identically every time it goes stale; beats should rotate anchor lines.</li><li>It answers "remind me why" but not "show me my goal's details."</li></ul>
+        <p class="keep">Pure existing tokens. The dimmed anti-vision line stays at .5 alpha deliberately, it is the one place dim text IS the meaning.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. STORY ============ -->
+  <section class="dir" id="story">
+    <h2>4 · The Story</h2>
+    <p class="blurb">The goal plus where it came from. The night it was forged, the answers that mattered, what has happened since. Clarity becomes the origin record of the goal.</p>
+    <p class="job"><b>The job:</b> weight through history. "This isn't a wish, it has a date, an origin, and a trail."</p>
+    <div class="row">
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="sky"><div class="stars"></div>
+        <div class="star small"></div>
+        <div class="eyebrow">Forged July 2, 2026 · 41 days ago</div>
+        <div class="goal">Grow the channel to <span class="num">100,000</span> subscribers.</div>
+        <div class="hr"></div>
+        <div class="card"><div class="lab">In your words, that night</div><div class="txt">"I keep coming back to the people still stuck where I was two years ago. Nobody is making the thing I needed."</div></div>
+        <div class="card"><div class="lab">What it took</div><div class="txt">27 questions. You almost settled on "be more consistent" before the real one surfaced.</div></div>
+        <div class="card"><div class="lab">Since then</div><div class="txt" style="display:grid;gap:8px">
+          <span style="display:flex;gap:10px"><span style="color:var(--lo);font-variant-numeric:tabular-nums;min-width:52px">Day 1</span> First video shipped under the new banner</span>
+          <span style="display:flex;gap:10px"><span style="color:var(--lo);font-variant-numeric:tabular-nums;min-width:52px">Day 12</span> 10,000 subscribers crossed</span>
+          <span style="display:flex;gap:10px"><span style="color:var(--lo);font-variant-numeric:tabular-nums;min-width:52px">Day 33</span> Best week yet, 4 videos</span>
+        </div></div>
+        <div class="ghost">Read the full night</div>
+      </div></div><div class="hint">scroll ↓</div></div></div>
+      <div class="notes">
+        <h3>Why this direction</h3>
+        <ul>
+          <li>The Clarity transcript and proof events already exist in state; this surfaces them.</li>
+          <li>"Forged + date" gives the goal provenance, very Memento.</li>
+          <li>Milestone moments (the animations you're building) get a permanent home here.</li>
+        </ul>
+        <h3>Risk</h3>
+        <ul><li>Overlaps The Path / Your Story views in js/17. Might belong there instead.</li><li>Quoting their own conversation back needs care; it can feel surveilled if the quote is wrong.</li></ul>
+        <p class="keep">Timeline rows reuse proof-event data. No new fonts, tabular day numbers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. CHECK ============ -->
+  <section class="dir" id="check">
+    <h2>5 · The Check</h2>
+    <p class="blurb">A quiet recommitment surface. Once in a while, or whenever they open it, Clarity asks one honest question: is this still the one? Recommit with a hold, or refine it.</p>
+    <p class="job"><b>The job:</b> keep the star TRUE. A goal that drifted from the person is the silent killer of everything downstream.</p>
+    <div class="row">
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scroll"><div class="sky" style="display:flex;flex-direction:column;justify-content:center;min-height:100%"><div class="stars"></div>
+        <div class="star" style="margin-top:0"></div>
+        <div class="goal" style="margin-top:24px">Grow the channel to <span class="num">100,000</span> subscribers.</div>
+        <div class="time"><span>41 days locked in</span></div>
+        <div class="hr"></div>
+        <div style="text-align:center;color:rgba(255,255,255,.92);font-size:1.02rem;font-weight:650;margin:6px 0 26px">Is this still the one?</div>
+        <div class="cta" style="max-width:240px;margin:0 auto">Still the one. Hold to recommit</div>
+        <div class="ghost" style="max-width:240px;margin:10px auto 0">Something changed</div>
+      </div></div></div></div>
+      <div class="notes">
+        <h3>Why this direction</h3>
+        <ul>
+          <li>The hold-to-recommit is a real physical moment, same gesture language as ignition.</li>
+          <li>"Something changed" routes into refine, which already exists.</li>
+          <li>Recommit events are honest fuel for the drift-intercept notifications later.</li>
+        </ul>
+        <h3>Risk</h3>
+        <ul><li>As the ONLY thing shown it wastes most visits; nobody needs the question daily. Likely a beat inside another direction, not the whole surface.</li></ul>
+        <p class="keep">One primary action per surface. The hold reuses ignition's gesture, nothing new invented.</p>
+      </div>
+    </div>
+  </section>
+
+  <div style="border-top:1px solid var(--hair);padding-top:22px;color:var(--lo);font-size:.85rem;max-width:78ch">
+    <b style="color:var(--mid)">These combine.</b> The likely real answer is a spine plus organs: one direction as the main surface, pieces of the others folded in (the Check as an occasional beat, the Distance card inside the Full Picture, the Fire as a button). Pick the spine and which organs, and the next round mocks the combined screen properly.
+  </div>
+</div>
+</body>
+</html>

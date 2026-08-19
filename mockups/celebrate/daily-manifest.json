@@ -1,0 +1,44 @@
+{
+ "concepts": [
+  {
+   "key": "t-path",
+   "name": "The path of days (default)",
+   "blurb": "One mark per day laid left to right, set apart in sevens so the weeks read at a glance, and today standing taller in green at the leading edge with the start date named behind it. There is no track and no marker sliding along one, so nothing on the screen can be read as being part of the way to somewhere. It suits an open goal, or anyone who would flinch at a bar."
+  },
+  {
+   "key": "n-odo",
+   "name": "The odometer",
+   "blurb": "Three wheels in a quiet housing, the leading zeros unlit so day one still reads as a number instead of an empty screen. The day's wheel spins, clicks past its detent, settles back and seats green. On day 30 the tens wheel wakes up for the first time and stays lit."
+  },
+  {
+   "key": "n-ghost",
+   "name": "Yesterday behind you",
+   "blurb": "Today's total lands large with a small green full stop after it, while yesterday's number rises above it, shrinking and dimming into a column of days already done. Day one has nothing above it and says so in one quiet line, at the exact height the column will grow from."
+  },
+  {
+   "key": "t-month",
+   "name": "The rolling window",
+   "blurb": "REBUILT. A rolling window of the last thirty days rather than a calendar month, so the picture never collapses backwards on the 1st, and the total underneath is free to grow past thirty forever. Days not shown up are quiet ground, never numbered holes."
+  },
+  {
+   "key": "o-thread",
+   "name": "The thread",
+   "blurb": "A single line drawn one day-length longer every time they show up, folding at the edge so it stays in frame. Every day is worth the same length and all three phones are drawn at the same scale, so a week is a row and a month is five. Today is the bright tip, and the small node marks where it began."
+  },
+  {
+   "key": "t-steps",
+   "name": "The staircase",
+   "blurb": "A drawn staircase, one riser and one tread per day, with today's plank laying green at the top and the date riding above it. The climb gets denser rather than taller as days add up, so thirty days is a fine flight inside the same height and day one is one step off the ground."
+  },
+  {
+   "key": "a-field",
+   "name": "The field",
+   "blurb": "One dot per day on a hex lattice, every dot keeping its exact place forever while the shape grows outward, and today's arriving last with a single quiet ripple and a thin ring that stays. Day 7 closes into a perfect hexagon. It suits someone who wants the reward to be spatial and calm, a shape they recognise before they read the number."
+  },
+  {
+   "key": "t-stamp",
+   "name": "The stamp",
+   "blurb": "Today's date pressed into the record, a green rule under it, and the days before it fading down the page. For someone who wants a receipt more than a picture: it keeps Memento's ledger feeling with no seals, no borders and no certificate, and at thirty days it says plainly how many entries sit below the ones you can see."
+  }
+ ]
+}

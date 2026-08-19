@@ -1,0 +1,92 @@
+<style>
+/* ev-2. THE GRAIN. One engraved mark per day done, filling the face. */
+[data-c="ev-2"] .b1{justify-content:center;padding:30px 24px}
+[data-c="ev-2"] .lede{font-size:13.5px;line-height:1.5;font-weight:500;color:var(--text-mid);
+  max-width:31ch;letter-spacing:-.005em}
+
+[data-c="ev-2"] .ages{display:flex;align-items:flex-end;justify-content:center;gap:17px;margin-top:24px}
+[data-c="ev-2"] .age{display:flex;flex-direction:column;align-items:center}
+[data-c="ev-2"] .lab{margin-top:11px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="ev-2"] .fc{position:relative;width:96px;height:128px;overflow:hidden;border-radius:5px;
+  background:linear-gradient(165deg,rgba(235,238,248,.12),rgba(235,238,248,.02) 48%,rgba(235,238,248,.05));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 24px rgba(0,0,0,.55)}
+[data-c="ev-2"] .fc::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:radial-gradient(150% 45% at 50% -12%,rgba(255,255,255,.13),transparent 56%)}
+
+[data-c="ev-2"] .field{position:absolute;left:10px;top:10px;width:75px;height:105px}
+[data-c="ev-2"] .rows{position:absolute;left:0;top:0;width:100%;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 3px,rgba(235,238,248,0) 3px 5px);
+  -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,0) 1px 5px);
+          mask-image:repeating-linear-gradient(180deg,#000 0 1px,rgba(0,0,0,0) 1px 5px)}
+[data-c="ev-2"] .part{position:absolute;left:0;height:1px;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 3px,rgba(235,238,248,0) 3px 5px)}
+
+[data-c="ev-2"] .rule{width:100%;height:1px;background:var(--hairline);margin:26px 0 22px}
+
+[data-c="ev-2"] .fc--big{width:141px;height:188px;border-radius:8px}
+[data-c="ev-2"] .fc--big .field{left:15px;top:15px;width:111px;height:156px}
+[data-c="ev-2"] .fc--big .rows{
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 4.5px,rgba(235,238,248,0) 4.5px 7.4px);
+  -webkit-mask-image:repeating-linear-gradient(180deg,#000 0 1.2px,rgba(0,0,0,0) 1.2px 7.4px);
+          mask-image:repeating-linear-gradient(180deg,#000 0 1.2px,rgba(0,0,0,0) 1.2px 7.4px)}
+[data-c="ev-2"] .fc--big .part{height:1.2px;
+  background:repeating-linear-gradient(90deg,rgba(235,238,248,.34) 0 4.5px,rgba(235,238,248,0) 4.5px 7.4px)}
+[data-c="ev-2"] .eng{position:absolute;left:11px;bottom:9px;z-index:4;font-size:9.5px;font-weight:500;
+  letter-spacing:.005em;color:rgba(235,238,248,.62)}
+
+/* today: the mark being cut, the only colour on the screen */
+[data-c="ev-2"] .now{position:absolute;left:96.2px;top:125.8px;width:4.5px;height:1.2px;z-index:4;
+  background:var(--accent);box-shadow:0 0 9px rgba(var(--accent-rgb),.5);transform-origin:0 50%}
+[data-c="ev-2"] .b1.on .now{animation:ev2cut .34s cubic-bezier(.2,.8,.3,1) 1s backwards}
+@keyframes ev2cut{from{opacity:.2;transform:scaleX(0)}}
+
+[data-c="ev-2"] .cap2{margin-top:13px;font-size:12px;line-height:1.5;color:var(--text-mid);max-width:31ch}
+[data-c="ev-2"] .state{margin-top:6px;font-size:11px;color:var(--text-lo)}
+</style>
+<div class="ph" data-c="ev-2">
+  <div class="st">
+    <div class="b b1">
+      <div class="lede">Every morning you write cuts one mark into the face. Scattered at first, woven after a year.</div>
+
+      <div class="ages">
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:0"></div>
+            <div class="part" style="top:0;width:35px"></div>
+          </div></div>
+          <div class="lab">Day 7</div>
+        </div>
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:25px"></div>
+            <div class="part" style="top:25px;width:15px"></div>
+          </div></div>
+          <div class="lab">Day 90</div>
+        </div>
+        <div class="age">
+          <div class="fc"><div class="field">
+            <div class="rows" style="height:85px"></div>
+            <div class="part" style="top:85px;width:65px"></div>
+          </div></div>
+          <div class="lab">Day 300</div>
+        </div>
+      </div>
+
+      <div class="rule"></div>
+
+      <div class="fc fc--big">
+        <div class="field">
+          <div class="rows" style="height:125.8px"></div>
+          <div class="part" style="top:125.8px;width:96.2px"></div>
+          <div class="now"></div>
+        </div>
+        <div class="eng">Write every morning</div>
+      </div>
+      <div class="lab">Day 301</div>
+      <div class="cap2">Mark 269, cut this morning. The 32 days you missed are simply not on the card.</div>
+      <div class="state">Before the writing is done, the mark is not cut.</div>
+    </div>
+  </div>
+  <div class="hint">Tap to replay</div>
+</div>

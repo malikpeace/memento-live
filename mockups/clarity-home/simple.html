@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clarity page 2, the simple version</title>
+<style>
+  :root{--ink:#060708;--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.60);--lo:rgba(255,255,255,.38);
+    --hair:rgba(255,255,255,.09);--cyan:#3ad9f5;--glass:rgba(255,255,255,.05)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--hi);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1240px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:.95rem;margin:0 0 4px;max-width:78ch}
+  header .sub{color:var(--lo);font-size:.85rem;max-width:78ch}
+  .grid{display:flex;flex-wrap:wrap;gap:34px;margin-top:34px}
+  .cell{flex:0 0 auto;width:330px}
+  .cell .cap{font-size:.95rem;font-weight:700;margin:0 0 3px}
+  .cell .capsub{color:var(--lo);font-size:.8rem;margin:0 0 14px;min-height:40px}
+  .phone{width:330px;border-radius:50px;padding:10px;
+    background:linear-gradient(180deg,#15171c,#0a0b0e);
+    box-shadow:0 34px 90px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  .screen{position:relative;border-radius:41px;overflow:hidden;height:690px;background:#05060a}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:106px;height:28px;border-radius:16px;background:#000;z-index:9}
+  .inner{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;padding:0 20px 34px;
+    background:radial-gradient(120% 30% at 50% -4%, rgba(58,217,245,.09), transparent 60%), #05060a}
+  .inner::-webkit-scrollbar{display:none}
+
+  .head{margin:54px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:-.01em}
+  .card{position:relative;background:var(--glass);backdrop-filter:blur(22px) saturate(1.35);border-radius:15px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);padding:16px 17px;margin:0 0 12px}
+  .lab{color:var(--lo);font-size:.78rem;font-weight:650;margin-bottom:8px}
+  .txt{color:rgba(255,255,255,.93);font-size:.95rem;line-height:1.55}
+  .txt--big{font-size:1.02rem}
+  .anti{color:rgba(255,255,255,.5);font-size:.92rem;line-height:1.52}
+
+  .standrow{display:flex;align-items:baseline;gap:9px}
+  .standrow b{font-size:2.1rem;font-weight:750;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1;color:var(--cyan)}
+  .standrow span{color:var(--mid);font-size:.9rem}
+  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin:13px 0 9px}
+  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(58,217,245,.6),var(--cyan))}
+  .meta{display:flex;justify-content:space-between;color:var(--lo);font-size:.75rem;font-variant-numeric:tabular-nums}
+  .upd{margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:9px 13px;border-radius:10px;
+    background:rgba(255,255,255,.075);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:var(--hi);font-size:.82rem;font-weight:650}
+  .upd svg{width:12px;height:12px;stroke:var(--cyan);fill:none;stroke-width:2;stroke-linecap:round}
+
+  .walldays{font-size:2.1rem;font-weight:750;letter-spacing:-.025em;font-variant-numeric:tabular-nums;line-height:1}
+  .wallsub{color:var(--mid);font-size:.88rem;margin-top:5px}
+
+  .change{margin-top:16px;display:flex;justify-content:center;align-items:center;height:48px;border-radius:12px;
+    color:var(--mid);font-size:.88rem;font-weight:600;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+
+  .notes{max-width:430px}
+  .notes h3{font-size:.95rem;font-weight:700;margin:0 0 8px}
+  .notes ul{margin:0 0 16px;padding-left:18px;color:var(--mid);font-size:.88rem}
+  .notes li{margin:5px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Clarity page 2, the simple version</h1>
+    <p>Page 1 keeps the star, the goal, and the date. Page 2 only carries what page 1 does not: where you stand, the big why, the anti-vision, and one quiet button to change the goal. Nothing else. For a goal with no finish line, the standing box steps aside and the why leads the page.</p>
+    <p class="sub">Three goal shapes, same skeleton, the standing slot swaps its face. Phones scroll if they need to; none of these should need much.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- NUMERIC -->
+    <div class="cell">
+      <p class="cap">A number goal</p>
+      <p class="capsub">Maya, 100k subscribers. Standing leads, why and anti-vision follow.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner">
+        <div class="head">Summary:</div>
+        <div class="card">
+          <div class="standrow"><b>12,400</b><span>of 100,000</span></div>
+          <div class="bar"><i style="width:12.4%"></i></div>
+          <div class="meta"><span>Started at 8,100</span><span>Day 41</span></div>
+          <div class="upd"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Update</div>
+        </div>
+        <div class="card">
+          <div class="lab">Why this matters</div>
+          <div class="txt txt--big">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</div>
+        </div>
+        <div class="card">
+          <div class="lab">If nothing changes</div>
+          <div class="anti">Another year of edits sitting in drafts while the ideas go stale.</div>
+        </div>
+        <div class="change">Change your Neutron Star</div>
+      </div></div></div>
+    </div>
+
+    <!-- MAINTAIN / OPEN -->
+    <div class="cell">
+      <p class="cap">A maintain goal, no finish line</p>
+      <p class="capsub">"Be present, eat right." No standing box at all. The why IS the page.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner">
+        <div class="head">Summary:</div>
+        <div class="card">
+          <div class="txt txt--big" style="font-size:1.1rem;line-height:1.6">Being actually there at dinner, clear-headed and eating like someone who plans to stick around for the people who need you.</div>
+        </div>
+        <div class="card">
+          <div class="lab">If nothing changes</div>
+          <div class="anti">More evenings half-there behind a screen, feeling worse in a body you’re not taking care of.</div>
+        </div>
+        <div class="change">Change your Neutron Star</div>
+      </div></div></div>
+    </div>
+
+    <!-- DATED -->
+    <div class="cell">
+      <p class="cap">A dated goal</p>
+      <p class="capsub">Marcus, the bar exam. Standing is the wall: how far the date is.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="inner">
+        <div class="head">Summary:</div>
+        <div class="card">
+          <div class="walldays">112 days</div>
+          <div class="wallsub">to the bar exam, July 28, 2026</div>
+        </div>
+        <div class="card">
+          <div class="lab">Why this matters</div>
+          <div class="txt txt--big">First lawyer in the family.</div>
+        </div>
+        <div class="card">
+          <div class="lab">If nothing changes</div>
+          <div class="anti">A fourth year of telling everyone next summer.</div>
+        </div>
+        <div class="change">Change your Neutron Star</div>
+      </div></div></div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="cell notes" style="width:430px">
+      <h3>The rules this follows</h3>
+      <ul>
+        <li>Nothing repeats page 1. No goal sentence, no date restated except where it IS the standing (the wall).</li>
+        <li>Four elements maximum, and the maintain shape drops to three. Anti-vision is the only dimmed text.</li>
+        <li>The standing slot swaps per goal shape: number goals get the distance, dated goals get the wall, no-finish-line goals get nothing, the why leads instead.</li>
+        <li>Update sits inside the standing card, only where a number exists to update.</li>
+        <li>"Change your Neutron Star" is deliberately quiet, present on every shape, routes to refine/redo.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

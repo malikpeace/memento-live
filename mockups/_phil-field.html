@@ -1,0 +1,585 @@
+<style>
+.field{
+  --bg:#050609;
+  --hi:#eef2fb;
+  --mid:#c9d1e0;
+  --lo:#8b94a5;
+  --clar:#3ad9f5;
+  --cons:#3fd94e;
+  --act:#eef2fb;
+  position:relative;
+  isolation:isolate;
+  width:100%;
+  min-height:100%;
+  margin:0;
+  padding:0 0 118px;
+  box-sizing:border-box;
+  overflow-x:clip;
+  background:var(--bg);
+  color:var(--hi);
+  font-size:15.5px;
+  line-height:1.5;
+  font-weight:400;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---- the air: broad blooms that never touch a boundary ---- */
+.field .air{
+  position:absolute;
+  left:50%;
+  top:0;
+  bottom:0;
+  width:100%;
+  max-width:760px;
+  transform:translateX(-50%);
+  z-index:0;
+  pointer-events:none;
+}
+.field .air b{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+}
+.field .air b{left:0;width:100%;}
+.field .air .a1{
+  top:0;height:560px;
+  background:radial-gradient(64% 52% at 50% 44%, rgba(238,242,251,.085), rgba(238,242,251,0) 70%);
+}
+.field .air .a2{
+  top:660px;height:920px;
+  background:radial-gradient(62% 50% at 46% 50%, rgba(58,217,245,.062), rgba(58,217,245,0) 70%);
+}
+.field .air .a3{
+  top:1760px;height:840px;
+  background:radial-gradient(62% 50% at 54% 50%, rgba(238,242,251,.055), rgba(238,242,251,0) 70%);
+}
+.field .air .a4{
+  top:2680px;height:980px;
+  background:radial-gradient(62% 50% at 48% 50%, rgba(63,217,78,.055), rgba(63,217,78,0) 70%);
+}
+
+.field .col{
+  position:relative;
+  z-index:1;
+  max-width:352px;
+  margin:0 auto;
+  padding:0 21px;
+  box-sizing:border-box;
+}
+
+/* ---- glow primitive: a pool of light behind type, no container ---- */
+.field .pool{position:relative;display:inline-block;}
+.field .pool>span{position:relative;z-index:1;display:block;}
+.field .pool::before{
+  content:"";
+  position:absolute;
+  left:50%;top:50%;
+  width:218px;height:162px;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(238,242,251,.155), rgba(238,242,251,0) 70%);
+  z-index:0;
+  pointer-events:none;
+}
+.field .pool.wide::before{width:420px;height:250px;background:radial-gradient(50% 50% at 50% 50%, rgba(238,242,251,.10), rgba(238,242,251,0) 70%);}
+.field .pool.cool::before{background:radial-gradient(50% 50% at 50% 50%, rgba(58,217,245,.16), rgba(58,217,245,0) 70%);}
+.field .pool.live::before{background:radial-gradient(50% 50% at 50% 50%, rgba(63,217,78,.15), rgba(63,217,78,0) 70%);}
+.field .pool.soft::before{width:300px;height:200px;background:radial-gradient(50% 50% at 50% 50%, rgba(238,242,251,.085), rgba(238,242,251,0) 70%);}
+/* headings and quotes hold the full column, so their light centres on the column */
+.field .mv.pool,
+.field .said.pool{display:block;}
+
+/* ---- opening ---- */
+.field .open{padding:104px 0 0;text-align:center;}
+.field .wordmark{
+  margin:0;
+  font-size:33px;
+  font-weight:300;
+  letter-spacing:-.028em;
+  line-height:1.1;
+  color:var(--hi);
+}
+.field .owner{margin:9px 0 0;font-size:16px;color:var(--mid);}
+.field .made{
+  margin:22px auto 0;
+  max-width:290px;
+  font-size:15px;
+  color:var(--mid);
+}
+
+/* ---- seams between movements: light, never a rule ---- */
+.field .seam{position:relative;height:112px;}
+.field .seam::before{
+  content:"";
+  position:absolute;
+  left:50%;top:50%;
+  width:400px;height:200px;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(238,242,251,.10), rgba(238,242,251,0) 66%);
+  pointer-events:none;
+}
+.field .seam.cool::before{background:radial-gradient(50% 50% at 50% 50%, rgba(58,217,245,.11), rgba(58,217,245,0) 66%);}
+.field .seam.live::before{background:radial-gradient(50% 50% at 50% 50%, rgba(63,217,78,.11), rgba(63,217,78,0) 66%);}
+.field .seam.small{height:74px;}
+
+/* ---- movement headings ---- */
+.field .mv{
+  margin:0;
+  font-size:23px;
+  font-weight:330;
+  letter-spacing:-.02em;
+  color:var(--hi);
+  text-align:center;
+}
+.field .lede{
+  margin:14px auto 0;
+  max-width:322px;
+  font-size:15.5px;
+  color:var(--mid);
+  text-align:center;
+}
+
+/* ---- canvases ---- */
+.field .surface{position:relative;margin:40px 0 0;}
+.field .surface canvas{display:block;width:100%;}
+.field .surface.days canvas{height:158px;}
+.field .surface.life canvas{height:248px;}
+.field .surface.vow canvas{height:112px;}
+.field .cap{
+  margin:22px auto 0;
+  max-width:308px;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--mid);
+  text-align:center;
+}
+
+/* today, still breathing */
+.field .today{
+  position:absolute;
+  top:52%;right:16px;
+  width:96px;height:96px;
+  transform:translate(50%,-50%);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(63,217,78,.20), rgba(63,217,78,0) 66%);
+  pointer-events:none;
+  animation:fieldBreath 4.6s ease-in-out infinite;
+}
+@keyframes fieldBreath{
+  0%,100%{opacity:.58;}
+  50%{opacity:1;}
+}
+@media (prefers-reduced-motion:reduce){
+  .field .today{animation:none;opacity:.82;}
+}
+
+/* ---- floating numbers ---- */
+.field .stat{margin:46px 0 0;}
+.field .stat.l{text-align:left;padding-left:4px;}
+.field .stat.c{text-align:center;}
+.field .stat.r{text-align:right;padding-right:4px;}
+.field .n{
+  font-size:47px;
+  font-weight:250;
+  letter-spacing:-.038em;
+  line-height:1;
+  color:var(--hi);
+}
+.field .n.sm{font-size:35px;letter-spacing:-.03em;}
+.field .lab{
+  margin:11px 0 0;
+  font-size:15px;
+  line-height:1.45;
+  color:var(--mid);
+}
+.field .lab.hi{color:var(--hi);}
+.field .when{margin:5px 0 0;font-size:13px;color:var(--lo);}
+
+/* ---- quotes float, nothing holds them ---- */
+.field .said{
+  margin:38px auto 0;
+  max-width:312px;
+  font-size:19px;
+  line-height:1.42;
+  font-weight:330;
+  letter-spacing:-.014em;
+  color:var(--hi);
+  text-align:center;
+}
+.field .said.small{font-size:17px;max-width:290px;}
+/* on a wide screen the field simply gets deeper. the column breathes a little. */
+@media (min-width:900px){
+  .field .col{max-width:408px;}
+  .field .open{padding-top:136px;}
+  .field .seam{height:126px;}
+}
+
+.field .close{
+  margin:58px auto 0;
+  max-width:292px;
+  font-size:15.5px;
+  line-height:1.55;
+  color:var(--mid);
+  text-align:center;
+}
+</style>
+
+<div class="field">
+  <div class="air" aria-hidden="true">
+    <b class="a1"></b><b class="a2"></b><b class="a3"></b><b class="a4"></b>
+  </div>
+
+  <div class="col">
+
+    <!-- opening -->
+    <div class="open">
+      <h1 class="wordmark pool wide"><span>Memento</span></h1>
+      <p class="owner">Malik Peace</p>
+      <p class="made">Lit July 15, 2026 at 6:42 in the morning. Today is August 7. This is day 24.</p>
+    </div>
+
+    <div class="seam"></div>
+
+    <!-- 1. progress so far -->
+    <h2 class="mv pool soft"><span>Progress so far</span></h2>
+    <p class="lede">Every pool of light is a day you left a mark. The dark stretches are the days you did not.</p>
+
+    <div class="surface days">
+      <canvas id="fldDays" aria-label="24 days, brighter where more was done"></canvas>
+      <div class="today" aria-hidden="true"></div>
+    </div>
+    <p class="cap">July 15 on the left, today on the right. White light is an action, cool light is a note, and the sharpest points are records.</p>
+
+    <div class="stat c">
+      <div class="n pool"><span>21</span></div>
+      <p class="lab">actions completed</p>
+    </div>
+
+    <div class="stat l">
+      <div class="n pool"><span>31</span></div>
+      <p class="lab">marks in all. 21 actions, 7 notes, 3 records.</p>
+    </div>
+
+    <div class="stat r">
+      <div class="n pool sm"><span>17 of 24</span></div>
+      <p class="lab">days carry a mark. Seven do not, and they are still yours.</p>
+    </div>
+
+    <div class="stat c">
+      <div class="n pool live"><span>6</span></div>
+      <p class="lab">days, your longest run</p>
+      <p class="when">July 22 to July 27</p>
+    </div>
+
+    <div class="stat l">
+      <div class="n pool live"><span>3</span></div>
+      <p class="lab">days, the run you are standing in right now</p>
+    </div>
+
+    <div class="stat r">
+      <div class="n pool"><span>2</span></div>
+      <p class="lab hi">times you went quiet and came back. You have not quit once.</p>
+    </div>
+
+    <div class="stat c">
+      <div class="n pool sm"><span>9 hours</span></div>
+      <p class="lab">of deep work, across 6 sessions</p>
+    </div>
+
+    <div class="stat l">
+      <div class="n pool"><span>840</span></div>
+      <p class="lab">words written down</p>
+    </div>
+
+    <div class="stat r">
+      <div class="n pool sm"><span>4 marks</span></div>
+      <p class="lab">your brightest day</p>
+      <p class="when">July 24</p>
+    </div>
+
+    <div class="seam cool"></div>
+
+    <!-- 2. mori -->
+    <h2 class="mv pool soft"><span>Mori</span></h2>
+    <p class="lede">The time is finite. This is the part that never refills.</p>
+
+    <div class="stat c">
+      <div class="n pool"><span>8,254</span></div>
+      <p class="lab">days lived</p>
+    </div>
+
+    <div class="stat c">
+      <div class="n pool cool"><span>20,967</span></div>
+      <p class="lab">days left, at the average</p>
+      <p class="when">the only number here that falls</p>
+    </div>
+
+    <div class="surface life">
+      <canvas id="fldLife" aria-label="4,175 weeks of a life, the spent ones dark"></canvas>
+    </div>
+    <p class="cap">Every point is one week. The dark middle is the part already spent. The three green points are the weeks you have given to this so far.</p>
+
+    <div class="stat c">
+      <div class="n pool sm"><span>1,179 of 4,175</span></div>
+      <p class="lab">weeks. Three of them, so far, went to the thing you are building.</p>
+    </div>
+
+    <div class="seam live"></div>
+
+    <!-- 3. vivere -->
+    <h2 class="mv pool soft"><span>Vivere</span></h2>
+    <p class="lede">What you told yourself you were doing with the rest of it.</p>
+
+    <p class="said pool wide"><span>"I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that."</span></p>
+    <p class="when" style="text-align:center;margin-top:14px;">written July 15</p>
+
+    <div class="seam small"></div>
+
+    <p class="said small pool wide"><span>"Get to 100 paying users"</span></p>
+    <p class="when" style="text-align:center;margin-top:12px;">signed July 15, still open</p>
+
+    <div class="surface vow">
+      <canvas id="fldVow" aria-label="9 of 100 paying users, the rest still dark"></canvas>
+    </div>
+
+    <div class="stat c">
+      <div class="n pool sm"><span>9 of 100</span></div>
+      <p class="lab">lit so far. The green point at the far end is where you said you were going.</p>
+    </div>
+
+    <div class="seam small"></div>
+
+    <p class="said small pool cool"><span>"Wanted to quit at 3pm and did not."</span></p>
+    <p class="when" style="text-align:center;margin-top:12px;">July 28</p>
+
+    <p class="close">All of it already happened. Nothing above can be taken back, and on the days you do nothing the light stays exactly where you left it.</p>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var root = document.querySelector('.field');
+  if(!root) return;
+
+  var HI='238,242,251', CL='58,217,245', CO='63,217,78';
+
+  /* seeded, deterministic. same field on every load. */
+  function seeded(s){
+    var a = s>>>0;
+    return function(){
+      a = (a + 0x6D2B79F5)|0;
+      var t = Math.imul(a ^ (a>>>15), 1|a);
+      t = (t + Math.imul(t ^ (t>>>7), 61|t)) ^ t;
+      return ((t ^ (t>>>14))>>>0) / 4294967296;
+    };
+  }
+
+  /* day 1 = July 15. [actions, notes, records] */
+  var DAYS=[
+    [1,1,0],[1,0,0],[1,0,0],[1,1,0],[0,0,0],[0,0,0],[0,0,0],
+    [1,0,0],[1,1,0],[2,1,1],[1,0,0],[3,0,0],[1,0,1],[0,1,0],
+    [0,0,0],[0,0,0],[0,0,0],[1,0,0],[1,1,0],[2,0,0],[0,0,0],
+    [1,0,0],[2,1,0],[1,0,1]
+  ];
+
+  function fit(cv, cssH){
+    if(!cv || !cv.getContext) return null;
+    var ctx = cv.getContext('2d');
+    if(!ctx) return null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = cv.clientWidth || 320;
+    var h = cssH;
+    cv.width = Math.max(1, Math.round(w*dpr));
+    cv.height = Math.max(1, Math.round(h*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    return {ctx:ctx, w:w, h:h};
+  }
+
+  /* every glow is a radial gradient that reaches zero before its own radius. */
+  function bloom(ctx,x,y,r,col,a){
+    if(r<=0 || a<=0) return;
+    var g = ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,   'rgba('+col+','+a+')');
+    g.addColorStop(0.34,'rgba('+col+','+(a*0.42)+')');
+    g.addColorStop(0.68,'rgba('+col+','+(a*0.11)+')');
+    g.addColorStop(1,   'rgba('+col+',0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fill();
+  }
+  function point(ctx,x,y,r,col,a){
+    if(r<=0 || a<=0) return;
+    var g = ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,  'rgba('+col+','+a+')');
+    g.addColorStop(0.5,'rgba('+col+','+(a*0.72)+')');
+    g.addColorStop(1,  'rgba('+col+',0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  /* a reusable grain of light. cheap to stamp thousands of times,
+     and it has a halo, so nothing on the page is ever a hard speck. */
+  var sprites = {};
+  function grain(col){
+    if(sprites[col]) return sprites[col];
+    var S = 32, c = document.createElement('canvas');
+    c.width = S; c.height = S;
+    var x = c.getContext('2d');
+    if(!x) return null;
+    var g = x.createRadialGradient(S/2,S/2,0,S/2,S/2,S/2);
+    g.addColorStop(0,    'rgba('+col+',1)');
+    g.addColorStop(0.20, 'rgba('+col+',0.72)');
+    g.addColorStop(0.46, 'rgba('+col+',0.20)');
+    g.addColorStop(0.74, 'rgba('+col+',0.05)');
+    g.addColorStop(1,    'rgba('+col+',0)');
+    x.fillStyle = g;
+    x.fillRect(0,0,S,S);
+    sprites[col] = c;
+    return c;
+  }
+  function stamp(ctx,sp,x,y,r,a){
+    if(!sp || a<=0 || r<=0) return;
+    ctx.globalAlpha = a > 1 ? 1 : a;
+    ctx.drawImage(sp, x-r, y-r, r*2, r*2);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawDays(){
+    var cv = document.getElementById('fldDays');
+    var s = fit(cv, 158);
+    if(!s) return;
+    var ctx=s.ctx, w=s.w, h=s.h;
+    var pad = 16;
+    var step = (w - pad*2) / (DAYS.length - 1);
+    var mid = h*0.52;
+    var rnd = seeded(715);
+
+    /* the water the points sit in */
+    bloom(ctx, w*0.5, mid, w*0.62, HI, 0.035);
+
+    for(var i=0;i<DAYS.length;i++){
+      var d = DAYS[i];
+      var x = pad + i*step;
+      var jy = mid + (rnd()*2-1)*4.2;
+      var a=d[0], n=d[1], r=d[2];
+      if(a===0 && n===0 && r===0) continue;
+
+      if(a>0){
+        bloom(ctx, x, jy, 16 + a*10.5, HI, 0.085 + a*0.052);
+        point(ctx, x, jy, 2.0 + a*0.62, HI, 0.95);
+      }
+      if(n>0){
+        var ny = jy - 7.5;
+        bloom(ctx, x, ny, 17 + n*7, CL, 0.115);
+        point(ctx, x, ny, 2.1, CL, 0.72);
+      }
+      if(r>0){
+        var ry = jy + 8.5;
+        bloom(ctx, x, ry, 31, HI, 0.13);
+        point(ctx, x, ry, 3.0, HI, 1);
+      }
+    }
+
+    /* today, one last breath of green under the CSS pulse */
+    var lx = pad + (DAYS.length-1)*step;
+    bloom(ctx, lx, mid, 34, CO, 0.10);
+  }
+
+  function drawLife(){
+    var cv = document.getElementById('fldLife');
+    var s = fit(cv, 248);
+    if(!s) return;
+    var ctx=s.ctx, w=s.w, h=s.h;
+    var total = 4175, lived = 1179;
+    var gHI = grain(HI), gCO = grain(CO);
+
+    /* every week of a life, laid out from the middle outwards at the
+       golden angle, so nothing lines up and no boundary is a line.
+       the weeks already spent are the dark centre. what is left is the
+       light around it, thinning to nothing before it reaches any side. */
+    var cx = w/2, cy = h/2;
+    var R = Math.min(w*0.44, h*0.46);
+    var GOLD = 2.399963229728653;
+
+    function soft(v){
+      var t = v < 0 ? 0 : (v > 1 ? 1 : v);
+      return t*t*(3 - 2*t);
+    }
+
+    for(var k=0;k<total;k++){
+      var t = Math.sqrt((k + 0.5) / total);
+      var rr = R * t;
+      var th = k * GOLD;
+      var x = cx + rr*Math.cos(th);
+      var y = cy + rr*Math.sin(th);
+      var f = t <= 0.74 ? 1 : soft((1 - t) / 0.26);
+      if(f <= 0.012) continue;
+
+      if(k >= lived - 3 && k < lived){
+        bloom(ctx, x, y, 26, CO, 0.22);
+        stamp(ctx, gCO, x, y, 5.6, 0.95);
+      } else if(k < lived){
+        stamp(ctx, gHI, x, y, 2.6, 0.115);
+      } else {
+        stamp(ctx, gHI, x, y, 3.2, 0.60*f);
+      }
+    }
+  }
+
+  function drawVow(){
+    var cv = document.getElementById('fldVow');
+    var s = fit(cv, 112);
+    if(!s) return;
+    var ctx=s.ctx, w=s.w, h=s.h;
+    var pad = 18;
+    var pitch = (w - pad*2) / 99;
+    var mid = h*0.5;
+    var rnd = seeded(9100);
+    var gHI = grain(HI), gCO = grain(CO);
+
+    /* the nine already lit sit in one shallow pool */
+    bloom(ctx, pad + pitch*4.5, mid, 74, HI, 0.085);
+
+    for(var i=0;i<100;i++){
+      var x = pad + i*pitch;
+      var y = mid + (rnd()*2-1)*31;
+      if(i < 9){
+        bloom(ctx, x, y, 20, HI, 0.13);
+        stamp(ctx, gHI, x, y, 5.4, 0.95);
+      } else if(i < 99){
+        var t = (i - 9) / 89;
+        stamp(ctx, gHI, x, y, 3.0, 0.185*(1-t) + 0.05);
+      } else {
+        bloom(ctx, x, y, 30, CO, 0.13);
+        stamp(ctx, gCO, x, y, 5.0, 0.62);
+      }
+    }
+  }
+
+  function paint(){
+    drawDays();
+    drawLife();
+    drawVow();
+  }
+
+  paint();
+
+  var t = null;
+  function requeue(){
+    if(t) clearTimeout(t);
+    t = setTimeout(paint, 120);
+  }
+  if(window.ResizeObserver){
+    try{ new ResizeObserver(requeue).observe(root); }catch(e){ }
+  }
+  window.addEventListener('resize', requeue);
+  if(document.fonts && document.fonts.ready && document.fonts.ready.then){
+    document.fonts.ready.then(paint).catch(function(){});
+  }
+})();
+</script>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Today box, 15 variations</title>
+
+<link rel="stylesheet" href="../memento-app/css/base.css?v=1049" onerror="this.href='../css/base.css?v=1049'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css?v=1049" onerror="this.href='../css/dashboard.css?v=1049'">
+
+<style>
+  html, body { margin:0; background:#08090b; color:#f5f5f7;
+    font-family:-apple-system, system-ui, sans-serif; }
+  .wrap { max-width:1200px; margin:0 auto; padding:26px 20px 100px; }
+  h1 { font-size:23px; font-weight:750; letter-spacing:-.02em; margin:0 0 6px; }
+  .lede { font-size:14px; line-height:1.6; color:rgba(245,245,247,.62); max-width:74ch; margin:0 0 30px; }
+
+  .v { margin:0 0 44px; }
+  .v__name { font-size:15.5px; font-weight:700; letter-spacing:-.01em; margin:0 0 3px; }
+  .v__why  { font-size:13px; line-height:1.5; color:rgba(245,245,247,.55); margin:0 0 15px; max-width:76ch; }
+  .pair { display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; }
+  .cap { font-size:11px; font-weight:650; letter-spacing:.06em; text-transform:uppercase;
+    color:rgba(245,245,247,.34); margin:0 0 8px; }
+  .phone { width:340px; flex:none; }
+  .desk  { flex:1 1 440px; min-width:400px; max-width:540px; }
+  .stage { border-radius:16px; background:#000; padding:16px; }
+
+  /* ── the shared skeleton every variation restyles ───────────────────────
+     .tb = the box, .tb__lab = the small line, .tb__move = the one thing,
+     .tb__go = the action. Every variation is CSS on these four. */
+  .tb { border-radius:16px; background:var(--surface-1); padding:20px;
+        box-shadow:var(--shadow-card), inset 0 1px 0 rgba(255,255,255,.06); }
+  .tb__lab { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+             color:var(--text-lo); margin:0 0 8px; }
+  .tb__move { font-size:19px; font-weight:700; line-height:1.3; letter-spacing:-.015em;
+              color:var(--text-hi); margin:0 0 16px; }
+  .tb__go { font:inherit; font-weight:700; font-size:15px; border:0; cursor:pointer;
+            border-radius:10px; padding:13px 22px; background:var(--solid-bg); color:var(--solid-fg); }
+  .desk .tb { padding:26px 28px; }
+  .desk .tb__move { font-size:31px; letter-spacing:-.028em; line-height:1.14; }
+
+  /* 1 · current */
+  .v1 .tb__go { width:100%; }
+  .v1 .tb__move { margin-bottom:0; padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.08); }
+  .v1 .tb__go { margin-top:14px; }
+
+  /* 2 · no label at all */
+  .v2 .tb__lab { display:none; }
+
+  /* 3 · the date is the label */
+  /* (markup swap only) */
+
+  /* 4 · hairline rule under the label, editorial */
+  .v4 .tb__lab { padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,.10); margin-bottom:14px; }
+
+  /* 5 · the move is the whole card, action is a full-width foot */
+  .v5 .tb { padding:0; overflow:hidden; }
+  .v5 .tb__lab { padding:20px 20px 0; }
+  .v5 .tb__move { padding:0 20px 20px; margin:0; }
+  .v5 .tb__go { width:100%; border-radius:0; padding:16px; }
+  .desk.v5 .tb__lab { padding:26px 28px 0; }
+  .desk.v5 .tb__move { padding:0 28px 24px; }
+
+  /* 6 · vertical hairline rail (no colour, just light) */
+  .v6 .tb { padding-left:0; }
+  .v6 .tb__inner { border-left:2px solid rgba(255,255,255,.22); padding-left:18px; }
+  .desk.v6 .tb__inner { padding-left:24px; }
+
+  /* 7 · circle check instead of a bar */
+  .v7 .tb__row { display:flex; align-items:center; gap:16px; }
+  .v7 .tb__move { margin:0; flex:1; }
+  .v7 .tb__go { width:52px; height:52px; padding:0; border-radius:999px; flex:none;
+                display:flex; align-items:center; justify-content:center; }
+  .v7 .tb__go svg { width:22px; height:22px; }
+
+  /* 8 · no card, type on the ground */
+  .v8 .tb { background:none; box-shadow:none; padding:4px 2px; }
+
+  /* 9 · poster: centred, generous */
+  .v9 .tb { padding:34px 24px; text-align:center; }
+  .v9 .tb__move { font-size:23px; margin-bottom:22px; }
+  .desk.v9 .tb__move { font-size:34px; }
+  .v9 .tb__go { padding:14px 34px; }
+
+  /* 10 · the move + the smallest version under it */
+  .v10 .tb__sub { font-size:13.5px; line-height:1.5; color:var(--text-2); margin:-8px 0 16px; }
+  .desk.v10 .tb__sub { font-size:15px; margin-top:-6px; }
+
+  /* 11 · outline action, quieter */
+  .v11 .tb__go { background:transparent; color:var(--text-hi);
+                 box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.30); }
+
+  /* 12 · streak hairline across the top */
+  .v12 .tb { position:relative; overflow:hidden; }
+  .v12 .tb::before { content:''; position:absolute; left:0; top:0; height:2px; width:62%;
+                     background:rgba(255,255,255,.34); }
+
+  /* 13 · swipe rail instead of a button */
+  .v13 .tb__rail { position:relative; height:52px; border-radius:12px;
+                   background:rgba(255,255,255,.06); display:flex; align-items:center;
+                   box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
+  .v13 .tb__knob { position:absolute; left:4px; width:44px; height:44px; border-radius:9px;
+                   background:var(--solid-bg); display:flex; align-items:center; justify-content:center; }
+  .v13 .tb__knob svg { width:18px; height:18px; color:var(--solid-fg); }
+  .v13 .tb__railtxt { width:100%; text-align:center; font-size:13.5px; font-weight:650;
+                      color:var(--text-2); letter-spacing:.01em; }
+
+  /* 14 · split row: move left, action right (desktop-native) */
+  .v14 .tb__row { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+  .v14 .tb__move { margin:0; flex:1; }
+  .v14 .tb__go { flex:none; }
+
+  /* 15 · numbered day, quiet anchor */
+  .v15 .tb__row { display:flex; align-items:baseline; gap:14px; margin-bottom:14px; }
+  .v15 .tb__day { font-size:34px; font-weight:750; letter-spacing:-.03em; color:var(--text-hi);
+                  font-variant-numeric:tabular-nums; line-height:1; }
+  .v15 .tb__dayl { font-size:12px; font-weight:650; letter-spacing:.1em; text-transform:uppercase;
+                   color:var(--text-lo); }
+  .v15 .tb__move { margin-bottom:16px; }
+  .v15 .tb__go { width:100%; }
+</style>
+</head>
+<body class="ns-bloom">
+<div class="wrap">
+  <h1>Today box, 15 variations</h1>
+  <p class="lede">Same content every time: the label, the one move, the way to finish it. No colour anywhere, no extra information. Each row is the phone version beside the desktop version so you can judge both at once. Tell me the numbers you like and I will build them properly.</p>
+  <div id="out"></div>
+</div>
+
+<script>
+const MOVE = "Write the first draft of this week's video script";
+const MIN  = "Smallest version: open the doc and write one line";
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+const V = [
+  { n:1,  name:'Current',                 why:'What ships today. Label, move, a hairline, full-width button.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:2,  name:'No label',                why:'Drop the word "Today" entirely. The move is on the home screen; of course it is today.',
+    body:(d)=>`<p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:3,  name:'The date is the label',   why:'Replaces the generic word with something true and quietly different every day.',
+    body:(d)=>`<p class="tb__lab">Sat, Aug 2</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:4,  name:'Editorial rule',          why:'A hairline under the label. Reads like a printed page, costs nothing.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:5,  name:'Full-bleed action',       why:'The button becomes the base of the card. One enormous target, very hard to miss.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:6,  name:'Hairline rail',           why:'A white rule down the left edge instead of a coloured kicker. Structure without colour.',
+    body:(d)=>`<div class="tb__inner"><p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button></div>` },
+  { n:7,  name:'Circle check',            why:'The action shrinks to one round check beside the move. Maximum calm, smaller target.',
+    body:(d)=>`<p class="tb__lab">Today</p><div class="tb__row"><p class="tb__move">${MOVE}</p><button class="tb__go">${CHECK}</button></div>` },
+  { n:8,  name:'No card',                 why:'Kill the panel. The move floats on the background, like the card is the only object on screen.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:9,  name:'Poster',                  why:'Centred and generous. Feels like a statement rather than a row in a list.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:10, name:'With the floor',          why:'Adds the smallest honest version underneath, so a bad day still has a door.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><p class="tb__sub">${MIN}</p><button class="tb__go">Mark Complete</button>` },
+  { n:11, name:'Outline action',          why:'Quieter button. The move stays the loudest thing on the card.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:12, name:'Streak hairline',         why:'A thin white rule across the top, as long as your streak is deep. Progress with no numbers.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` },
+  { n:13, name:'Swipe to finish',         why:'Finishing takes a deliberate drag. Harder to do by accident, more satisfying when real.',
+    body:(d)=>`<p class="tb__lab">Today</p><p class="tb__move">${MOVE}</p><div class="tb__rail"><span class="tb__knob">${CHECK}</span><span class="tb__railtxt">Slide to complete</span></div>` },
+  { n:14, name:'Split row',               why:'Move on the left, action on the right. Uses the width desktop actually has.',
+    body:(d)=>`<p class="tb__lab">Today</p><div class="tb__row"><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button></div>` },
+  { n:15, name:'Day count anchor',        why:'The day number becomes the quiet anchor. Weight without colour, and it earns meaning over time.',
+    body:(d)=>`<div class="tb__row"><span class="tb__day">21</span><span class="tb__dayl">days in</span></div><p class="tb__move">${MOVE}</p><button class="tb__go">Mark Complete</button>` }
+];
+
+document.getElementById('out').innerHTML = V.map(v => `
+  <div class="v">
+    <p class="v__name">${v.n} &middot; ${v.name}</p>
+    <p class="v__why">${v.why}</p>
+    <div class="pair">
+      <div class="phone v${v.n}">
+        <p class="cap">Phone</p>
+        <div class="stage"><div class="tb">${v.body(false)}</div></div>
+      </div>
+      <div class="desk v${v.n}">
+        <p class="cap">Desktop &amp; iPad</p>
+        <div class="stage"><div class="tb">${v.body(true)}</div></div>
+      </div>
+    </div>
+  </div>
+`).join('');
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<style>
+[data-c="n-odo"]{--d:#3fd94e;--ink:235,238,248}
+[data-c="n-odo"] .od-date{font-size:12.5px;font-weight:500;color:rgba(var(--ink),.42);letter-spacing:-.005em;margin-bottom:30px}
+[data-c="n-odo"] .od-drum{display:flex;justify-content:center;gap:5px;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 13%,#000 87%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0,#000 13%,#000 87%,transparent 100%)}
+[data-c="n-odo"] .od-w{width:56px;height:106px;overflow:hidden;border-radius:10px;
+  background:linear-gradient(180deg,rgba(235,238,248,0),rgba(235,238,248,.02) 50%,rgba(235,238,248,0))}
+[data-c="n-odo"] .od-r{display:block;will-change:transform}
+[data-c="n-odo"] .od-r span{display:block;height:106px;line-height:106px;font-size:88px;font-weight:700;
+  letter-spacing:-.05em;font-variant-numeric:tabular-nums;text-align:center}
+[data-c="n-odo"] .od-r--dim{color:rgba(var(--ink),.07)}
+[data-c="n-odo"] .od-r--live{color:var(--d)}
+[data-c="n-odo"] .od-u{font-size:14px;font-weight:500;color:rgba(var(--ink),.62);letter-spacing:-.005em;margin-top:22px}
+
+[data-c="n-odo"].on .od-date{animation:kOdoFadeNODO .5s ease-out both}
+[data-c="n-odo"].on .od-u{animation:kOdoFadeNODO .5s ease-out .98s both}
+[data-c="n-odo"].on .od-r--r01{animation:kOdoInkNODO .86s ease-out .18s both,kOdoR01NODO .86s linear .18s both}
+[data-c="n-odo"].on .od-r--r67{animation:kOdoInkNODO .86s ease-out .18s both,kOdoR67NODO .86s linear .18s both}
+[data-c="n-odo"].on .od-r--r23{animation:kOdoInkNODO .86s ease-out .18s both,kOdoR23NODO .86s linear .18s both}
+[data-c="n-odo"].on .od-r--r90{animation:kOdoInkNODO .86s ease-out .18s both,kOdoR90NODO .86s linear .18s both}
+@keyframes kOdoFadeNODO{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes kOdoInkNODO{0%,82%{color:rgba(235,238,248,.96)}100%{color:#3fd94e}}
+@keyframes kOdoR01NODO{0%{transform:translateY(0);animation-timing-function:cubic-bezier(.55,.05,.25,1)}
+  88%{transform:translateY(-113px);animation-timing-function:cubic-bezier(.35,0,.25,1)}100%{transform:translateY(-106px)}}
+@keyframes kOdoR67NODO{0%{transform:translateY(-636px);animation-timing-function:cubic-bezier(.55,.05,.25,1)}
+  88%{transform:translateY(-749px);animation-timing-function:cubic-bezier(.35,0,.25,1)}100%{transform:translateY(-742px)}}
+@keyframes kOdoR23NODO{0%{transform:translateY(-212px);animation-timing-function:cubic-bezier(.55,.05,.25,1)}
+  88%{transform:translateY(-325px);animation-timing-function:cubic-bezier(.35,0,.25,1)}100%{transform:translateY(-318px)}}
+@keyframes kOdoR90NODO{0%{transform:translateY(-954px);animation-timing-function:cubic-bezier(.55,.05,.25,1)}
+  88%{transform:translateY(-1067px);animation-timing-function:cubic-bezier(.35,0,.25,1)}100%{transform:translateY(-1060px)}}
+@media (prefers-reduced-motion:reduce){[data-c="n-odo"] *{animation:none!important}
+  [data-c="n-odo"] .od-date,[data-c="n-odo"] .od-u{opacity:1!important;transform:none!important}
+  [data-c="n-odo"] .od-r--live{color:#3fd94e!important}}
+</style>
+<div class="ph" data-c="n-odo" data-state="d1"><div class="dst">
+  <div class="od-date">Tuesday, June 3</div>
+  <div class="od-drum">
+    <div class="od-w"><div class="od-r od-r--dim" style="transform:translateY(0)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--dim" style="transform:translateY(0)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--live od-r--r01" style="transform:translateY(-106px)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+  </div>
+  <div class="od-u">day</div>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="n-odo" data-state="w1"><div class="dst">
+  <div class="od-date">Thursday, June 12</div>
+  <div class="od-drum">
+    <div class="od-w"><div class="od-r od-r--dim" style="transform:translateY(0)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--dim" style="transform:translateY(0)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--live od-r--r67" style="transform:translateY(-742px)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+  </div>
+  <div class="od-u">days</div>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="n-odo" data-state="m1"><div class="dst">
+  <div class="od-date">Tuesday, July 14</div>
+  <div class="od-drum">
+    <div class="od-w"><div class="od-r od-r--dim" style="transform:translateY(0)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--live od-r--r23" style="transform:translateY(-318px)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+    <div class="od-w"><div class="od-r od-r--live od-r--r90" style="transform:translateY(-1060px)"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>0</span></div></div>
+  </div>
+  <div class="od-u">days</div>
+</div><div class="hint">Tap to replay</div></div>

@@ -1,0 +1,60 @@
+<style>
+[data-c="fr-3"] .fr3-sub{max-width:24ch}
+[data-c="fr-3"] .deposit{max-width:17ch}
+[data-c="fr-3"] .deposit b{white-space:nowrap}
+[data-c="fr-3"] .mark--foot{bottom:94px}
+
+[data-c="fr-3"] .fr3-field{display:flex;flex-direction:column;gap:13px;margin-bottom:32px}
+[data-c="fr-3"] .fr3-row{display:flex;gap:13px}
+[data-c="fr-3"] .fr3-d{width:8px;height:8px;border-radius:50%;background:rgba(var(--ink),.30)}
+[data-c="fr-3"] .fr3-d.last{background:var(--accent)}
+
+[data-c="fr-3"] .b2.on .fr3-row{animation:fr3In .44s cubic-bezier(.2,.8,.3,1) backwards}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(2){animation-delay:.07s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(3){animation-delay:.14s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(4){animation-delay:.21s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(5){animation-delay:.28s}
+@keyframes fr3In{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+[data-c="fr-3"] .b2.on .fr3-d.last{animation:fr3Land .5s cubic-bezier(.2,.8,.3,1) .42s backwards}
+@keyframes fr3Land{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+
+[data-c="fr-3"] .b3.on .deposit{animation:fr3Settle .5s cubic-bezier(.2,.8,.3,1) .1s backwards}
+@keyframes fr3Settle{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+[data-c="fr-3"] .fr3-box{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:10px;
+  background:rgba(var(--ink),.04);box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-c="fr-3"] .fr3-field{display:flex;align-items:center;gap:14px;justify-content:center}
+[data-c="fr-3"] .fr3-mult{font-size:30px;font-weight:750;letter-spacing:-.03em;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+[data-c="fr-3"] .fr3-off{opacity:.16}
+</style>
+
+<div class="ph" data-c="fr-3"><div class="st">
+
+  <div class="b b1">
+    <div class="cap" style="margin:0 0 10px;">Total runs</div>
+    <div class="n n--hero" data-count="0|50">50</div>
+  </div>
+
+  <div class="b b2">
+    <div class="fr3-field">
+      <div class="fr3-row"><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i></div>
+      <div class="fr3-row"><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i></div>
+      <div class="fr3-row"><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i></div>
+      <div class="fr3-row"><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i></div>
+      <div class="fr3-row"><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d"></i><i class="fr3-d last"></i></div>
+    </div>
+    <!-- days only: the app has no mileage data, and Memento never invents a
+         number the user did not give it. If a goal's own unit is miles, the
+         real pulses can speak here instead. -->
+    <div class="sub fr3-sub">Fifty runs in <b>101 days</b>.</div>
+    <div class="cap">Since January 14</div>
+  </div>
+
+  <div class="b b3">
+    <div class="deposit">On this day, your <b>50th run</b>.</div>
+    <div class="cap">April 25</div>
+    <svg class="mark--foot" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+  </div>
+
+</div>
+<div class="keepbtn">Keep</div><div class="hint">Tap to replay</div></div>

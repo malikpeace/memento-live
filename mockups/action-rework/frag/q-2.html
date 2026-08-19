@@ -1,0 +1,348 @@
+<!-- ARCHETYPE, the surviving refine step: q-2 one question full-bleed, answered in tappable slabs,
+     and the fourth question IS the pulse (pu-1's poster field), so the flow ends on the number.
+     BEAUTY PASS 2026-08-13: one type ladder (21 question / 15 answer / 12 meta), one slab rhythm
+     (every answer the same 56px block, one 10px gap, one 14px radius shared with the field and the
+     button), and the last button is a HOLD (gesture law), with its hint sitting in the row the free
+     field vacates so nothing moves between beats. -->
+<section class="cell" data-k="q-2">
+<style>
+/* TYPE LADDER: question 21px/500, answers 15px/500, quiet meta 12px, one white CTA at 15.5px/700.
+   SELECTION follows the app: quiet dark glass at rest, solid white with near-black text when
+   chosen. No tick, no green, the fill IS the feedback. */
+[data-k="q-2"] .q2-wrap{position:absolute;inset:0;display:flex;flex-direction:column;padding:26px 20px 20px}
+
+/* ---- header: back chevron + progress + counter ---- */
+[data-k="q-2"] .q2-top{display:flex;align-items:center;gap:10px;height:30px;flex:none}
+[data-k="q-2"] .q2-back{flex:none;width:30px;height:30px;padding:0;border:0;border-radius:9px;display:flex;
+  align-items:center;justify-content:center;background:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:opacity .16s ease}
+[data-k="q-2"] .q2-back svg{display:block}
+[data-k="q-2"] .q2-back:active{opacity:.6}
+[data-k="q-2"] .q2-back.ghost{visibility:hidden;pointer-events:none}
+[data-k="q-2"] .q2-bar{display:flex;gap:5px;align-items:center;flex:1;min-width:0}
+/* mirrors the back button so the bar sits truly centered */
+[data-k="q-2"] .q2-sp{flex:none;width:30px}
+/* each segment is a track that FILLS as its question gets answered, so progress is earned, not
+   counted. Kept deliberately quiet: 2px, low ink, never a bright bar competing with the question. */
+[data-k="q-2"] .q2-seg{position:relative;height:2px;flex:1;border-radius:999px;overflow:hidden;
+  background:rgba(var(--ink),.10);transition:background .3s ease}
+[data-k="q-2"] .q2-seg.now{background:rgba(var(--ink),.14)}
+[data-k="q-2"] .q2-seg i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;
+  background:rgba(var(--ink),.30);transition:width .42s cubic-bezier(.2,.7,.2,1),background .3s ease}
+[data-k="q-2"] .q2-seg.now i{width:18%;background:rgba(var(--ink),.52)}
+[data-k="q-2"] .q2-seg.now.ans i{width:100%}
+[data-k="q-2"] .q2-seg.done i{width:100%}
+[data-k="q-2"] .q2-n{flex:none;font-size:12px;font-weight:500;color:var(--text-lo);
+  font-variant-numeric:tabular-nums;letter-spacing:.005em}
+
+/* ---- the question: bottom aligned in its reserve, so a two line question drops its last line
+       on the SAME baseline as a one line question and nothing below ever shifts ---- */
+[data-k="q-2"] .q2-q{margin:26px 0 0;font-size:21px;line-height:1.22;font-weight:500;letter-spacing:-.022em;
+  color:rgba(var(--ink),.96);min-height:52px;flex:none;display:flex;align-items:flex-end}
+[data-k="q-2"] .q2-q.fade{animation:q2q .34s cubic-bezier(.2,.7,.2,1) both}
+/* the unit slot exists on every step, empty on the three refine questions, so the four beats
+   share one skeleton and the CTA sits on one baseline throughout */
+[data-k="q-2"] .q2-unit{margin:8px 0 0;min-height:18px;flex:none;font-size:12.5px;line-height:1.4;
+  color:rgba(var(--ink),.90)}
+
+/* ---- the answer body: slabs on 1 to 3, the poster field on 4, both optically centred ---- */
+[data-k="q-2"] .q2-as{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:0}
+[data-k="q-2"] .q2-as.enter{animation:q2q .36s cubic-bezier(.2,.7,.2,1) .06s both}
+/* FLAT (Malik, 2026-08-18): the boxes are gone. Answers are ruled rows,
+   a hairline over each and one under the last. Chosen = the text goes full
+   bright and a short dash lands at the row's end, the rail's language. */
+[data-k="q-2"] .q2-a{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  min-height:52px;padding:15px 2px;border:0;border-radius:0;font-family:inherit;font-size:15px;
+  font-weight:500;line-height:1.3;letter-spacing:-.014em;color:rgba(var(--ink),.80);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;background:none;
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.12);
+  transition:color .18s ease}
+[data-k="q-2"] .q2-a:last-child{box-shadow:inset 0 1px 0 rgba(var(--ink),.12), inset 0 -1px 0 rgba(var(--ink),.12)}
+[data-k="q-2"] .q2-a::after{content:'';margin-left:auto;width:16px;height:2.5px;border-radius:2px;
+  background:transparent;transition:background .18s ease}
+[data-k="q-2"] .q2-a:hover{color:rgba(var(--ink),.95)}
+[data-k="q-2"] .q2-a:focus-visible{outline:2px solid rgba(var(--ink),.55);outline-offset:-2px}
+[data-k="q-2"] .q2-a.on{color:var(--text-hi);font-weight:700}
+[data-k="q-2"] .q2-a.on::after{background:rgba(var(--ink),.95)}
+
+/* ---- the pulse field, pu-1's design ported: a pen on a line, not a box ---- */
+[data-k="q-2"] .q2-pulse{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-variant-numeric:tabular-nums}
+[data-k="q-2"] .q2-field{width:fit-content;min-width:150px;margin:0 auto}
+[data-k="q-2"] .q2-set{display:flex;align-items:baseline;justify-content:center;gap:3px}
+[data-k="q-2"] .q2-pre{font-size:22px;font-weight:500;line-height:1;letter-spacing:-.01em;
+  color:rgba(var(--ink),.82)}
+[data-k="q-2"] .q2-num{-webkit-appearance:none;appearance:none;border:0;outline:0;background:transparent;
+  padding:0;margin:0;width:140px;text-align:center;font-family:inherit;font-weight:700;font-size:100px;
+  line-height:1;letter-spacing:-.055em;color:rgba(var(--ink),1);font-variant-numeric:tabular-nums;
+  caret-color:rgba(var(--ink),.92);transition:font-size .14s ease-out}
+[data-k="q-2"] .q2-num::placeholder{color:rgba(var(--ink),.20)}
+[data-k="q-2"] .q2-num::-webkit-outer-spin-button,[data-k="q-2"] .q2-num::-webkit-inner-spin-button{
+  -webkit-appearance:none;margin:0}
+[data-k="q-2"] .q2-rule{height:1px;width:100%;margin-top:12px;background:rgba(var(--ink),.28);
+  transition:background .18s ease-out}
+[data-k="q-2"] .q2-field:focus-within .q2-rule{background:rgba(var(--ink),.55)}
+[data-k="q-2"] .q2-wrap.written .q2-rule{background:rgba(var(--ink),.10)}
+[data-k="q-2"] .q2-mirror{position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden;
+  font-family:inherit;font-weight:700;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
+
+/* ---- footer: free field + the CTA ---- */
+[data-k="q-2"] .q2-foot{position:relative;margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:10px;flex:none}
+/* the hold hint takes the exact row the free field vacates on the pulse step, so the CTA never moves */
+[data-k="q-2"] .q2-hint{position:absolute;left:0;right:0;top:18px;height:46px;margin:0;display:none;
+  align-items:center;justify-content:center;font-size:12.5px;letter-spacing:-.005em;color:rgba(var(--ink),.62)}
+[data-k="q-2"] .q2-hint.show{display:flex}
+[data-k="q-2"] .q2-own{display:flex;align-items:center;gap:9px;padding:0 2px;height:46px;border-radius:0;
+  background:none;box-shadow:inset 0 -1px 0 rgba(var(--ink),.16);
+  transition:box-shadow .18s ease}
+[data-k="q-2"] .q2-own.lit{box-shadow:inset 0 -1px 0 rgba(var(--ink),.30)}
+[data-k="q-2"] .q2-own:focus-within{box-shadow:inset 0 -1px 0 rgba(var(--ink),.45)}
+/* hidden, not removed, on the pulse step: the CTA must not move between beats */
+[data-k="q-2"] .q2-own.gone{visibility:hidden;pointer-events:none}
+[data-k="q-2"] .q2-own i{flex:none;display:block;width:1.5px;height:15px;border-radius:1px;
+  background:rgba(var(--ink),.55);transition:background .18s ease,height .18s ease}
+[data-k="q-2"] .q2-own:focus-within i,[data-k="q-2"] .q2-own.lit i{background:rgba(var(--ink),.95);height:17px}
+[data-k="q-2"] .q2-own input{flex:1;min-width:0;height:100%;border:0;background:none;outline:none;
+  font-family:inherit;font-size:13.5px;letter-spacing:-.008em;color:rgba(var(--ink),.96)}
+[data-k="q-2"] .q2-own input::placeholder{color:rgba(var(--ink),.66)}
+[data-k="q-2"] .q2-cta{position:relative;display:block;width:100%;height:52px;padding:0;border:0;border-radius:14px;
+  overflow:hidden;font-family:inherit;background:rgba(235,238,248,.94);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;
+  font-variant-numeric:tabular-nums;
+  transition:background .2s ease,transform .14s ease,box-shadow .2s ease}
+[data-k="q-2"] .q2-lab{position:relative;display:flex;align-items:center;justify-content:center;height:100%;
+  font-size:15.5px;font-weight:700;letter-spacing:-.014em;color:#0b0c10;transition:color .2s ease}
+[data-k="q-2"] .q2-cta:hover{background:rgba(240,243,251,.97)}
+[data-k="q-2"] .q2-cta:active{transform:scale(.985)}
+[data-k="q-2"] .q2-cta:focus-visible{outline:2px solid rgba(var(--ink),.65);outline-offset:2px}
+/* no backdrop-filter on this button: a blurred backdrop inside an overflow-clipped button drops
+   the radius on WebKit, and at .92 over near-black it buys nothing */
+[data-k="q-2"] .q2-cta[disabled]{background:rgba(22,25,31,.92);
+  box-shadow:inset 0 1px 0 rgba(var(--ink),.08);cursor:default;transform:none}
+[data-k="q-2"] .q2-cta[disabled] .q2-lab{color:rgba(var(--ink),.62)}
+[data-k="q-2"] .q2-cta.sec{background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k="q-2"] .q2-cta.sec .q2-lab{color:rgba(var(--ink),.94);font-weight:500;font-size:13px}
+[data-k="q-2"] .q2-cta.sec:hover{background:rgba(30,34,42,.94)}
+/* the hold: the plan is not made by a tap. Light fills the button, the label inverts where it lands,
+   letting go early takes the light straight back. */
+[data-k="q-2"] .q2-cta.hold{background:rgba(22,25,31,.92);box-shadow:inset 0 1px 0 rgba(var(--ink),.08)}
+[data-k="q-2"] .q2-cta.hold .q2-lab{color:rgba(var(--ink),.96)}
+[data-k="q-2"] .q2-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(235,238,248,.94);
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k="q-2"] .q2-inv{position:absolute;left:0;top:0;bottom:0;width:0;overflow:hidden;pointer-events:none;
+  transition:width .2s cubic-bezier(.2,.7,.3,1)}
+[data-k="q-2"] .q2-inv span{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;
+  justify-content:center;color:#0b0c10;font-size:15.5px;font-weight:700;letter-spacing:-.014em}
+[data-k="q-2"] .q2-cta.holding .q2-fill,[data-k="q-2"] .q2-cta.holding .q2-inv{width:100%;transition:width .78s linear}
+[data-k="q-2"] .q2-cta:not(.hold) .q2-fill,[data-k="q-2"] .q2-cta:not(.hold) .q2-inv{display:none}
+
+@keyframes q2q{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-k="q-2"] .q2-q.fade,[data-k="q-2"] .q2-as.enter{animation:none}
+  [data-k="q-2"] *{transition:none}
+}
+</style>
+<h3>One at a time</h3><p class="cap">The refine step as a conversation: one question owns the screen, the answers are slabs you can hit without looking, and the fourth question is the pulse itself, so the flow ends on their own number and one button.</p>
+<div class="bk"><i>All seven buckets</i></div>
+<div class="ph">
+  <div class="grid"></div>
+  <div class="q2-wrap">
+    <div class="q2-top">
+      <button type="button" class="q2-back ghost" aria-label="Back">
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" aria-hidden="true"><path d="M6 1 1.2 6 6 11" stroke="rgba(235,238,248,.82)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="q2-bar">
+        <div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div>
+      </div>
+      <span class="q2-sp" aria-hidden="true"></span>
+    </div>
+    <div class="q2-q"></div>
+    <p class="q2-unit"></p>
+    <div class="q2-as"></div>
+    <div class="q2-foot">
+      <div class="q2-own"><i></i><input placeholder="In your own words"></div>
+      <p class="q2-hint">Press and hold</p>
+      <button type="button" class="q2-cta" disabled>
+        <span class="q2-fill" aria-hidden="true"></span>
+        <span class="q2-lab">Continue</span>
+        <span class="q2-inv" aria-hidden="true"><span>Continue</span></span>
+      </button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="q-2"]'); if(!r) return;
+  /* Three refine questions, then the pulse. PROVENANCE: every value here is typed by the
+     person on this screen. Memento measures nothing and knows nothing else. */
+  var D=[
+    {q:"So, what have you already done toward this?",
+     a:["Nothing yet, this is day one","I have had the idea a while","I've made a little progress","I do it, just not consistently"]},
+    {q:"What do you think it actually takes?",
+     a:["Talking to more people","A better offer","Showing up every day","I honestly do not know"]},
+    {q:"How much time do you have on a normal day?",
+     a:["Under 30 minutes","About an hour","Two to three hours","Most of the day"]}
+  ];
+  var PULSE={q:"Where are you today?",unit:"Dollars this month",pre:"$"};
+  var LAST=D.length; /* index 3 = the pulse step */
+  var i=0, picked=[null,null,null], typed=['','',''], pulse='', written=false;
+  var wrap=r.querySelector('.q2-wrap'), q=r.querySelector('.q2-q'), unit=r.querySelector('.q2-unit'),
+      as=r.querySelector('.q2-as'), own=r.querySelector('.q2-own'),
+      inp=own.querySelector('input'), back=r.querySelector('.q2-back'), cta=r.querySelector('.q2-cta'),
+      segs=r.querySelectorAll('.q2-seg'), hint=r.querySelector('.q2-hint'),
+      lab=r.querySelector('.q2-lab'), fill=r.querySelector('.q2-fill'),
+      inv=r.querySelector('.q2-inv'), invLab=inv.firstElementChild;
+  var holding=false;
+  function setLabel(t){ lab.textContent=t; invLab.textContent=t; }
+  function stopHold(){ if(!holding) return; holding=false; cta.classList.remove('holding'); }
+  function startHold(){
+    if(holding||cta.disabled||!cta.classList.contains('hold')) return;
+    invLab.style.width=cta.offsetWidth+'px'; holding=true;
+    void fill.offsetWidth; cta.classList.add('holding');
+  }
+  var mirror=document.createElement('span'); mirror.className='q2-mirror'; r.appendChild(mirror);
+  var num=null;
+
+  /* drop the entry animation once it has played: a held fill would pin a layer and fight the press
+     transforms. the timer is belt and braces, some engines never deliver animationend offscreen */
+  var enterT=0;
+  function clearEnter(){ clearTimeout(enterT); as.classList.remove('enter'); }
+  as.addEventListener('animationend',function(e){ if(e.target===as) clearEnter(); });
+
+  function answeredAt(k){
+    if(k===LAST) return pulse.length>0;
+    return picked[k]!==null || typed[k].trim().length>1;
+  }
+  function answered(){ return answeredAt(i); }
+  function segSync(){
+    for(var k=0;k<segs.length;k++){
+      var s=segs[k];
+      s.classList.toggle('done', k<i);
+      s.classList.toggle('now', k===i);
+      s.classList.toggle('ans', answeredAt(k));
+    }
+  }
+  function syncCta(){
+    var holdStep = (i===LAST && !written);
+    if(i===LAST){
+      cta.disabled = !written && pulse.length===0;
+      cta.classList.toggle('sec', written);
+      setLabel(written ? 'Start over' : 'Create action plan');
+    }else{
+      cta.classList.remove('sec');
+      cta.disabled = !answered();
+      setLabel('Continue');
+    }
+    /* the plan is committed with a hold, never a tap. Everything else here is navigation. */
+    cta.classList.toggle('hold', holdStep && !cta.disabled);
+    if(!holdStep || cta.disabled) stopHold();
+    hint.classList.toggle('show', holdStep && !cta.disabled);
+    segSync();
+  }
+  function marks(){
+    var kids=as.children;
+    for(var k=0;k<kids.length;k++) kids[k].classList.toggle('on',picked[i]===k);
+  }
+  /* money: whole dollars, grouped as they type */
+  function clean(raw){ return raw.replace(/[^0-9]/g,'').replace(/^0+(?=\d)/,''); }
+  function shown(v){ return v ? v.replace(/\B(?=(\d{3})+(?!\d))/g,',') : ''; }
+  function fit(){
+    if(!num) return;
+    var t=num.value||num.placeholder, L=t.length,
+        px=L<=3?100:L===4?88:L===5?76:L===6?64:54;
+    num.style.fontSize=px+'px';
+    mirror.style.fontSize=px+'px'; mirror.textContent=t;
+    num.style.width=Math.max(64,Math.ceil(mirror.getBoundingClientRect().width)+10)+'px';
+  }
+  function buildSlabs(){
+    D[i].a.forEach(function(t,k){
+      var b=document.createElement('button'); b.type='button'; b.className='q2-a';
+      b.appendChild(document.createTextNode(t));
+      b.addEventListener('click',function(){
+        picked[i] = (picked[i]===k ? null : k);
+        if(picked[i]!==null){ typed[i]=''; inp.value=''; own.classList.remove('lit'); }
+        marks(); syncCta();
+      });
+      as.appendChild(b);
+    });
+    marks();
+  }
+  function buildPulse(){
+    as.classList.add('q2-pulse');
+    var f=document.createElement('div'); f.className='q2-field';
+    var set=document.createElement('div'); set.className='q2-set';
+    var pre=document.createElement('span'); pre.className='q2-pre'; pre.textContent=PULSE.pre;
+    num=document.createElement('input');
+    num.className='q2-num'; num.type='text'; num.setAttribute('inputmode','numeric');
+    num.autocomplete='off'; num.placeholder='0'; num.setAttribute('aria-label',"today's number");
+    num.value=shown(pulse); num.readOnly=written;
+    num.addEventListener('input',function(){
+      pulse=clean(num.value); num.value=shown(pulse); fit(); syncCta();
+    });
+    num.addEventListener('keydown',function(e){
+      if(e.key==='Enter'){ e.preventDefault(); num.blur(); if(!cta.disabled) cta.click(); }
+    });
+    set.appendChild(pre); set.appendChild(num);
+    var rule=document.createElement('div'); rule.className='q2-rule';
+    f.appendChild(set); f.appendChild(rule); as.appendChild(f);
+    fit();
+  }
+  function render(anim){
+    var pulseStep = (i===LAST);
+    q.classList.remove('fade');
+    if(anim){ void q.offsetWidth; q.classList.add('fade'); }
+    q.textContent = pulseStep ? PULSE.q : D[i].q;
+    /* one label, never a string of little phrases */
+    unit.textContent = pulseStep ? PULSE.unit : '';
+    num=null;
+    as.className='q2-as'; as.innerHTML='';
+    if(anim){ void as.offsetWidth; as.classList.add('enter');
+      clearTimeout(enterT); enterT=setTimeout(clearEnter,560); }
+    if(pulseStep) buildPulse(); else buildSlabs();
+    own.classList.toggle('gone',pulseStep);
+    wrap.classList.toggle('written',pulseStep&&written);
+    if(!pulseStep){ inp.value=typed[i]; own.classList.toggle('lit',typed[i].trim().length>0); }
+    back.classList.toggle('ghost', i===0);
+    syncCta();
+  }
+  function commit(){
+    written=true; if(num) num.readOnly=true; wrap.classList.add('written'); syncCta();
+  }
+  fill.addEventListener('transitionend',function(e){
+    if(e.propertyName!=='width'||!holding) return;
+    holding=false; cta.classList.remove('holding'); commit();
+  });
+  cta.addEventListener('pointerdown',startHold);
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){ cta.addEventListener(ev,stopHold); });
+  cta.addEventListener('keydown',function(e){
+    if((e.key===' '||e.key==='Enter') && cta.classList.contains('hold')){ e.preventDefault(); startHold(); }
+  });
+  cta.addEventListener('keyup',function(e){ if(e.key===' '||e.key==='Enter') stopHold(); });
+  cta.addEventListener('blur',stopHold);
+  cta.addEventListener('click',function(){
+    if(cta.disabled||cta.classList.contains('hold')) return; /* the commit is a hold, not a tap */
+    if(i===LAST){
+      if(written){ /* replay the flow from the top */
+        i=0; picked=[null,null,null]; typed=['','','']; pulse=''; written=false;
+        inp.value=''; own.classList.remove('lit'); render(true); return;
+      }
+      return;
+    }
+    i++; render(true);
+  });
+  back.addEventListener('click',function(){
+    if(i===0) return;
+    if(i===LAST) written=false;
+    i--; render(true);
+  });
+  inp.addEventListener('input',function(){
+    typed[i]=inp.value;
+    own.classList.toggle('lit',inp.value.trim().length>0);
+    if(inp.value.trim().length>0 && picked[i]!==null){ picked[i]=null; marks(); }
+    syncCta();
+  });
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); if(!cta.disabled) cta.click(); } });
+  render(false);
+})();
+</script>
+</section>

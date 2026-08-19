@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consistency, the tap-in page</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  html, body { background: #060708; }
+  body { margin: 0; padding: 72px 22px 120px; color: var(--text-hi, #fff); font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; }
+  #finalControls { position: fixed; top: 0; left: 0; right: 0; z-index: 200; background: rgba(6,7,10,0.94); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); border-bottom: 1px solid var(--hairline, rgba(255,255,255,0.09)); padding: 12px 22px; }
+  #finalControls .nf-controls { max-width: 430px; margin: 0 auto; }
+  .lede { max-width: 430px; margin: 0 auto 24px; }
+  .lede h1 { font-size: 19px; font-weight: 700; letter-spacing: -0.015em; margin: 2px 0 6px; }
+  .lede p { font-size: 13px; color: var(--text-mid, rgba(255,255,255,0.8)); line-height: 1.55; margin: 0; }
+</style>
+</head>
+<body>
+<div id="finalControls"></div>
+<div class="lede">
+  <h1>Consistency, the tap-in page</h1>
+  <p>One number that only grows, three stats you can improve, the honest record underneath, then the deeper stats once there is enough history to read them. Drag the day control up top to see the page from day 1 onward.</p>
+</div>
+<div id="finalLab"></div>
+<script src="_kit.js"></script>
+<script src="final.js"></script>
+<script>
+  (function () {
+    var bar = document.getElementById('finalControls');
+    function fit() { document.body.style.paddingTop = (bar.offsetHeight + 14) + 'px'; }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(bar);
+    window.addEventListener('resize', fit); window.addEventListener('load', fit);
+  })();
+</script>
+</body>
+</html>

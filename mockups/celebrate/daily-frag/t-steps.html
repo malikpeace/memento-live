@@ -1,0 +1,89 @@
+<style>
+[data-c="t-steps"]{--day:#3fd94e;--day-rgb:63,217,78;--ink:235,238,248}
+[data-c="t-steps"] .tk{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="t-steps"] .tk-breath{position:absolute;left:50%;top:-92px;width:280px;height:280px;
+  margin-left:-140px;pointer-events:none;opacity:0;
+  background:radial-gradient(circle closest-side,rgba(var(--day-rgb),.085),rgba(var(--day-rgb),.028) 44%,transparent 72%)}
+[data-c="t-steps"] .tk-field{position:relative}
+[data-c="t-steps"] .tk-s{position:absolute;opacity:0;
+  border-top:var(--tw) solid rgba(var(--day-rgb),.34);
+  border-left:var(--rw) solid rgba(var(--day-rgb),.16)}
+[data-c="t-steps"] .tk-riser{position:absolute;width:var(--rw);background:rgba(var(--day-rgb),.55);
+  transform:scaleY(0);transform-origin:50% 100%}
+[data-c="t-steps"] .tk-tread{position:absolute;height:3px;border-radius:2px;background:var(--day);
+  transform:scaleX(0);transform-origin:0 50%}
+[data-c="t-steps"] .tk-ground{position:absolute;left:-12px;right:-12px;bottom:0;height:1px;
+  background:rgba(var(--ink),.14);transform:scaleX(0)}
+[data-c="t-steps"] .tk-here{position:absolute;left:0;right:0;bottom:calc(100% + 11px);text-align:right;
+  font-size:11.5px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.52);opacity:0}
+[data-c="t-steps"][data-state="d1"] .tk-here{text-align:left}
+[data-c="t-steps"] .tk-count{position:relative;display:flex;flex-direction:column;align-items:center;
+  margin-top:44px;opacity:0}
+[data-c="t-steps"] .tk-n{font-size:52px;font-weight:800;line-height:.9;letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.96)}
+[data-c="t-steps"] .tk-u{font-size:14.5px;font-weight:500;letter-spacing:-.01em;color:rgba(var(--ink),.62);
+  margin-top:12px}
+[data-c="t-steps"] .tk-mark{position:absolute;left:50%;bottom:50px;width:14px;height:14px;margin-left:-7px;
+  fill:rgba(var(--ink),.13);opacity:0}
+
+[data-c="t-steps"].on .tk-breath{animation:tkBreath_tsteps 900ms ease-out 260ms both}
+[data-c="t-steps"].on .tk-ground{animation:tkDraw_tsteps 420ms cubic-bezier(.2,.9,.25,1) both}
+[data-c="t-steps"].on .tk-s{animation:tkRise_tsteps 280ms ease-out both;animation-delay:calc(110ms + var(--i) * 4ms)}
+[data-c="t-steps"].on .tk-riser{animation:tkClimb_tsteps 220ms cubic-bezier(.3,.8,.4,1) both;
+  animation-delay:calc(160ms + var(--i) * 4ms)}
+[data-c="t-steps"].on .tk-tread{animation:tkLay_tsteps 320ms cubic-bezier(.2,.9,.25,1) both;
+  animation-delay:calc(300ms + var(--i) * 4ms)}
+[data-c="t-steps"].on .tk-here{animation:tkRise_tsteps 340ms ease-out both;animation-delay:calc(440ms + var(--i) * 4ms)}
+[data-c="t-steps"].on .tk-count{animation:tkRise_tsteps 420ms cubic-bezier(.2,.9,.25,1) 620ms both}
+[data-c="t-steps"].on .tk-mark{animation:tkFade_tsteps 460ms ease-out 780ms both}
+@keyframes tkFade_tsteps{from{opacity:0}to{opacity:1}}
+@keyframes tkRise_tsteps{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes tkBreath_tsteps{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+@keyframes tkDraw_tsteps{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes tkClimb_tsteps{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes tkLay_tsteps{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="t-steps"] *{animation:none!important}
+  [data-c="t-steps"] .tk-breath,[data-c="t-steps"] .tk-s,[data-c="t-steps"] .tk-here,
+  [data-c="t-steps"] .tk-count,[data-c="t-steps"] .tk-mark{opacity:1!important;transform:none!important}
+  [data-c="t-steps"] .tk-ground,[data-c="t-steps"] .tk-riser,
+  [data-c="t-steps"] .tk-tread{transform:none!important}
+}
+</style>
+<div class="ph" data-c="t-steps" data-state="d1"><div class="dst">
+  <div class="tk">
+    <div class="tk-breath"></div>
+    <div class="tk-field" style="--tw:2.5px;--rw:1.5px;width:84px;height:37.50px">
+      <span class="tk-riser" style="--i:1;left:0.00px;bottom:0.00px;height:36.00px"></span><span class="tk-tread" style="--i:1;left:0.00px;bottom:34.50px;width:84.00px"></span>
+      <div class="tk-here" style="--i:1">Aug 1</div>
+      <div class="tk-ground"></div>
+    </div>
+    <div class="tk-count"><span class="tk-n">1</span><span class="tk-u">day climbed</span></div>
+  </div>
+  <svg class="tk-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-steps" data-state="w1"><div class="dst">
+  <div class="tk">
+    <div class="tk-breath"></div>
+    <div class="tk-field" style="--tw:2.5px;--rw:1.5px;width:224px;height:148.50px">
+      <i class="tk-s" style="--i:1;left:0.00px;bottom:0.00px;width:30.00px;height:21.00px"></i><i class="tk-s" style="--i:2;left:30.00px;bottom:21.00px;width:30.00px;height:21.00px"></i><i class="tk-s" style="--i:3;left:60.00px;bottom:42.00px;width:30.00px;height:21.00px"></i><i class="tk-s" style="--i:4;left:90.00px;bottom:63.00px;width:30.00px;height:21.00px"></i><i class="tk-s" style="--i:5;left:120.00px;bottom:84.00px;width:30.00px;height:21.00px"></i><i class="tk-s" style="--i:6;left:150.00px;bottom:105.00px;width:30.00px;height:21.00px"></i><span class="tk-riser" style="--i:7;left:180.00px;bottom:126.00px;height:21.00px"></span><span class="tk-tread" style="--i:7;left:180.00px;bottom:145.50px;width:44.00px"></span>
+      <div class="tk-here" style="--i:7">Aug 8</div>
+      <div class="tk-ground"></div>
+    </div>
+    <div class="tk-count"><span class="tk-n">7</span><span class="tk-u">days climbed</span></div>
+  </div>
+  <svg class="tk-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-steps" data-state="m1"><div class="dst">
+  <div class="tk">
+    <div class="tk-breath"></div>
+    <div class="tk-field" style="--tw:1.5px;--rw:1px;width:225px;height:166.50px">
+      <i class="tk-s" style="--i:1;left:0.00px;bottom:0.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:2;left:7.20px;bottom:5.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:3;left:14.40px;bottom:11.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:4;left:21.60px;bottom:16.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:5;left:28.80px;bottom:22.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:6;left:36.00px;bottom:27.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:7;left:43.20px;bottom:33.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:8;left:50.40px;bottom:38.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:9;left:57.60px;bottom:44.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:10;left:64.80px;bottom:49.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:11;left:72.00px;bottom:55.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:12;left:79.20px;bottom:60.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:13;left:86.40px;bottom:66.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:14;left:93.60px;bottom:71.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:15;left:100.80px;bottom:77.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:16;left:108.00px;bottom:82.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:17;left:115.20px;bottom:88.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:18;left:122.40px;bottom:93.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:19;left:129.60px;bottom:99.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:20;left:136.80px;bottom:104.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:21;left:144.00px;bottom:110.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:22;left:151.20px;bottom:115.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:23;left:158.40px;bottom:121.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:24;left:165.60px;bottom:126.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:25;left:172.80px;bottom:132.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:26;left:180.00px;bottom:137.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:27;left:187.20px;bottom:143.00px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:28;left:194.40px;bottom:148.50px;width:7.20px;height:5.50px"></i><i class="tk-s" style="--i:29;left:201.60px;bottom:154.00px;width:7.20px;height:5.50px"></i><span class="tk-riser" style="--i:30;left:208.80px;bottom:159.50px;height:5.50px"></span><span class="tk-tread" style="--i:30;left:208.80px;bottom:163.50px;width:16.00px"></span>
+      <div class="tk-here" style="--i:30">Aug 31</div>
+      <div class="tk-ground"></div>
+    </div>
+    <div class="tk-count"><span class="tk-n">30</span><span class="tk-u">days climbed</span></div>
+  </div>
+  <svg class="tk-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>

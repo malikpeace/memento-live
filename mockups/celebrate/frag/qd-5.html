@@ -1,0 +1,42 @@
+<style>
+[data-c="qd-5"] .ceil{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+[data-c="qd-5"] .ceil i{display:block;width:168px;height:2px;border-radius:2px;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
+[data-c="qd-5"] .ceil span{font-size:12.5px;font-weight:600;letter-spacing:-.01em;
+  font-variant-numeric:tabular-nums;color:var(--text-lo)}
+[data-c="qd-5"] .b.on .ceil i{animation:qd5ceil .55s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes qd5ceil{to{transform:scaleX(1)}}
+
+[data-c="qd-5"] .lead{display:flex;align-items:baseline;justify-content:center;gap:2px}
+[data-c="qd-5"] .lead .u{font-size:40px;font-weight:800;letter-spacing:-.04em;color:var(--text-hi)}
+[data-c="qd-5"] .lead .u--sm{font-size:28px;color:var(--text-mid);font-weight:650;margin-left:2px}
+[data-c="qd-5"] .sub{text-wrap:balance}
+[data-c="qd-5"] .sub + .sub{margin-top:7px}
+[data-c="qd-5"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-5"] .ceil i{transform:scaleX(1)}
+}
+</style>
+<div class="ph" data-c="qd-5">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="ceil"><i></i><span>1h</span></div>
+      <div class="lead"><span class="n n--hero">58</span><span class="u">m</span></div>
+      <div class="sub">your daily average this week</div>
+    </div>
+
+    <div class="b b2">
+      <div class="lead"><span class="n n--big" data-count="0|15">15</span><span class="u--sm">h</span></div>
+      <div class="sub">back this week.</div>
+      <div class="sub">3h 08m a day, 11 weeks ago.</div>
+    </div>
+
+    <div class="b b3">
+      <div class="deposit">On this day, your week averaged <b>58m</b> a day. First week under 1h.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

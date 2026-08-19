@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inside the Memento, chambered</title>
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;overflow-x:clip;background:#050609;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  :root{--mmask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path d='M150 146 L256 252 L362 146 L362 366 L150 366 Z'/></svg>");
+    --hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
+    --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
+    --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;--safe-t:0px;--safe-b:0px;
+    --ink1:rgba(13,17,25,.94);--ink2:rgba(24,28,36,.68);--ink3:rgba(24,28,36,.48)}
+  p,h1,h2{margin:0}
+
+  /* ── STATE A: the home ─────────────────────────────────────────────── */
+  .home{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;
+    background:#050609;transition:opacity .45s ease .28s}
+  .home.is-diving{opacity:0;pointer-events:none}
+  .home__in{text-align:center}
+  .home .cage{width:min(64vw,246px);margin:0 auto;cursor:pointer;
+    transition:transform .72s cubic-bezier(.55,0,.8,.4), opacity .5s ease .3s}
+  .home.is-diving .cage{transform:scale(10.5);opacity:0}
+  .home__name{margin-top:24px;font-size:21px;font-weight:720;letter-spacing:-.02em;color:var(--hi);
+    transition:opacity .3s ease}
+  .home__mori{margin-top:8px;font-size:18px;font-weight:250;letter-spacing:.11em;color:var(--hi);
+    font-variant-numeric:tabular-nums;transition:opacity .3s ease}
+  .home__hint{margin-top:30px;font-size:12.5px;color:var(--lo);transition:opacity .3s ease}
+  .home.is-diving .home__name,.home.is-diving .home__mori,.home.is-diving .home__hint{opacity:0}
+
+  /* ── STATE B: inside the card ──────────────────────────────────────── */
+  .inside{position:fixed;inset:0;z-index:5;opacity:0;transition:opacity .5s ease .32s}
+  .inside.is-open{opacity:1}
+  .in-scroll{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:
+      radial-gradient(70% 34% at 20% 4%, color-mix(in srgb, var(--clar) 12%, transparent), transparent 70%),
+      radial-gradient(64% 30% at 86% 30%, color-mix(in srgb, var(--cons) 9%, transparent), transparent 72%),
+      linear-gradient(168deg,#eaeef5 0%,#dde3ec 46%,#cfd7e2 100%)}
+  .in-col{max-width:430px;margin:0 auto;padding:calc(var(--safe-t) + 150px) 24px 60px}
+
+  /* the rim: the device edges become the card's edge, open at the bottom */
+  .rim{position:fixed;inset:0;z-index:8;pointer-events:none}
+  .rim::before{content:"";position:absolute;left:0;right:0;top:0;height:2.5px;
+    background:#fff;box-shadow:0 0 18px 3px rgba(238,244,255,.85), 0 0 44px 8px rgba(200,215,255,.4)}
+  .rim::after{content:"";position:absolute;top:0;bottom:0;left:0;width:2.5px;
+    background:linear-gradient(180deg,#fff 62%,rgba(255,255,255,0));
+    box-shadow:0 0 18px 3px rgba(238,244,255,.7)}
+  .rim i{position:absolute;top:0;bottom:0;right:0;width:2.5px;
+    background:linear-gradient(180deg,#fff 62%,rgba(255,255,255,0));
+    box-shadow:0 0 18px 3px rgba(238,244,255,.7)}
+
+  .in-back{position:fixed;top:calc(var(--safe-t) + 14px);left:14px;z-index:9;
+    display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;
+    background:rgba(16,20,28,.1);color:var(--ink1);cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+  .in-back svg{width:17px;height:17px}
+
+  .in-mode{position:fixed;top:calc(var(--safe-t) + 17px);right:14px;z-index:9;
+    border:0;padding:8px 13px;border-radius:999px;background:rgba(16,20,28,.1);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);color:var(--ink1);
+    font:inherit;font-size:12px;font-weight:660;cursor:pointer}
+
+  /* ── BORDER MODE: the glow is the frame, the middle goes dark ─────────── */
+  .inside.brd .in-scroll{background:
+    radial-gradient(120% 26% at 50% 0%, rgba(210,225,250,.10), transparent 70%),
+    radial-gradient(46% 100% at 0% 50%, rgba(210,225,250,.06), transparent 70%),
+    radial-gradient(46% 100% at 100% 50%, rgba(210,225,250,.06), transparent 70%),
+    linear-gradient(180deg,#07080c,#050609)}
+  .inside.brd{--ink1:rgba(245,246,250,.97);--ink2:rgba(238,241,247,.74);--ink3:rgba(232,236,244,.5)}
+  .inside.brd .rim::before{inset:5px;height:auto;border-radius:46px;background:none;
+    box-shadow:0 0 0 2.5px #fff, 0 0 22px 4px rgba(238,244,255,.8),
+      0 0 60px 16px rgba(200,215,255,.35), inset 0 0 30px rgba(238,244,255,.30)}
+  .inside.brd .rim::after,.inside.brd .rim i{display:none}
+  .inside.brd .in-mark{fill:#c7cdd8}
+  .inside.brd .in-name,.inside.brd .in-hero>b,.inside.brd .in-total b{
+    text-shadow:0 0 34px rgba(238,244,255,.22)}
+  .inside.brd .in-star{background:color-mix(in srgb, var(--clar) 12%, rgba(255,255,255,.05));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+  .inside.brd .in-items,.inside.brd .in-sum,.inside.brd .in-total{
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+  .inside.brd .in-r i{background-image:radial-gradient(circle, rgba(255,255,255,.3) 1px, transparent 1.2px)}
+  .inside.brd .in-best b:nth-of-type(1){color:var(--cons)}
+  .inside.brd .in-then__now{color:var(--cons)}
+  .inside.brd .in-well{box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 18px 44px rgba(0,0,0,.5);
+    background:linear-gradient(180deg,#0c0e13,#08090d)}
+  .inside.brd .in-viv{background:
+    radial-gradient(70% 60% at 50% 0%, color-mix(in srgb, var(--cons) 13%, transparent), transparent 74%)}
+  .inside.brd .in-viv__closer{color:var(--cons)}
+  .inside.brd .in-seal{background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .inside.brd .in-seal__law{box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .inside.brd .in-org{background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(228,232,240,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+      0 10px 30px rgba(0,0,0,.45)}
+  .inside.brd .in-org__k{color:rgba(24,28,36,.55)}
+  .inside.brd .in-org__d{color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.18)}
+  .inside.brd .in-org__t{color:rgba(24,28,36,.62)}
+  .inside.brd .in-code i{background:rgba(238,242,251,.75)}
+  .inside.brd .in-back,.inside.brd .in-mode{background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi)}
+  .inside.brd .in-col{padding-top:calc(var(--safe-t) + 66px)}
+
+  .in-bigline{margin-top:34px;text-align:center;font-size:21px;font-weight:640;color:var(--ink2)}
+  .in-bigline b{font-size:44px;font-weight:800;letter-spacing:-.04em;color:var(--ink1);
+    font-variant-numeric:tabular-nums;padding:0 3px}
+  .in-sky{position:relative;margin-top:18px;border-radius:20px;overflow:hidden;
+    background:radial-gradient(70% 52% at 50% 38%, rgba(63,217,78,.10), transparent 72%),
+      radial-gradient(60% 50% at 50% 70%, rgba(58,217,245,.05), transparent 72%),
+      linear-gradient(180deg,#07090c,#040507)}
+  .in-sky canvas{display:block;width:100%;height:auto}
+  .in-sky__name{position:absolute;left:14px;bottom:11px;font-size:11.5px;color:rgba(238,242,251,.4)}
+  .in-skykey{display:flex;gap:16px;justify-content:center;margin-top:13px;font-size:12.5px;color:var(--ink2)}
+  .in-skykey span{display:inline-flex;align-items:center;gap:6px}
+  .in-skykey i{width:8px;height:8px;border-radius:50%}
+  .in-skykey .k1{background:var(--cons)}
+  .in-skykey .k2{background:var(--clar)}
+  .in-skykey .k3{background:#fff;box-shadow:0 0 7px rgba(255,255,255,.8)}
+  .in-skycap{margin-top:8px;text-align:center;font-size:12.5px;color:var(--ink3)}
+  .in-trio{display:flex;gap:1px;margin-top:26px;border-radius:14px;overflow:hidden;
+    background:rgba(127,132,145,.22)}
+  .in-trio>div{flex:1;padding:13px 8px;text-align:center;background:rgba(255,255,255,.04)}
+  .in-trio b{display:block;font-size:24px;font-weight:780;letter-spacing:-.03em;color:var(--ink1);
+    font-variant-numeric:tabular-nums}
+  .in-trio span{display:block;margin-top:3px;font-size:10.5px;line-height:1.3;color:var(--ink3)}
+  .in-pull{margin:34px 0 0;padding:0 8px;text-align:center;font-size:19px;font-weight:680;
+    font-style:italic;letter-spacing:-.018em;line-height:1.4;color:var(--ink1)}
+  .in-pull span{display:block;margin-top:8px;font-size:12px;font-weight:600;font-style:normal;color:var(--ink3)}
+
+  /* the ring stays open at the bottom until they have seen everything */
+  .rim-cover{position:fixed;left:0;right:0;bottom:0;height:76px;z-index:8;pointer-events:none;
+    background:linear-gradient(to top, #050609 26%, rgba(5,6,9,0));
+    transition:opacity .6s ease}
+  .inside.rim-done .rim-cover{opacity:0}
+  .inside:not(.brd) .rim-cover{display:none}
+
+  .evh{margin-top:40px;font-size:21px;font-weight:750;letter-spacing:-.022em;color:var(--ink1)}
+  .evsub{margin-top:6px;font-size:13px;line-height:1.5;color:var(--ink3)}
+  .evgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .evd{position:relative;display:block;text-align:center;border:0;cursor:pointer;
+    border-radius:15px;padding:18px 13px 15px;overflow:hidden;font:inherit;
+    background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(226,230,238,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+      0 8px 22px rgba(0,0,0,.4)}
+  .evd__t{display:block;font-size:14px;font-weight:720;letter-spacing:-.015em;line-height:1.3;
+    color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.16)}
+  .evd--q .evd__t{font-style:italic;font-weight:660}
+  .evd__d{display:block;margin-top:7px;font-size:10.5px;letter-spacing:.08em;
+    color:rgba(24,28,36,.55);font-variant-numeric:tabular-nums}
+  .evd__story{display:none;margin-top:12px;padding-top:11px;
+    box-shadow:inset 0 1.5px 0 rgba(16,20,28,.12);
+    font-size:13px;line-height:1.55;color:rgba(24,28,36,.78);text-align:left}
+  .evd.is-open{grid-column:1/-1}
+  .evd.is-open .evd__story{display:block}
+  .evcap{margin-top:12px;font-size:12px;color:var(--ink3);text-align:center}
+
+  .in-count{margin-top:16px;font-size:29px;font-weight:250;letter-spacing:.09em;
+    color:var(--hi);font-variant-numeric:tabular-nums}
+  .in-d0{position:fixed;top:calc(var(--safe-t) + 62px);right:14px;z-index:9;border:0;
+    padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:var(--hi);
+    font:inherit;font-size:12px;font-weight:660;cursor:pointer}
+  /* [hidden] must win over any display rule, or the day one column renders
+     underneath the main one and the page reads as having a second ending. */
+  .in-col[hidden]{display:none!important}
+  .vow{margin-top:46px;padding:20px 19px 17px;border-radius:16px;
+    background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--clar) 11%, transparent), transparent 70%), var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .vow__l{font-size:12px;font-weight:660;color:var(--clar)}
+  .vow__q{margin-top:9px;font-size:24px;font-weight:740;letter-spacing:-.026em;line-height:1.22;color:var(--hi)}
+  .vow__w{margin-top:12px;font-size:15px;font-style:italic;line-height:1.45;color:var(--mid)}
+  .vow__d{margin-top:13px;padding-top:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    font-size:12.5px;color:var(--lo)}
+  .d0line{margin-top:20px;font-size:14.5px;line-height:1.55;color:var(--hi);text-align:left}
+  .d0wks{margin-top:14px;border-radius:16px;padding:15px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .d0wks canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
+  .d0wks__cap{margin-top:12px;font-size:13px;line-height:1.5;color:var(--mid);text-align:center}
+  /* face mode: the light middle. The components read the palette vars, so
+     flipping the vars flips all sixteen tiles to dark ink on the face. */
+  .inside:not(.brd) .in-scroll{
+    --hi:rgba(13,17,25,.94);--mid:rgba(24,28,36,.7);--lo:rgba(24,28,36,.5);
+    --fill:rgba(16,20,28,.06);--inset:inset 0 1px 0 rgba(255,255,255,.55);
+    --act:#10151f}
+  .inside:not(.brd) .in-mode,.inside:not(.brd) .in-d0{
+    background:rgba(16,20,28,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+    color:rgba(13,17,25,.94)}
+  .in-flowh{margin:104px 0 10px;font-size:23px;font-weight:750;letter-spacing:-.024em;color:var(--hi)}
+  .in-flowh--sub{margin-top:118px;font-size:46px;letter-spacing:-.035em;line-height:1.02}
+  .in-flowh--sub{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .in-flowh--sub::after{content:attr(data-sub);display:block;margin-top:10px;
+    font-size:15px;font-weight:600;letter-spacing:0;color:var(--mid);
+    opacity:0;transform:translateY(-3px);transition:opacity .35s ease,transform .35s ease}
+  .in-flowh--sub:hover::after,.in-flowh--sub.is-sub::after{opacity:1;transform:none}
+
+  /* the age of the Memento: the biggest number on the page */
+  .bigup{margin-top:52px;text-align:left}
+  .bigup__d{font-size:34px;font-weight:640;letter-spacing:-.03em;line-height:1;color:var(--mid)}
+  .bigup__d b{font-size:104px;font-weight:800;letter-spacing:-.055em;color:var(--cons);
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 80px color-mix(in srgb, var(--cons) 30%, transparent)}
+  .bigup__u{margin-top:14px;font-size:15px;color:var(--mid)}
+  .bigup__u span{color:var(--hi);font-weight:640;font-variant-numeric:tabular-nums}
+
+  /* the ambient life: a blur of white, cyan or green breathing in and out */
+  .in-amb{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .in-amb i{position:absolute;width:340px;height:340px;border-radius:50%;
+    filter:blur(85px);opacity:0}
+  .in-amb i:nth-child(1){left:-90px;top:16%;background:rgba(238,244,255,.22);
+    animation:inAmb 34s ease-in-out infinite}
+  .in-amb i:nth-child(2){right:-110px;top:44%;background:rgba(58,217,245,.18);
+    animation:inAmb 41s ease-in-out 14s infinite}
+  .in-amb i:nth-child(3){left:14%;bottom:6%;background:rgba(63,217,78,.16);
+    animation:inAmb 47s ease-in-out 27s infinite}
+  @keyframes inAmb{0%,62%,100%{opacity:0}76%,86%{opacity:1}}
+  .in-col{position:relative;z-index:1}
+  @media (prefers-reduced-motion: reduce){.in-amb i{animation:none}}
+
+  /* the lock: shut by default, opened by their own word */
+  .in-seal .seal-open{display:none}
+  .in-seal.is-open .seal-open{display:block}
+  .in-seal.is-open .seal-shut{display:none}
+  .in-seal.is-open .seal-shackle{transform:translateY(-2px) rotate(-16deg);transform-origin:8px 11px}
+  .seal-lock .seal-shackle{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+  .seal-shut__l{margin-top:14px;font-size:14.5px;line-height:1.5;color:var(--mid)}
+  .seal-hold{position:relative;display:block;width:100%;margin-top:16px;border:0;cursor:pointer;
+    overflow:hidden;border-radius:12px;padding:15px;font:inherit;font-size:14.5px;font-weight:660;
+    color:var(--hi);background:rgba(255,255,255,.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08);-webkit-tap-highlight-color:transparent;
+    -webkit-user-select:none;user-select:none;touch-action:none}
+  .seal-hold__fill{position:absolute;left:0;top:0;bottom:0;width:0;
+    background:color-mix(in srgb, var(--cons) 26%, transparent)}
+  .seal-hold.is-holding .seal-hold__fill{width:100%;transition:width 1.15s linear}
+  .seal-hold__t{position:relative}
+
+  /* the maker's mark, quiet, on every block */
+  .cpick > *, .viv-dream, .in-seal, .bigup{position:relative}
+  .cpick > *::before, .viv-dream::before, .in-seal::before{
+    content:"";position:absolute;right:12px;top:12px;width:13px;height:13px;z-index:2;
+    pointer-events:none;opacity:.16;
+    background:currentColor;
+    -webkit-mask:var(--mmask) center/contain no-repeat;mask:var(--mmask) center/contain no-repeat}
+  .cmb-wall::before,.amb-weeks::before{opacity:.1}
+
+  /* one shimmer, used everywhere something is alive. A slow band of light
+     crossing the marks, nothing more. */
+  @keyframes mShim{0%{background-position:-140% 0}100%{background-position:240% 0}}
+  .cmb-wall__grid i.back,
+  .vol-deep__bar i,
+  .rec-months__chart span.now,
+  .amb-threads__bar{
+    background-image:linear-gradient(100deg,
+      transparent 38%, rgba(255,255,255,.32) 50%, transparent 62%);
+    background-size:220% 100%;
+    animation:mShim 7s linear infinite}
+  .rec-months__chart span.now{animation-delay:1.4s}
+  .amb-threads__bar{animation-delay:2.8s}
+  .vol-deep__bar i{animation-delay:.7s}
+  @media (prefers-reduced-motion: reduce){
+    .cmb-wall__grid i.back,.vol-deep__bar i,.rec-months__chart span.now,
+    .amb-threads__bar{animation:none;background-image:none}
+  }
+
+  /* THE CHAMBER LAYER: every piece gets its own room of darkness. Blocks stay
+     their natural size and stay left aligned, the separation does the talking,
+     and a gentle snap settles each chamber as you arrive. */
+  .in-scroll{scroll-snap-type:y proximity}
+  .cpick{margin-top:26vh;scroll-snap-align:start;scroll-margin-top:14vh}
+  .vow,.gp,.viv-dream,.viv-wall,.in-seal{margin-top:26vh;scroll-snap-align:start;scroll-margin-top:14vh}
+  .bigup{margin-top:18vh;scroll-snap-align:start;scroll-margin-top:20vh}
+  .in-flowh{margin:38vh 0 0;scroll-snap-align:start;scroll-margin-top:26vh}
+  .in-flowh--sub{margin-top:44vh}
+  .in-org{margin-top:36vh;scroll-snap-align:start;scroll-margin-top:20vh}
+  .in-foot{margin-top:20vh;padding-bottom:12vh}
+  .d0line{margin-top:16vh}
+
+  /* the goal path: what they want, what they do, where they stand */
+  .gp{border-radius:16px;padding:6px 0}
+  .gp__r{display:flex;gap:13px;align-items:flex-start;padding:17px 17px;border-radius:16px;
+    background:var(--fill);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .gp__r+.gp__r{margin-top:10px}
+  .gp__dot{flex:0 0 9px;height:9px;margin-top:6px;border-radius:50%}
+  .gp__r--clar .gp__dot{background:var(--clar);box-shadow:0 0 11px color-mix(in srgb, var(--clar) 65%, transparent)}
+  .gp__r--act .gp__dot{background:var(--act);box-shadow:0 0 11px color-mix(in srgb, var(--act) 55%, transparent)}
+  .gp__r--cons .gp__dot{background:var(--cons);box-shadow:0 0 11px color-mix(in srgb, var(--cons) 65%, transparent)}
+  .gp__k{font-size:12px;font-weight:680;color:var(--mid)}
+  .gp__v{margin-top:4px;font-size:15.5px;font-weight:650;letter-spacing:-.015em;line-height:1.4;color:var(--hi)}
+  .gp__s{margin-top:6px;font-size:12.5px;color:var(--lo);font-variant-numeric:tabular-nums}
+
+  /* the now cell breathes */
+  .mor-oneday__now{animation:inNow 2.8s ease-in-out infinite}
+  @keyframes inNow{0%,100%{opacity:1}50%{opacity:.4}}
+  @media (prefers-reduced-motion: reduce){.mor-oneday__now{animation:none}}
+
+  /* the board and the months announce themselves */
+  .rec-board .rec-board__t{font-size:21px!important;font-weight:750;letter-spacing:-.02em;margin-bottom:8px}
+  .rec-months .rec-months__t{font-size:21px!important;font-weight:750;letter-spacing:-.02em}
+  .cmb-wall .cmb-wall__h{font-size:21px!important;font-weight:750;letter-spacing:-.02em}
+
+  /* the dream and the wall */
+  .viv-dream{margin-top:22px;border-radius:16px;padding:20px 19px 17px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .viv-dream__q{font-size:19px;font-weight:680;font-style:italic;letter-spacing:-.018em;
+    line-height:1.42;color:var(--hi)}
+  .viv-dream__d{margin-top:12px;font-size:12.5px;font-weight:640;color:var(--cons)}
+  .viv-dream__g{margin-top:4px;font-size:13px;color:var(--mid)}
+  .viv-wall{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:26px}
+  .viv-wall__note{border-radius:14px;padding:14px 13px;background:var(--fill);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07);display:flex;flex-direction:column;justify-content:space-between;min-height:104px}
+  .viv-wall__note p{margin:0;font-size:14px;font-weight:600;line-height:1.4;color:var(--hi)}
+  .viv-wall__note span{margin-top:10px;font-size:11px;color:var(--lo)}
+  .viv-wall__pic{position:relative;border-radius:14px;min-height:104px;overflow:hidden;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+  .viv-wall__pic--a{background:
+    radial-gradient(80% 60% at 30% 20%, rgba(58,217,245,.5), transparent 70%),
+    radial-gradient(90% 70% at 80% 90%, rgba(63,217,78,.4), transparent 70%),
+    linear-gradient(160deg,#20303c,#101a22)}
+  .viv-wall__pic--b{background:
+    radial-gradient(90% 70% at 70% 20%, rgba(238,244,255,.4), transparent 70%),
+    radial-gradient(80% 60% at 20% 85%, rgba(58,217,245,.3), transparent 70%),
+    linear-gradient(160deg,#1c2836,#0e141c)}
+  .viv-wall__pic span{position:absolute;left:11px;bottom:9px;font-size:11px;color:rgba(238,244,255,.75)}
+  .viv-wall__add{grid-column:1/-1;border:0;cursor:pointer;border-radius:14px;padding:14px;
+    background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+    color:var(--mid);font:inherit;font-size:13.5px;font-weight:640}
+
+  /* the plaque, sunk into the page like set stone */
+  .inside .in-org{box-shadow:inset 0 3px 6px rgba(0,0,0,.85), inset 0 -1px 0 rgba(255,255,255,.09),
+    0 0 0 5px #030406, 0 1px 0 5px rgba(255,255,255,.055), 0 18px 44px rgba(0,0,0,.55)}
+  .inside.brd .in-org{box-shadow:inset 0 2px 3px rgba(255,255,255,.92), inset 0 -3px 6px rgba(20,24,32,.22),
+    0 0 0 5px #030406, 0 1px 0 6px rgba(255,255,255,.06), 0 18px 44px rgba(0,0,0,.6)}
+  .cpick{margin-top:26px}
+  .cpick > *{max-width:100%}
+  /* the components were designed as tiles on near black, the ring room IS near black */
+  .in-head{text-align:left}
+  .in-mark{width:34px;height:34px;fill:rgba(238,244,255,.65);display:block;margin:0}
+  .inside.brd .in-mark{fill:rgba(238,244,255,.65)}
+  .in-title{margin-top:16px;font-size:26px;font-weight:780;letter-spacing:-.028em;color:var(--hi)}
+  .in-owner{margin-top:12px;padding-top:11px;display:flex;align-items:baseline;gap:12px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10);font-size:12.5px;color:var(--lo)}
+  .in-owner b{font-size:16px;font-weight:700;letter-spacing:-.012em;color:var(--hi)}
+  .in-name{margin-top:16px;font-size:27px;font-weight:780;letter-spacing:-.028em;color:var(--ink1);
+    text-shadow:0 1px 1px rgba(255,255,255,.85), 0 -1px .5px rgba(0,0,0,.16)}
+  .in-count{margin-top:8px;font-size:17px;font-weight:300;letter-spacing:.11em;color:var(--ink2);
+    font-variant-numeric:tabular-nums}
+  .in-since{margin-top:6px;font-size:12.5px;color:var(--ink2)}
+
+  .in-hero{display:flex;align-items:center;gap:13px;margin-top:44px}
+  .in-hero>b{font-size:68px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--ink1);
+    font-variant-numeric:tabular-nums;text-shadow:0 1px 1px rgba(255,255,255,.8), 0 -1px .5px rgba(0,0,0,.14)}
+  .in-herol{font-size:14px;font-weight:620;line-height:1.3;color:var(--ink2)}
+  .in-heror{margin-left:auto;text-align:right;font-size:13px;line-height:1.45;color:var(--ink2)}
+  .in-heror b{font-weight:720;color:var(--ink1)}
+
+  .in-star{display:flex;gap:11px;align-items:flex-start;margin-top:20px;border-radius:14px;
+    padding:12px 14px;background:color-mix(in srgb, var(--clar) 15%, rgba(255,255,255,.42));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+  .in-star__dot{flex:0 0 9px;height:9px;margin-top:5px;border-radius:50%;
+    background:var(--clar);box-shadow:0 0 12px color-mix(in srgb, var(--clar) 70%, transparent)}
+  .in-star__l{font-size:11.5px;font-weight:640;color:var(--ink2)}
+  .in-star__g{margin-top:2px;font-size:16px;font-weight:700;letter-spacing:-.015em;color:var(--ink1)}
+
+  .in-items{margin-top:22px;padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .in-items--tight{margin-top:12px}
+  .in-cols{display:flex;align-items:baseline;gap:7px;padding:0 0 5px;font-size:11.5px;color:var(--ink3)}
+  .in-cols i{flex:1}
+  .in-cols b,.in-r b{font-weight:640;font-variant-numeric:tabular-nums;width:40px;text-align:right}
+  .in-r{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:13.5px}
+  .in-r span{color:var(--ink2);white-space:nowrap}
+  .in-r i{flex:1;height:1px;background-image:radial-gradient(circle, rgba(16,20,28,.34) 1px, transparent 1.2px);
+    background-size:6px 2px;background-repeat:repeat-x;background-position:bottom}
+  .in-r b{color:var(--ink1)}
+  .in-best span,.in-best b{color:var(--ink1);font-weight:700}
+  .in-best b:nth-of-type(1){color:color-mix(in srgb, var(--cons) 62%, #063313)}
+  .in-sum{margin-top:5px;padding-top:9px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .in-sum span{color:var(--ink1);font-weight:700}
+  .in-meta span,.in-meta b{font-size:12.5px}
+  .in-meta b{color:var(--ink2);font-weight:560}
+  .in-wide{width:auto!important;white-space:nowrap}
+  .in-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;
+    padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .in-total span{font-size:13.5px;font-weight:740;color:var(--ink1)}
+  .in-total b{font-size:34px;font-weight:800;letter-spacing:-.04em;color:var(--ink1);
+    font-variant-numeric:tabular-nums;text-shadow:0 1px 1px rgba(255,255,255,.8)}
+  .in-total em{font-style:normal;font-size:15px;font-weight:600;color:var(--ink2)}
+
+  .in-then{margin-top:44px;text-align:center}
+  .in-then__cards{display:flex;gap:16px;justify-content:center}
+  .in-then__side{flex:1;max-width:146px}
+  .cage-sm{width:100%;max-width:124px;margin:0 auto}
+  .cage-sm .daycard-ns__name{display:none!important}
+  .cage-sm *{animation:none!important;will-change:auto!important}
+  .in-then__when{margin-top:11px;font-size:12px;font-weight:720;color:var(--ink2)}
+  .in-then__now{color:color-mix(in srgb, var(--cons) 62%, #063313)}
+  .in-then__f{margin-top:5px;font-size:13px;font-weight:600;color:var(--ink1)}
+  .in-then__side:first-child .in-then__f{color:var(--ink2);font-weight:560}
+  .in-then__line{margin-top:16px;font-size:15px;font-weight:700;letter-spacing:-.015em;color:var(--ink1)}
+
+  /* mori: the dark well cut into the face */
+  .in-well{margin:52px -4px 0;border-radius:20px;padding:22px 20px 20px;
+    background:linear-gradient(180deg,#0a0c10,#07080b);
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.06),
+      0 1px 0 rgba(255,255,255,.55)}
+  .in-well__h{font-size:20px;font-weight:750;letter-spacing:-.022em;color:var(--hi)}
+  .in-well__lead{margin-top:12px;font-size:14.5px;line-height:1.5;color:var(--mid)}
+  .in-well__lead b{color:var(--hi);font-weight:760;font-variant-numeric:tabular-nums}
+  .in-tiles{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;margin:14px 0 0;
+    border-radius:12px;overflow:hidden;background:rgba(255,255,255,.07)}
+  .in-tiles>div{background:#0d0f14;padding:11px 6px;text-align:center}
+  .in-tiles b{display:block;font-size:16.5px;font-weight:750;letter-spacing:-.02em;color:var(--hi);
+    font-variant-numeric:tabular-nums}
+  .in-tiles span{display:block;margin-top:2px;font-size:10px;color:var(--lo)}
+  .in-well__ways{margin:12px 0 16px;font-size:13.5px;line-height:1.55;color:var(--mid)}
+  .in-well canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
+  .in-well__cap{margin-top:12px;font-size:13px;line-height:1.5;color:var(--mid);text-align:center}
+
+  /* vivere: green light on the face itself */
+  .in-viv{position:relative;margin-top:52px;border-radius:20px;padding:22px 18px 18px;
+    background:
+      radial-gradient(70% 60% at 50% 0%, color-mix(in srgb, var(--cons) 20%, transparent), transparent 74%),
+      radial-gradient(60% 46% at 84% 92%, color-mix(in srgb, var(--cons) 14%, transparent), transparent 72%)}
+  .in-viv__h{font-size:20px;font-weight:750;letter-spacing:-.022em;color:var(--ink1)}
+  .in-viv__lead{margin-top:14px;font-size:13px;font-weight:640;color:var(--ink2)}
+  .in-viv__q{margin-top:10px;font-size:22px;font-weight:720;letter-spacing:-.024em;line-height:1.32;color:var(--ink1)}
+  .in-viv__q .w{opacity:.2;transition:opacity .7s ease,text-shadow .7s ease}
+  .in-viv__q .w.lit{opacity:1;text-shadow:0 0 20px color-mix(in srgb, var(--cons) 50%, transparent)}
+  .in-viv__closer{margin-top:16px;font-size:13.5px;font-weight:660;
+    color:color-mix(in srgb, var(--cons) 62%, #063313)}
+  .in-seal{margin-top:26px;border-radius:16px;padding:16px 16px 13px;
+    background:rgba(255,255,255,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+  .in-seal__hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:680;color:var(--ink2)}
+  .in-seal__hd svg{width:14px;height:14px}
+  .in-seal__b{margin-top:11px;font-size:14px;line-height:1.6;color:var(--ink1)}
+  .in-seal__sign{margin-top:11px;font-size:13px;font-style:italic;color:var(--ink2)}
+  .in-seal__law{margin-top:12px;padding-top:10px;box-shadow:inset 0 1px 0 rgba(16,20,28,.14);
+    font-size:11.5px;color:var(--ink3)}
+
+  /* the plaque inverts on the light face: dark stone, light strike */
+  .in-org{position:relative;margin:110px 0 0;padding:30px 22px 28px;border-radius:18px;
+    text-align:center;overflow:hidden;
+    background:linear-gradient(180deg, rgba(9,11,15,.94), rgba(14,17,22,.9));
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.08),
+      0 10px 30px rgba(10,14,20,.35)}
+  .in-org>*{position:relative;display:block}
+  .in-org__k{font-size:12px;font-weight:600;color:rgba(232,236,244,.5)}
+  .in-org__d{margin:9px 0 0;font-size:20px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;color:rgba(228,233,242,.92);
+    text-shadow:0 -1px 1px rgba(0,0,0,.85), 0 1px .5px rgba(255,255,255,.16)}
+  .in-org__t{margin:9px 0 0;font-size:13px;color:rgba(232,236,244,.62);font-variant-numeric:tabular-nums}
+
+  .in-foot{margin-top:60px;text-align:center}
+  .in-code{display:inline-flex;gap:2.5px;height:26px}
+  .in-code i{width:2px;background:rgba(16,20,28,.8)}
+  .in-code i:nth-child(3n){width:4px}
+  .in-code i:nth-child(5n){width:1.5px;opacity:.55}
+  .in-code i:nth-child(7n){width:5px}
+  .in-digits{margin-top:6px;font-size:12px;letter-spacing:.14em;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .in-policy{margin-top:12px;font-size:11px;color:var(--ink2)}
+</style>
+<style id="picks">/* mor-clocks */
+.mor-clocks{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-clocks__pane{padding:10px 0 12px}
+.mor-clocks__pane--up{box-shadow:var(--inset);padding-top:16px;margin-top:2px}
+.mor-clocks__num{font-size:52px;line-height:1;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--hi)}
+.mor-clocks__pane--up .mor-clocks__num{color:var(--cons)}
+.mor-clocks__cap{margin-top:9px;font-size:14px;line-height:1.4;color:var(--mid)}
+.mor-clocks__cap span{color:var(--hi);font-variant-numeric:tabular-nums}
+.mor-clocks__foot{margin:14px 0 0;font-size:13px;line-height:1.4;color:var(--mid)}
+
+/* clk-units */
+.clk-units{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.clk-units .clk-units__h{font-size:15px;color:var(--hi);margin-bottom:12px}
+.clk-units .clk-units__r{display:flex;align-items:baseline;justify-content:space-between;padding:9px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.clk-units .clk-units__r span{font-size:14px;color:var(--mid)}
+.clk-units .clk-units__r b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.clk-units .clk-units__r--live b{font-size:22px;color:var(--act)}
+
+/* vol-total */
+.vol-total{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:20px 18px 14px;color:var(--hi)}
+.vol-total__n{font-size:78px;line-height:.86;letter-spacing:-.035em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-total__cap{margin-top:10px;font-size:14.5px;color:var(--mid)}
+.vol-total__rows{margin-top:16px}
+.vol-total__row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.vol-total__row span{font-size:14px;color:var(--mid)}
+.vol-total__row b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+
+/* vol-pages */
+.vol-pages{display:grid;grid-template-columns:1fr 62px;gap:16px;align-items:end;background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.vol-pages__n{font-size:34px;line-height:1;letter-spacing:-.02em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-pages__sub{margin:12px 0 0;font-size:14.5px;line-height:1.45;color:var(--mid)}
+.vol-pages__raw{margin-top:12px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lo)}
+.vol-pages__block{position:relative;height:135px;border-radius:3px;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.24) 0 1px,rgba(255,255,255,.02) 1px 3px);box-shadow:inset 1px 0 0 rgba(255,255,255,.10),inset -1px 0 0 rgba(0,0,0,.35)}
+.vol-pages__block i{position:absolute;left:0;right:0;top:-5px;height:5px;border-radius:2px 2px 0 0;background:rgba(238,241,247,.5)}
+
+/* vol-deep */
+.vol-deep{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:18px;color:var(--hi)}
+.vol-deep__n{font-size:32px;line-height:1.05;letter-spacing:-.02em;font-weight:600;font-variant-numeric:tabular-nums;color:var(--hi)}
+.vol-deep__cap{margin-top:8px;font-size:14.5px;color:var(--mid)}
+.vol-deep__bar{margin-top:16px;height:26px;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(238,241,247,.62) 0 1.7px,transparent 1.7px calc(100%/88))}
+.vol-deep__raw{margin-top:10px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--lo)}
+
+/* rec-board */
+.rec-board{padding:16px 18px 6px;border-radius:14px;background:var(--fill);box-shadow:var(--inset)}.rec-board__t{font-size:15px;color:var(--hi);margin-bottom:4px}.rec-board__r{padding:11px 0;border-top:1px solid rgba(255,255,255,.07)}.rec-board__a{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.rec-board__a span{font-size:14.5px;color:var(--mid)}.rec-board__a b{font-size:19px;font-weight:600;letter-spacing:-.01em;color:var(--act);font-variant-numeric:tabular-nums}.rec-board__b{margin-top:3px;font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* rec-hold */
+.rec-hold{position:relative;padding:20px 18px 16px;border-radius:14px;background:var(--fill);box-shadow:var(--inset);color:var(--mid)}.rec-hold__m{position:absolute;top:16px;right:16px;width:16px;height:16px;fill:var(--lo)}.rec-hold__num{font-size:92px;line-height:.84;font-weight:600;letter-spacing:-.05em;color:var(--act);font-variant-numeric:tabular-nums}.rec-hold__unit{margin-top:14px;font-size:16px;line-height:1.35;color:var(--hi)}.rec-hold__rule{height:1px;margin:14px 0 10px;background:rgba(255,255,255,.08)}.rec-hold__meta{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* mil-500 */
+.mil-500{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:20px 16px 18px;color:var(--hi);font-variant-numeric:tabular-nums}
+.mil-500 .mil-500__row{display:flex;align-items:baseline;gap:6px}
+.mil-500 .mil-500__now{font-size:62px;line-height:.88;font-weight:640;letter-spacing:-.03em;color:var(--act)}
+.mil-500 .mil-500__slash{font-size:30px;line-height:1;font-weight:400;color:var(--lo)}
+.mil-500 .mil-500__goal{font-size:30px;line-height:1;font-weight:560;letter-spacing:-.02em;color:var(--mid)}
+.mil-500 .mil-500__cap{margin:12px 0 0;font-size:13px;color:var(--lo)}
+.mil-500 .mil-500__line{margin:14px 0 0;font-size:16px;line-height:1.45;color:var(--hi)}
+
+/* cmb-wall */
+.cmb-wall{padding:18px;border-radius:14px;background:var(--fill);box-shadow:var(--inset);color:var(--hi)}
+.cmb-wall .cmb-wall__h{margin:0 0 14px;font-size:14px;line-height:1.4;color:var(--mid)}
+.cmb-wall .cmb-wall__grid{display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+.cmb-wall .cmb-wall__c{display:block;width:100%;aspect-ratio:1/1;border-radius:2px;background:rgba(255,255,255,.05)}
+.cmb-wall .cmb-wall__c.is-on{background:rgba(255,255,255,.26)}
+.cmb-wall .cmb-wall__c.is-back{background:var(--cons)}
+.cmb-wall .cmb-wall__legend{display:flex;gap:14px;margin:14px 0 0;font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.cmb-wall .cmb-wall__legend span{display:flex;align-items:center;gap:6px}
+.cmb-wall .cmb-wall__legend i{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.05)}
+.cmb-wall .cmb-wall__legend i.is-on{background:rgba(255,255,255,.26)}
+.cmb-wall .cmb-wall__legend i.is-back{background:var(--cons)}
+.cmb-wall .cmb-wall__f{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--mid)}
+
+/* rec-months */
+.rec-months{padding:16px 18px;border-radius:14px;background:var(--fill);box-shadow:var(--inset)}.rec-months__t{font-size:15px;color:var(--hi)}.rec-months__chart{display:flex;align-items:flex-end;gap:5px;height:104px;margin-top:14px}.rec-months__chart span{flex:1;border-radius:2px 2px 0 0;background:rgba(255,255,255,.14)}.rec-months__chart span.top{background:var(--cons)}.rec-months__chart span.low{background:rgba(255,255,255,.09)}.rec-months__chart span.now{background:repeating-linear-gradient(180deg,rgba(255,255,255,.16) 0 3px,transparent 3px 6px)}.rec-months__ax{display:flex;gap:5px;margin-top:6px}.rec-months__ax i{flex:1;text-align:center;font-size:10px;font-style:normal;color:var(--lo)}.rec-months__c{margin-top:12px;font-size:13.5px;line-height:1.45;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* amb-weeks */
+.amb-weeks{background:var(--fill);box-shadow:var(--inset);border-radius:16px;padding:16px;color:var(--hi)}
+.amb-weeks__cv{display:block;width:100%;height:auto}
+.amb-weeks__rows{margin-top:16px;display:grid;gap:7px}
+.amb-weeks__r{display:flex;align-items:baseline;gap:9px}
+.amb-weeks__r b{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;min-width:62px}
+.amb-weeks__g{color:var(--cons)}
+.amb-weeks__r span{font-size:13.5px;color:var(--mid);line-height:1.35}
+.amb-weeks__p{margin:14px 0 0;padding-top:12px;background:linear-gradient(90deg,rgba(255,255,255,.10),rgba(255,255,255,0)) top/100% 1px no-repeat;font-size:12.5px;color:var(--mid)}
+
+/* mor-remaining */
+.mor-remaining{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-remaining__t{margin:0 0 6px;font-size:14px;color:var(--mid)}
+.mor-remaining__r{display:flex;align-items:baseline;justify-content:space-between;padding:11px 0;box-shadow:var(--inset)}
+.mor-remaining__r span{font-size:15px;color:var(--hi)}
+.mor-remaining__r b{font-size:22px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--hi)}
+.mor-remaining__f{margin:14px 0 0;font-size:13px;line-height:1.45;color:var(--mid)}
+
+/* mor-oneday */
+.mor-oneday{background:var(--fill);box-shadow:var(--inset);border-radius:14px;padding:16px 18px 14px;color:var(--hi)}
+.mor-oneday__t{margin:0 0 12px;font-size:14px;color:var(--mid)}
+.mor-oneday__row{display:flex;gap:3px;align-items:stretch}
+.mor-oneday__row i{flex:1 1 0;height:32px;border-radius:3px;background:var(--fill);box-shadow:var(--inset)}
+.mor-oneday__row i.mor-oneday__on{background:var(--act);opacity:.30;box-shadow:none}
+.mor-oneday__row i.mor-oneday__now{background:var(--act);opacity:1;box-shadow:none}
+.mor-oneday__f{margin:12px 0 0;font-size:14px;line-height:1.45;color:var(--hi)}
+.mor-oneday__f span{font-variant-numeric:tabular-nums}
+
+/* wrd-span */
+.wrd-span{background:var(--fill);border-radius:14px;box-shadow:var(--inset);padding:18px}
+.wrd-span .wrd-span__meta{font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.wrd-span .wrd-span__q{margin:7px 0 0;font-size:16px;line-height:1.42;color:var(--hi)}
+.wrd-span .wrd-span__gap{display:flex;align-items:center;gap:10px;margin:16px 0}
+.wrd-span .wrd-span__gap i{flex:1;height:1px;background:rgba(255,255,255,.1)}
+.wrd-span .wrd-span__gap span{font-size:12.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+
+/* wrd-hardest */
+.wrd-hardest{background:var(--fill);border-radius:14px;box-shadow:var(--inset);padding:18px}
+.wrd-hardest .wrd-hardest__head{font-size:14px;line-height:1.45;color:var(--mid)}
+.wrd-hardest .wrd-hardest__list{list-style:none;margin:14px 0 0;padding:0}
+.wrd-hardest .wrd-hardest__item{padding:12px 0;box-shadow:var(--inset)}
+.wrd-hardest .wrd-hardest__item:first-child{box-shadow:none;padding-top:0}
+.wrd-hardest .wrd-hardest__date{font-size:12px;color:var(--lo);font-variant-numeric:tabular-nums}
+.wrd-hardest .wrd-hardest__q{margin:6px 0 0;font-size:15.5px;line-height:1.4;color:var(--hi)}
+
+/* amb-threads */
+.amb-threads{background:var(--fill);box-shadow:var(--inset);border-radius:16px;padding:16px;color:var(--hi)}
+.amb-threads__t{padding:11px 0}
+.amb-threads__t+.amb-threads__t{background:linear-gradient(90deg,rgba(255,255,255,.09),rgba(255,255,255,0)) top/100% 1px no-repeat}
+.amb-threads__l{font-size:15px;font-weight:500;color:var(--hi)}
+.amb-threads__bar{position:relative;height:3px;border-radius:2px;margin:11px 0 9px}
+.amb-threads__bar i{position:absolute;right:-3px;top:50%;width:7px;height:7px;border-radius:50%;transform:translateY(-50%)}
+.amb-threads__bar--done{background:linear-gradient(90deg,rgba(63,217,78,.30),rgba(63,217,78,.85))}
+.amb-threads__bar--done i{background:var(--cons)}
+.amb-threads__bar--stop{background:linear-gradient(90deg,rgba(238,241,247,.12),rgba(238,241,247,.34))}
+.amb-threads__bar--stop i{background:rgba(5,6,9,1);box-shadow:0 0 0 1.5px rgba(238,241,247,.40)}
+.amb-threads__ticks{height:12px;margin:9px 0;background:linear-gradient(90deg,var(--act) 0 62%,rgba(255,255,255,.13) 62% 100%);-webkit-mask-image:repeating-linear-gradient(90deg,#000 0 1.7px,transparent 1.7px 3.1px);mask-image:repeating-linear-gradient(90deg,#000 0 1.7px,transparent 1.7px 3.1px)}
+.amb-threads__s{font-size:13px;color:var(--mid);line-height:1.35}</style>
+<style id="mv">
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
+  .room{ position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
+
+  /* the chips are the same card, small */
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the customiser sheet. Held open from the card. Glass over a scrim, so
+     the card stays visible behind it and you can see what you are changing. */
+  .hint{ margin:26px 0 0; text-align:center; font-size:12.5px; color:var(--lo); }
+  .sheetwrap{ position:fixed; inset:0; z-index:60; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .sheetwrap__scrim{ position:absolute; inset:0; background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .22s ease-out; }
+  .sheetwrap.is-open .sheetwrap__scrim{ opacity:1; }
+  .sheet{ position:relative; width:100%; max-width:470px;
+    padding:10px 20px calc(20px + var(--safe-b));
+    border-radius:20px 20px 0 0;
+    background:rgba(16,18,23,.82);
+    backdrop-filter:blur(34px) saturate(1.5);
+    -webkit-backdrop-filter:blur(34px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -20px 60px rgba(0,0,0,.6);
+    transform:translateY(102%); transition:transform .26s cubic-bezier(.32,.72,0,1); }
+  .sheetwrap.is-open .sheet{ transform:translateY(0); }
+  .sheet__grab{ display:block; width:38px; height:4px; margin:0 auto 14px;
+    border-radius:999px; background:rgba(255,255,255,.2); }
+  .sheet .strip{ margin:0 -20px; padding:2px 20px 12px; }
+  .sheet__done{ display:block; width:100%; margin:16px 0 0; padding:15px;
+    border:0; border-radius:13px; background:#f2f3f6; color:#0b0c0e;
+    font:inherit; font-size:15.5px; font-weight:650; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){
+    .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
+
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
+
+  .hero__name{ margin:22px 0 7px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  /* a thin clock, not a sentence. Light weight and open tracking so the digits
+     read as a running timer rather than a statistic. */
+  #mori{ font-size:19px; font-weight:250; letter-spacing:.11em; color:var(--hi);
+    font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1; }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
+    color:var(--hi); outline:none; }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
+
+  /* ── 4 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  /* ring + mark: two small choices that ride on top of the material */
+  .tog{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px; }
+  .tog__g{ display:flex; gap:2px; padding:2px; border-radius:999px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .tog__g button{ font:inherit; font-size:12px; font-weight:620; letter-spacing:-.005em;
+    color:var(--mid); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; transition:background .15s ease-out; }
+  .tog__g button.on{ color:#0b0c0e; background:#f2f3f6; }
+
+  /* colour-matched ring: the rim and the room glow take the card's own colour */
+  body.ring-colour .cage .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,.85)),
+                inset 0 0 16px 2px color-mix(in srgb, var(--edge, #fff) 28%, transparent) !important; }
+  body.ring-colour .cage.flat .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  /* the mark, pulled toward the card's colour. Tinted, never fully coloured. */
+  body.mark-tint .cage .daycard-ns__emblem path{
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--edge, #ffffff) 28%) !important; }
+  body.mark-tint .cage .daycard-ns__name{
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--edge, #ffffff) 22%) !important; }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ margin:30px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+
+  .trail{ margin:16px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  /* ── the last block on the screen, and the oldest thing on it. Recessed
+     rather than raised: a well cut into the page, with the date struck INTO
+     the surface the same way the name is struck into the card. Same engraving
+     language, so the beginning and the object agree. */
+  .origin{ position:relative; margin:34px 0 0; padding:30px 22px 28px;
+    border-radius:18px; text-align:center; overflow:hidden;
+    background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.16));
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.55),
+                inset 0 -1px 0 rgba(255,255,255,.07); }
+  /* one soft pool of the card's own light, radial so it never draws an edge */
+  .origin::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--tint, #3ad9f5) 16%, transparent), transparent 72%); }
+  .origin > *{ position:relative; }
+  .origin__k{ display:block; font-size:12px; font-weight:600; color:var(--lo); }
+  .origin__d{ display:block; margin:9px 0 0; font-size:20px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:rgba(228,233,242,.9);
+    text-shadow: 0 -1px 1px rgba(0,0,0,.85), 0 1px 0.5px rgba(255,255,255,.16); }
+  .origin__t{ display:block; margin:9px 0 0; font-size:13px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  
+</style>
+<style>.rim,.rim::before,.rim::after{z-index:8}</style>
+</head><body>
+
+<!-- STATE A: the home. Dark room, the card, one instruction. -->
+<div class="home" id="home">
+  <div class="home__in">
+    <div class="cage" id="homeCage"></div>
+    <p class="home__name">Your Memento</p>
+    <p class="home__mori">20967:16:41:52</p>
+    <p class="home__hint">Tap the card</p>
+  </div>
+</div>
+
+<!-- STATE B: inside the card. Dark middle, the ring is the device. -->
+<div class="inside" id="inside" hidden>
+  <div class="rim" aria-hidden="true"></div>
+  <div class="rim-cover" aria-hidden="true"></div>
+  <button class="in-mode" id="inMode" type="button">Middle: dark</button>
+  <button class="in-d0" id="inD0btn" type="button">What day one looks like</button>
+  <button class="in-back" id="inBack" type="button" aria-label="Back out of the card">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+
+  <div class="in-scroll" id="inScroll">
+    <div class="in-amb" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="in-col">
+
+      <header class="in-head">
+        <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <p class="in-title">Your Memento</p>
+        <p class="in-owner">Owner<b>Malik Peace</b></p>
+        <p class="in-count">20967:16:41:52</p>
+      </header>
+
+      <!-- THE AGE OF THE MEMENTO: the biggest number on the page -->
+      <div class="bigup">
+        <div class="bigup__d">Day <b>24</b></div>
+        <div class="bigup__u">and <span id="bigupLive">12h 30m 7s</span></div>
+      </div>
+
+      <!-- HOW FAR YOU'VE COME: stats and evidence -->
+      <div class="vow">
+        <p class="vow__l">The promise</p>
+        <p class="vow__q">Get to 100 paying users.</p>
+        <p class="vow__w">Because I am done building things nobody pays for.</p>
+        <p class="vow__d">Signed July 15, and not changed since.</p>
+      </div>
+
+      <div class="gp">
+        <div class="gp__r gp__r--clar">
+          <span class="gp__dot"></span>
+          <div>
+            <p class="gp__k">Clarity</p>
+            <p class="gp__v">100 paying users, because the building has to start paying you back.</p>
+            <p class="gp__s">9 of 100 are in.</p>
+          </div>
+        </div>
+        <div class="gp__r gp__r--act">
+          <span class="gp__dot"></span>
+          <div>
+            <p class="gp__k">Action</p>
+            <p class="gp__v">Today: message ten people who fit the product.</p>
+            <p class="gp__s">21 moves made since July 15.</p>
+          </div>
+        </div>
+        <div class="gp__r gp__r--cons">
+          <span class="gp__dot"></span>
+          <div>
+            <p class="gp__k">Consistency</p>
+            <p class="gp__v">17 of 24 days carry a mark. The current run is 3, the longest is 6.</p>
+            <p class="gp__s">Two gaps opened, two closed.</p>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="in-flowh">Progress so far</h2>
+      <div class="cpick"><div class="vol-total">
+  <div class="vol-total__n">31</div>
+  <div class="vol-total__cap">total marks on the record</div>
+  <div class="vol-total__rows">
+    <div class="vol-total__row"><span>Actions completed</span><b>21</b></div>
+    <div class="vol-total__row"><span>Deep work sessions</span><b>6</b></div>
+    <div class="vol-total__row"><span>Notes and reflections</span><b>4</b></div>
+  </div>
+</div></div>
+      <div class="cpick"><div class="vol-pages">
+  <div class="vol-pages__text">
+    <div class="vol-pages__n">840 words</div>
+    <p class="vol-pages__sub">Written in here since July 15, in your own hand. Three and a half pages of a book that did not exist last month.</p>
+    
+  </div>
+  <div class="vol-pages__block" aria-hidden="true"><i></i></div>
+</div></div>
+      <div class="cpick"><div class="vol-deep">
+  <div class="vol-deep__n">9 hours</div>
+  <div class="vol-deep__cap">of deep work</div>
+  <div class="vol-deep__bar" aria-hidden="true"></div>
+  <div class="vol-deep__raw">6 sessions, 90 minutes each</div>
+</div></div>
+      <div class="cpick"><div class="rec-board"><div class="rec-board__t">Records</div><div class="rec-board__r"><div class="rec-board__a"><span>Longest run</span><b>6 days</b></div><div class="rec-board__b">Set July 27. Standing 11 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Best week</span><b>6 of 7</b></div><div class="rec-board__b">Week of July 22. Standing 11 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Biggest day</span><b>4 marks</b></div><div class="rec-board__b">July 24. Standing 14 days.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>First mark</span><b>day 1</b></div><div class="rec-board__b">July 15, 6:42 AM. Everything descends from it.</div></div><div class="rec-board__r"><div class="rec-board__a"><span>Comebacks</span><b>2</b></div><div class="rec-board__b">Two gaps opened, two closed.</div></div></div></div>
+      <div class="cpick"><div class="rec-hold"><svg class="rec-hold__m" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg><div class="rec-hold__num">6</div><div class="rec-hold__unit">days in a row. Your longest, ever.</div><div class="rec-hold__rule"></div><div class="rec-hold__meta"><span>July 22 to July 27, 2026</span><span>standing 11 days</span></div></div></div>
+
+      <!-- the wall and the months flow inside the same movement -->
+      <div class="cpick"><div class="cmb-wall">
+  <p class="cmb-wall__h">Comebacks</p>
+  <div class="cmb-wall__grid" id="cmb-wall-grid"></div>
+  <div class="cmb-wall__legend">
+    <span><i class="is-on"></i>17 marked</span>
+    <span><i class="is-back"></i>2 back</span>
+    <span><i class="is-off"></i>7 blank</span>
+  </div>
+  <p class="cmb-wall__f">Your longest run, 6 days in July, began on one of the green cells.</p>
+</div></div>
+
+      <!-- 4. THE MONTHS -->
+      <div class="cpick"><div class="rec-months"><div class="rec-months__t">Every week so far</div><div class="rec-months__chart"><span style="height:43%" class="low"></span><span style="height:71%"></span><span style="height:86%" class="top"></span><span style="height:57%" class="now"></span></div><div class="rec-months__ax"><i>Jul 15</i><i>Jul 22</i><i>Jul 29</i><i>Aug 5</i></div><div class="rec-months__c">Week of July 22 was 6 of 7, the best so far. This week is still running.</div></div></div>
+
+      <!-- 5. MEMENTO MORI -->
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
+      <div class="cpick"><div class="amb-weeks">
+  <canvas class="amb-weeks__cv" width="652" height="274"></canvas>
+  <div class="amb-weeks__rows">
+    <div class="amb-weeks__r"><b>1,179</b><span>weeks behind you</span></div>
+    <div class="amb-weeks__r"><b class="amb-weeks__g">3</b><span>of them went into this</span></div>
+    <div class="amb-weeks__r"><b>2,996</b><span>left, if the guess of eighty years holds</span></div>
+  </div>
+  <p class="amb-weeks__p">Each dot is one week. The white one is this week.</p>
+</div></div>
+      <div class="cpick"><div class="mor-remaining">
+  <p class="mor-remaining__t">What is left, counted six ways.</p>
+  <div class="mor-remaining__r"><span>Days</span><b>20,967</b></div>
+  <div class="mor-remaining__r"><span>Weeks</span><b>2,996</b></div>
+  <div class="mor-remaining__r"><span>Months</span><b>689</b></div>
+  <div class="mor-remaining__r"><span>Saturdays</span><b>2,995</b></div>
+  <div class="mor-remaining__r"><span>Summers</span><b>58</b></div>
+  <div class="mor-remaining__r"><span>Birthdays</span><b>59</b></div>
+  <p class="mor-remaining__f">One assumption, 80 years. Change it and every row moves.</p>
+</div></div>
+      <div class="cpick"><div class="mor-oneday">
+  <p class="mor-oneday__t">Today, hour by hour.</p>
+  <div class="mor-oneday__row" id="mor-oneday-row"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <p class="mor-oneday__f"><span id="mor-oneday-gone">0</span> hours gone, <span id="mor-oneday-left">24</span> to go. This is one of the 20,967.</p>
+</div></div>
+
+      <!-- MEMENTO VIVERE: the promises they made to themselves -->
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
+
+      <div class="viv-dream">
+        <p class="viv-dream__q">&ldquo;I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.&rdquo;</p>
+        <p class="viv-dream__d">The dream, written July 15, 2026</p>
+        <p class="viv-dream__g">Get to 100 paying users. Signed the same morning.</p>
+      </div>
+      <div class="cpick"><div class="amb-threads">
+  <div class="amb-threads__t">
+    <div class="amb-threads__l">Get to 100 paying users</div>
+    <div class="amb-threads__bar" style="width:100%"><i></i></div>
+    <div class="amb-threads__s">open, signed July 15, day 24, at 9 of 100</div>
+  </div>
+  <div class="amb-threads__t">
+    
+    
+    <div class="amb-threads__s"></div>
+  </div>
+  <div class="amb-threads__t">
+    
+  </div>
+</div></div>
+
+      <div class="cpick"><div class="wrd-span">
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">15 July 2026, 6:42 AM. The first thing you typed.</div>
+    <p class="wrd-span__q">I do not want to be the person who talks about this.</p>
+  </div>
+  <div class="wrd-span__gap"><i></i><span>24 days</span><i></i></div>
+  <div class="wrd-span__row">
+    <div class="wrd-span__meta">7 August 2026. The latest.</div>
+    <p class="wrd-span__q">9 of 100. Slower than I said. Still going.</p>
+  </div>
+</div></div>
+      <div class="cpick"><div class="wrd-hardest">
+  <div class="wrd-hardest__head">You have written on two days you wanted to stop. Both are here.</div>
+  <ol class="wrd-hardest__list">
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">28 July 2026</div><p class="wrd-hardest__q">Wanted to quit at 3pm and did not.</p></li>
+    <li class="wrd-hardest__item"><div class="wrd-hardest__date">2 August 2026</div><p class="wrd-hardest__q">Three days gone. I opened it anyway.</p></li>
+    
+  </ol>
+</div></div>
+
+      <div class="viv-wall">
+        <div class="viv-wall__note"><p>Found the pace again. Slow is fine.</p><span>July 19</span></div>
+        <div class="viv-wall__pic viv-wall__pic--a"><span>Jun 12</span></div>
+        <div class="viv-wall__pic viv-wall__pic--b"><span>May 4</span></div>
+        <div class="viv-wall__note"><p>She said she was proud of me.</p><span>June 12</span></div>
+        <button class="viv-wall__add" type="button">Add a note or a photo</button>
+      </div>
+
+      <div class="in-seal is-locked" id="seal">
+        <div class="in-seal__hd">
+          <svg class="seal-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path class="seal-shackle" d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Sealed July 15, day one</span>
+        </div>
+
+        <div class="seal-shut">
+          <p class="seal-shut__l">The note you wrote before day one.</p>
+          <button class="seal-hold" id="sealHold" type="button">
+            <span class="seal-hold__fill"></span>
+            <span class="seal-hold__t">Hold to open</span>
+          </button>
+        </div>
+
+        <div class="seal-open">
+          <p class="in-seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
+          <p class="in-seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
+          <p class="in-seal__sign">you, at the start</p>
+        </div>
+      </div>
+
+      <!-- 8. THE ENDING -->
+      <div class="in-org">
+        <span class="in-org__k">Creation of Your Memento</span>
+        <span class="in-org__d">July 15, 2026</span>
+        <span class="in-org__t">6:42 AM</span>
+      </div>
+
+      <div class="in-foot">
+        <div class="in-code" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="in-digits">0024 / 0017</p>
+        <p class="in-policy">Get the most out of your existence.</p>
+      </div>
+
+    </div>
+
+    <div class="in-col in-col--d0" id="inD0col" hidden>
+      <header class="in-head">
+        <svg class="in-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+        <p class="in-title">Your Memento</p>
+        <p class="in-owner">Owner<b>Malik Peace</b></p>
+        <p class="in-count">21267:16:41:52</p>
+      </header>
+
+      <div class="bigup">
+        <div class="bigup__d">Day <b>1</b></div>
+        <div class="bigup__u">and <span id="inD0live">11h 17m 16s</span></div>
+      </div>
+
+      <div class="vow">
+        <p class="vow__l">The promise</p>
+        <p class="vow__q">Get to 100 paying users.</p>
+        <p class="vow__w">Because I am done building things nobody pays for.</p>
+        <p class="vow__d">Signed this morning. It does not change from here.</p>
+      </div>
+
+      <p class="d0line">The ledger opens with the first mark. That can be tonight.</p>
+
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, you will die.">Mori</h2>
+      <div class="d0wks">
+        <canvas id="inWeeksD0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
+        <p class="d0wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
+      </div>
+
+      <h2 class="in-flowh in-flowh--sub" data-sub="Remember, to live.">Vivere</h2>
+      <div class="in-seal">
+        <div class="in-seal__hd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Unsealed, until tonight</span>
+        </div>
+        <p class="in-seal__b">Tonight you write one note to the person you are doing this for. You pick a word to lock it with, and it never changes again.</p>
+        <p class="in-seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>
+      </div>
+
+      <div class="in-org">
+        <span class="in-org__k">Creation of Your Memento</span>
+        <span class="in-org__d">August 7, 2026</span>
+        <span class="in-org__t">6:42 AM</span>
+      </div>
+
+      <div class="in-foot">
+        <p class="in-digits">0001 / 0000</p>
+        <p class="in-policy">Get the most out of your existence.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rimfix"></div><script>
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+
+</script>
+<script>
+document.querySelector(".rim").innerHTML="<i></i>";
+
+document.body.classList.add('ns-bloom');
+var M = MATS[0];
+document.getElementById('homeCage').className='cage is-stock';
+document.getElementById('homeCage').innerHTML=realCard(matVars(M,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+
+var home=document.getElementById('home'), inside=document.getElementById('inside');
+inside.classList.add('brd');
+var modeBtn=document.getElementById('inMode');
+if(modeBtn){
+  modeBtn.addEventListener('click',function(){
+    var brd=inside.classList.toggle('brd');
+    modeBtn.textContent=brd?'Middle: dark':'Middle: the face';
+  });
+}
+document.getElementById('homeCage').addEventListener('click',function(){
+  inside.hidden=false;
+  inside.classList.remove('rim-done');
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    home.classList.add('is-diving');
+    inside.classList.add('is-open');
+  });});
+  setTimeout(function(){home.style.display='none';},900);
+});
+document.getElementById('inBack').addEventListener('click',function(){
+  home.style.display='';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    home.classList.remove('is-diving');
+    inside.classList.remove('is-open');
+  });});
+  setTimeout(function(){inside.hidden=true;},700);
+  document.getElementById('inScroll').scrollTop=0;
+});
+
+/* the age of the Memento climbs while you watch */
+(function(){
+  var b=document.getElementById('bigupLive'); if(!b)return;
+  var t0=Date.now(), base=44915;
+  setInterval(function(){
+    var e=base+Math.floor((Date.now()-t0)/1000);
+    b.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
+  },1000);
+})();
+
+/* the seal opens to a held finger. Reading it should cost a second. */
+(function(){
+  var seal=document.getElementById('seal'), btn=document.getElementById('sealHold');
+  if(!seal||!btn)return;
+  var t=null;
+  function start(e){
+    if(e.cancelable)e.preventDefault();
+    btn.classList.add('is-holding');
+    t=setTimeout(function(){seal.classList.add('is-open');},1150);
+  }
+  function stop(){ clearTimeout(t); btn.classList.remove('is-holding'); }
+  ['pointerdown','touchstart'].forEach(function(ev){btn.addEventListener(ev,start,{passive:false});});
+  ['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(function(ev){
+    btn.addEventListener(ev,stop);});
+})();
+
+/* Mori and Vivere answer a touch with what their names mean */
+document.querySelectorAll('.in-flowh--sub').forEach(function(h){
+  h.addEventListener('click',function(){h.classList.toggle('is-sub');});
+});
+
+/* day one: the same room before anything has happened */
+(function(){
+  var btn=document.getElementById('inD0btn'), col0=document.querySelector('.in-col:not(.in-col--d0)'),
+      col1=document.getElementById('inD0col'), cage=document.getElementById('homeCage');
+  if(!btn||!col1)return;
+  var on=false;
+  btn.addEventListener('click',function(){
+    on=!on;
+    col0.hidden=on; col1.hidden=!on;
+    btn.textContent=on?'Back to day 300':'What day one looks like';
+    if(cage){
+      cage.innerHTML=realCard(matVars(MATS[0],{clar:!on,act:!on,cons:!on}),{name:'Malik Peace'});
+      if(on)document.body.classList.remove('ns-bloom');else document.body.classList.add('ns-bloom');
+    }
+    document.getElementById('inScroll').scrollTop=0;
+  });
+  var cv=document.getElementById('inWeeksD0');
+  if(cv){
+    var cols=52,total=4175,lived=1179,cell=5,gap=1;
+    var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+    cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+    var cx=cv.getContext('2d');cx.scale(2,2);
+    for(var i=0;i<total;i++){
+      var c2=i%cols,r2=Math.floor(i/cols),x=c2*(cell+gap),y=r2*(cell+gap);
+      cx.fillStyle=i<lived?'rgba(255,255,255,0.42)':'rgba(255,255,255,0.10)';
+      cx.fillRect(x,y,cell,cell);
+    }
+    var cc=lived%cols,rr=Math.floor(lived/cols);
+    cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+    cx.strokeRect(cc*(cell+gap)-0.5,rr*(cell+gap)-0.5,cell+1,cell+1);
+  }
+  var live=document.getElementById('inD0live');
+  if(live){
+    var t0=Date.now(), b=40611;
+    setInterval(function(){
+      var e=b+Math.floor((Date.now()-t0)/1000);
+      live.textContent=Math.floor(e/3600)+'h '+Math.floor(e%3600/60)+'m '+(e%60)+'s';
+    },1000);
+  }
+})();
+
+/* the barcode: generated from the person's own numbers, unique per memento */
+(function(){
+  var host=document.querySelector('.in-code'); if(!host)return;
+  var data='MALIK-0001-0024-0017';
+  var h=2166136261;
+  for(var i=0;i<data.length;i++){h^=data.charCodeAt(i);h=Math.imul(h,16777619);}
+  var out='',x=h>>>0;
+  for(var b=0;b<26;b++){
+    x=(Math.imul(x,1664525)+1013904223)>>>0;
+    var w=[2,2,3,4,5][x%5], op=(x>>3)%7===0?'.5':'1';
+    out+='<i style="width:'+w+'px;opacity:'+op+'"></i>';
+  }
+  host.innerHTML=out;
+})();
+
+/* the ring closes only when they reach the very bottom */
+(function(){
+  var sc=document.getElementById('inScroll'); if(!sc)return;
+  function check(){
+    var done = sc.scrollHeight > 0 && sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 6;
+    inside.classList.toggle('rim-done', done);
+  }
+  sc.addEventListener('scroll', check, {passive:true});
+  check();
+})();
+
+</script>
+<script>
+/* mor-clocks */
+try{ (function(){
+var el = document.getElementById('mor-clocks-tick');
+if (!el) { return; }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function tick(){
+  var now = new Date();
+  var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 6, 42, 0, 0);
+  if (now.getTime() < start.getTime()) { start = new Date(start.getTime() - 86400000); }
+  var s = Math.floor((now.getTime() - start.getTime()) / 1000);
+  el.textContent = Math.floor(s / 3600) + 'h ' + pad(Math.floor(s / 60) % 60) + 'm ' + pad(s % 60) + 's';
+}
+tick();
+setInterval(tick, 1000);
+})(); }catch(e){ console.error("mor-clocks",e); }
+
+/* clk-units */
+try{ (function(){
+var s=document.getElementById('clk-units-s'),m=document.getElementById('clk-units-m');if(!s)return;
+var base=25874287,t0=Date.now();
+function tick(){var v=base+Math.floor((Date.now()-t0)/1000);
+s.textContent=v.toLocaleString('en-US');
+if(m)m.textContent=Math.floor(v/60).toLocaleString('en-US');}
+tick();setInterval(tick,1000);
+})(); }catch(e){ console.error("clk-units",e); }
+
+/* cmb-wall */
+try{ (function(){
+var g=document.getElementById('cmb-wall-grid'); if(!g||g.childElementCount)return;
+var gaps=[[15,4],[37,7],[66,6],[87,5],[112,8],[136,6],[155,8],[180,9],[196,2],[210,4],[233,1],[258,1],[272,5],[292,3]];
+var blank={},back={},i,d;
+for(i=0;i<gaps.length;i++){ var s=gaps[i][0],l=gaps[i][1]; for(d=s;d<s+l;d++){ blank[d]=1; } back[s+l]=1; }
+var f=document.createDocumentFragment();
+for(d=1;d<=24;d++){
+  var c=document.createElement('i');
+  c.className='cmb-wall__c '+(blank[d]?'is-off':(back[d]?'is-back':'is-on'));
+  f.appendChild(c);
+}
+g.appendChild(f);
+})(); }catch(e){ console.error("cmb-wall",e); }
+
+/* amb-weeks */
+try{ (function(){
+var c=document.querySelector('.amb-weeks__cv');if(!c||!c.getContext)return;var g=c.getContext('2d');if(!g)return;var COLS=100,TOT=4175,LIV=1179,P=6.52,S=5.2,i;g.clearRect(0,0,c.width,c.height);for(i=0;i<TOT;i++){var x=(i%COLS)*P,y=((i/COLS)|0)*P,f;if(i<LIV-43){f='rgba(238,241,247,.20)';}else if(i<LIV-1){f='rgba(63,217,78,.72)';}else if(i===LIV-1){f='rgba(245,246,250,.97)';}else{f='rgba(255,255,255,.055)';}g.fillStyle=f;g.fillRect(x,y,S,S);}
+})(); }catch(e){ console.error("amb-weeks",e); }
+
+/* mor-oneday */
+try{ (function(){
+var row = document.getElementById('mor-oneday-row');
+if (!row) { return; }
+var gone = document.getElementById('mor-oneday-gone');
+var left = document.getElementById('mor-oneday-left');
+var cells = row.children;
+function paint(){
+  var h = new Date().getHours();
+  for (var i = 0; i < cells.length; i++) {
+    cells[i].className = i < h ? 'mor-oneday__on' : (i === h ? 'mor-oneday__now' : '');
+  }
+  if (gone) { gone.textContent = String(h); }
+  if (left) { left.textContent = String(24 - h); }
+}
+paint();
+setInterval(paint, 30000);
+})(); }catch(e){ console.error("mor-oneday",e); }
+</script>
+</body></html>

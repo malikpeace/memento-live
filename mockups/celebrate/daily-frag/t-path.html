@@ -1,0 +1,83 @@
+<style>
+[data-c="t-path"]{--day:#3fd94e;--day-rgb:63,217,78;--ink:235,238,248}
+[data-c="t-path"] .tp{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="t-path"] .tp-breath{position:absolute;left:50%;top:58%;width:280px;height:280px;
+  margin:-140px 0 0 -140px;pointer-events:none;opacity:0;
+  background:radial-gradient(circle closest-side,rgba(var(--day-rgb),.09),rgba(var(--day-rgb),.03) 44%,transparent 72%)}
+[data-c="t-path"] .tp-n{position:relative;font-size:80px;font-weight:800;line-height:.86;letter-spacing:-.055em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.96);opacity:0}
+[data-c="t-path"] .tp-u{position:relative;font-size:14.5px;font-weight:500;letter-spacing:-.01em;
+  color:rgba(var(--ink),.62);margin-top:15px;opacity:0}
+[data-c="t-path"] .tp-band{position:relative;width:240px;height:52px;margin-top:38px;display:flex;
+  justify-content:center;align-items:flex-start}
+[data-c="t-path"] .tp-rail{position:relative;display:flex;align-items:flex-end;gap:var(--grp);
+  height:var(--th)}
+[data-c="t-path"] .tp-g{display:flex;align-items:flex-end;gap:var(--gap)}
+[data-c="t-path"] .tp-d{width:var(--mw);height:var(--mh);border-radius:var(--mw);
+  background:rgba(var(--ink),.30);opacity:0}
+[data-c="t-path"] .tp-d--t{width:var(--tw);height:var(--th);border-radius:var(--tw);background:var(--day);
+  transform-origin:50% 100%}
+[data-c="t-path"] .tp-from{position:absolute;left:0;top:calc(100% + 9px);font-size:10.5px;font-weight:500;
+  white-space:nowrap;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.32);opacity:0}
+[data-c="t-path"] .tp-date{position:relative;font-size:12.5px;font-weight:500;letter-spacing:-.005em;
+  color:rgba(var(--ink),.48);margin-top:14px;opacity:0}
+[data-c="t-path"] .tp-mark{position:absolute;left:50%;bottom:50px;width:14px;height:14px;margin-left:-7px;
+  fill:rgba(var(--ink),.13);opacity:0}
+
+[data-c="t-path"].on .tp-breath{animation:tpBreath_tpath 900ms ease-out 240ms both}
+[data-c="t-path"].on .tp-n{animation:tpRise_tpath 430ms cubic-bezier(.2,.9,.25,1) both}
+[data-c="t-path"].on .tp-u{animation:tpFade_tpath 380ms ease-out 130ms both}
+[data-c="t-path"].on .tp-d{animation:tpTick_tpath 260ms ease-out both;animation-delay:calc(200ms + var(--i) * 6ms)}
+[data-c="t-path"].on .tp-d--t{animation:tpStand_tpath 420ms cubic-bezier(.2,.9,.25,1) both;
+  animation-delay:calc(250ms + var(--i) * 6ms)}
+[data-c="t-path"].on .tp-from{animation:tpFade_tpath 360ms ease-out 470ms both}
+[data-c="t-path"].on .tp-date{animation:tpRise_tpath 400ms ease-out 580ms both}
+[data-c="t-path"].on .tp-mark{animation:tpFade_tpath 460ms ease-out 740ms both}
+@keyframes tpFade_tpath{from{opacity:0}to{opacity:1}}
+@keyframes tpRise_tpath{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tpBreath_tpath{from{opacity:0;transform:scale(.84)}to{opacity:1;transform:none}}
+@keyframes tpTick_tpath{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+@keyframes tpStand_tpath{from{opacity:0;transform:scaleY(.18)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="t-path"] *{animation:none!important}
+  [data-c="t-path"] .tp-breath,[data-c="t-path"] .tp-n,[data-c="t-path"] .tp-u,[data-c="t-path"] .tp-d,
+  [data-c="t-path"] .tp-from,[data-c="t-path"] .tp-date,
+  [data-c="t-path"] .tp-mark{opacity:1!important;transform:none!important}
+}
+</style>
+<div class="ph" data-c="t-path" data-state="d1"><div class="dst">
+  <div class="tp">
+    <div class="tp-breath"></div>
+    <div class="tp-n">1</div>
+    <div class="tp-u">day on the path</div>
+    <div class="tp-band"><div class="tp-rail" style="--mw:3px;--mh:16px;--tw:5px;--th:30px;--gap:6px;--grp:10px">
+      <div class="tp-g"><i class="tp-d tp-d--t" style="--i:1"></i></div>
+    </div></div>
+    <div class="tp-date">Saturday, August 1</div>
+  </div>
+  <svg class="tp-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-path" data-state="w1"><div class="dst">
+  <div class="tp">
+    <div class="tp-breath"></div>
+    <div class="tp-n">7</div>
+    <div class="tp-u">days on the path</div>
+    <div class="tp-band"><div class="tp-rail" style="--mw:4px;--mh:17px;--tw:5px;--th:26px;--gap:8px;--grp:10px">
+      <div class="tp-g"><i class="tp-d" style="--i:1"></i><i class="tp-d" style="--i:2"></i><i class="tp-d" style="--i:3"></i><i class="tp-d" style="--i:4"></i><i class="tp-d" style="--i:5"></i><i class="tp-d" style="--i:6"></i><i class="tp-d tp-d--t" style="--i:7"></i></div><div class="tp-from">Aug 1</div>
+    </div></div>
+    <div class="tp-date">Saturday, August 8</div>
+  </div>
+  <svg class="tp-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-path" data-state="m1"><div class="dst">
+  <div class="tp">
+    <div class="tp-breath"></div>
+    <div class="tp-n">30</div>
+    <div class="tp-u">days on the path</div>
+    <div class="tp-band"><div class="tp-rail" style="--mw:2.5px;--mh:13px;--tw:3.5px;--th:21px;--gap:4px;--grp:10px">
+      <div class="tp-g"><i class="tp-d" style="--i:1"></i><i class="tp-d" style="--i:2"></i><i class="tp-d" style="--i:3"></i><i class="tp-d" style="--i:4"></i><i class="tp-d" style="--i:5"></i><i class="tp-d" style="--i:6"></i><i class="tp-d" style="--i:7"></i></div><div class="tp-g"><i class="tp-d" style="--i:8"></i><i class="tp-d" style="--i:9"></i><i class="tp-d" style="--i:10"></i><i class="tp-d" style="--i:11"></i><i class="tp-d" style="--i:12"></i><i class="tp-d" style="--i:13"></i><i class="tp-d" style="--i:14"></i></div><div class="tp-g"><i class="tp-d" style="--i:15"></i><i class="tp-d" style="--i:16"></i><i class="tp-d" style="--i:17"></i><i class="tp-d" style="--i:18"></i><i class="tp-d" style="--i:19"></i><i class="tp-d" style="--i:20"></i><i class="tp-d" style="--i:21"></i></div><div class="tp-g"><i class="tp-d" style="--i:22"></i><i class="tp-d" style="--i:23"></i><i class="tp-d" style="--i:24"></i><i class="tp-d" style="--i:25"></i><i class="tp-d" style="--i:26"></i><i class="tp-d" style="--i:27"></i><i class="tp-d" style="--i:28"></i></div><div class="tp-g"><i class="tp-d" style="--i:29"></i><i class="tp-d tp-d--t" style="--i:30"></i></div><div class="tp-from">Aug 1</div>
+    </div></div>
+    <div class="tp-date">Monday, August 31</div>
+  </div>
+  <svg class="tp-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>

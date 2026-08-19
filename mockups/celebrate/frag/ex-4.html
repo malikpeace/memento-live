@@ -1,0 +1,118 @@
+<style>
+/* ex-4 GROWTH RINGS. The material lays down one contour every thirty days,
+   outward from the middle, the way a tree does. The ring being drawn is dotted
+   for the days not yet lived, solid for the ones that are. Count the rings for
+   the months, look at the tip for today. Twelve rings reaches the rim. */
+[data-c="ex-4"] .b{padding:24px 22px 42px}
+[data-c="ex-4"] .exhd{font-size:18px;font-weight:650;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="ex-4"] .exsub{font-size:13.5px;line-height:1.5;color:var(--text-mid);margin-top:8px;max-width:31ch}
+
+[data-c="ex-4"] .exrow{display:flex;justify-content:center;gap:14px;margin-top:24px}
+[data-c="ex-4"] .excol{width:96px;display:flex;flex-direction:column;align-items:center}
+
+[data-c="ex-4"] .exc{position:relative;width:78px;height:106px;border-radius:10px;overflow:hidden;
+  clip-path:inset(0 round 10px);
+  background:linear-gradient(165deg,rgba(255,255,255,.11),rgba(255,255,255,.02) 48%,rgba(255,255,255,.05));
+  box-shadow:0 12px 26px rgba(0,0,0,.5)}
+[data-c="ex-4"] .exc::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+  background:linear-gradient(140deg,rgba(255,255,255,.55),rgba(255,255,255,.10) 26%,
+    rgba(255,255,255,.02) 52%,rgba(255,255,255,.20) 80%,rgba(255,255,255,.42));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  pointer-events:none;z-index:2}
+[data-c="ex-4"] .exrings{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+[data-c="ex-4"] .exrings rect{fill:none;vector-effect:non-scaling-stroke}
+[data-c="ex-4"] .rs{stroke:rgba(235,238,248,.17);stroke-width:1}
+[data-c="ex-4"] .rn{stroke:rgba(235,238,248,.32);stroke-width:1}
+[data-c="ex-4"] .rg{stroke:rgba(235,238,248,.13);stroke-width:1;stroke-dasharray:.5 .5}
+[data-c="ex-4"] .ra{stroke:rgba(235,238,248,.58);stroke-width:1.6;stroke-linecap:round}
+
+[data-c="ex-4"] .exlab{font-size:11px;color:var(--text-lo);margin-top:13px;line-height:1.35}
+[data-c="ex-4"] .exlab b{display:block;color:var(--text-mid);font-weight:600;font-size:11.5px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.005em}
+
+[data-c="ex-4"] .exrule{width:56px;height:1px;background:var(--hairline);margin:22px 0 16px}
+[data-c="ex-4"] .extod{font-size:11.5px;color:var(--text-lo);margin-bottom:12px}
+[data-c="ex-4"] .exc.big{width:118px;height:160px;border-radius:13px;clip-path:inset(0 round 13px);
+  box-shadow:0 20px 42px rgba(0,0,0,.6)}
+
+/* THE ONE ACCENT MOMENT: today's tick, the first day of the eleventh ring. */
+[data-c="ex-4"] .rt{stroke:rgba(var(--accent-rgb),.98);stroke-width:2.4;stroke-linecap:round;
+  opacity:1;animation:ex4tick .55s cubic-bezier(.2,.8,.3,1) .6s both}
+@keyframes ex4tick{from{opacity:0}to{opacity:1}}
+
+[data-c="ex-4"] .exdep{font-size:14.5px;color:var(--text-mid);line-height:1.5;margin-top:16px;max-width:26ch}
+[data-c="ex-4"] .exdep b{color:var(--text-hi);font-weight:650}
+[data-c="ex-4"] .excap{font-size:12px;color:var(--text-mid);line-height:1.5;margin-top:8px;max-width:33ch}
+</style>
+<div class="ph" data-c="ex-4"><div class="st">
+  <div class="b b1">
+    <div class="exhd">Lose 40 lbs.</div>
+    <div class="exsub">The material lays down a ring every thirty days, outward from the middle.</div>
+
+    <div class="exrow">
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rg" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6" pathLength="30"/>
+            <rect class="ra" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6" pathLength="30" stroke-dasharray="7 30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 7</b>down 2 lbs</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+            <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+            <rect class="rn" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+            <rect class="rg" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4" pathLength="30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 90</b>down 14 lbs</div>
+      </div>
+      <div class="excol">
+        <div class="exc">
+          <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+            <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+            <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+            <rect class="rs" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+            <rect class="rs" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4"/>
+            <rect class="rs" x="16.38" y="22.25" width="45.25" height="61.5" rx="6.0"/>
+            <rect class="rs" x="13.85" y="18.8" width="50.3" height="68.4" rx="6.6"/>
+            <rect class="rs" x="11.32" y="15.35" width="55.35" height="75.3" rx="7.2"/>
+            <rect class="rs" x="8.8" y="11.9" width="60.4" height="82.2" rx="7.8"/>
+            <rect class="rs" x="6.28" y="8.45" width="65.45" height="89.1" rx="8.4"/>
+            <rect class="rn" x="3.75" y="5.0" width="70.5" height="96.0" rx="9.0"/>
+            <rect class="rg" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30"/>
+          </svg>
+        </div>
+        <div class="exlab"><b>Day 300</b>down 38 lbs</div>
+      </div>
+    </div>
+
+    <div class="exrule"></div>
+    <div class="extod">Today</div>
+
+    <div class="exc big">
+      <svg class="exrings" viewBox="0 0 78 106" aria-hidden="true">
+        <rect class="rs" x="26.48" y="36.05" width="25.05" height="33.9" rx="3.6"/>
+        <rect class="rs" x="23.95" y="32.6" width="30.1" height="40.8" rx="4.2"/>
+        <rect class="rs" x="21.43" y="29.15" width="35.15" height="47.7" rx="4.8"/>
+        <rect class="rs" x="18.9" y="25.7" width="40.2" height="54.6" rx="5.4"/>
+        <rect class="rs" x="16.38" y="22.25" width="45.25" height="61.5" rx="6.0"/>
+        <rect class="rs" x="13.85" y="18.8" width="50.3" height="68.4" rx="6.6"/>
+        <rect class="rs" x="11.32" y="15.35" width="55.35" height="75.3" rx="7.2"/>
+        <rect class="rs" x="8.8" y="11.9" width="60.4" height="82.2" rx="7.8"/>
+        <rect class="rs" x="6.28" y="8.45" width="65.45" height="89.1" rx="8.4"/>
+        <rect class="rn" x="3.75" y="5.0" width="70.5" height="96.0" rx="9.0"/>
+        <rect class="rg" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30"/>
+        <rect class="rt" x="1.23" y="1.55" width="75.55" height="102.9" rx="9.6" pathLength="30" stroke-dasharray="1 60"/>
+      </svg>
+    </div>
+
+    <div class="exdep">On this day, you were down <b>38 lbs</b>.</div>
+    <div class="excap">Ten rings closed, and the eleventh opened today. Twelve reaches the rim, which is a year.</div>
+  </div>
+</div>
+<div class="hint">Tap to replay</div></div>

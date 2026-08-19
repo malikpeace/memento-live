@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tap the Memento — six ways to show the year</title>
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+<style>
+  :root{--hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
+    --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
+    --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;--safe-t:0px;--safe-b:0px}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .page{max-width:1400px;margin:0 auto;padding:34px 20px 130px}
+  h1{margin:0 0 9px;font-size:26px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 6px;font-size:14.5px;line-height:1.6;color:var(--mid);max-width:84ch}
+  .lede b{color:var(--hi);font-weight:640}
+  .nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;flex-wrap:wrap;margin:18px -20px 0;
+    padding:12px 20px;background:rgba(5,6,9,.92);backdrop-filter:blur(24px)}
+  .nav a{font-size:12.5px;font-weight:620;text-decoration:none;color:var(--mid);
+    padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.055)}
+  .nav a:hover{color:var(--hi);background:rgba(255,255,255,.1)}
+  .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(400px,100%),1fr));gap:44px 26px;margin-top:22px}
+  .pg{scroll-margin-top:72px}
+  .pg__hd h2{margin:0 0 6px;font-size:19px;font-weight:720;letter-spacing:-.02em}
+  .pg__th{margin:0 0 8px;font-size:13px;line-height:1.55;color:var(--mid)}
+  .pg__wow{margin:0 0 16px;font-size:13px;line-height:1.55;color:var(--hi)}
+  .phone{position:relative;width:100%;max-width:390px;height:820px;overflow:hidden;border-radius:26px;
+    background:#050609;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 12px 40px rgba(0,0,0,.55)}
+  .phone__in{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .phone__in::-webkit-scrollbar{display:none}
+  .screen{position:relative;z-index:1;padding:0 20px 60px}
+  .body{margin:26px 0 0}
+  .phone .cage{width:196px!important}
+  .phone .hero{padding:16px 0 0!important}
+  .mori{font-size:19px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .jumpbtn{margin-top:12px;padding:9px 15px;border:0;border-radius:10px;background:rgba(255,255,255,.08);
+    box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:13px;font-weight:640;cursor:pointer}
+</style>
+<style id="mv">
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
+  .room{ position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
+
+  /* the chips are the same card, small */
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the customiser sheet. Held open from the card. Glass over a scrim, so
+     the card stays visible behind it and you can see what you are changing. */
+  .hint{ margin:26px 0 0; text-align:center; font-size:12.5px; color:var(--lo); }
+  .sheetwrap{ position:fixed; inset:0; z-index:60; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .sheetwrap__scrim{ position:absolute; inset:0; background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .22s ease-out; }
+  .sheetwrap.is-open .sheetwrap__scrim{ opacity:1; }
+  .sheet{ position:relative; width:100%; max-width:470px;
+    padding:10px 20px calc(20px + var(--safe-b));
+    border-radius:20px 20px 0 0;
+    background:rgba(16,18,23,.82);
+    backdrop-filter:blur(34px) saturate(1.5);
+    -webkit-backdrop-filter:blur(34px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -20px 60px rgba(0,0,0,.6);
+    transform:translateY(102%); transition:transform .26s cubic-bezier(.32,.72,0,1); }
+  .sheetwrap.is-open .sheet{ transform:translateY(0); }
+  .sheet__grab{ display:block; width:38px; height:4px; margin:0 auto 14px;
+    border-radius:999px; background:rgba(255,255,255,.2); }
+  .sheet .strip{ margin:0 -20px; padding:2px 20px 12px; }
+  .sheet__done{ display:block; width:100%; margin:16px 0 0; padding:15px;
+    border:0; border-radius:13px; background:#f2f3f6; color:#0b0c0e;
+    font:inherit; font-size:15.5px; font-weight:650; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){
+    .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
+
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
+
+  .hero__name{ margin:22px 0 7px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  /* a thin clock, not a sentence. Light weight and open tracking so the digits
+     read as a running timer rather than a statistic. */
+  #mori{ font-size:19px; font-weight:250; letter-spacing:.11em; color:var(--hi);
+    font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1; }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
+    color:var(--hi); outline:none; }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
+
+  /* ── 4 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  /* ring + mark: two small choices that ride on top of the material */
+  .tog{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px; }
+  .tog__g{ display:flex; gap:2px; padding:2px; border-radius:999px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .tog__g button{ font:inherit; font-size:12px; font-weight:620; letter-spacing:-.005em;
+    color:var(--mid); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; transition:background .15s ease-out; }
+  .tog__g button.on{ color:#0b0c0e; background:#f2f3f6; }
+
+  /* colour-matched ring: the rim and the room glow take the card's own colour */
+  body.ring-colour .cage .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,.85)),
+                inset 0 0 16px 2px color-mix(in srgb, var(--edge, #fff) 28%, transparent) !important; }
+  body.ring-colour .cage.flat .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  /* the mark, pulled toward the card's colour. Tinted, never fully coloured. */
+  body.mark-tint .cage .daycard-ns__emblem path{
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--edge, #ffffff) 28%) !important; }
+  body.mark-tint .cage .daycard-ns__name{
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--edge, #ffffff) 22%) !important; }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ margin:30px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+
+  .trail{ margin:16px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  /* ── the last block on the screen, and the oldest thing on it. Recessed
+     rather than raised: a well cut into the page, with the date struck INTO
+     the surface the same way the name is struck into the card. Same engraving
+     language, so the beginning and the object agree. */
+  .origin{ position:relative; margin:34px 0 0; padding:30px 22px 28px;
+    border-radius:18px; text-align:center; overflow:hidden;
+    background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.16));
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.55),
+                inset 0 -1px 0 rgba(255,255,255,.07); }
+  /* one soft pool of the card's own light, radial so it never draws an edge */
+  .origin::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--tint, #3ad9f5) 16%, transparent), transparent 72%); }
+  .origin > *{ position:relative; }
+  .origin__k{ display:block; font-size:12px; font-weight:600; color:var(--lo); }
+  .origin__d{ display:block; margin:9px 0 0; font-size:20px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:rgba(228,233,242,.9);
+    text-shadow: 0 -1px 1px rgba(0,0,0,.85), 0 1px 0.5px rgba(255,255,255,.16); }
+  .origin__t{ display:block; margin:9px 0 0; font-size:13px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  
+</style>
+<style id="styles">
+/* ── 1. wrapped ─────────────────────────────────────────────────────────── */
+.wr-deck{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:0;margin:0 -20px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.wr-deck::-webkit-scrollbar{display:none}
+.wr-pane{flex:0 0 100%;scroll-snap-align:center;padding:34px 24px 26px;display:flex;flex-direction:column;
+  align-items:flex-start;justify-content:center;min-height:330px}
+.wr-kick{font-size:12.5px;font-weight:700;color:var(--lo);margin-bottom:8px}
+.wr-huge{font-size:clamp(64px,22vw,88px);font-weight:800;letter-spacing:-.055em;line-height:.92;
+  color:var(--hi);font-variant-numeric:tabular-nums}
+.wr-lead{margin-top:10px;font-size:22px;font-weight:700;letter-spacing:-.028em;line-height:1.16;color:var(--hi)}
+.wr-sub{margin-top:12px;font-size:14.5px;line-height:1.55;color:var(--mid);max-width:30ch}
+.wr-quote{font-size:24px;font-weight:700;letter-spacing:-.028em;line-height:1.3;color:var(--hi)}
+.wr-pane--why{justify-content:center}
+.wr-dots{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.wr-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2)}
+.wr-dots i.on{background:rgba(255,255,255,.85)}
+
+/* ── 2. dossier ─────────────────────────────────────────────────────────── */
+.ds{padding:6px 0 0}
+.ds-goal{font-size:21px;font-weight:730;letter-spacing:-.028em;line-height:1.2;color:var(--hi)}
+.ds-why{margin-top:8px;font-size:14px;line-height:1.5;color:var(--mid);font-style:italic}
+.ds-rail{position:relative;height:5px;border-radius:999px;background:rgba(255,255,255,.1);margin:20px 0 0}
+.ds-rail b{display:block;height:100%;border-radius:999px;background:var(--cons)}
+.ds-rail i{position:absolute;top:-3px;width:11px;height:11px;margin-left:-5px;border-radius:50%;
+  background:#fff;box-shadow:0 0 0 3px rgba(5,6,9,.9)}
+.ds-ends{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px;color:var(--lo)}
+.ds-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin:20px 0 0;
+  background:rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
+.ds-grid>div{background:#0a0b0f;padding:13px 11px}
+.ds-grid em{display:block;font-style:normal;font-size:20px;font-weight:730;letter-spacing:-.03em;
+  color:var(--hi);font-variant-numeric:tabular-nums}
+.ds-grid span{display:block;margin-top:3px;font-size:11px;line-height:1.35;color:var(--lo)}
+.ds-h{margin:22px 0 8px;font-size:13px;font-weight:700;color:var(--mid)}
+.ds-tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ds-tbl td{padding:8px 0;font-size:14px;color:var(--mid);
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.055)}
+.ds-tbl td:nth-child(2){text-align:right;color:var(--hi)}
+.ds-tbl td:nth-child(3){text-align:right;width:52px;color:var(--cons);font-weight:650}
+.ds-tbl tr.is-now td{color:var(--hi);font-weight:650}
+.ds-foot{margin-top:16px;font-size:12px;color:var(--lo)}
+
+/* ── 3. squares ─────────────────────────────────────────────────────────── */
+.sq{padding:6px 0 0;text-align:center}
+.sq-goal{font-size:21px;font-weight:730;letter-spacing:-.028em;color:var(--hi)}
+.sq-line{margin-top:8px;font-size:14px;line-height:1.5;color:var(--mid)}
+.sq-line b{color:var(--hi);font-weight:700}
+.sq-grid{display:block;margin:22px auto 0}
+.sq-key{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:16px;font-size:11px;color:var(--lo)}
+.sq-key span{display:inline-flex;align-items:center;gap:5px}
+.sq-key i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.k-on{background:var(--cons)}.k-off{background:rgba(255,255,255,.10)}
+.k-now{background:transparent;box-shadow:inset 0 0 0 1.5px #fff}
+.k-todo{background:rgba(58,217,245,.32)}
+.sq-big{margin:26px 0 0;font-size:56px;font-weight:800;letter-spacing:-.05em;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.sq-big em{font-style:normal;font-size:22px;font-weight:600;color:var(--lo);margin-left:6px}
+.sq-sub{margin-top:6px;font-size:14px;line-height:1.5;color:var(--mid)}
+.sq-quote{margin:24px auto 0;max-width:30ch;font-size:16px;font-style:italic;line-height:1.45;color:var(--hi)}
+.sq-door{margin:26px auto 0;display:block;padding:11px 20px;border:0;border-radius:11px;
+  background:rgba(255,255,255,.07);box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:14px;font-weight:640}
+
+/* ── 4. ledger ──────────────────────────────────────────────────────────── */
+.lg{padding:6px 0 0}
+.lg-goal{font-size:21px;font-weight:730;letter-spacing:-.028em;color:var(--hi)}
+.lg-sub{margin-top:7px;font-size:14px;color:var(--mid)}
+.lg-rows{margin-top:22px}
+.lg-r{display:flex;align-items:center;gap:11px;padding:9px 0;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.055)}
+.lg-m{flex:0 0 34px;font-size:13.5px;font-weight:650;color:var(--mid)}
+.lg-b{flex:1 1 auto;height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.lg-b i{display:block;height:100%;border-radius:999px;background:rgba(255,255,255,.34)}
+.lg-n{flex:0 0 26px;text-align:right;font-size:13.5px;color:var(--hi);font-variant-numeric:tabular-nums}
+.lg-d{flex:0 0 36px;text-align:right;font-size:13.5px;font-weight:650;color:var(--cons);font-variant-numeric:tabular-nums}
+.lg-r.is-best .lg-b i{background:var(--cons)}
+.lg-r.is-best .lg-m{color:var(--hi)}
+.lg-r.is-now .lg-b i{background:rgba(58,217,245,.75)}
+.lg-tot{display:flex;justify-content:space-between;margin-top:16px;font-size:16px;font-weight:700;color:var(--hi)}
+.lg-say{margin-top:20px;font-size:14.5px;line-height:1.55;color:var(--mid)}
+
+/* ── 5. ascent ──────────────────────────────────────────────────────────── */
+.as{padding:14px 0 0;display:flex;flex-direction:column;align-items:center}
+.as-t{font-size:40px;font-weight:800;letter-spacing:-.045em;color:var(--hi);font-variant-numeric:tabular-nums}
+.as-t--sm{font-size:26px;color:var(--lo)}
+.as-s{margin-top:3px;font-size:12.5px;color:var(--lo)}
+.as-top,.as-bot{text-align:center}
+.as-line{position:relative;width:3px;height:330px;margin:22px 0;border-radius:999px;background:rgba(255,255,255,.1)}
+.as-fill{position:absolute;left:0;right:0;bottom:0;height:62%;border-radius:999px;
+  background:linear-gradient(180deg,var(--cons),rgba(63,217,78,.25))}
+.as-you{position:absolute;left:50%;bottom:62%;transform:translate(-50%,50%);
+  width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;
+  box-shadow:0 0 0 6px rgba(5,6,9,.95),0 0 34px rgba(63,217,78,.4)}
+.as-you b{font-size:16px;font-weight:800;color:#07080b;font-variant-numeric:tabular-nums}
+.as-tick{position:absolute;left:14px;transform:translateY(50%);white-space:nowrap;
+  font-size:11.5px;color:var(--lo);display:flex;align-items:center;gap:7px}
+.as-tick i{width:9px;height:1px;background:rgba(255,255,255,.2);margin-left:-14px}
+.as-say{margin-top:8px;font-size:14.5px;line-height:1.55;color:var(--mid);text-align:center;max-width:32ch}
+
+/* ── 6. two numbers ─────────────────────────────────────────────────────── */
+.tw{padding:26px 0 0;text-align:center}
+.tw-block{padding:14px 0}
+.tw-n{font-size:72px;font-weight:800;letter-spacing:-.055em;line-height:.94;color:var(--hi);
+  font-variant-numeric:tabular-nums}
+.tw-l{margin-top:8px;font-size:15px;color:var(--mid)}
+.tw-rule{width:36px;height:1px;margin:14px auto;background:rgba(255,255,255,.16)}
+.tw-quote{margin:34px auto 0;max-width:28ch;font-size:16px;font-style:italic;line-height:1.45;color:var(--hi)}
+.tw-doors{display:flex;flex-direction:column;gap:9px;margin-top:40px}
+.tw-doors button{padding:13px;border:0;border-radius:12px;background:rgba(255,255,255,.06);
+  box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:14.5px;font-weight:620;text-align:left;padding-left:16px}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="crashguard">
+  /* iOS Safari compositing guard. Sections outside the viewport are not
+     rendered, so ten frames cost about as much as one. */
+  .pg{content-visibility:auto;contain-intrinsic-size:400px 1150px}
+  /* The card's looping glimmer and will-change hints pin a GPU layer per card.
+     On a page of cards that is the whole crash. Nothing here needs them. */
+  .cage .daycard-theme-living *,
+  .cage .daycard-wrap__aura,
+  .cage .daycard-bloom{animation:none!important;will-change:auto!important}
+  /* A cage with no card in it still holds its space, so mounting and
+     unmounting never moves the page under your thumb. */
+  .cage:empty{aspect-ratio:.716;border-radius:16px;
+    background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+  .notesbtn{display:none}
+  @media (max-width:520px){
+    /* On a phone the fake phone frame is a costume, and a 390px frame inside a
+       375px screen squeezes every design narrower than it will ever really be.
+       Drop the frame, render each design at the true device width, and lose ten
+       nested scroll containers while we are at it. */
+    .page{padding-left:0;padding-right:0}
+    .page > h1,.page > .lede,.page > div:not(.row),.pg__hd{padding-left:20px;padding-right:20px}
+    .nav{margin-left:0;margin-right:0;padding-left:20px;padding-right:20px}
+    .phone{max-width:none;height:auto;overflow:visible;border-radius:0;
+      box-shadow:none;background:transparent}
+    .phone__in{position:static;overflow:visible}
+    /* .screen keeps its own 20px, which is the app's real geometry, so the
+       elements that deliberately bleed past it (the bar, a full width deck)
+       land exactly on the screen edge instead of being clipped. */
+    .screen{padding-bottom:30px}
+    .row{gap:34px 0}
+    /* On a phone the notes are a wall of text between you and the screen you
+       came to look at, so they start folded and the design comes first. */
+    .pg__meta,.pg__wow{display:none}
+    body.notes-open .pg__meta{display:grid}
+    body.notes-open .pg__wow{display:block}
+    .notesbtn{display:inline-block}
+  }
+</style>
+<script id="crashguard-notes">
+document.addEventListener('DOMContentLoaded',function(){
+  var host=document.querySelector('.jumpbtn'); if(!host||!host.parentNode) return;
+  var b=document.createElement('button');
+  b.type='button'; b.className='jumpbtn notesbtn'; b.textContent='Show the notes';
+  b.addEventListener('click',function(){
+    var on=document.body.classList.toggle('notes-open');
+    b.textContent=on?'Hide the notes':'Show the notes';
+  });
+  host.parentNode.appendChild(b);
+});
+</script>
+</head><body>
+<div class="page">
+  <h1>Tap the Memento: six ways to show the year</h1>
+  <p class="lede">One person, one goal, one set of numbers, six layouts. Change the design, not the data,
+    so you are judging the presentation.</p>
+  <p class="lede"><b>The person:</b> signed <i>Get to 100 paying users</i> on February 3. 186 days in,
+    62 users, showed up 141 days, longest run 23, best month June.</p>
+  <p class="lede">Each frame scrolls on its own. The Wrapped one swipes sideways.</p>
+  <button id="jump" class="jumpbtn" type="button">Scroll all frames past the card</button>
+  <nav class="nav"><a href="#p-wrapped">The Wrapped</a><a href="#p-dossier">The Dossier</a><a href="#p-squares">The Year in Squares</a><a href="#p-ledger">The Ledger</a><a href="#p-ascent">The Ascent</a><a href="#p-two">Two Numbers</a></nav>
+  <div class="row">
+  <section class="pg" id="p-wrapped">
+    <header class="pg__hd"><h2>The Wrapped</h2>
+      <p class="pg__th">Spotify Wrapped, literally. Full-bleed panels you swipe sideways, one enormous number each.</p>
+      <p class="pg__wow">Loudest. Zero scrolling: it is a deck, so it is the same three flicks on day 1 and day 900. The risk is it feels like a slideshow you have already watched.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="wr-deck" data-deck>
+  <div class="wr-pane">
+    <div class="wr-kick">Since February 3</div>
+    <div class="wr-huge">62</div>
+    <div class="wr-lead">of 100 paying users.</div>
+    <div class="wr-sub">You started at zero. Sixty two people now pay you every month.</div>
+  </div>
+  <div class="wr-pane">
+    <div class="wr-kick">You showed up</div>
+    <div class="wr-huge">141</div>
+    <div class="wr-lead">days out of 186.</div>
+    <div class="wr-sub">Seventy six percent. Your longest unbroken run was 23 days, in June.</div>
+  </div>
+  <div class="wr-pane">
+    <div class="wr-kick">At this pace</div>
+    <div class="wr-huge">Oct 14</div>
+    <div class="wr-lead">is when you arrive.</div>
+    <div class="wr-sub">Six weeks ahead of the date you signed. You have been gaining on it since May.</div>
+  </div>
+  <div class="wr-pane wr-pane--why">
+    <div class="wr-kick">Why you started</div>
+    <div class="wr-quote">&ldquo;Because I am done building things nobody pays for.&rdquo;</div>
+    <div class="wr-sub">Written February 3. It has not changed.</div>
+  </div>
+</div>
+<div class="wr-dots"><i class="on"></i><i></i><i></i><i></i></div>
+</div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-dossier">
+    <header class="pg__hd"><h2>The Dossier</h2>
+      <p class="pg__th">One dense page. Everything visible at once, nothing hidden, cold and typographic.</p>
+      <p class="pg__wow">The opposite of a slideshow. Nothing to swipe, nothing to wait for. Reads like a case file on your own goal. Risk: it is a wall of numbers, which is what you rejected before.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="ds">
+  <div class="ds-goal">Get to 100 paying users.</div>
+  <div class="ds-why">&ldquo;Because I am done building things nobody pays for.&rdquo;</div>
+
+  <div class="ds-rail"><b style="width:62%"></b><i style="left:62%"></i></div>
+  <div class="ds-ends"><span>0 &middot; Feb 3</span><span>100 &middot; Sep 1</span></div>
+
+  <div class="ds-grid">
+    <div><em>62</em><span>paying users</span></div>
+    <div><em>+62</em><span>closed so far</span></div>
+    <div><em>38</em><span>still to close</span></div>
+    <div><em>186</em><span>days since you signed</span></div>
+    <div><em>141</em><span>days you showed up</span></div>
+    <div><em>76%</em><span>of every day available</span></div>
+    <div><em>23</em><span>longest run</span></div>
+    <div><em>6</em><span>current run</span></div>
+    <div><em>Oct 14</em><span>arrival at this pace</span></div>
+  </div>
+
+  <div class="ds-h">The months</div>
+  <table class="ds-tbl">
+    <tr><td>February</td><td>18 / 26</td><td>+4</td></tr>
+    <tr><td>March</td><td>21 / 31</td><td>+9</td></tr>
+    <tr><td>April</td><td>19 / 30</td><td>+7</td></tr>
+    <tr><td>May</td><td>26 / 31</td><td>+14</td></tr>
+    <tr><td>June</td><td>28 / 30</td><td>+18</td></tr>
+    <tr><td>July</td><td>22 / 31</td><td>+8</td></tr>
+    <tr class="is-now"><td>August</td><td>7 / 7</td><td>+2</td></tr>
+  </table>
+
+  <div class="ds-foot">Nothing here is an estimate except the arrival date.</div>
+</div>
+</div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-squares">
+    <header class="pg__hd"><h2>The Year in Squares</h2>
+      <p class="pg__th">One bounded grid holds everything. Days you showed up light up inside it. It gets denser, never longer.</p>
+      <p class="pg__wow">This is the memorial shape. The grid is a fixed object, so the page is the same height forever. Everything else is one line of text around it.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="sq">
+  <div class="sq-goal">Get to 100 paying users.</div>
+  <div class="sq-line">186 days since you signed. You showed up for <b>141</b> of them.</div>
+  <canvas class="sq-grid" id="sqGrid"></canvas>
+  <div class="sq-key">
+    <span><i class="k-on"></i>showed up</span>
+    <span><i class="k-off"></i>missed</span>
+    <span><i class="k-now"></i>today</span>
+    <span><i class="k-todo"></i>left before September 1</span>
+  </div>
+  <div class="sq-big">62<em>/ 100</em></div>
+  <div class="sq-sub">Every lit square moved that number. None of them moved it alone.</div>
+  <div class="sq-quote">&ldquo;Because I am done building things nobody pays for.&rdquo;</div>
+  <button class="sq-door" type="button">The record &rsaquo;</button>
+</div>
+</div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-ledger">
+    <header class="pg__hd"><h2>The Ledger</h2>
+      <p class="pg__th">Month by month, one row each, a bar for the days you showed up.</p>
+      <p class="pg__wow">Caps at twelve rows a year. Reads like a statement of effort. Honest about bad months instead of hiding them.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="lg">
+  <div class="lg-goal">Get to 100 paying users.</div>
+  <div class="lg-sub">Seven months. Here is every one of them.</div>
+  <div class="lg-rows">
+    <div class="lg-r"><span class="lg-m">Feb</span><span class="lg-b"><i style="width:69%"></i></span><span class="lg-n">18</span><span class="lg-d">+4</span></div>
+    <div class="lg-r"><span class="lg-m">Mar</span><span class="lg-b"><i style="width:68%"></i></span><span class="lg-n">21</span><span class="lg-d">+9</span></div>
+    <div class="lg-r"><span class="lg-m">Apr</span><span class="lg-b"><i style="width:63%"></i></span><span class="lg-n">19</span><span class="lg-d">+7</span></div>
+    <div class="lg-r"><span class="lg-m">May</span><span class="lg-b"><i style="width:84%"></i></span><span class="lg-n">26</span><span class="lg-d">+14</span></div>
+    <div class="lg-r is-best"><span class="lg-m">Jun</span><span class="lg-b"><i style="width:93%"></i></span><span class="lg-n">28</span><span class="lg-d">+18</span></div>
+    <div class="lg-r"><span class="lg-m">Jul</span><span class="lg-b"><i style="width:71%"></i></span><span class="lg-n">22</span><span class="lg-d">+8</span></div>
+    <div class="lg-r is-now"><span class="lg-m">Aug</span><span class="lg-b"><i style="width:100%"></i></span><span class="lg-n">7</span><span class="lg-d">+2</span></div>
+  </div>
+  <div class="lg-tot"><span>141 days</span><span>62 users</span></div>
+  <div class="lg-say">June was your best month and it is not close. Whatever you were doing then, you stopped in July.</div>
+</div>
+</div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-ascent">
+    <header class="pg__hd"><h2>The Ascent</h2>
+      <p class="pg__th">A single line from where you started to where you are going, with you on it.</p>
+      <p class="pg__wow">One screen, no scroll at all. The most emotional of the set because it shows the gap, not the stats.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="as">
+  <div class="as-top">
+    <div class="as-t">100</div>
+    <div class="as-s">paying users &middot; September 1</div>
+  </div>
+  <div class="as-line">
+    <span class="as-fill"></span>
+    <span class="as-you"><b>62</b></span>
+    <span class="as-tick" style="bottom:25%"><i></i>50 &middot; June 20</span>
+    <span class="as-tick" style="bottom:10%"><i></i>25 &middot; April 9</span>
+    <span class="as-tick" style="bottom:44%"><i></i>first repeat customer</span>
+  </div>
+  <div class="as-bot">
+    <div class="as-t as-t--sm">0</div>
+    <div class="as-s">February 3 &middot; 186 days ago</div>
+  </div>
+  <div class="as-say">You are 38 away. At the pace of the last thirty days you arrive October 14.</div>
+</div>
+</div>
+      </div>
+    </div></div>
+  </section>
+  <section class="pg" id="p-two">
+    <header class="pg__hd"><h2>Two Numbers</h2>
+      <p class="pg__th">Almost nothing. The distance you closed and the days you showed up. Everything else behind one tap.</p>
+      <p class="pg__wow">The quietest. Closest to a memorial and the hardest to get bored of, because there is nothing to get bored of.</p></header>
+    <div class="phone"><div class="phone__in">
+      <div class="screen">
+        <header class="bar"><button class="bar__back" type="button" aria-label="Back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button><span class="bar__title">Your Memento</span></header>
+        <div class="hero"><div class="cage"></div>
+          <p class="hero__name">Your Memento</p>
+          <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+        </div>
+        <div class="body">
+<div class="tw">
+  <div class="tw-block">
+    <div class="tw-n">62</div>
+    <div class="tw-l">of the 100 you asked for</div>
+  </div>
+  <div class="tw-rule"></div>
+  <div class="tw-block">
+    <div class="tw-n">141</div>
+    <div class="tw-l">days you showed up</div>
+  </div>
+  <div class="tw-quote">&ldquo;Because I am done building things nobody pays for.&rdquo;</div>
+  <div class="tw-doors">
+    <button type="button">The months</button>
+    <button type="button">The record</button>
+    <button type="button">The arrival</button>
+  </div>
+</div>
+</div>
+      </div>
+    </div></div>
+  </section></div>
+</div>
+<script>
+/* ── the app's real card markup, lifted verbatim ─────────────────────────── */
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+/* ── the earned layers. Real order: cyan at Clarity, platinum when the Action
+   plan is revealed, green on the first completed move. ─────────────────── */
+/* all three pillars are held; the card renders fully lit. */
+const earned = {clar:true, act:true, cons:true};
+
+/* ── the record. Only event types the app actually writes
+   (action-complete, proof, reflection-save, vivere, mori-moment,
+   weekly-review, new-record, distraction-log, deepwork-commit).
+   Generated across the whole 47 days so the page shows ALL of it: the volume
+   IS the argument, and a "show more" button hides exactly the thing that makes
+   the record hard to walk away from. ───────────────────────────────────── */
+const MOVES = [
+  'Sent the pricing email', 'Cut the third feature', 'Called the two churned users',
+  'Shipped the waitlist page', 'Wrote the first offer', 'Rewrote the landing headline',
+  'Recorded the demo in one take', 'Deleted the settings screen nobody opened',
+  'Asked ten people what they would pay', 'Fixed the signup that dropped 40%',
+  'Wrote to the four people who replied', 'Closed the tab and finished the migration',
+  'Shipped the paywall', 'Answered every support email', 'Cut the onboarding to three screens',
+  'Moved the deadline in instead of out', 'Wrote the follow-up nobody wanted to write',
+  'Killed the feature I spent a week on', 'Published the thing before it was ready',
+  'Turned off notifications until noon', 'Did the hard call first',
+  'Shipped the fix on the phone', 'Wrote the second offer', 'Raised the price',
+  'Sat with the numbers instead of guessing', 'Said no to the collaboration',
+  'Rebuilt the card render', 'Took the whole afternoon on one paragraph',
+  'Sent the cold email to the list of nine', 'Shipped without asking anyone first'
+];
+const REFLECTIONS = [
+  'Stopped negotiating with myself at 7am.', 'Wanted to quit at 3pm and did not.',
+  'The work was boring today. Did it anyway.', 'Realised I was busy, not working.',
+  'Two hours of real focus beats a full day of touching things.',
+  'I keep reaching for the easy task first.', 'Nobody is coming. That is fine.',
+  'The fear was about being seen, not about the work.',
+  'Shipped something I would have sat on a month ago.',
+  'Tired is not the same as done.', 'Did it badly and it still counted.',
+  'I do not need to feel ready.'
+];
+const OTHER = [
+  ['weekly-review', 'Weekly review', ['Four moves done, one dropped', 'Five moves, none dropped', 'Three moves. Slower week.']],
+  ['distraction-log', 'Distraction logged', ['Opened the analytics tab 9 times before noon', 'Two hours gone to a rabbit hole', 'Phone in the other room from now on']],
+  ['vivere', 'Vision board', ['Added: the room with one desk in it', 'Added: the first thousand', 'Added: a morning nobody else owns']],
+  ['deepwork-commit', 'Deep work booked', ['Two hours, no phone', 'Ninety minutes before anyone was awake']],
+  ['mori-moment', 'Memento Mori', ['Looked at the weeks left', 'Twenty thousand days is not many']]
+];
+const MARKS = {
+  '2026-06-19': ['clar', 'Ignition', 'You signed and ignited your Neutron Star'],
+  '2026-06-21': ['mark', 'The platinum arrived', 'Your first plan was revealed'],
+  '2026-07-04': ['mark', 'The green arrived', 'Seven days unbroken. The card changed.'],
+  '2026-07-18': ['mark', 'New longest run', '14 days, past the old record of 9'],
+  '2026-08-01': ['mark', 'New longest run', '21 days, past the old record of 14']
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August',
+  'September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function buildTrail(){
+  const r = rng(hash('trail-v2'));
+  const start = new Date(2026, 5, 19), today = new Date(2026, 7, 4);
+  const out = [];
+  for (let d = new Date(today); d >= start; d.setDate(d.getDate() - 1)){
+    const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+              + '-' + String(d.getDate()).padStart(2,'0');
+    const stamp = DAYS[d.getDay()] + ' ' + d.getDate();
+    const day = [];
+    if (MARKS[iso]){
+      const [k, t, m] = MARKS[iso];
+      day.push({k, t, m, d: stamp});
+    }
+    // the move for the day, on most days
+    if (r() > 0.19) day.push({k:'act', t: MOVES[Math.floor(r()*MOVES.length)],
+      m:'Action · the move for the day', d: stamp});
+    // a reflection now and then
+    if (r() > 0.72) day.push({k:'', t:'Reflection',
+      m:'\u201c' + REFLECTIONS[Math.floor(r()*REFLECTIONS.length)] + '\u201d', d: stamp});
+    // everything else, sparsely
+    if (r() > 0.79){
+      const o = OTHER[Math.floor(r()*OTHER.length)];
+      day.push({k:'', t:o[1], m:o[2][Math.floor(r()*o[2].length)], d: stamp});
+    }
+    if (day.length) out.push({mon: MONTHS[d.getMonth()], evs: day});
+  }
+  // group consecutive days under one month heading
+  const groups = [];
+  out.forEach(day=>{
+    const last = groups[groups.length-1];
+    if (last && last.mon === day.mon) last.evs.push(...day.evs);
+    else groups.push({mon: day.mon, evs: day.evs.slice()});
+  });
+  return groups;
+}
+const TRAIL = buildTrail();
+
+let cur = 0;
+
+function paint(){
+  const m = MATS[cur];
+  const n = (earned.clar?1:0) + (earned.act?1:0) + (earned.cons?1:0);
+  /* The app's own gate: before the star is lit the card emits nothing at all.
+     Turning the cyan off here does exactly what a blank pre-Clarity card does. */
+  document.body.classList.toggle('ns-bloom', earned.clar);
+  document.body.classList.toggle('is-void', m.n === 'Void');
+  /* the chosen material lights the whole page */
+  document.documentElement.style.setProperty('--tint', m.tint || '#3ad9f5');
+
+  const cage = document.getElementById('heroCard');
+  cage.innerHTML = realCard(matVars(m, earned), {name:'Malik Peace'});
+  cage.className = 'cage ' + (m.cls||'') + (m.stock ? ' is-stock' : '');
+
+  document.getElementById('matNote').textContent = m.note;
+
+  /* The layers section has to stay true whichever material is on. On the stock
+     card the three ARE the colour. On any other, they still set how much light
+     it gives off, so the dates never become a claim about a colour that is not
+     on screen. */
+  document.querySelectorAll('.chip').forEach((c,i)=>
+    c.setAttribute('aria-pressed', i===cur ? 'true' : 'false'));
+}
+
+/* the strip */
+document.getElementById('strip').innerHTML = MATS.map((m,i)=>
+  `<button class="chip" type="button" aria-pressed="false" data-i="${i}">
+     <span class="chipcage ${m.cls||''}${m.stock?' is-stock':''}">${realCard(matVars(m), {name:''})}</span>
+     <span class="chip__n">${m.n}</span>
+   </button>`).join('');
+document.getElementById('strip').addEventListener('click', e=>{
+  const b = e.target.closest('.chip'); if(!b) return;
+  cur = +b.dataset.i; paint();
+});
+
+/* the layers */
+/* the trail, all of it */
+/* Collapsed by month, newest open. The full weight still reads at a glance,
+   because a closed month carries its count AND a dot for every mark in it, so
+   nothing is hidden, it is compressed. Scrolling past 66 rows to reach the
+   bottom of the screen was the problem; losing the evidence would be worse. */
+const TOTAL_MARKS = TRAIL.reduce((n,g)=>n+g.evs.length,0);
+const evHtml = e =>
+  `<div class="ev"><span class="ev__dot ${e.k?'is-'+e.k:''}"></span>
+     <span class="ev__b"><span class="ev__t">${e.t}</span>
+       <span class="ev__m">${e.m}</span></span>
+     <span class="ev__d">${e.d}</span></div>`;
+
+document.getElementById('trail').innerHTML = TRAIL.map((g,i)=>
+  `<section class="mo${i===0?' is-open':''}">
+     <button class="mo__h" type="button">
+       <span class="mo__n">${g.mon}</span>
+       <span class="mo__dots">${g.evs.map(e=>
+         `<i class="mo__dot ${e.k?'is-'+e.k:''}"></i>`).join('')}</span>
+       <span class="mo__c">${g.evs.length}</span>
+       <svg class="mo__x" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+     </button>
+     <div class="mo__b">${g.evs.map(evHtml).join('')}</div>
+   </section>`).join('');
+
+document.getElementById('trail').addEventListener('click', e=>{
+  const h = e.target.closest('.mo__h'); if(!h) return;
+  h.parentElement.classList.toggle('is-open');
+});
+
+/* ── Memento Mori. The app already models birth year and life expectancy
+   (moriYearsRemaining in js/06), so this is the same number, ticking. Plain
+   total days plus the clock: two figures, both of them falling. ─────────── */
+const BIRTH_YEAR = 2004, LIFE_EXPECTANCY = 80;
+const END = new Date(BIRTH_YEAR + LIFE_EXPECTANCY, 0, 1).getTime();
+const moriEl = document.getElementById('mori');
+function tickMori(){
+  const ms = Math.max(0, END - Date.now());
+  const rest = ms % 86400000;
+  const p = n => String(n).padStart(2, '0');
+  moriEl.textContent = Math.floor(ms / 86400000)
+    + ':' + p(Math.floor(rest/3600000))
+    + ':' + p(Math.floor(rest%3600000/60000))
+    + ':' + p(Math.floor(rest%60000/1000));
+}
+tickMori();
+setInterval(tickMori, 1000);
+
+/* ── hold the card to open the customiser. The card gives under the finger so
+   the gesture is felt before the sheet arrives. A plain tap does nothing, or
+   every scroll that starts on the card would open it.
+
+   Why this is not just pointerdown/pointerup: on iOS a long press competes with
+   the selection callout, and pointerleave fires on a pixel of jitter, which
+   killed the hold before it ever completed. So the press cancels on real
+   MOVEMENT (12px) rather than on leaving the element, listens to touch events
+   as well as pointer events, and takes contextmenu as a second way in. */
+const wrap = document.getElementById('sheetWrap');
+const cage = document.getElementById('heroCard');
+const HOLD_MS = 380, SLOP = 12;
+let holdT = null, sx = 0, sy = 0, armed = false;
+
+function openSheet(){
+  holdT = null; armed = false;
+  cage.classList.remove('is-pressing');
+  wrap.hidden = false;
+  /* force a reflow so the closed transform is committed before the open class
+     lands, otherwise the sheet jumps into place with no slide. rAF is not
+     reliable here: a throttled or non-painting frame swallows it. */
+  void wrap.offsetHeight;
+  wrap.classList.add('is-open');
+  try{ navigator.vibrate && navigator.vibrate(8); }catch(e){}
+}
+function closeSheet(){
+  wrap.classList.remove('is-open');
+  setTimeout(()=>{ wrap.hidden = true; }, 280);
+}
+function pressStart(x, y){
+  if (armed) return;
+  armed = true; sx = x; sy = y;
+  cage.classList.add('is-pressing');
+  clearTimeout(holdT);
+  holdT = setTimeout(openSheet, HOLD_MS);
+}
+function pressMove(x, y){
+  if (!armed) return;
+  if (Math.abs(x - sx) > SLOP || Math.abs(y - sy) > SLOP) pressEnd();
+}
+function pressEnd(){
+  armed = false;
+  cage.classList.remove('is-pressing');
+  clearTimeout(holdT); holdT = null;
+}
+
+/* touch first: iOS fires these reliably even when pointer events get cancelled */
+cage.addEventListener('touchstart', e=>{
+  const t = e.touches[0]; if(t) pressStart(t.clientX, t.clientY);
+}, {passive:true});
+cage.addEventListener('touchmove', e=>{
+  const t = e.touches[0]; if(t) pressMove(t.clientX, t.clientY);
+}, {passive:true});
+['touchend','touchcancel'].forEach(ev=>
+  cage.addEventListener(ev, pressEnd, {passive:true}));
+
+/* mouse/pen for everything else. pointerdown is ignored for touch so the two
+   paths can never both arm the same press. */
+cage.addEventListener('pointerdown', e=>{
+  if (e.pointerType === 'touch') return;
+  pressStart(e.clientX, e.clientY);
+});
+addEventListener('pointermove', e=>{
+  if (e.pointerType === 'touch') return;
+  pressMove(e.clientX, e.clientY);
+});
+['pointerup','pointercancel'].forEach(ev=>
+  addEventListener(ev, e=>{ if(e.pointerType !== 'touch') pressEnd(); }));
+
+/* if a platform gets to its own long-press menu first, take that as the hold */
+cage.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  if (wrap.hidden) openSheet();
+});
+
+/* and a plain tappable way in, so the customiser is never gesture-only */
+document.getElementById('hintBtn').addEventListener('click', openSheet);
+
+document.getElementById('sheetScrim').addEventListener('click', closeSheet);
+document.getElementById('sheetDone').addEventListener('click', closeSheet);
+addEventListener('keydown', e=>{ if(e.key === 'Escape' && !wrap.hidden) closeSheet(); });
+
+/* ring + mark toggles */
+[['ringTog','ring-colour'], ['markTog','mark-tint']].forEach(([id, cls])=>{
+  const g = document.getElementById(id);
+  g.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.body.classList.toggle(cls, b.dataset.v === '1');
+    g.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b));
+  });
+});
+
+/* the promise: the meta line has nothing to report until something is written */
+const pT = document.getElementById('promiseT'), pM = document.getElementById('promiseM');
+function promiseState(){
+  const has = pT.textContent.trim().length > 0;
+  pM.textContent = has ? '19 June' : '';
+}
+pT.addEventListener('input', promiseState);
+promiseState();
+
+/* the bar title arrives once the card has gone */
+const bar = document.getElementById('bar');
+addEventListener('scroll', ()=>{
+  bar.classList.toggle('is-scrolled', scrollY > 230);
+}, {passive:true});
+
+paint();
+</script>
+<script>
+(function(){
+  var m=MATS[0];
+  /* Build on approach, destroy on leave. At most ONE card is alive on a phone
+     and three on a desktop, so the page can never hold ten compositing stacks. */
+  var CARD=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  var cages=[].slice.call(document.querySelectorAll('.cage'));
+  cages.forEach(function(c){c.className='cage is-stock';});
+  var touch=(('ontouchstart' in window)||navigator.maxTouchPoints>0);
+  var LIVE=(window.innerWidth<900||touch)?1:3;
+  var live=[];
+  function mount(c){
+    if(c.getAttribute('data-on'))return;
+    c.setAttribute('data-on','1'); c.innerHTML=CARD; live.push(c);
+    while(live.length>LIVE){var o=live.shift(); if(o!==c) drop(o);}
+  }
+  function drop(c){
+    if(!c.getAttribute('data-on'))return;
+    c.removeAttribute('data-on'); c.innerHTML='';
+    var i=live.indexOf(c); if(i>-1) live.splice(i,1);
+  }
+  if(window.IntersectionObserver){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){mount(e.target);} else {drop(e.target);} });
+    },{rootMargin:'260px 0px'});
+    cages.forEach(function(c){io.observe(c);});
+  } else {
+    cages.slice(0,LIVE).forEach(mount);
+  }
+
+  document.body.classList.add('ns-bloom');
+
+  // the squares grid: 186 days lived + the days left before the deadline
+  var cv=document.getElementById('sqGrid');
+  if(cv){
+    var DONE=[], total=210, showed=141, today=185;
+    var cols=21, rows=Math.ceil(total/cols), cell=12, gap=3;
+    var w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    cv.width=w*dpr; cv.height=h*dpr; cv.style.width=w+'px'; cv.style.height=h+'px';
+    var cx=cv.getContext('2d'); cx.scale(dpr,dpr);
+    // deterministic miss pattern so it looks like a real record
+    var seed=9; function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+    for(var i=0;i<total;i++){
+      var col=i%cols, row=Math.floor(i/cols), x=col*(cell+gap), y=row*(cell+gap);
+      var lit = i<=today && rnd() < (showed/ (today+1)) + 0.06;
+      if(i>today){ cx.fillStyle='rgba(58,217,245,0.22)'; }
+      else if(lit){ cx.fillStyle='rgba(63,217,78,0.85)'; }
+      else { cx.fillStyle='rgba(255,255,255,0.10)'; }
+      cx.beginPath();
+      if(cx.roundRect) cx.roundRect(x,y,cell,cell,3); else cx.rect(x,y,cell,cell);
+      cx.fill();
+      if(i===today){ cx.strokeStyle='rgba(255,255,255,0.9)'; cx.lineWidth=1.5;
+        cx.beginPath();
+        if(cx.roundRect) cx.roundRect(x-1,y-1,cell+2,cell+2,4); else cx.rect(x-1,y-1,cell+2,cell+2);
+        cx.stroke(); }
+    }
+  }
+
+  // the wrapped deck dots
+  var deck=document.querySelector('[data-deck]');
+  if(deck){
+    deck.addEventListener('scroll',function(){
+      var i=Math.round(deck.scrollLeft/deck.clientWidth);
+      document.querySelectorAll('.wr-dots i').forEach(function(d,n){d.classList.toggle('on',n===i);});
+    });
+  }
+
+  document.getElementById('jump').addEventListener('click',function(){
+    var on=this.dataset.on==='1';
+    document.querySelectorAll('.phone__in').forEach(function(f){
+      var b=f.querySelector('.body');
+      f.scrollTo({top:on?0:(b.offsetTop-6),behavior:'smooth'});});
+    this.dataset.on=on?'0':'1';
+    this.textContent=on?'Scroll all frames past the card':'Back to the top of each frame';});
+})();
+</script>
+</body></html>

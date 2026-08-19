@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chooser tests</title>
+<style>
+  body { background:#0a0b0d; color:#e8ecf5; font:13px/1.6 ui-monospace, Menlo, monospace; padding:24px; }
+  .pass { color:#3fd94e; } .fail { color:#ff6b6b; font-weight:700; }
+  h1 { font:700 18px/1 -apple-system, sans-serif; }
+  #sum { font-weight:700; margin-top:14px; }
+</style>
+</head>
+<body>
+<h1>Chooser tests</h1>
+<div id="out"></div>
+<div id="sum"></div>
+<script src="chooser.js?v=tw41"></script>
+<script>
+var C = MilestoneChooser, out = [], failures = 0;
+function t(name, fn) {
+  try { fn(); out.push('<div class="pass">PASS ' + name + '</div>'); }
+  catch (e) { failures++; out.push('<div class="fail">FAIL ' + name + ' :: ' + e.message + '</div>'); }
+}
+function eq(a, b, why) {
+  var ja = JSON.stringify(a), jb = JSON.stringify(b);
+  if (ja !== jb) throw new Error((why || '') + ' expected ' + jb + ' got ' + ja);
+}
+function gpOf(o) {
+  return Object.assign({ target:null, unit:'', baseline:null, current:null, updatedAt:'', history:[] }, o);
+}
+var LOSE = 'I am someone who will lose 50 lbs by December';
+var EARN = 'Reach 100 paying users for my app';
+
+/* ---------- L1 milestone derivation ---------- */
+t('L1 the percent ladder up: 0->100 gives his exact list', function () {
+  eq(C.milestones(gpOf({ target:100, baseline:0 }), 'up'), [1,5,10,20,25,30,40,50,60,75,80,90,95,100]);
+});
+t('L1 the percent ladder down: 214->164 (lose 50 from 214)', function () {
+  eq(C.milestones(gpOf({ target:164, baseline:214 }), 'down'), [212,209,204,202,199,194,189,184,177,174,169,167,164]);
+});
+t('L1 tiny target: write 3 books celebrates per unit', function () {
+  eq(C.milestones(gpOf({ target:3, baseline:0 }), 'up'), [1,2,3]);
+});
+t('L1 down with no baseline: only the end is knowable', function () {
+  eq(C.milestones(gpOf({ target:199, baseline:null }), 'down'), [199]);
+});
+t('L1 marks never stack or strand on the target: 187->11', function () {
+  eq(C.milestones(gpOf({ target:11, baseline:187 }), 'down'), [185,178,169,152,143,134,117,99,81,55,46,29,20,11]);
+});
+
+/* ---------- L7 direction ---------- */
+t('L7 baseline beats verbs: 214 -> 164 is down', function () {
+  eq(C.direction(gpOf({ target:164, baseline:214 }), EARN), 'down');
+});
+t('L7 no baseline: "lose 50 lbs" is down', function () {
+  eq(C.direction(gpOf({ target:50 }), LOSE), 'down');
+});
+t('L7 no baseline, no down verb: up', function () {
+  eq(C.direction(gpOf({ target:100 }), EARN), 'up');
+});
+
+/* ---------- steps, finals, coalescing ---------- */
+function run(gp, star, prev, ledger, today, days) {
+  return C.evaluate({ gp:gp, star:star, prevValue:prev, ledger:ledger, today:today || '2026-08-09', days:days });
+}
+t('step: 15->22 of 100 crosses 20 as a step', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:22,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:22}] }), EARN, 15, {});
+  eq([ev.kind, ev.milestone, ev.intensity], ['step', 20, 'step']);
+  eq(ev.remaining, 78);
+});
+t('no crossing: once the first move is paid, quiet until a mark', function () {
+  var led = {}; led[C.starHash(EARN) + ':first-move'] = '2026-06-01';
+  eq(run(gpOf({ target:100, baseline:0, current:19,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:19}] }), EARN, 15, led), null);
+});
+t('L3 one pulse over two marks fires ONLY the furthest', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:45,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:45}] }), EARN, 15, {});
+  eq([ev.kind, ev.milestone], ['step', 40]);
+});
+t('L4 reaching the target is final, and swallows the step under it', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:100,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:100}] }), EARN, 75, {});
+  eq([ev.kind, ev.intensity, ev.milestone], ['final', 'final', 100]);
+});
+t('down goal: 205->198 crosses 204/202/199, fires the furthest (199)', function () {
+  var ev = run(gpOf({ target:164, baseline:214, current:198,
+    history:[{day:'2026-05-01',value:214},{day:'2026-08-09',value:198}] }), LOSE, 205, {});
+  eq([ev.kind, ev.milestone], ['step', 199]);
+});
+t('down goal L3: 205->190 crosses 204 AND 194, fires only 194', function () {
+  var ev = run(gpOf({ target:164, baseline:214, current:190,
+    history:[{day:'2026-05-01',value:214},{day:'2026-08-09',value:190}] }), LOSE, 205, {});
+  eq([ev.kind, ev.milestone], ['step', 194]);
+});
+
+/* ---------- L2 once only, bounce and recross ---------- */
+t('L2 recrossing a paid milestone is silent', function () {
+  var led = {};
+  var gp = gpOf({ target:164, baseline:214, current:203,
+    history:[{day:'2026-05-01',value:214},{day:'2026-06-09',value:203}] });
+  var ev1 = C.evaluate({ gp:gp, star:LOSE, prevValue:214, ledger:led, today:'2026-06-09' });
+  eq([ev1.kind, ev1.milestone], ['step', 204]);
+  // bounce up to 210, then back under 204: nothing
+  gp.current = 203;
+  var ev2 = C.evaluate({ gp:gp, star:LOSE, prevValue:210, ledger:led, today:'2026-07-01' });
+  eq(ev2, null, 'recross');
+});
+t('L2 the final also fires once', function () {
+  var led = {};
+  var gp = gpOf({ target:100, baseline:0, current:100,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:100}] });
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:90, ledger:led }).kind, 'final');
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:90, ledger:led }), null, 'second time');
+});
+
+/* ---------- L5 cold start ---------- */
+t('L5 first-week crossing is cold', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:22,
+    history:[{day:'2026-08-08',value:5},{day:'2026-08-09',value:22}] }), EARN, 15, {});
+  eq(ev.cold, true);
+});
+t('L5 two months of history is not cold', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:22,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:22}] }), EARN, 15, {});
+  eq(ev.cold, false);
+});
+
+/* ---------- L6 goal changed ---------- */
+t('L6 no baseline reports hasBaseline:false but still fires on the target', function () {
+  var ev = run(gpOf({ target:199, baseline:null, current:198,
+    history:[{day:'2026-08-09',value:198}] }), LOSE, 205, {});
+  eq([ev.kind, ev.hasBaseline], ['final', false]);
+});
+
+/* ---------- L8 records ---------- */
+t('L8 new best beyond 2% fires a record', function () {
+  var ev = run(gpOf({ target:null, current:1000,
+    history:[{day:'2026-04-01',value:355},{day:'2026-07-01',value:840},{day:'2026-08-09',value:1000}] }), EARN, 840, {});
+  eq([ev.kind, ev.milestone, ev.prev], ['record', 1000, 840]);
+});
+t('L8 a hair past the best is NOT a record (2% margin)', function () {
+  eq(run(gpOf({ target:null, current:846,
+    history:[{day:'2026-04-01',value:355},{day:'2026-07-01',value:840},{day:'2026-08-09',value:846}] }), EARN, 840, {}), null);
+});
+t('L8 first pulse ever has nothing to beat', function () {
+  eq(run(gpOf({ target:null, current:355,
+    history:[{day:'2026-08-09',value:355}] }), EARN, null, {}), null);
+});
+t('L8 cooldown: two records in one week collapse to one', function () {
+  var led = {};
+  var gp = gpOf({ target:null, current:1000,
+    history:[{day:'2026-04-01',value:355},{day:'2026-07-01',value:840},{day:'2026-08-09',value:1000}] });
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:840, ledger:led, today:'2026-08-09' }).kind, 'record');
+  gp.history.push({day:'2026-08-12',value:1200}); gp.current = 1200;
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:1000, ledger:led, today:'2026-08-12' }), null, 'inside cooldown');
+  gp.history.push({day:'2026-08-17',value:1400}); gp.current = 1400;
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:1200, ledger:led, today:'2026-08-17' }).kind, 'record', 'after cooldown');
+});
+
+/* ---------- L8 decimal margins ---------- */
+t('L8 decimal goal: 1.5h -> 1.0h screen time IS a record', function () {
+  var ev = run(gpOf({ target:null, current:1.0,
+    history:[{day:'2026-04-01',value:2.5},{day:'2026-07-01',value:1.5},{day:'2026-08-09',value:1.0}] }), LOSE, 1.5, {});
+  eq([ev.kind, ev.milestone, ev.prev], ['record', 1.0, 1.5]);
+});
+t('L8 decimal goal: a hair under the best still is not one', function () {
+  eq(run(gpOf({ target:null, current:1.49,
+    history:[{day:'2026-04-01',value:2.5},{day:'2026-07-01',value:1.5},{day:'2026-08-09',value:1.49}] }), LOSE, 1.5, {}), null);
+});
+
+/* ---------- L11 first move ---------- */
+t('L11 the 1% mark witnesses the first inch (0->3 fires mark 1)', function () {
+  var led = {};
+  var gp = gpOf({ target:100, baseline:0, current:3,
+    history:[{day:'2026-08-01',value:0},{day:'2026-08-09',value:3}] });
+  var ev = C.evaluate({ gp:gp, star:EARN, prevValue:0, ledger:led, today:'2026-08-09' });
+  eq([ev.kind, ev.milestone], ['step', 1]);
+  gp.current = 4;
+  eq(C.evaluate({ gp:gp, star:EARN, prevValue:3, ledger:led, today:'2026-08-10' }), null, 'the next inch is quiet');
+});
+t('L11 movement below the first mark still fires the first-move, once', function () {
+  var led = {};
+  var gp = gpOf({ target:100, baseline:0, current:0.5,
+    history:[{day:'2026-08-01',value:0},{day:'2026-08-09',value:0.5}] });
+  var ev = C.evaluate({ gp:gp, star:EARN, prevValue:0, ledger:led, today:'2026-08-09' });
+  eq([ev.kind, ev.key.indexOf(':first-move') > -1], ['first', true]);
+});
+t('L11 a real mark still outranks the first move', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:22,
+    history:[{day:'2026-06-01',value:0},{day:'2026-08-09',value:22}] }), EARN, 0, {});
+  eq(ev.kind, 'step');
+});
+
+/* ---------- L9 weekly day rhythm (Malik 2026-08-13: every 7 days) ---------- */
+t('L9 day 14 fires the 14 rung once', function () {
+  var led = {};
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:14, today:'2026-08-09' });
+  eq([ev.family, ev.kind, ev.milestone], ['mt', 'days', 14]);
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:15, today:'2026-08-10' }), null, 'day 15 (same rung)');
+});
+t('L9 day 6 fires nothing', function () {
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:6 }), null);
+});
+t('L9 day 100 is a BOLD rung (the round marks hit harder, on the day)', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:100 });
+  eq([ev.milestone, ev.intensity], [100, 'bold']);
+});
+t('L9 weekly rungs are quiet steps: day 98 fires 98 as a step', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:98 });
+  eq([ev.milestone, ev.intensity], [98, 'step']);
+});
+t('L9 a bold fire spends its week: 98 then 100-bold then quiet until 105', function () {
+  var led = {};
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:98,  today:'2026-08-01' }).milestone, 98);
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:100, today:'2026-08-03' }).intensity, 'bold');
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:101, today:'2026-08-04' }), null, 'day 101 quiet');
+  eq(C.evaluate({ gp:null, star:'stay sober', ledger:led, days:105, today:'2026-08-08' }).milestone, 105);
+});
+t('L9 past a year the bold marks keep coming by hundreds: day 465', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:465 });
+  eq([ev.milestone, ev.intensity], [465, 'bold']);
+});
+t('L9 the weekly rhythm still runs between bold marks: day 472 -> 469', function () {
+  var led = {};
+  C.evaluate({ gp:null, star:'stay sober', ledger:led, days:465, today:'2026-08-01' });
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:472, today:'2026-08-08' });
+  eq([ev.milestone, ev.intensity], [469, 'step']);
+});
+
+t('L9 month marks fire on their exact day: day 60', function () {
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:{}, days:60 });
+  eq([ev.milestone, ev.month === true], [60, true]);
+});
+t('L9 a month fire spends its week: day 63 still fires 63 after day 60', function () {
+  var led = {};
+  C.evaluate({ gp:null, star:'stay sober', ledger:led, days:60, today:'2026-08-01' });
+  var ev = C.evaluate({ gp:null, star:'stay sober', ledger:led, days:63, today:'2026-08-04' });
+  eq(ev.milestone, 63);
+});
+
+/* ---------- the count ladder (Malik 2026-08-14) ---------- */
+t('COUNT ladder: dense start, widening, every 50 past 300', function () {
+  eq([C.countHit(1), C.countHit(6), C.countHit(15), C.countHit(47), C.countHit(125), C.countHit(199), C.countHit(340), C.countHit(400)],
+     [1, 5, 15, 40, 125, 175, 300, 400]);
+  eq([C.countNext(1), C.countNext(50), C.countNext(125), C.countNext(300)], [5, 60, 150, 350]);
+});
+
+/* ---------- L10 one event max ---------- */
+t('L10 evaluate returns one event object, never a list', function () {
+  var ev = run(gpOf({ target:100, baseline:0, current:100,
+    history:[{day:'2026-06-01',value:5},{day:'2026-08-09',value:100}] }), EARN, 5, {});
+  eq(Array.isArray(ev), false); eq(ev.kind, 'final');
+});
+
+/* ---------- L9 count-total goals: the ladder actually fires ---------- */
+t('L9 count rung: total 50 fires count-50 once, silent between rungs', function () {
+  var led = {};
+  var ev = C.evaluate({ star:'Run 100 runs', ledger:led, count:50 });
+  eq(ev.kind, 'count'); eq(ev.milestone, 50);
+  eq(C.evaluate({ star:'Run 100 runs', ledger:led, count:53 }), null);
+});
+t('L9 count rung past 300: every 50', function () {
+  var ev = C.evaluate({ star:'Run lots', ledger:{}, count:412 });
+  eq(ev.milestone, 400);
+});
+t('L9 count below the first rung: silent', function () {
+  eq(C.evaluate({ star:'Run 100 runs', ledger:{}, count:0 }), null);
+});
+
+document.getElementById('out').innerHTML = out.join('');
+document.getElementById('sum').innerHTML = failures
+  ? '<span class="fail">' + failures + ' FAILING</span>'
+  : '<span class="pass">ALL ' + out.length + ' PASS</span>';
+window.__failures = failures; window.__total = out.length;
+</script>
+</body>
+</html>

@@ -1,0 +1,1935 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The sync box, redesigned</title>
+<style>
+  :root{
+    --ink:255,255,255;
+    --text-hi:rgba(255,255,255,.96); --text-mid:rgba(255,255,255,.68);
+    --text-lo:rgba(255,255,255,.42); --hairline:rgba(255,255,255,.09);
+    --surface-1:rgba(255,255,255,.04);
+    --glass-bg:rgba(255,255,255,.115);
+    --glass-border:rgba(255,255,255,.10);
+    --glass-shadow:0 1px 2px rgba(0,0,0,.30), 0 8px 20px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.05);
+    --glass-highlight:inset 0 1px 0 rgba(255,255,255,.13);
+    --glass-blur:blur(28px) saturate(1.4);
+    --card-r:18px; --rx:1;
+    --clar:#3ad9f5; --cons:#3fd94e; --act:#eef2fb;
+    --color-clarity:#3ad9f5; --color-consistency:#3fd94e;
+    --accent:#3fd94e; --accent-rgb:63,217,78;
+    --solid-bg:#f2f3f6; --solid-fg:#0b0c0e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#050609;color:var(--text-hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1340px;margin:0 auto;padding:34px 22px 120px}
+
+  h1{margin:0 0 8px;font-size:26px;font-weight:750;letter-spacing:-.025em}
+  .lede{margin:0 0 4px;font-size:14.5px;line-height:1.6;color:var(--text-mid);max-width:74ch}
+  .lede b{color:var(--text-hi);font-weight:640}
+
+  .nav{position:sticky;top:0;z-index:30;display:flex;gap:8px;flex-wrap:wrap;
+    margin:22px -22px 0;padding:12px 22px;background:rgba(5,6,9,.82);
+    backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+  .nav a{font-size:13px;font-weight:620;text-decoration:none;color:var(--text-mid);
+    padding:8px 14px;border-radius:999px;background:var(--surface-1)}
+  .nav a:hover{color:var(--text-hi);background:rgba(255,255,255,.085)}
+
+  .sect{padding-top:40px;scroll-margin-top:72px}
+  .sect__sub{margin:44px 0 20px;font-size:16px;font-weight:680;letter-spacing:-.015em;color:var(--text-hi)}
+  .tag{margin-left:8px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
+  .tag--cut{background:rgba(255,255,255,.07);color:var(--text-lo)}
+  .tag--risk{background:rgba(58,217,245,.14);color:#8fe6f7}
+  .tag--new{background:rgba(63,217,78,.16);color:#8ee79a}
+  .sect__sub--new{color:#8ee79a}
+  .guide{margin:26px 0 0;padding:18px 18px 16px;border-radius:15px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);overflow-x:auto}
+  .guide h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.015em}
+  .guide table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+  .guide th{text-align:left;font-size:11px;font-weight:750;color:var(--text-lo);padding:0 9px 6px 0}
+  .guide td{padding:7px 9px 7px 0;color:var(--text-mid);line-height:1.45;vertical-align:top;border-top:1px solid rgba(255,255,255,.06)}
+  .guide td b{color:var(--text-hi);font-weight:640}
+  .slot__risk{margin:9px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-mid)}
+  .slot__risk b{color:var(--text-hi);font-weight:640}
+  .pc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;
+    padding:12px 13px;border-radius:12px;background:rgba(255,255,255,.032)}
+  .pc__h{display:block;margin:0 0 6px;font-size:11.5px;font-weight:700;color:var(--text-lo)}
+  .pc__col--p .pc__h{color:#7fe08c}
+  .pc__col--c .pc__h{color:#f0938f}
+  .pc ul{margin:0;padding-left:14px}
+  .pc li{margin:0 0 5px;font-size:12px;line-height:1.5;color:var(--text-mid)}
+  .slot__verdict{margin:11px 0 0;font-size:12.5px;line-height:1.55;color:var(--text-hi);font-weight:560}
+
+  .sect__hd h2{margin:0 0 5px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+  .sect__hd p{margin:0 0 22px;font-size:13.5px;line-height:1.55;color:var(--text-mid)}
+  .sect__hd b{color:var(--text-hi);font-weight:640}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:30px 22px}
+  .slot{margin:0}
+  .slot__cap{display:flex;align-items:baseline;gap:9px;margin:0 0 11px;padding-left:2px}
+  .slot__n{font-size:11.5px;font-weight:700;color:var(--text-lo);font-variant-numeric:tabular-nums}
+  .slot__t{font-size:15px;font-weight:650;letter-spacing:-.012em}
+
+  /* the phone context: the Memento above, its glow, then the real glass card */
+  .phone{position:relative;padding:0 0 16px;border-radius:22px;overflow:hidden;
+    background:linear-gradient(180deg,#0a0c10,#07080b)}
+  .phone__glow{position:absolute;left:50%;top:-58px;width:290px;height:220px;
+    transform:translateX(-50%);pointer-events:none;
+    background:radial-gradient(closest-side,rgba(63,217,78,.30),transparent 72%);
+    filter:blur(14px)}
+  .phone__memento{position:relative;height:96px;margin:0 16px;border-radius:14px;
+    display:grid;place-items:center;
+    background:radial-gradient(120% 150% at 50% 30%,#3fbf6e,#1d8f52 62%,#116d3d);
+    box-shadow:0 10px 34px rgba(63,217,78,.20),inset 0 1px 0 rgba(255,255,255,.24)}
+  .phone__memento svg{width:26px;height:26px;fill:rgba(245,255,248,.95)}
+
+  .cc-card{position:relative;overflow:hidden;margin:14px 16px 0;
+    padding:22px 22px 20px;
+    background:var(--glass-bg);border-radius:var(--card-r);
+    box-shadow:var(--glass-shadow),var(--glass-highlight);
+    backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur)}
+  .cc-card::before{content:'';position:absolute;inset:0;border-radius:inherit;
+    pointer-events:none;z-index:0;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 46%)}
+  .cc-card > *{position:relative;z-index:1}
+  .cc-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 0}
+  .cc-dots i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.22)}
+  .cc-dots i.on{background:rgba(255,255,255,.85)}
+
+  .slot__meta{margin:13px 2px 0}
+  .slot__idea{margin:0;font-size:13px;line-height:1.5;color:var(--text-mid)}
+  .bf{margin:0;font-size:13.5px;line-height:1.5;color:var(--text-hi);font-weight:600}
+  .bf__x{display:block;margin:5px 0 0;font-size:12px;font-weight:500;color:#f0938f}
+  .slot__evo{margin:8px 0 0;font-size:13px;line-height:1.55;color:var(--text-mid)}
+  .slot__evo b{color:var(--text-hi);font-weight:640}
+  .slot__data{margin:8px 0 0;font-size:11.5px;line-height:1.5;color:var(--text-lo)}
+
+  @media (max-width:400px){ .grid{grid-template-columns:1fr;gap:30px} .wrap{padding:26px 14px 90px} }
+</style>
+<style id="variants">
+/* NEW today-hold-tonight */
+.v-today-hold-tonight{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-hold-tonight .ht-rule{margin:0;font-size:17.5px;font-weight:640;line-height:1.3;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-row{display:flex;align-items:baseline;gap:10px;margin:15px 0 0}
+.v-today-hold-tonight .ht-n{font-size:34px;font-weight:700;letter-spacing:-.035em;line-height:1;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-hold-tonight .ht-m{font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-today-hold-tonight .ht-btn{margin:16px 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.45);font:inherit;font-size:14.5px;font-weight:650}
+.v-today-hold-tonight .ht-note{margin:9px 0 0;font-size:11.5px;line-height:1.4;color:rgba(255,255,255,.4)}
+
+/* NEW today-derived-line */
+.v-today-derived-line{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-today-derived-line .dl-top{margin:0;font-size:13px;font-weight:600;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math{margin:5px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-today-derived-line .dl-math b{color:rgba(255,255,255,.96);font-weight:650}
+.v-today-derived-line .dl-act{margin:14px 0 0;font-size:18px;font-weight:680;letter-spacing:-.018em;line-height:1.28;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-derived-line .dl-bar{margin:15px 0 0;height:4px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.v-today-derived-line .dl-bar i{display:block;height:100%;background:rgba(238,242,251,.85)}
+.v-today-derived-line .dl-foot{margin:10px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW star-star-open-evidence */
+.v-star-star-open-evidence{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-star-star-open-evidence .soe-star{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-open-evidence .soe-list{margin:14px 0 0;padding:0;list-style:none}
+.v-star-star-open-evidence .soe-list li{display:flex;gap:12px;align-items:baseline;padding:6px 0;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.86);border-top:1px solid rgba(255,255,255,.06)}
+.v-star-star-open-evidence .soe-list li:first-child{border-top:0}
+.v-star-star-open-evidence .soe-list li span:last-child{margin-left:auto;flex:none;font-size:11.5px;color:rgba(255,255,255,.4)}
+.v-star-star-open-evidence .soe-foot{margin:12px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+
+/* NEW consistency-cadence-week */
+.v-consistency-cadence-week{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-cadence-week .cw-head{display:flex;align-items:baseline;gap:9px}
+.v-consistency-cadence-week .cw-n{font-size:38px;font-weight:700;letter-spacing:-.04em;line-height:1;color:#3fd94e}
+.v-consistency-cadence-week .cw-of{font-size:14px;font-weight:600;color:rgba(255,255,255,.86)}
+.v-consistency-cadence-week .cw-tag{margin-left:auto;padding:4px 10px;border-radius:999px;background:rgba(63,217,78,.14);color:#8ee79a;font-size:11px;font-weight:750}
+.v-consistency-cadence-week .cw-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:18px 0 0}
+.v-consistency-cadence-week .cw-days i{height:26px;border-radius:6px;background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-days i.on{background:#3fd94e}
+.v-consistency-cadence-week .cw-days i.rest{background:rgba(255,255,255,.05)}
+.v-consistency-cadence-week .cw-lbl{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:7px 0 0;text-align:center;font-size:10.5px;color:rgba(255,255,255,.4)}
+.v-consistency-cadence-week .cw-lbl span{display:block}
+.v-consistency-cadence-week .cw-foot{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-consistency-cadence-week .cw-foot b{color:rgba(255,255,255,.96);font-weight:650}
+
+/* NEW consistency-not-moving */
+.v-consistency-not-moving{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums}
+.v-consistency-not-moving .nm-hd{margin:0;font-size:17px;font-weight:660;line-height:1.32;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-consistency-not-moving .nm-two{display:flex;gap:22px;margin:15px 0 0}
+.v-consistency-not-moving .nm-two span{display:flex;flex-direction:column;font-size:12px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-two b{font-size:24px;font-weight:700;letter-spacing:-.03em;color:rgba(255,255,255,.96)}
+.v-consistency-not-moving .nm-say{margin:14px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.v-consistency-not-moving .nm-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:#f2f3f6;color:#0b0c0e;font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
+
+/* today-gap-close */
+.v-today-gap-close{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-gap-close .gc-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-head{display:flex;align-items:baseline;gap:8px;margin:16px 0 0}
+.v-today-gap-close .gc-now{font-size:22px;line-height:1;font-weight:650;letter-spacing:-.03em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-gap-close .gc-of{font-size:13.5px;line-height:1;font-weight:450;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-new{margin-left:auto;font-size:12.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.9)}
+.v-today-gap-close .gc-rail{display:flex;height:5px;margin:11px 0 0;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-gap-close .gc-base{width:41%;background:rgba(var(--ink,255,255,255),.5)}
+.v-today-gap-close .gc-week{width:6%;background:var(--solid-bg,#eef2fb)}
+.v-today-gap-close .gc-read{margin:11px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-gap-close .gc-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-gap-close .gc-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-gap-close .gc-do{transition:none}}
+
+/* today-today-weight */
+.v-today-today-weight{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-weight .tw-move{margin:0;font-size:19px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-row{display:flex;align-items:center;gap:10px;margin-top:16px}
+.v-today-today-weight .tw-ladder{display:inline-flex;align-items:flex-end;gap:4px;height:16px}
+.v-today-today-weight .tw-ladder i{display:block;width:4px;border-radius:2px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-weight .tw-ladder i:nth-child(1){height:6px}
+.v-today-today-weight .tw-ladder i:nth-child(2){height:8.5px}
+.v-today-today-weight .tw-ladder i:nth-child(3){height:11px}
+.v-today-today-weight .tw-ladder i:nth-child(4){height:13.5px}
+.v-today-today-weight .tw-ladder i:nth-child(5){height:16px}
+.v-today-today-weight .tw-ladder i.is-past{background:rgba(var(--ink,255,255,255),.36)}
+.v-today-today-weight .tw-ladder i.is-on{background:var(--solid-bg,#eef2fb)}
+.v-today-today-weight .tw-tier{font-size:14px;line-height:1;font-weight:600;letter-spacing:-.005em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-run{margin:11px 0 0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-weight .tw-n{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-weight .tw-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-weight .tw-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-weight .tw-cta{transition:none}}
+
+/* today-today-open */
+.v-today-today-open{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-open .to-move{margin:0;font-size:18.5px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-open .to-start{display:flex;align-items:flex-start;gap:9px;margin-top:14px;padding:11px 12px;border-radius:10px;background:rgba(var(--ink,255,255,255),.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-today-today-open .to-ic{flex:0 0 auto;margin-top:3px;color:rgba(var(--ink,255,255,255),.6)}
+.v-today-today-open .to-start p{margin:0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.92)}
+.v-today-today-open .to-gap{margin:11px 0 0;font-size:13px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.72)}
+.v-today-today-open .to-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-open .to-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-open .to-cta{transition:none}}
+
+/* today-today-run */
+.v-today-today-run{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-run .tr-list{list-style:none;margin:0;padding:0}
+.v-today-today-run .tr-list li{position:relative;display:flex;align-items:flex-start;gap:11px;padding-bottom:11px}
+.v-today-today-run .tr-list li:last-child{padding-bottom:0}
+.v-today-today-run .tr-list li:not(:last-child)::before{content:"";position:absolute;left:3px;top:15px;bottom:1px;width:1px;background:rgba(var(--ink,255,255,255),.14)}
+.v-today-today-run .tr-mk{flex:0 0 auto;width:7px;height:7px;margin-top:6px;border-radius:999px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.5)}
+.v-today-today-run .tr-now .tr-mk{margin-top:8px;box-shadow:inset 0 0 0 1.5px rgba(var(--ink,255,255,255),.75)}
+.v-today-today-run .tr-mk--on{background:var(--solid-bg,#eef2fb);box-shadow:none;opacity:.85}
+.v-today-today-run .tr-list li p{margin:0;flex:1 1 auto;font-size:13.5px;line-height:1.4;font-weight:450;color:rgba(var(--ink,255,255,255),.82)}
+.v-today-today-run .tr-now p{font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-run .tr-list li time{flex:0 0 auto;font-size:12.5px;line-height:1.5;font-weight:500;color:rgba(var(--ink,255,255,255),.55)}
+.v-today-today-run .tr-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-run .tr-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-run .tr-cta{transition:none}}
+
+/* today-week-rhythm */
+.v-today-week-rhythm{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-week-rhythm .wr-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-week{display:flex;gap:13px;margin:16px 0 0}
+.v-today-week-rhythm .wr-day{display:flex;flex-direction:column;align-items:center;gap:7px;width:22px;font-size:10.5px;line-height:1;font-weight:600;color:rgba(var(--ink,255,255,255),.42)}
+.v-today-week-rhythm .wr-day i{width:9px;height:9px;border-radius:50%;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-week-rhythm .wr-day.is-done{color:rgba(var(--ink,255,255,255),.7)}
+.v-today-week-rhythm .wr-day.is-done i{background:var(--solid-bg,#eef2fb)}
+.v-today-week-rhythm .wr-day.is-now{color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-day.is-now i{background:transparent;box-shadow:inset 0 0 0 2px rgba(var(--ink,255,255,255),.62)}
+.v-today-week-rhythm .wr-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-week-rhythm .wr-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-week-rhythm .wr-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-week-rhythm .wr-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-week-rhythm .wr-do{transition:none}}
+
+/* today-record-line */
+.v-today-record-line{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-record-line .rl-verdict{margin:0;font-size:18px;line-height:1.28;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-rows{margin:15px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-record-line .rl-row{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:rgba(var(--ink,255,255,255),.8)}
+.v-today-record-line .rl-k{width:86px;flex:0 0 auto}
+.v-today-record-line .rl-bar{flex:1 1 auto;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-record-line .rl-bar b{display:block;height:100%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-record-line .rl-n{width:12px;flex:0 0 auto;text-align:right;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-row.is-best{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-row.is-best .rl-bar b{background:rgba(var(--ink,255,255,255),.28)}
+.v-today-record-line .rl-row.is-best .rl-n{color:rgba(var(--ink,255,255,255),.55)}
+.v-today-record-line .rl-move{margin:15px 0 0;font-size:15px;line-height:1.34;font-weight:600;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-record-line .rl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-record-line .rl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-record-line .rl-do{transition:none}}
+
+/* today-today-then */
+.v-today-today-then{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-then .tn-move{margin:0;font-size:19.5px;line-height:1.32;font-weight:600;letter-spacing:-.016em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-then .tn-then{display:flex;align-items:stretch;gap:11px;margin-top:16px}
+.v-today-today-then .tn-rule{flex:0 0 auto;width:1px;border-radius:999px;background:linear-gradient(to bottom,rgba(var(--ink,255,255,255),.3),rgba(var(--ink,255,255,255),.07))}
+.v-today-today-then .tn-then p{margin:0;font-size:13.5px;line-height:1.45;font-weight:450;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-then .tn-then p span{color:var(--text-hi,rgba(255,255,255,.96));font-weight:500}
+.v-today-today-then .tn-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-then .tn-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-then .tn-cta{transition:none}}
+
+/* today-today-toward */
+.v-today-today-toward{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-today-toward .tt-move{margin:0;font-size:18.5px;line-height:1.33;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-rail{margin-top:16px}
+.v-today-today-toward .tt-track{position:relative;display:block;height:5px;border-radius:999px;background:rgba(var(--ink,255,255,255),.1);overflow:hidden}
+.v-today-today-toward .tt-fill{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:999px;background:var(--solid-bg,#eef2fb)}
+.v-today-today-toward .tt-base{position:absolute;left:12%;top:0;bottom:0;width:1px;background:var(--solid-fg,#07080b);opacity:.55}
+.v-today-today-toward .tt-nums{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px}
+.v-today-today-toward .tt-cur{font-size:13.5px;line-height:1.3;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-today-toward .tt-cur b{font-size:16px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-today-toward .tt-delta{flex:0 0 auto;font-size:12.5px;line-height:1.3;font-weight:500;color:rgba(var(--ink,255,255,255),.7)}
+.v-today-today-toward .tt-cta{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-today-toward .tt-cta:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-today-toward .tt-cta{transition:none}}
+
+/* today-size-ladder */
+.v-today-size-ladder{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-size-ladder .sl-move{margin:0;font-size:18px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-scale{display:flex;align-items:flex-end;gap:9px;height:30px;margin:16px 0 0}
+.v-today-size-ladder .sl-scale i{width:13px;border-radius:3px;background:rgba(var(--ink,255,255,255),.12)}
+.v-today-size-ladder .sl-scale i:nth-child(1){height:7px}
+.v-today-size-ladder .sl-scale i:nth-child(2){height:12px}
+.v-today-size-ladder .sl-scale i:nth-child(3){height:18px}
+.v-today-size-ladder .sl-scale i:nth-child(4){height:24px}
+.v-today-size-ladder .sl-scale i:nth-child(5){height:30px}
+.v-today-size-ladder .sl-scale i.is-past{background:rgba(var(--ink,255,255,255),.32)}
+.v-today-size-ladder .sl-scale i.is-now{background:var(--solid-bg,#eef2fb)}
+.v-today-size-ladder .sl-read{margin:14px 0 0;font-size:13.5px;line-height:1.42;font-weight:450;color:rgba(var(--ink,255,255,255),.88)}
+.v-today-size-ladder .sl-read b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-size-ladder .sl-do{margin-top:auto;appearance:none;border:0;width:100%;height:46px;border-radius:10px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:15.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.28);transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-size-ladder .sl-do:active{transform:scale(.985);opacity:.94}
+@media (prefers-reduced-motion:reduce){.v-today-size-ladder .sl-do{transition:none}}
+
+/* today-move-ledger */
+.v-today-move-ledger{display:flex;flex-direction:column;min-height:176px;padding-bottom:10px;font-variant-numeric:tabular-nums}
+.v-today-move-ledger .ml-top{display:flex;align-items:flex-start;gap:14px}
+.v-today-move-ledger .ml-move{margin:0;flex:1 1 auto;font-size:17.5px;line-height:1.3;font-weight:600;letter-spacing:-.015em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-today-move-ledger .ml-do{flex:0 0 auto;appearance:none;border:0;height:34px;padding:0 18px;border-radius:9px;background:var(--solid-bg,#eef2fb);color:var(--solid-fg,#07080b);font-family:inherit;font-size:13.5px;font-weight:600;letter-spacing:-.01em;cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-today-move-ledger .ml-do:active{transform:scale(.985);opacity:.94}
+.v-today-move-ledger .ml-list{margin:17px 0 0;display:flex;flex-direction:column;gap:9px}
+.v-today-move-ledger .ml-row{display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.25}
+.v-today-move-ledger .ml-d{width:68px;flex:0 0 auto;font-weight:600;color:rgba(var(--ink,255,255,255),.5)}
+.v-today-move-ledger .ml-t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(var(--ink,255,255,255),.86)}
+.v-today-move-ledger .ml-foot{margin:auto 0 0;font-size:12.5px;line-height:1.35;font-weight:450;color:rgba(var(--ink,255,255,255),.68)}
+@media (prefers-reduced-motion:reduce){.v-today-move-ledger .ml-do{transition:none}}
+
+/* today-mv-ask */
+.v-today-mv-ask{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__q{margin:0;font-size:14px;line-height:1.1;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ask__a{margin:12px 0 0;font-size:46px;line-height:.96;letter-spacing:-.04em;font-weight:600;}
+.v-today-mv-ask__move{margin:16px 0 18px;font-size:16.5px;line-height:1.34;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ask__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ask__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-rule */
+.v-today-mv-rule{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__head{margin:0;display:flex;align-items:baseline;gap:7px;}
+.v-today-mv-rule__big{font-size:27px;line-height:1;font-weight:600;letter-spacing:-.03em;font-variant-numeric:tabular-nums;}
+.v-today-mv-rule__sub{font-size:14.5px;line-height:1;font-weight:500;letter-spacing:-.008em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__svg{display:block;margin-top:15px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__ends{margin:2px 0 0;display:flex;justify-content:space-between;font-size:11.5px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-rule__row{margin-top:auto;padding-top:18px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-rule__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-rule__tier{display:block;margin-top:6px;font-size:13px;line-height:1.2;font-weight:500;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-rule__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-rule__tick:active{background:rgba(255,255,255,.1);}
+
+/* today-mv-ordinal */
+.v-today-mv-ordinal{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__n{margin:0;font-size:62px;line-height:.9;font-weight:600;letter-spacing:-.052em;font-variant-numeric:tabular-nums;}
+.v-today-mv-ordinal__suf{font-size:26px;letter-spacing:-.03em;margin-left:2px;}
+.v-today-mv-ordinal__sub{margin:11px 0 0;font-size:13.5px;line-height:1.25;font-weight:500;letter-spacing:-.006em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-ordinal__line{height:1px;margin:15px 0 0;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-ordinal__move{margin:14px 0 16px;font-size:16.5px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-ordinal__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-ordinal__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-chain */
+.v-today-mv-chain{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__link{position:relative;display:flex;gap:14px;padding-bottom:18px;}
+.v-today-mv-chain__link:last-of-type{padding-bottom:16px;}
+.v-today-mv-chain__link--now::before{content:"";position:absolute;left:4px;top:14px;bottom:2px;width:1px;background:var(--hairline,rgba(255,255,255,.09));}
+.v-today-mv-chain__node{flex:0 0 auto;width:9px;height:9px;margin-top:5px;border-radius:999px;background:#eef2fb;}
+.v-today-mv-chain__node--open{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.34);}
+.v-today-mv-chain__body{flex:1;min-width:0;}
+.v-today-mv-chain__lbl{margin:0;font-size:12.5px;line-height:1.1;font-weight:500;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-chain__txt{margin:7px 0 0;font-size:16.5px;line-height:1.32;font-weight:600;letter-spacing:-.014em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-chain__txt--next{font-size:15.5px;font-weight:500;letter-spacing:-.01em;}
+.v-today-mv-chain__do{margin-top:auto;width:100%;height:40px;border:0;border-radius:10px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));font-family:inherit;font-size:15px;font-weight:600;letter-spacing:-.008em;cursor:pointer;}
+.v-today-mv-chain__do:active{background:rgba(255,255,255,.085);}
+
+/* today-mv-trace */
+.v-today-mv-trace{display:flex;flex-direction:column;min-height:170px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__head{margin:0;font-size:25px;line-height:1;font-weight:600;letter-spacing:-.03em;}
+.v-today-mv-trace__sub{margin:8px 0 0;font-size:13.5px;line-height:1.2;font-weight:500;letter-spacing:-.006em;font-variant-numeric:tabular-nums;color:var(--text-mid,rgba(255,255,255,.62));}
+.v-today-mv-trace__svg{display:block;margin-top:13px;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__span{margin:3px 0 0;text-align:right;font-size:11.5px;line-height:1;font-weight:500;color:var(--text-lo,rgba(255,255,255,.40));}
+.v-today-mv-trace__row{margin-top:auto;padding-top:16px;display:flex;align-items:flex-start;gap:14px;}
+.v-today-mv-trace__move{margin:0;flex:1;font-size:16px;line-height:1.32;font-weight:500;letter-spacing:-.012em;color:var(--text-hi,rgba(255,255,255,.96));}
+.v-today-mv-trace__tick{flex:0 0 auto;width:30px;height:30px;margin-top:1px;border:0;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:var(--text-hi,rgba(255,255,255,.96));display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.v-today-mv-trace__tick:active{background:rgba(255,255,255,.1);}
+
+/* star-star-distance */
+.v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}}
+:root[data-theme="light"] .v-star-star-distance{--cy:#0b90b0;--cyglow:none;--rail:rgba(0,0,0,.12)}
+:root[data-theme="dark"] .v-star-star-distance{--cy:#3ad9f5;--cyglow:0 0 12px rgba(58,217,245,.45);--rail:rgba(255,255,255,.14)}
+.v-star-star-distance .sd-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-distance .sd-row{display:flex;align-items:baseline;gap:7px;margin-top:20px}
+.v-star-star-distance .sd-big{font-size:34px;font-weight:700;line-height:1;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-distance .sd-of{min-width:0;font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-distance .sd-delta{flex:none;margin-left:auto;align-self:center;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-distance .sd-rail{position:relative;height:4px;border-radius:999px;background:var(--rail);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);margin-top:14px;overflow:hidden}
+.v-star-star-distance .sd-fill{position:absolute;top:0;bottom:0;left:0;width:34%;border-radius:999px;background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-distance .sd-foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-distance .sd-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-surface */
+.v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-surface{--cy:#0b90b0;--cyglow:none}}
+:root[data-theme="light"] .v-star-star-surface{--cy:#0b90b0;--cyglow:none}
+:root[data-theme="dark"] .v-star-star-surface{--cy:#3ad9f5;--cyglow:0 0 8px rgba(58,217,245,.7)}
+.v-star-star-surface .su-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-surface .su-why{display:flex;gap:11px;margin-top:18px}
+.v-star-star-surface .su-dot{flex:0 0 auto;width:5px;height:5px;border-radius:999px;background:var(--cy);margin-top:7px;box-shadow:var(--cyglow)}
+.v-star-star-surface .su-txt{font-size:14px;line-height:1.44;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.v-star-star-surface .su-foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-surface .su-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-spine */
+.v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}}
+:root[data-theme="light"] .v-star-star-spine{--cy:#0b90b0;--cydim:rgba(11,144,176,.55);--cyglow:none;--mark:rgba(0,0,0,.14)}
+:root[data-theme="dark"] .v-star-star-spine{--cy:#3ad9f5;--cydim:rgba(58,217,245,.55);--cyglow:0 0 8px rgba(58,217,245,.8);--mark:rgba(255,255,255,.13)}
+.v-star-star-spine .ss-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-spine .ss-spine{display:flex;align-items:flex-end;gap:2px;height:14px;margin-top:20px}
+.v-star-star-spine .ss-spine i{flex:1 1 0;min-width:1px;height:5px;border-radius:1px;background:var(--mark)}
+.v-star-star-spine .ss-spine i.on{height:14px;background:var(--cydim)}
+.v-star-star-spine .ss-spine i.now{background:var(--cy);box-shadow:var(--cyglow)}
+.v-star-star-spine .ss-meta{display:flex;align-items:baseline;margin:12px 0 0;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-meta b{margin-left:auto;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-spine .ss-line{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-spine .ss-line b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-ledger */
+.v-star-star-ledger{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-ledger .sl-star{margin:0;font-size:16px;line-height:1.34;font-weight:680;letter-spacing:-.01em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-ledger .sl-rule{height:1px;background:var(--hairline,rgba(255,255,255,.09));margin:16px 0}
+.v-star-star-ledger .sl-row{display:flex;align-items:flex-end;gap:10px}
+.v-star-star-ledger .sl-big{font-size:36px;font-weight:700;line-height:.86;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-lab{font-size:13px;line-height:1.22;color:var(--text-mid,rgba(255,255,255,.62));padding-bottom:1px}
+.v-star-star-ledger .sl-wk{margin-left:auto;text-align:right;line-height:1.35}
+.v-star-star-ledger .sl-wk b{display:block;font-size:13px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-ledger .sl-wk span{display:block;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-ledger .sl-last{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-ledger .sl-last b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-climb */
+.v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}}
+:root[data-theme="light"] .v-star-star-climb{--cy:#0b90b0;--ceil:rgba(0,0,0,.28)}
+:root[data-theme="dark"] .v-star-star-climb{--cy:#3ad9f5;--ceil:rgba(255,255,255,.26)}
+.v-star-star-climb__head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.v-star-star-climb__now{display:flex;align-items:baseline;gap:7px;min-width:0}
+.v-star-star-climb__now b{font-size:34px;line-height:1;font-weight:700;letter-spacing:-.028em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-climb__now span{font-size:13px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-star-star-climb__delta{flex:none;font-size:12.5px;font-weight:650;color:var(--cy)}
+.v-star-star-climb__chart{position:relative;margin-top:16px}
+.v-star-star-climb__chart svg{display:block}
+.v-star-star-climb__area{fill:color-mix(in srgb,var(--cy) 16%,transparent)}
+.v-star-star-climb__line{fill:none;stroke:var(--cy);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.v-star-star-climb__ceil{stroke:var(--ceil);stroke-width:1;stroke-dasharray:2 5}
+.v-star-star-climb__dot{fill:var(--cy)}
+.v-star-star-climb__ceilcap{position:absolute;right:0;top:5px;font-size:11px;line-height:1;font-weight:600;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-climb__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-arrival */
+.v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}}
+:root[data-theme="light"] .v-star-star-arrival{--cy:#0b90b0;--rail:rgba(0,0,0,.10);--tick:rgba(0,0,0,.36);--inset:none}
+:root[data-theme="dark"] .v-star-star-arrival{--cy:#3ad9f5;--rail:rgba(255,255,255,.10);--tick:rgba(255,255,255,.38);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-arrival__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__lead{display:flex;align-items:baseline;gap:9px;margin-top:14px}
+.v-star-star-arrival__date{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-arrival__at{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__shift{margin:10px 0 0;font-size:12.5px;line-height:1.2;font-weight:650;color:var(--cy)}
+.v-star-star-arrival__rail{position:relative;height:6px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);margin-top:16px}
+.v-star-star-arrival__fill{position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--cy) 42%,transparent),var(--cy))}
+.v-star-star-arrival__base{position:absolute;left:12%;top:-3px;bottom:-3px;width:2px;border-radius:2px;background:var(--tick)}
+.v-star-star-arrival__foot{margin:14px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-arrival__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-count */
+.v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}}
+:root[data-theme="light"] .v-star-star-count{--cy:#0b90b0;--bar:rgba(0,0,0,.20);--ceil:rgba(0,0,0,.22);--chip:rgba(0,0,0,.07);--inset:none}
+:root[data-theme="dark"] .v-star-star-count{--cy:#3ad9f5;--bar:rgba(255,255,255,.20);--ceil:rgba(255,255,255,.22);--chip:rgba(255,255,255,.08);--inset:inset 0 1px 0 rgba(255,255,255,.08)}
+.v-star-star-count__star{margin:0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:12px}
+.v-star-star-count__n{font-size:36px;line-height:1;font-weight:680;letter-spacing:-.032em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__n span{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__stale{flex:none;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__bars{position:relative;display:flex;align-items:flex-end;gap:7px;height:38px;margin-top:16px}
+.v-star-star-count__bars i{flex:1;border-radius:3px;background:var(--bar)}
+.v-star-star-count__bars i.best{background:color-mix(in srgb,var(--cy) 34%,transparent)}
+.v-star-star-count__bars i.now{background:var(--cy)}
+.v-star-star-count__ceil{position:absolute;left:0;right:0;top:0;height:1px;background:var(--ceil)}
+.v-star-star-count__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-size:12.5px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-count__foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-count__act{flex:none;appearance:none;border:0;border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;font-weight:650;color:var(--text-hi,rgba(255,255,255,.96));background:var(--chip);box-shadow:var(--inset);cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}
+.v-star-star-count__act:active{transform:scale(.97);opacity:.85}
+@media (prefers-reduced-motion:reduce){.v-star-star-count__act{transition:none}}
+
+/* star-star-revision */
+.v-star-star-revision{font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.v-star-star-revision .sr-star{margin:0;font-size:16.5px;line-height:1.32;font-weight:700;letter-spacing:-.011em;color:var(--text-hi,rgba(255,255,255,.96));display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.v-star-star-revision .sr-now{margin:10px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-then{display:flex;gap:11px;margin-top:16px}
+.v-star-star-revision .sr-tick{flex:0 0 auto;width:1px;align-self:stretch;background:var(--hairline,rgba(255,255,255,.09))}
+.v-star-star-revision .sr-body{min-width:0}
+.v-star-star-revision .sr-lab{display:block;font-size:12px;line-height:1.2;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-old{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-top:5px;font-size:13.5px;line-height:1.38;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-revision .sr-foot{margin:16px 0 0;font-size:12.5px;line-height:1.35;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-revision .sr-foot b{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+
+/* star-star-pot */
+.v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}}
+:root[data-theme="light"] .v-star-star-pot{--cy:#0b90b0;--rail:rgba(0,0,0,.09);--base:rgba(0,0,0,.26);--inset:none}
+:root[data-theme="dark"] .v-star-star-pot{--cy:#3ad9f5;--rail:rgba(255,255,255,.09);--base:rgba(255,255,255,.24);--inset:inset 0 1px 0 rgba(255,255,255,.06)}
+.v-star-star-pot__lead{display:flex;align-items:baseline;gap:9px}
+.v-star-star-pot__lead b{font-size:38px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__lead span{min-width:0;font-size:12.5px;line-height:1.25;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__rail{position:relative;height:8px;border-radius:999px;background:var(--rail);box-shadow:var(--inset);overflow:hidden;margin-top:16px}
+.v-star-star-pot__base{position:absolute;left:0;top:0;bottom:0;width:12%;background:var(--base)}
+.v-star-star-pot__gain{position:absolute;left:12%;top:0;bottom:0;width:26%;background:var(--cy)}
+.v-star-star-pot__scale{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px;font-size:12px;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-pot__at{font-weight:650;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-pot__star{margin:16px 0 0;font-size:13.5px;line-height:1.35;font-weight:600;letter-spacing:-.004em;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-dial */
+.v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42);display:flex;flex-direction:column;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+@media (prefers-color-scheme:light){.v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}}
+:root[data-theme="light"] .v-star-star-dial{--cy:#0b90b0;--track:rgba(0,0,0,.10);--mark:rgba(0,0,0,.40)}
+:root[data-theme="dark"] .v-star-star-dial{--cy:#3ad9f5;--track:rgba(255,255,255,.10);--mark:rgba(255,255,255,.42)}
+.v-star-star-dial__row{display:flex;align-items:center;gap:20px}
+.v-star-star-dial__gauge{position:relative;flex:none;width:104px;height:104px}
+.v-star-star-dial__gauge svg{display:block}
+.v-star-star-dial__track{fill:none;stroke:var(--track);stroke-width:7}
+.v-star-star-dial__arc{fill:none;stroke:var(--cy);stroke-width:7;stroke-linecap:round}
+.v-star-star-dial__mark{fill:var(--mark)}
+.v-star-star-dial__pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:650;letter-spacing:-.02em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__side{min-width:0}
+.v-star-star-dial__left{font-size:40px;line-height:.95;font-weight:680;letter-spacing:-.035em;color:var(--text-hi,rgba(255,255,255,.96))}
+.v-star-star-dial__unit{margin-top:5px;font-size:13px;line-height:1.3;color:var(--text-mid,rgba(255,255,255,.62))}
+.v-star-star-dial__pace{margin-top:10px;font-size:12px;line-height:1.3;font-weight:650;color:var(--cy)}
+.v-star-star-dial__foot{margin:16px 0 0;font-size:12.5px;line-height:1.4;color:var(--text-mid,rgba(255,255,255,.62))}
+
+/* star-star-strata */
+.v-strata{position:relative;height:168px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--f1:rgba(255,255,255,.12);--f2:rgba(255,255,255,.07);--lift:inset 0 1px 0 rgba(255,255,255,.07)}
+.v-strata *{box-sizing:border-box}
+.v-strata__core{position:absolute;left:0;top:0;width:20px}
+.v-strata__l{display:block;height:var(--h);margin-bottom:3px;border-radius:3px;box-shadow:var(--lift)}
+.v-strata__l--now{background:linear-gradient(180deg,rgba(58,217,245,.62),rgba(58,217,245,.30))}
+.v-strata__l--mid{background:var(--f1)}
+.v-strata__l--old{background:var(--f2)}
+.v-strata__body{position:absolute;left:36px;right:0;top:0;bottom:0}
+.v-strata__now{margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-strata__meta{margin:8px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-strata__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-strata__past{position:absolute;left:0;right:0;margin:0;display:flex;align-items:baseline;gap:12px;font-size:13px;line-height:1.2;color:var(--ink2)}
+.v-strata__past span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v-strata__past b{font-weight:500;font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-strata{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--f1:rgba(12,14,18,.14);--f2:rgba(12,14,18,.08);--lift:inset 0 1px 0 rgba(255,255,255,.35)}.v-strata__l--now{background:linear-gradient(180deg,#1aa9c9,rgba(26,169,201,.55))}}
+
+/* star-star-meridian */
+.v-meridian{position:relative;height:172px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--cy:rgba(58,217,245,.58)}
+.v-meridian__star{position:absolute;top:0;left:0;right:0;margin:0;font-size:16.5px;line-height:1.28;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-meridian__line{position:absolute;left:0;right:0;height:1px;top:calc(152px - var(--p) * 104px);background:linear-gradient(90deg,transparent,var(--cy) 14%,var(--cy) 86%,transparent)}
+.v-meridian__read{position:absolute;right:0;bottom:8px;font-size:12.5px;line-height:1;color:var(--ink2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.v-meridian__anti{position:absolute;left:0;right:0;bottom:0;margin:0;font-size:13px;line-height:1.34;font-weight:400;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-meridian{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--cy:rgba(17,140,168,.75)}}
+
+/* star-star-folio */
+.v-folio{height:170px;display:flex;flex-direction:column;justify-content:space-between;padding-top:4px;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62)}
+.v-folio__star{margin:0;font-size:30px;line-height:1.14;font-weight:600;letter-spacing:-.024em;color:var(--ink);text-wrap:balance}
+.v-folio__foot{display:flex;align-items:baseline;justify-content:space-between;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:light){.v-folio{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60)}}
+
+/* star-star-plumb */
+.v-plumb{height:170px;display:grid;grid-template-columns:1fr 92px;gap:14px;align-items:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.40);--hair:rgba(255,255,255,.09);--cy:#3ad9f5}
+.v-plumb__star{margin:0;font-size:16px;line-height:1.3;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.v-plumb__meta{margin:11px 0 0;font-size:12.5px;line-height:1;color:var(--ink2);font-variant-numeric:tabular-nums}
+.v-plumb__meta i{font-style:normal;color:var(--ink3);padding:0 3px}
+.v-plumb__svg{width:92px;height:168px;display:block}
+.v-plumb__ref{stroke:var(--hair);stroke-width:1}
+.v-plumb__cord{stroke:rgba(255,255,255,.52);stroke-width:1}
+.v-plumb__pin{fill:var(--cy)}
+.v-plumb__bob{fill:var(--cy);fill-opacity:.9}
+.v-plumb__off{stroke:var(--ink3);stroke-width:1;stroke-opacity:.55}
+@media (prefers-color-scheme:light){.v-plumb{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--ink3:rgba(12,14,18,.38);--hair:rgba(12,14,18,.14);--cy:#118ca8}.v-plumb__cord{stroke:rgba(12,14,18,.50)}}
+
+/* star-star-vigil */
+.v-vigil{height:168px;display:flex;flex-direction:column;justify-content:center;--ink:rgba(255,255,255,.96);--ink2:rgba(255,255,255,.62);--hair:rgba(255,255,255,.09)}
+.v-vigil__news{display:flex;align-items:baseline;gap:9px}
+.v-vigil__n{font-size:54px;line-height:.94;font-weight:600;letter-spacing:-.038em;color:var(--ink);font-variant-numeric:tabular-nums}
+.v-vigil__u{font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.v-vigil__sub{margin:11px 0 0;font-size:13px;line-height:1.3;color:var(--ink2)}
+.v-vigil__rule{height:1px;background:var(--hair);margin:16px 0 14px}
+.v-vigil__star{margin:0;font-size:14.5px;line-height:1.34;font-weight:600;letter-spacing:-.005em;color:var(--ink)}
+@media (prefers-color-scheme:light){.v-vigil{--ink:rgba(12,14,18,.95);--ink2:rgba(12,14,18,.60);--hair:rgba(12,14,18,.13)}}
+
+/* consistency-chain-slack */
+.v-consistency-chain-slack{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-chain-slack .cs-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-chain-slack .cs-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-chain-slack .cs-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-chain-slack .cs-bank{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-chain-slack .cs-bank svg{flex:0 0 auto;opacity:.75;}
+.v-consistency-chain-slack .cs-chain{display:flex;align-items:flex-end;gap:4px;height:34px;margin-top:24px;}
+.v-consistency-chain-slack .cs-chain i{flex:1 1 0;min-width:0;height:100%;border-radius:3px;display:block;}
+.v-consistency-chain-slack .cs-k{background:#3fd94e;opacity:.92;}
+.v-consistency-chain-slack .cs-p{background:#3fd94e;opacity:.34;height:38%;}
+.v-consistency-chain-slack .cs-g{background:currentColor;opacity:.22;}
+.v-consistency-chain-slack .cs-t{box-shadow:0 0 12px rgba(63,217,78,.45);}
+.v-consistency-chain-slack .cs-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-run-rank */
+.v-consistency-run-rank{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-run-rank .rr-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-run-rank .rr-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-run-rank .rr-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-run-rank .rr-rank{margin-left:auto;padding-bottom:3px;font-size:.8rem;font-weight:650;letter-spacing:-.005em;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-run-rank .rr-bar{position:relative;height:6px;margin-top:24px;border-radius:999px;background:var(--hairline);}
+.v-consistency-run-rank .rr-fill{position:absolute;top:0;bottom:0;left:0;width:40.8%;border-radius:999px;background:#3fd94e;box-shadow:0 0 14px rgba(63,217,78,.32);}
+.v-consistency-run-rank .rr-notch{position:absolute;top:-4px;bottom:-4px;left:45.6%;width:2px;border-radius:2px;background:currentColor;opacity:.5;}
+.v-consistency-run-rank .rr-marks{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:11px;font-size:.79rem;}
+.v-consistency-run-rank .rr-near{font-weight:600;color:var(--text-hi);}
+.v-consistency-run-rank .rr-far{font-weight:600;color:var(--text-mid);white-space:nowrap;}
+.v-consistency-run-rank .rr-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-weekday-shape */
+.v-consistency-weekday-shape{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-weekday-shape .ws-h{font-size:16px;line-height:1.32;font-weight:600;letter-spacing:-.015em;color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-h b{font-weight:600;color:#3fd94e;}
+.v-consistency-weekday-shape .ws-list{margin-top:16px;display:flex;flex-direction:column;gap:4px;}
+.v-consistency-weekday-shape .ws-r{display:flex;align-items:center;gap:10px;height:11px;}
+.v-consistency-weekday-shape .ws-d{width:26px;flex:none;font-size:11.5px;line-height:1;font-weight:520;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-tr{flex:1;height:9px;border-radius:5px;background:var(--hairline);overflow:hidden;}
+.v-consistency-weekday-shape .ws-fl{display:block;height:100%;border-radius:5px;background:currentColor;opacity:.66;width:var(--w);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-fl{background:#3fd94e;opacity:1;}
+.v-consistency-weekday-shape .ws-r.is-low .ws-fl{opacity:.26;}
+.v-consistency-weekday-shape .ws-p{width:30px;flex:none;text-align:right;font-size:11.5px;line-height:1;color:var(--text-mid);}
+.v-consistency-weekday-shape .ws-r.is-top .ws-d,.v-consistency-weekday-shape .ws-r.is-top .ws-p{color:var(--text-hi);}
+.v-consistency-weekday-shape .ws-ft{margin-top:14px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-made-of */
+.v-consistency-made-of{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-made-of .mo-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-made-of .mo-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-made-of .mo-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-made-of .mo-win{margin-left:auto;padding-bottom:4px;font-size:.78rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-made-of .mo-bar{display:flex;gap:3px;height:10px;margin-top:24px;}
+.v-consistency-made-of .mo-bar i{display:block;height:100%;border-radius:3px;}
+.v-consistency-made-of .mo-a{background:#3fd94e;opacity:.9;}
+.v-consistency-made-of .mo-b{background:currentColor;opacity:.44;}
+.v-consistency-made-of .mo-c{background:currentColor;opacity:.26;}
+.v-consistency-made-of .mo-key{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;font-size:.78rem;color:var(--text-mid);}
+.v-consistency-made-of .mo-key span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.v-consistency-made-of .mo-key i{width:7px;height:7px;border-radius:2px;flex:0 0 auto;}
+.v-consistency-made-of .mo-key b{font-weight:700;color:var(--text-hi);}
+.v-consistency-made-of .mo-foot{margin-top:18px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-rate-drift */
+.v-consistency-rate-drift{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-rate-drift .rd-head{display:flex;align-items:flex-end;gap:9px;}
+.v-consistency-rate-drift .rd-num{font-size:3.25rem;line-height:.82;font-weight:700;letter-spacing:-.035em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-unit{font-size:.8rem;line-height:1.2;font-weight:600;color:var(--text-mid);padding-bottom:2px;}
+.v-consistency-rate-drift .rd-rate{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;padding-bottom:3px;}
+.v-consistency-rate-drift .rd-rate b{font-size:1.15rem;line-height:1;font-weight:700;letter-spacing:-.02em;color:var(--text-hi);}
+.v-consistency-rate-drift .rd-rate small{font-size:.74rem;line-height:1;font-weight:600;color:var(--text-mid);}
+.v-consistency-rate-drift .rd-graph{display:block;width:100%;height:54px;margin-top:20px;overflow:visible;}
+.v-consistency-rate-drift .rd-foot{margin-top:16px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-returns */
+.v-consistency-returns{color:var(--text-hi);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;}
+.v-consistency-returns .rt-row{display:flex;align-items:center;gap:20px;}
+.v-consistency-returns .rt-ring{position:relative;flex:0 0 96px;width:96px;height:96px;}
+.v-consistency-returns .rt-ring svg{display:block;width:96px;height:96px;}
+.v-consistency-returns .rt-arc{filter:drop-shadow(0 0 8px rgba(63,217,78,.35));}
+.v-consistency-returns .rt-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.v-consistency-returns .rt-num{font-size:1.9rem;line-height:1;font-weight:700;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-returns .rt-lab{font-size:.7rem;font-weight:600;color:var(--text-mid);}
+.v-consistency-returns .rt-rail{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:9px;}
+.v-consistency-returns .rt-lead{margin:0;font-size:.94rem;line-height:1.25;font-weight:600;color:var(--text-hi);}
+.v-consistency-returns .rt-lead b{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;margin-right:3px;}
+.v-consistency-returns .rt-sub{margin:0;font-size:.82rem;line-height:1.25;color:var(--text-mid);}
+.v-consistency-returns .rt-foot{margin-top:20px;font-size:.83rem;line-height:1.35;color:var(--text-mid);}
+
+/* consistency-week-rhythm */
+.v-consistency-week-rhythm{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-week-rhythm .wr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-week-rhythm .wr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-of{font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-d{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--text-hi);white-space:nowrap;}
+.v-consistency-week-rhythm .wr-row{display:flex;gap:8px;margin-top:20px;}
+.v-consistency-week-rhythm .wr-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.v-consistency-week-rhythm .wr-tr{width:70%;height:58px;border-radius:4px;background:var(--hairline);display:flex;align-items:flex-end;overflow:hidden;}
+.v-consistency-week-rhythm .wr-fl{width:100%;border-radius:4px;background:currentColor;opacity:.8;}
+.v-consistency-week-rhythm .wr-col.is-today .wr-fl{background:#3fd94e;opacity:1;}
+.v-consistency-week-rhythm .wr-dy{font-size:10.5px;font-weight:520;color:var(--text-mid);}
+.v-consistency-week-rhythm .wr-col.is-today .wr-dy{color:var(--text-hi);}
+.v-consistency-week-rhythm .wr-ft{margin-top:17px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-year-ribbon */
+.v-consistency-year-ribbon{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-year-ribbon .yr-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-year-ribbon .yr-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-year-ribbon .yr-rib{display:flex;align-items:flex-end;gap:1.5px;height:58px;margin-top:20px;}
+.v-consistency-year-ribbon .wk{flex:1;height:var(--h);border-radius:1.5px;background:currentColor;opacity:.4;}
+.v-consistency-year-ribbon .wk.is-peak{opacity:.85;}
+.v-consistency-year-ribbon .wk.is-off{opacity:.15;}
+.v-consistency-year-ribbon .wk.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-year-ribbon .yr-ax{display:flex;margin-top:10px;font-size:10px;color:var(--text-mid);}
+.v-consistency-year-ribbon .yr-ax span{flex:1;}
+.v-consistency-year-ribbon .yr-ax span:last-child{flex:none;}
+
+/* consistency-rate-curve */
+.v-consistency-rate-curve{display:flex;flex-direction:column;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-rate-curve .rc-top{display:flex;align-items:baseline;gap:8px;}
+.v-consistency-rate-curve .rc-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-of{font-size:13.5px;font-weight:500;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-sub{margin-top:9px;font-size:13px;line-height:1.35;color:var(--text-hi);}
+.v-consistency-rate-curve .rc-chart{position:relative;margin-top:16px;height:64px;}
+.v-consistency-rate-curve .rc-chart svg{display:block;width:100%;height:64px;overflow:visible;}
+.v-consistency-rate-curve .rc-tag{position:absolute;left:0;top:48.8%;transform:translateY(-140%);font-size:10px;line-height:1;color:var(--text-mid);}
+.v-consistency-rate-curve .rc-ft{margin-top:15px;font-size:12.5px;color:var(--text-mid);}
+
+/* consistency-comeback */
+.v-consistency-comeback{display:flex;gap:16px;align-items:flex-start;color:var(--text-hi);font-variant-numeric:tabular-nums;}
+.v-consistency-comeback .cb-l{width:132px;flex:none;}
+.v-consistency-comeback .cb-n{font-size:30px;line-height:1;font-weight:640;letter-spacing:-.03em;color:var(--text-hi);}
+.v-consistency-comeback .cb-k{margin-top:6px;font-size:14px;font-weight:500;color:var(--text-hi);}
+.v-consistency-comeback .cb-sub{margin-top:16px;font-size:12.5px;line-height:1.55;color:var(--text-mid);}
+.v-consistency-comeback .cb-r{flex:1;display:flex;flex-direction:column;gap:7px;}
+.v-consistency-comeback .cb-hd{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:9px;color:var(--text-mid);text-align:center;}
+.v-consistency-comeback .cb-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.v-consistency-comeback .cel{aspect-ratio:1;border-radius:3px;background:currentColor;opacity:.08;}
+.v-consistency-comeback .cel.is-fut{opacity:.03;}
+.v-consistency-comeback .cel.lv1{opacity:.26;}
+.v-consistency-comeback .cel.lv2{opacity:.48;}
+.v-consistency-comeback .cel.lv3{opacity:.76;}
+.v-consistency-comeback .cel.is-now{background:#3fd94e;opacity:1;}
+.v-consistency-comeback .cb-cap{margin-top:1px;font-size:11px;color:var(--text-mid);text-align:right;}
+
+/* consistency-ledger */
+.v-consistency-ledger{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-ledger__hero{display:flex;align-items:baseline;gap:11px;}
+.v-consistency-ledger__n{font-size:76px;line-height:.84;font-weight:600;letter-spacing:-.048em;color:rgba(255,255,255,.96);}
+.v-consistency-ledger__of{font-size:19px;font-weight:400;letter-spacing:-.01em;color:rgba(255,255,255,.62);}
+.v-consistency-ledger__say{margin:15px 0 0;font-size:14.5px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.9);max-width:255px;}
+.v-consistency-ledger__rule{height:1px;background:rgba(255,255,255,.09);margin-top:16px;}
+.v-consistency-ledger__foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-ledger__today{color:#3fd94e;}
+
+/* consistency-water */
+.v-consistency-water{min-height:176px;box-sizing:border-box;font-variant-numeric:tabular-nums;}
+.v-consistency-water__gauge{position:relative;height:176px;}
+.v-consistency-water__miss{position:absolute;top:calc(13% - 18px);right:0;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-water__now{position:absolute;left:-22px;right:-22px;top:13%;height:1px;background:rgba(63,217,78,.6);}
+.v-consistency-water__now::after{content:"";position:absolute;left:0;right:0;top:1px;height:38px;background:linear-gradient(180deg, rgba(63,217,78,.10), rgba(63,217,78,0));}
+.v-consistency-water__body{position:absolute;top:13px;left:22px;right:22px;}
+.v-consistency-water__read{display:flex;align-items:baseline;gap:2px;}
+.v-consistency-water__n{font-size:44px;line-height:.9;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-water__pct{font-size:20px;font-weight:500;color:rgba(255,255,255,.62);}
+.v-consistency-water__sub{margin-top:8px;font-size:14px;letter-spacing:-.005em;color:rgba(255,255,255,.88);}
+.v-consistency-water__low{position:absolute;left:-22px;right:-22px;top:60%;height:1px;background:rgba(255,255,255,.11);}
+.v-consistency-water__low span{position:absolute;top:7px;right:22px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.58);}
+
+/* consistency-pace */
+.v-consistency-pace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-pace__hero{display:flex;align-items:baseline;gap:10px;}
+.v-consistency-pace__n{font-size:54px;line-height:.86;font-weight:600;letter-spacing:-.045em;color:rgba(255,255,255,.96);}
+.v-consistency-pace__u{font-size:17px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-pace__say{margin:13px 0 0;font-size:14px;line-height:1.34;letter-spacing:-.005em;color:rgba(255,255,255,.86);}
+.v-consistency-pace__axis{position:relative;height:34px;margin-top:22px;}
+.v-consistency-pace__track{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(255,255,255,.12);}
+.v-consistency-pace__done{position:absolute;top:0;left:0;width:46%;height:1px;background:rgba(255,255,255,.62);}
+.v-consistency-pace__proj{position:absolute;top:0;left:46%;width:35.6%;height:1px;background:repeating-linear-gradient(90deg, rgba(63,217,78,.8) 0 3px, rgba(63,217,78,0) 3px 7px);}
+.v-consistency-pace__now{position:absolute;top:-6px;left:46%;width:1px;height:13px;background:rgba(255,255,255,.92);}
+.v-consistency-pace__lands{position:absolute;top:-6px;left:81.6%;width:1px;height:13px;background:#3fd94e;}
+.v-consistency-pace__cap{position:absolute;top:-3px;right:0;width:1px;height:7px;background:rgba(255,255,255,.22);}
+.v-consistency-pace__tag{position:absolute;top:13px;left:46%;margin-left:-2px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-pace__end{position:absolute;top:13px;right:0;font-size:12.5px;color:rgba(255,255,255,.5);}
+
+/* consistency-held */
+.v-consistency-held{position:relative;min-height:172px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;}
+.v-consistency-held__mark{position:absolute;top:2px;left:0;width:7px;height:7px;background:#3fd94e;}
+.v-consistency-held__line{margin:0;font-size:29px;line-height:1.1;font-weight:500;letter-spacing:-.028em;color:rgba(255,255,255,.96);}
+.v-consistency-held__sub{margin:8px 0 0;font-size:15px;letter-spacing:-.008em;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums;}
+
+/* consistency-trace */
+.v-consistency-trace{min-height:168px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;font-variant-numeric:tabular-nums;}
+.v-consistency-trace__head{display:flex;align-items:baseline;gap:9px;}
+.v-consistency-trace__n{font-size:40px;line-height:.9;font-weight:600;letter-spacing:-.04em;color:rgba(255,255,255,.96);}
+.v-consistency-trace__u{font-size:16px;letter-spacing:-.012em;color:rgba(255,255,255,.9);}
+.v-consistency-trace__avg{margin-left:auto;font-size:13px;letter-spacing:-.005em;color:rgba(255,255,255,.72);}
+.v-consistency-trace__svg{display:block;width:100%;height:auto;margin-top:20px;}
+.v-consistency-trace__foot{display:flex;justify-content:space-between;margin-top:12px;font-size:12.5px;letter-spacing:-.005em;color:rgba(255,255,255,.62);}
+
+/* today-n-check */
+.v-today-n-check { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-check__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.v-today-n-check__what { font-size: 13.5px; font-weight: 600; letter-spacing: -0.012em; }
+.v-today-n-check__cad { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); }
+.v-today-n-check__hero { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 13px; }
+.v-today-n-check__day { font-size: 33px; font-weight: 700; letter-spacing: -0.038em; line-height: 1; }
+.v-today-n-check__in { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-check__read { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 17px; }
+.v-today-n-check__val { font-size: 20px; font-weight: 650; letter-spacing: -0.022em; font-variant-numeric: tabular-nums; }
+.v-today-n-check__val span { margin-left: 5px; font-size: 12.5px; font-weight: 500; letter-spacing: 0; color: rgba(255,255,255,0.62); }
+.v-today-n-check__delta { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+.v-today-n-check__rail { display: flex; align-items: center; gap: 6px; margin-top: 15px; }
+.v-today-n-check__dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.90); }
+.v-today-n-check__dot--next { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.32); }
+.v-today-n-check__kept { margin-left: auto; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-check__foot { margin: 15px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); }
+
+/* today-n-act */
+.v-today-n-act { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-act__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.v-today-n-act__goal { font-size: 13.5px; font-weight: 600; letter-spacing: -0.012em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v-today-n-act__count { flex: 0 0 auto; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); font-variant-numeric: tabular-nums; }
+.v-today-n-act__rail { display: flex; gap: 6px; margin-top: 15px; }
+.v-today-n-act__seg { flex: 1 1 0; min-width: 0; }
+.v-today-n-act__seg i { display: block; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12); position: relative; }
+.v-today-n-act__seg i::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 2px; background: rgba(255,255,255,0.92); }
+.v-today-n-act__seg--done i::after { width: 100%; }
+.v-today-n-act__seg--now i::after { width: 55%; }
+.v-today-n-act__seg b { display: block; margin-top: 7px; font-size: 11px; font-weight: 600; letter-spacing: -0.005em; color: rgba(255,255,255,0.34); }
+.v-today-n-act__seg--done b { color: rgba(255,255,255,0.58); }
+.v-today-n-act__seg--now b { color: rgba(255,255,255,0.96); }
+.v-today-n-act__lab { margin-top: 19px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.62); }
+.v-today-n-act__move { margin-top: 5px; font-size: 19px; font-weight: 650; line-height: 1.24; letter-spacing: -0.024em; }
+.v-today-n-act__foot { margin: 14px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+
+/* today-n-pace */
+.v-today-n-pace { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-pace__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.v-today-n-pace__left { color: rgba(255,255,255,0.96); font-weight: 600; }
+.v-today-n-pace__right { color: rgba(255,255,255,0.62); }
+.v-today-n-pace__hero { margin-top: 12px; font-size: 26px; font-weight: 700; line-height: 1.08; letter-spacing: -0.038em; font-variant-numeric: tabular-nums; }
+.v-today-n-pace__rows { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.v-today-n-pace__row { display: flex; align-items: center; gap: 10px; }
+.v-today-n-pace__k { flex: 0 0 48px; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.62); }
+.v-today-n-pace__bar { flex: 1 1 auto; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.10); position: relative; overflow: hidden; }
+.v-today-n-pace__bar b { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 2px; background: rgba(255,255,255,0.92); }
+.v-today-n-pace__row--you .v-today-n-pace__bar b { background: rgba(255,255,255,0.34); }
+.v-today-n-pace__n { flex: 0 0 auto; min-width: 54px; text-align: right; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(255,255,255,0.96); }
+.v-today-n-pace__row--you .v-today-n-pace__n { color: rgba(255,255,255,0.72); }
+.v-today-n-pace__foot { margin: 16px 0 0; font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.88); }
+
+/* today-n-first */
+.v-today-n-first { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-first__said { margin: 0; font-size: 13px; font-weight: 500; line-height: 1.38; letter-spacing: -0.008em; color: rgba(255,255,255,0.72); }
+.v-today-n-first__move { margin-top: 15px; font-size: 25px; font-weight: 700; line-height: 1.1; letter-spacing: -0.036em; }
+.v-today-n-first__how { margin-top: 8px; font-size: 13px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); }
+.v-today-n-first__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.v-today-n-first__day { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.96); font-variant-numeric: tabular-nums; }
+.v-today-n-first__dots { display: flex; align-items: center; gap: 6px; }
+.v-today-n-first__d { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.10); }
+.v-today-n-first__d--now { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.80); }
+.v-today-n-first__foot { margin: 14px 0 0; font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.62); }
+
+/* today-n-hold */
+.v-today-n-hold { display: flex; flex-direction: column; color: rgba(255,255,255,0.96); }
+.v-today-n-hold__pill { display: inline-flex; align-items: center; gap: 7px; align-self: flex-start; padding: 5px 10px 5px 9px; border-radius: 8px; background: rgba(255,255,255,0.05); font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.88); }
+.v-today-n-hold__pill i { width: 6px; height: 6px; border-radius: 999px; background: #3fd94e; }
+.v-today-n-hold__rule { margin-top: 14px; font-size: 21px; font-weight: 700; line-height: 1.16; letter-spacing: -0.032em; }
+.v-today-n-hold__stats { display: flex; align-items: flex-start; gap: 26px; margin-top: 18px; }
+.v-today-n-hold__stat { display: flex; flex-direction: column; min-width: 0; }
+.v-today-n-hold__stat b { font-size: 21px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; color: rgba(255,255,255,0.96); font-variant-numeric: tabular-nums; }
+.v-today-n-hold__stat--lead b { color: #3fd94e; }
+.v-today-n-hold__stat span { margin-top: 6px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,0.62); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.v-today-n-hold__cost { margin: 16px 0 0; font-size: 12.5px; font-weight: 500; line-height: 1.35; color: rgba(255,255,255,0.88); font-variant-numeric: tabular-nums; }
+
+/* star-n-acts */
+.v-star-n-acts { font-variant-numeric: tabular-nums; }
+.v-star-n-acts .v-star-n-acts__goal { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 13px; }
+.v-star-n-acts .v-star-n-acts__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.v-star-n-acts .v-star-n-acts__act { display: grid; grid-template-columns: 7px 1fr auto; align-items: center; column-gap: 12px; row-gap: 9px; }
+.v-star-n-acts .v-star-n-acts__mark { width: 7px; height: 7px; border-radius: 50%; background: rgba(var(--ink), 0.16); }
+.v-star-n-acts .v-star-n-acts__name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.012em; color: var(--text-mid, rgba(var(--ink), 0.62)); }
+.v-star-n-acts .v-star-n-acts__when { font-size: 12px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-star-n-acts .v-star-n-acts__act--done .v-star-n-acts__mark { background: rgba(var(--ink), 0.34); }
+.v-star-n-acts .v-star-n-acts__act--done .v-star-n-acts__name { color: rgba(var(--ink), 0.52); }
+.v-star-n-acts .v-star-n-acts__act--next .v-star-n-acts__name { color: rgba(var(--ink), 0.34); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__mark { background: #3ad9f5; box-shadow: 0 0 0 4px rgba(58, 217, 245, 0.13); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__name { font-size: 18px; font-weight: 640; letter-spacing: -0.024em; color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-star-n-acts .v-star-n-acts__act--now .v-star-n-acts__when { font-size: 13px; font-weight: 620; color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-star-n-acts .v-star-n-acts__rail { grid-column: 2 / 4; height: 3px; border-radius: 2px; background: rgba(var(--ink), 0.10); overflow: hidden; }
+.v-star-n-acts .v-star-n-acts__rail i { display: block; height: 100%; width: 58.3%; border-radius: 2px; background: #3ad9f5; }
+
+/* star-n-held */
+.v-star-n-held { font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__rule { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 10px; }
+.v-star-n-held .v-star-n-held__count { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; }
+.v-star-n-held .v-star-n-held__count b { font-size: 62px; line-height: 0.84; font-weight: 640; letter-spacing: -0.045em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__count span { font-size: 13px; line-height: 1.22; font-weight: 560; letter-spacing: -0.012em; color: rgba(var(--ink), 0.74); padding-bottom: 2px; }
+.v-star-n-held .v-star-n-held__facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding-top: 13px; border-top: 1px solid rgba(var(--ink), 0.09); }
+.v-star-n-held .v-star-n-held__fact { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.v-star-n-held .v-star-n-held__fact b { font-size: 15px; font-weight: 620; letter-spacing: -0.02em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-star-n-held .v-star-n-held__fact span { font-size: 11px; font-weight: 500; line-height: 1.28; letter-spacing: -0.006em; color: var(--text-lo, rgba(var(--ink), 0.40)); }
+
+/* star-n-holduntil */
+.v-hu { font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__rule { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 12px; }
+.v-hu .v-hu__head { display: flex; align-items: baseline; gap: 8px; margin: 0 0 16px; }
+.v-hu .v-hu__head b { font-size: 40px; line-height: 0.9; font-weight: 640; letter-spacing: -0.042em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__head span { font-size: 13px; font-weight: 560; letter-spacing: -0.012em; color: rgba(var(--ink), 0.72); }
+.v-hu .v-hu__head em { margin-left: auto; font-style: normal; font-size: 12.5px; font-weight: 560; letter-spacing: -0.01em; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__rail { position: relative; height: 4px; border-radius: 2px; background: rgba(var(--ink), 0.10); margin: 0 0 9px; }
+.v-hu .v-hu__rail i { position: absolute; inset: 0 27% 0 0; border-radius: 2px; background: rgba(var(--ink), 0.30); }
+.v-hu .v-hu__rail s { position: absolute; top: 50%; left: 73%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: #3ad9f5; box-shadow: 0 0 0 4px rgba(58, 217, 245, 0.13); }
+.v-hu .v-hu__ends { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
+.v-hu .v-hu__ends span:last-child { color: rgba(var(--ink), 0.72); font-weight: 600; }
+.v-hu .v-hu__note { margin: 15px 0 0; font-size: 12px; line-height: 1.42; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.56); }
+
+/* star-n-arithmetic */
+.v-math { font-variant-numeric: tabular-nums; }
+.v-math .v-math__goal { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 11px; }
+.v-math .v-math__eq { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin: 0 0 7px; }
+.v-math .v-math__n { font-size: 15px; font-weight: 600; letter-spacing: -0.022em; color: rgba(var(--ink), 0.74); font-variant-numeric: tabular-nums; }
+.v-math .v-math__n--lit { color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-math .v-math__o { font-size: 14px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); }
+.v-math .v-math__step { font-size: 12px; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.52); padding: 0 0 13px; border-bottom: 1px solid rgba(var(--ink), 0.09); }
+.v-math .v-math__out { margin: 14px 0 9px; font-size: 23px; line-height: 1.06; font-weight: 640; letter-spacing: -0.034em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
+.v-math .v-math__foot { font-size: 11.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.50); }
+
+/* star-n-honest */
+.v-true { font-variant-numeric: tabular-nums; }
+.v-true .v-true__goal { font-size: 12.5px; line-height: 1.34; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 12px; }
+.v-true .v-true__rows { display: flex; flex-direction: column; gap: 9px; margin: 0 0 12px; }
+.v-true .v-true__row { display: flex; align-items: baseline; gap: 9px; }
+.v-true .v-true__row b { font-size: 21px; font-weight: 640; letter-spacing: -0.032em; font-variant-numeric: tabular-nums; }
+.v-true .v-true__row span { font-size: 12px; font-weight: 500; letter-spacing: -0.008em; }
+.v-true .v-true__row em { margin-left: auto; font-style: normal; font-size: 12.5px; font-weight: 600; letter-spacing: -0.012em; font-variant-numeric: tabular-nums; }
+.v-true .v-true__row--old b { color: rgba(var(--ink), 0.36); text-decoration: line-through; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.v-true .v-true__row--old span, .v-true .v-true__row--old em { color: rgba(var(--ink), 0.36); }
+.v-true .v-true__row--new b { color: var(--text-hi, rgba(var(--ink), 0.96)); }
+.v-true .v-true__row--new span { color: rgba(var(--ink), 0.60); }
+.v-true .v-true__row--new em { color: #3ad9f5; }
+.v-true .v-true__why { font-size: 11.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.54); padding-top: 12px; border-top: 1px solid rgba(var(--ink), 0.09); margin: 0 0 12px; }
+.v-true .v-true__cta { display: block; width: 100%; border: 0; border-radius: 10px; padding: 10px 12px; background: rgba(var(--ink), 0.08); color: var(--text-hi, rgba(var(--ink), 0.96)); font: inherit; font-size: 12.5px; font-weight: 600; letter-spacing: -0.012em; text-align: center; cursor: pointer; }
+.v-true .v-true__cta:active { background: rgba(var(--ink), 0.13); }
+
+/* consistency-n-hold */
+.v-consistency-n-hold{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-hold__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-hold__num{font-size:54px;font-weight:600;line-height:.86;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-hold__lab{font-size:15px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-hold__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-hold__rail{position:relative;height:6px;margin-top:16px;border-radius:3px;background:rgba(63,217,78,.13);overflow:hidden}
+.v-consistency-n-hold__rail i{position:absolute;inset:0;border-radius:3px;background:linear-gradient(90deg,rgba(63,217,78,.35),#3fd94e)}
+.v-consistency-n-hold__since{margin-top:10px;font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+.v-consistency-n-hold__facts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.v-consistency-n-hold__k{font-size:12px;color:rgba(255,255,255,.40);margin-bottom:5px}
+.v-consistency-n-hold__v{font-size:14px;line-height:1.34;color:rgba(255,255,255,.93);font-weight:500}
+
+/* consistency-n-cadence */
+.v-cad{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-cad__head{font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:rgba(255,255,255,.96)}
+.v-cad__sub{margin-top:7px;font-size:14.5px;line-height:1.35;color:rgba(255,255,255,.92)}
+.v-cad__weeks{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.v-cad__wk{display:flex;align-items:center;gap:10px}
+.v-cad__wl{width:70px;flex:none;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-cad__dots{flex:1;display:flex;align-items:center;gap:6px}
+.v-cad__d{width:12px;height:12px;border-radius:4px;background:rgba(255,255,255,.10)}
+.v-cad__d--kept{background:#3fd94e}
+.v-cad__d--today{background:rgba(255,255,255,.96)}
+.v-cad__d--open{background:rgba(255,255,255,.05)}
+.v-cad__wc{width:52px;flex:none;text-align:right;font-size:13px;font-weight:600;color:rgba(255,255,255,.62)}
+.v-cad__wc--ok{color:#3fd94e}
+.v-cad__foot{margin-top:20px;font-size:14.5px;font-weight:500;line-height:1.3;color:rgba(255,255,255,.93)}
+
+/* consistency-n-season */
+.v-consistency-n-season{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-season__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-season__num{font-size:46px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-season__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-season__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-season__ribbon{display:flex;align-items:flex-end;gap:6px;margin-top:20px}
+.v-consistency-n-season__m{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px}
+.v-consistency-n-season__b{width:100%;height:38px;border-radius:3px;background:rgba(255,255,255,.06);position:relative;overflow:hidden}
+.v-consistency-n-season__b::after{content:"";position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);border-radius:3px;background:#3fd94e}
+.v-consistency-n-season__m--off .v-consistency-n-season__b{height:5px;background:rgba(255,255,255,.10)}
+.v-consistency-n-season__m b{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.40)}
+.v-consistency-n-season__m--now b{color:rgba(255,255,255,.96)}
+.v-consistency-n-season__foot{margin-top:18px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+.v-consistency-n-season__foot b{font-weight:600;color:#3fd94e}
+
+/* consistency-n-adhere */
+.v-consistency-n-adhere{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-adhere__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-adhere__num{font-size:44px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-adhere__num span{font-size:24px;font-weight:500;margin-left:1px}
+.v-consistency-n-adhere__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-adhere__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-adhere__chart{position:relative;display:flex;align-items:flex-end;gap:4px;height:48px;margin-top:20px}
+.v-consistency-n-adhere__chart i{flex:1;height:calc(var(--h) * 100%);min-height:3px;border-radius:2px;background:#3fd94e}
+.v-consistency-n-adhere__chart i.lo{background:rgba(255,255,255,.26)}
+.v-consistency-n-adhere__plan{position:absolute;left:0;right:0;top:26%;height:1px;background:rgba(255,255,255,.20)}
+.v-consistency-n-adhere__axis{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:rgba(255,255,255,.40)}
+.v-consistency-n-adhere__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+.v-consistency-n-adhere__foot b{font-weight:600}
+
+/* consistency-n-bought */
+.v-consistency-n-bought{display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+.v-consistency-n-bought__head{display:flex;align-items:baseline;gap:12px}
+.v-consistency-n-bought__num{font-size:42px;font-weight:600;line-height:.88;letter-spacing:-.04em;color:rgba(255,255,255,.96)}
+.v-consistency-n-bought__num span{font-size:19px;font-weight:500;margin-left:4px;color:rgba(255,255,255,.62)}
+.v-consistency-n-bought__lab{font-size:14.5px;font-weight:500;line-height:1.2;color:rgba(255,255,255,.92)}
+.v-consistency-n-bought__lab span{display:block;margin-top:4px;font-size:12.5px;font-weight:400;color:rgba(255,255,255,.40)}
+.v-consistency-n-bought__rows{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+.v-consistency-n-bought__r{display:flex;align-items:center;gap:10px}
+.v-consistency-n-bought__m{width:28px;flex:none;font-size:12.5px;color:rgba(255,255,255,.62)}
+.v-consistency-n-bought__d{width:52px;flex:none;font-size:12.5px;color:rgba(255,255,255,.92)}
+.v-consistency-n-bought__t{flex:1;height:7px;border-radius:3px;background:rgba(255,255,255,.07);position:relative;overflow:hidden}
+.v-consistency-n-bought__t i{position:absolute;left:0;top:0;bottom:0;width:var(--w);border-radius:3px;background:#3fd94e}
+.v-consistency-n-bought__g{width:38px;flex:none;text-align:right;font-size:13.5px;font-weight:600;color:#3fd94e}
+.v-consistency-n-bought__g--flat{color:rgba(255,255,255,.40)}
+.v-consistency-n-bought__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(255,255,255,.93)}
+  .pil{display:inline-block;margin-right:8px;padding:3px 8px;border-radius:999px;
+    font-size:10.5px;font-weight:750}
+  .pil--act{background:rgba(238,242,251,.12);color:#dfe6f5}
+  .pil--clar{background:rgba(58,217,245,.15);color:#a8ecfa}
+  .pil--cons{background:rgba(63,217,78,.14);color:#8ee79a}
+  .star{margin-left:7px;font-size:12px;color:#ffd866}
+  .slot--pick .phone{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 34px rgba(0,0,0,.5),0 0 0 1.5px rgba(255,216,102,.35)}
+  .sect__hd h2{margin:0 0 4px;font-size:21px}
+  .sect__hd p{margin:0 0 22px;font-size:13px;color:var(--text-lo)}
+  .slot__n{display:none}
+
+  .v-nf{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.96)}
+  .v-nf .a-move{margin:0;font-size:19px;font-weight:680;line-height:1.28;letter-spacing:-.02em}
+  .v-nf .a-sup{margin:10px 0 0;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.62)}
+  .v-nf .a-how{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:13px;line-height:1.5;color:rgba(255,255,255,.9)}
+  .v-nf .a-urg{margin:11px 0 0;font-size:12.5px;color:rgba(255,255,255,.62)}
+  .v-nf .a-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius:11px;background:#f2f3f6;color:#0b0c0e;font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
+  .v-nf .a-btn--wait{background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.45)}
+  .v-nf .a-note{margin:9px 0 0;font-size:11.5px;color:rgba(255,255,255,.4)}
+  .v-nf .c-star{margin:0;font-size:22px;font-weight:700;line-height:1.28;letter-spacing:-.025em}
+  .v-nf .c-why{margin:14px 0 0;font-size:14.5px;line-height:1.58;color:rgba(255,255,255,.9)}
+  .v-nf .c-cost{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.62)}
+  .v-nf .c-meta{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:rgba(255,255,255,.4)}
+  .v-nf .ck-day{margin:12px 0 0;font-size:32px;font-weight:700;letter-spacing:-.035em}
+  .v-nf .ck-day span{margin-left:8px;font-size:13px;font-weight:500;letter-spacing:0;color:rgba(255,255,255,.62)}
+  .v-nf .d-row{display:flex;align-items:baseline;gap:11px}
+  .v-nf .d-big{font-size:44px;font-weight:700;letter-spacing:-.045em;line-height:1}
+  .v-nf .d-lbl{font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.62)}
+  .v-nf .d-foot{margin:auto 0 0;padding-top:12px;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.88)}
+  .v-cdt{align-items:center;text-align:center;justify-content:center}
+  .v-cdt .d-big{font-size:56px}
+  .v-cdt .d-lbl{margin-top:6px}
+  .v-cdt .d-foot{margin-top:16px}
+  .tag--day{background:rgba(58,217,245,.14);color:#a8ecfa}
+  .d1grp{margin:0 0 34px}
+  .d1grp h3{margin:0 0 3px;font-size:16px;font-weight:680;letter-spacing:-.015em}
+  .d1eg{margin:0 0 16px;font-size:12.5px;color:var(--text-lo)}
+  .v-nf .pb{margin:16px 0 0;height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .v-nf .pb i{display:block;height:100%;border-radius:999px;background:#3fd94e}
+  .v-nf .pb-l{display:flex;justify-content:space-between;margin:7px 0 0;font-size:11.5px;color:rgba(255,255,255,.4)}
+  .look{display:inline-block;margin-left:9px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.02em}
+  .look--new{background:#ffd866;color:#1a1405}
+  .look--check{background:rgba(255,216,102,.16);color:#ffd866}
+  .slot.look-new .phone{box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 34px rgba(0,0,0,.5),0 0 0 2px #ffd866}
+  /* review dimming removed: the round is settled, every face reads full */
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The sync box</h1>
+  <p class="lede"><b style="color:#ffd866">6 cards changed this round.</b> Everything dimmed is settled.</p>
+  <nav class="nav"><a href="#s-num-dl">A number and a deadline</a><a href="#s-num">A number, no deadline</a><a href="#s-rule">A rule to hold</a><a href="#s-rate">A rate to keep</a><a href="#s-event">An event to reach</a><a href="#s-open">Nothing to count</a><a href="#s-edge">Days one, off, and stalled</a><a href="#s-day1">Day one</a></nav>
+  <section class="sect" id="s-day1">
+    <header class="sect__hd"><h2>Day one, every kind of person</h2>
+    <p>What the box shows in the first minutes and the first week. Nothing empty, nothing borrowed from a future they do not have yet.</p></header>
+    <div class="d1grp"><h3>A number and a deadline</h3><p class="d1eg">lose 40 lbs in 6 months, signed an hour ago</p><div class="grid"><figure class="slot" id="d1-ndl-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The rule for today</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Eat 2,000 to 2,400 calories today</p>
+  <p class="a-sup">About 700 a meal with one snack spare. Tonight is the first confirm.</p>
+  <button class="a-btn a-btn--wait" type="button">Confirm tonight</button>
+  <p class="a-note">Opens at 5pm.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Identical on day one. The derivation exists the moment the goal is signed.</p></div>
+      </figure><figure class="slot" id="d1-ndl-c">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The arithmetic</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-sup" style="margin:0">Down 40 lbs by March 1</p>
+  <p class="c-star" style="margin-top:8px">40 lbs &divide; 26 weeks = 1.5 a week</p>
+  <p class="c-why">A 750 calorie deficit a day. Starting weight logged this morning: 214.6.</p>
+  <p class="c-meta">Day 1. The first weigh-in is Thursday.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">The math is complete before any history exists. Day one shows the plan, not progress.</p></div>
+      </figure><figure class="slot" id="d1-ndl-k">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">The record starts</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <span class="d-big" style="font-size:48px">Day 1</span>
+ <div class="pb" style="margin-top:14px"><i style="width:2%"></i></div>
+ <p class="pb-l"><span>today</span><span>March 1</span></p>
+ <p class="d-foot" style="font-size:14px">The line starts at 5pm tonight. Everything after this is record.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Honest zero, framed as a beginning. By week one this is the hold record with a real number.</p></div>
+      </figure></div></div><div class="d1grp"><h3>A number, no deadline</h3><p class="d1eg">100 paying users, signed today</p><div class="grid"><figure class="slot" id="d1-n-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The move, ready</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Message 10 people who fit the product</p>
+  <div class="a-how">Start with anyone who has ever asked about it.</div>
+  <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Identical on day one. The move never needed history.</p></div>
+      </figure><figure class="slot look-check" id="d1-n-c">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--clar">Clarity</span><span class="slot__t">Distance to the number</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">Get to 100 paying users.</p>
+ <p class="c-why">Because I am done building things nobody pays for.</p>
+ <p class="d-foot">Day 1. The counter moves when the first person starts paying.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Zero of 100 is honest and correct. No pace line until there are two data points.</p></div>
+      </figure><figure class="slot look-check" id="d1-n-k">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--cons">Consistency</span><span class="slot__t">The first mark</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <span class="d-big" style="font-size:40px">Day 1</span>
+ <p class="a-move" style="font-size:15.5px;margin-top:8px">Tonight&rsquo;s move is the first mark.</p>
+ <div style="margin:auto 0"><div class="pb"><i style="width:2%"></i></div>
+ <p class="pb-l"><span>0</span><span>100 paying users</span></p></div></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">By week one this becomes the week view with real days in it.</p></div>
+      </figure></div></div><div class="d1grp"><h3>A rule to hold</h3><p class="d1eg">stay sober, decided this morning</p><div class="grid"><figure class="slot" id="d1-r-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The rule, tonight</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">No drinking today</p>
+  <p class="a-sup">The danger window is 6 to 9. Book the evening before it books you.</p>
+  <button class="a-btn a-btn--wait" type="button">Confirm tonight</button>
+  <p class="a-note">Opens at 5pm.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Identical on day one. Day one IS the hardest day for a rule.</p></div>
+      </figure><figure class="slot" id="d1-r-c">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The rule, signed</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">No drinking.</p>
+  <p class="c-why">Because the version of me that drinks does not build anything.</p>
+  <p class="c-cost">Day 1. The cost of breaking it grows from here.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">The why carries the face before any days exist to lose.</p></div>
+      </figure><figure class="slot" id="d1-r-k">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Day one of the line</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <span class="d-big" style="font-size:48px">Day 1</span>
+ <span style="margin-top:5px;font-size:14px;font-weight:600;color:rgba(255,255,255,.7)">more to come</span>
+ <p class="d-foot" style="font-size:14px">Confirm this evening and the line exists.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Day one framed as the line being born, not as a tiny number.</p></div>
+      </figure></div></div><div class="d1grp"><h3>A rate to keep</h3><p class="d1eg">gym 3x a week, plan made today</p><div class="grid"><figure class="slot" id="d1-rt-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The scheduled move</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Leg day: 45 minute workout</p>
+  <p class="a-sup">0/3 workouts this week. First one today.</p>
+  <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Works day one: the schedule was set at plan creation, so the week has shape immediately.</p></div>
+      </figure><figure class="slot" id="d1-rt-c">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The rate, signed</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">Three workouts a week.</p>
+  <p class="c-why">Because I think clearer for two days after every session.</p>
+  <p class="c-meta">Your word, as of today</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Identical on day one.</p></div>
+      </figure><figure class="slot" id="d1-rt-k">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Week one</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <span style="font-size:15px;font-weight:650;color:rgba(255,255,255,.9)"><b style="font-size:44px;font-weight:700;letter-spacing:-.04em;color:#3fd94e">0</b> of 3, week one</span>
+ <p class="d-foot" style="font-size:14px;margin-top:14px">Three sessions make a perfect first week. Rest days will not count against you.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">States the contract on day one so the quiet days never read as failure later.</p></div>
+      </figure></div></div><div class="d1grp"><h3>An event to reach</h3><p class="d1eg">keep bees by spring, decided today</p><div class="grid"><figure class="slot" id="d1-e-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The part</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-sup" style="margin:0">Keep bees by spring &middot; part 1 of 4</p>
+  <p class="a-move" style="margin-top:8px">Read the hive-anatomy chapter</p>
+  <p class="a-sup">Part one is Learn. It ends when you order the kit.</p>
+  <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Works day one: the acts exist the moment the plan is made.</p></div>
+      </figure><figure class="slot" id="d1-e-c">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star" style="font-size:18px">Keep bees by spring.</p>
+  <div style="margin-top:12px;font-size:15.5px;font-weight:680;color:rgba(255,255,255,.96);letter-spacing:-.012em">Learn &rarr; Equip &rarr; Install &rarr; Tend</div>
+  <p class="d-foot">Part one began today. The whole path is known before any of it is walked.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">The path is the day-one gift: they can see the entire shape of the goal immediately.</p></div>
+      </figure><figure class="slot" id="d1-e-k">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Days till</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf v-cdt"><span class="d-big">231</span><span class="d-lbl">days till spring</span>
+  <p class="d-foot">Counting down to April 1, the date you set.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">A deadline works day one. Nothing to accumulate.</p></div>
+      </figure></div></div><div class="d1grp"><h3>Nothing to count</h3><p class="d1eg">be a better father, said out loud today</p><div class="grid"><figure class="slot" id="d1-o-a">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">First thirty seconds</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Phone in the drawer before dinner</p>
+  <div class="a-how">Put it there when you set the table, before you think about it.</div>
+  <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Identical on day one.</p></div>
+      </figure><figure class="slot" id="d1-o-c">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The goal and the why</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">Be a father my kids actually talk to.</p>
+  <p class="c-why">Because I grew up in a house where nobody did.</p>
+  <p class="c-meta">Signed today. The evidence starts tonight.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">The why is the whole face on day one, which is exactly right for an open goal.</p></div>
+      </figure><figure class="slot" id="d1-o-k">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">The first thing</span><span class="tag tag--day">day 1</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <span style="font-size:15.5px;font-weight:650;color:rgba(255,255,255,.9)"><b style="font-size:46px;font-weight:700;letter-spacing:-.04em">1</b> good day, starting tonight</span>
+ <p class="d-foot" style="font-size:14px;margin-top:14px">Open goals are built from evidence. Tonight is the first piece.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">By week one this is What it is made of, with real entries.</p></div>
+      </figure></div></div>
+  </section>
+
+  <section class="sect" id="s-num-dl">
+    <header class="sect__hd"><h2>A number and a deadline</h2><p>lose 40 lbs in 6 months, $10k by December</p></header>
+    <div class="grid"><figure class="slot slot--pick look-check" id="consistency-arrival-dl">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--cons">Consistency</span><span class="slot__t">Arrival, moving</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <p class="a-sup" style="margin:0">Your deadline: March 1</p>
+ <span class="d-big" style="font-size:38px;margin-top:8px">Feb 21</span>
+ <span style="margin-top:5px;font-size:13.5px;font-weight:650;color:#3fd94e">on pace to be 8 days early</span>
+ <p class="d-foot">Last week&rsquo;s kept days pulled the arrival 3 days earlier. Miss days and this date walks back toward March.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Consistency for number + deadline goals. Your kept days shown as what they actually bought: the arrival moving against the deadline you set.<span class="bf__x">Skip if no deadline</span></p></div>
+      </figure><figure class="slot slot--pick" id="today-derived-line">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The rule for today</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Eat 2,000 to 2,400 calories today</p>
+ <p class="a-sup">About 700 a meal with one snack spare. Dinner is where it slips.</p>
+ <button class="a-btn a-btn--wait" type="button">Confirm tonight</button>
+ <p class="a-note">Opens at 5pm. A rule cannot be finished at lunch.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Action for a number + deadline goal. The daily rule made practical, nothing about the past.<span class="bf__x">Skip if the goal has no derived daily number</span></p></div>
+      </figure><figure class="slot" id="today-n-pace">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The pace debt</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-n-pace">
+  <div class="v-today-n-pace__top">
+    <span class="v-today-n-pace__left">34 days to Sep 9</span>
+    <span class="v-today-n-pace__right">11 lbs to go</span>
+  </div>
+
+  <div class="v-today-n-pace__hero">You arrive<br>5 days late.</div>
+
+  <div class="v-today-n-pace__rows">
+    <div class="v-today-n-pace__row">
+      <span class="v-today-n-pace__k">Needed</span>
+      <i class="v-today-n-pace__bar"><b style="width:100%"></b></i>
+      <span class="v-today-n-pace__n">2.6 / wk</span>
+    </div>
+    <div class="v-today-n-pace__row v-today-n-pace__row--you">
+      <span class="v-today-n-pace__k">Yours</span>
+      <i class="v-today-n-pace__bar"><b style="width:62%"></b></i>
+      <span class="v-today-n-pace__n">1.6 / wk</span>
+    </div>
+  </div>
+
+  <p class="v-today-n-pace__foot">One more move a week closes it.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Clarity for deadline goals: whether your pace survives the date. It reports standing, so it lives here, not on Action.<span class="bf__x">Skip if no deadline, or under two weeks of data</span></p></div>
+      </figure><figure class="slot slot--pick" id="star-n-arithmetic">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The arithmetic</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-math">
+  <div class="v-math__goal">Down 40 lbs by March 1</div>
+  <div class="v-math__eq">
+    <span class="v-math__n">28 lbs</span>
+    <span class="v-math__o">/</span>
+    <span class="v-math__n">22 weeks</span>
+    <span class="v-math__o">=</span>
+    <span class="v-math__n v-math__n--lit">1.3 a week</span>
+  </div>
+  <div class="v-math__step">1.3 lbs a week is a 750 calorie deficit a day</div>
+  <div class="v-math__out">Eat 2,000 to 2,400 today</div>
+  <div class="v-math__foot">12 lbs down since April 2. If the weight stalls for three weeks, this number gets re-derived.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with a date: weight, revenue, subscribers, debt paid down<span class="bf__x">Skip if No target number or no deadline</span></p></div>
+      </figure><figure class="slot" id="star-n-honest">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The honest timeline</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-true">
+  <div class="v-true__goal">Down 40 lbs. Your date does not fit the math.</div>
+  <div class="v-true__rows">
+    <div class="v-true__row v-true__row--old">
+      <b>Oct 1</b>
+      <span>8 weeks left</span>
+      <em>2.4 lbs a week</em>
+    </div>
+    <div class="v-true__row v-true__row--new">
+      <b>Dec 14</b>
+      <span>19 weeks</span>
+      <em>1.0 lbs a week</em>
+    </div>
+  </div>
+  <div class="v-true__why">October needs 1,200 calories under maintenance every day. December needs 500, and it holds.</div>
+  <button class="v-true__cta" type="button">Move the date to Dec 14</button>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Anyone whose signed date the math cannot survive, especially weight and money<span class="bf__x">Skip if The deadline is already achievable</span></p></div>
+      </figure><figure class="slot" id="consistency-cadence-week-dl">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">Done</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <p style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,.6)">12 weeks of this reach your March 1 deadline.</p><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-num">
+    <header class="sect__hd"><h2>A number, no deadline</h2><p>100 paying users, read 50 books</p></header>
+    <div class="grid"><figure class="slot look-check" id="star-star-arrival">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--cons">Consistency</span><span class="slot__n">06</span>
+          <span class="slot__t">Arrival date</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-nf">
+ <p class="a-sup" style="margin:0">Projected arrival</p>
+ <span class="d-big" style="font-size:40px;margin-top:6px">Nov 25</span>
+ <span style="margin-top:5px;font-size:13.5px;font-weight:650;color:#3fd94e">9 days sooner than a week ago</span>
+ <p class="d-foot">Projected from the pace you have kept. You set no deadline; this date is your pace talking.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Consistency for number goals with no deadline. The projected date is your pace made visible, and it moves as you do.</p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot slot--pick" id="today-gap-close">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The move, ready</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Message 10 people who fit the product</p>
+ <div class="a-how">Start with the two who replied last week.</div>
+ 
+ <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Action for number goals. The move plus how to start. The count lives on Clarity, not here.</p></div>
+      </figure><figure class="slot slot--pick look-check" id="star-star-distance">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--clar">Clarity</span><span class="slot__n">01</span>
+          <span class="slot__t">Distance to the number</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-star-distance">
+  <p class="sd-star">Ship Memento to 100 paying users without abandoning it at 40.</p>
+  <div class="sd-row"><span class="sd-big">34</span><span class="sd-of">of 100 paying users</span><span class="sd-delta">+6 this week</span></div>
+  <div class="sd-rail" aria-hidden="true"><span class="sd-fill"></span></div>
+  <p class="sd-foot">Day 47. At this pace you arrive <b>Nov 12</b>.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity up or down with a target. The founder watching users climb week to week.<span class="bf__x">Skip if the goal names no number</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot slot--pick" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">N2</span>
+          <span class="slot__t">Doing it, not working</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-not-moving">
+  <p class="nm-hd">You kept every day. The number did not move.</p>
+  <div class="nm-two">
+    <span><b>19</b>of 21 days kept</span>
+    <span><b>0.4</b>lbs in 3 weeks</span>
+  </div>
+  <p class="nm-say">The plan expected 4.5. Something in it is wrong, not you.</p>
+  <button class="nm-btn" type="button">Redo the plan</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Appears only when weeks of kept days meet a flat number, and only for goals with a tracked number. Everyone else gets a plain "this is not working" button inside Action.</p>
+          
+          
+        </div>
+      </figure><figure class="slot" id="consistency-n-bought">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">What the days bought</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-n-bought">
+  <div class="v-consistency-n-bought__head">
+    <div class="v-consistency-n-bought__num">11.4<span>lbs</span></div>
+    <div class="v-consistency-n-bought__lab">gone since April
+      <span>62 days kept, month by month</span>
+    </div>
+  </div>
+
+  <div class="v-consistency-n-bought__rows">
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Apr</span><span class="v-consistency-n-bought__d">18 days</span><span class="v-consistency-n-bought__t"><i style="--w:90%"></i></span><span class="v-consistency-n-bought__g">4.2</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">May</span><span class="v-consistency-n-bought__d">16 days</span><span class="v-consistency-n-bought__t"><i style="--w:80%"></i></span><span class="v-consistency-n-bought__g">3.0</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jun</span><span class="v-consistency-n-bought__d">20 days</span><span class="v-consistency-n-bought__t"><i style="--w:100%"></i></span><span class="v-consistency-n-bought__g">3.9</span></div>
+    <div class="v-consistency-n-bought__r"><span class="v-consistency-n-bought__m">Jul</span><span class="v-consistency-n-bought__d">8 days</span><span class="v-consistency-n-bought__t"><i style="--w:40%"></i></span><span class="v-consistency-n-bought__g v-consistency-n-bought__g--flat">0.3</span></div>
+  </div>
+
+  <div class="v-consistency-n-bought__foot">July kept eight days and the number nearly stopped.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Quantity goals with tracked progress: proof the days are causing the number<span class="bf__x">Skip if goalProgress has no history to pair against</span></p></div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-rule">
+    <header class="sect__hd"><h2>A rule to hold</h2><p>stay sober, eat under 2,400, a no-buy year</p></header>
+    <div class="grid"><figure class="slot slot--pick" id="today-hold-tonight">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__n">N1</span>
+          <span class="slot__t">The rule, tonight</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">No drinking today</p>
+ <p class="a-sup">The danger window is 6 to 9. Book the evening before it books you.</p>
+ <button class="a-btn a-btn--wait" type="button">Confirm tonight</button>
+ <p class="a-note">Opens at 5pm. A rule cannot be finished at lunch.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Action for rules. The rule plus what actually helps hold it tonight. How long it has held lives on Consistency.</p>
+          
+          
+        </div>
+      </figure><figure class="slot slot--pick" id="star-n-held">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The rule, signed</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">No drinking.</p>
+ <p class="c-why">Because the version of me that drinks does not build anything.</p>
+ <p class="c-cost">Breaking it costs 214 days and the person who held them.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Clarity for rules. The rule, their why, and what breaking it costs.</p></div>
+      </figure><figure class="slot" id="star-n-holduntil">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">Hold until</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-hu">
+  <div class="v-hu__rule">Nothing new bought. Until January 1.</div>
+  <div class="v-hu__head">
+    <b>97</b><span>days to go</span>
+    <em>268 held</em>
+  </div>
+  <div class="v-hu__rail">
+    <i></i>
+    <s></s>
+  </div>
+  <div class="v-hu__ends"><span>Apr 7</span><span>Jan 1</span></div>
+  <div class="v-hu__note">Because every month unbought is a month of runway. Arrive at the date unbroken and it is done.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Clarity for rules that END on a date: a no-buy year, dry January, until launch. Most rules have no date; this face is only for the ones that do.<span class="bf__x">Skip if the rule has no end date</span></p></div>
+      </figure><figure class="slot slot--pick look-check" id="consistency-n-hold">
+        <figcaption class="slot__cap"><span class="look look--check">CHECK: this round</span><span class="pil pil--cons">Consistency</span><span class="slot__t">The hold record</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf" style="align-items:center;text-align:center;justify-content:center">
+ <span class="d-big" style="font-size:74px;letter-spacing:-.05em">214</span>
+ <span style="margin-top:2px;font-size:15px;font-weight:650;color:rgba(255,255,255,.8)">days unbroken</span>
+ <p class="d-foot" style="margin-top:14px">Your longest ever. The line has never been this long.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Consistency for rules. The unbroken line, and nothing else. The cost and the why live on Clarity.</p></div>
+      </figure><figure class="slot" id="consistency-chain-slack">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">01</span>
+          <span class="slot__t">Chain with slack</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-chain-slack">
+  <div class="cs-head">
+    <span class="cs-num">42</span>
+    <span class="cs-unit">days<br>in a row</span>
+    <span class="cs-bank">
+      <svg width="12" height="14" viewBox="0 0 13 15" aria-hidden="true"><path d="M6.5.7 12 2.6v5.1c0 3.2-2.2 5.6-5.5 6.6C3.2 13.3 1 10.9 1 7.7V2.6L6.5.7Z" fill="currentColor"/></svg>
+      2 saved days
+    </span>
+  </div>
+  <div class="cs-chain" role="img" aria-label="The last fourteen days: eleven kept, two part days, one covered by a saved day.">
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-g"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k"></i>
+    <i class="cs-p"></i>
+    <i class="cs-k"></i>
+    <i class="cs-k cs-t"></i>
+  </div>
+  <div class="cs-foot">A saved day covered Tuesday. The chain held.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The sober person who quits the app the day a streak breaks.<span class="bf__x">Skip if no grace days exist yet</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-rate">
+    <header class="sect__hd"><h2>A rate to keep</h2><p>gym 3x a week, write daily, call mom every Sunday</p></header>
+    <div class="grid"><figure class="slot slot--pick" id="today-rate-move">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The scheduled move</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Leg day: 45 minute workout</p>
+ <p class="a-sup">2/3 workouts this week.</p>
+ <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Action for rate goals. The session named plainly, and where the week stands.</p></div>
+      </figure><figure class="slot slot--pick" id="star-rate">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The rate, signed</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">Three runs a week.</p>
+ <p class="c-why">Because I think clearer for two days after every run.</p>
+ <p class="c-meta">Your word, since June 19</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Clarity for rate goals. The rate stated, and the why that holds it.</p></div>
+      </figure><figure class="slot slot--pick" id="consistency-cadence-week">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">N1</span>
+          <span class="slot__t">Your schedule, kept</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-cadence-week">
+  <div class="cw-head"><span class="cw-n">3</span><span class="cw-of">of 3 this week</span>
+    <span class="cw-tag">Done</span></div>
+  <div class="cw-days" aria-hidden="true">
+    <i class="on"></i><i class="rest"></i><i class="on"></i><i class="rest"></i>
+    <i class="on"></i><i class="rest"></i><i class="rest"></i>
+  </div>
+  <p class="cw-lbl"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></p>
+  <p class="cw-foot"><b>11 perfect weeks.</b> Rest days are not misses.</p>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The 3x-a-week lifter punished by every daily-streak face.<span class="bf__x">Skip if no schedule set, nothing to adhere to</span></p>
+          
+          
+        </div>
+      </figure><figure class="slot slot--pick" id="consistency-n-adhere">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Weeks you kept your own plan</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-n-adhere">
+  <div class="v-consistency-n-adhere__head">
+    <div class="v-consistency-n-adhere__num">87<span>%</span></div>
+    <div class="v-consistency-n-adhere__lab">of weeks hit the schedule you set
+      <span>22 of 26 weeks since February</span>
+    </div>
+  </div>
+
+  <div class="v-consistency-n-adhere__chart">
+    <div class="v-consistency-n-adhere__plan"></div>
+    <i style="--h:.74"></i><i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i>
+    <i style="--h:.98"></i><i style="--h:.74"></i><i style="--h:.74"></i><i class="lo" style="--h:.25"></i>
+    <i style="--h:.74"></i><i style="--h:.98"></i><i style="--h:.74"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i style="--h:.74"></i><i style="--h:.98"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i><i style="--h:.74"></i>
+    <i style="--h:.98"></i><i style="--h:.74"></i><i class="lo" style="--h:.49"></i><i style="--h:.74"></i>
+    <i style="--h:.74"></i><i style="--h:.74"></i>
+  </div>
+  <div class="v-consistency-n-adhere__axis"><span>Feb</span><span>Aug</span></div>
+
+  <div class="v-consistency-n-adhere__foot">Longest run at plan: <b>9 weeks</b>, April 7 to June 2.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Any goal months in: the long view of adherence, week over week<span class="bf__x">Skip if Fewer than eight weeks of record</span></p></div>
+      </figure><figure class="slot" id="consistency-run-rank">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">02</span>
+          <span class="slot__t">Run rank</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-run-rank">
+  <div class="rr-head">
+    <span class="rr-num">42</span>
+    <span class="rr-unit">days<br>in a row</span>
+    <span class="rr-rank">3rd longest run</span>
+  </div>
+  <div class="rr-bar" role="img" aria-label="42 days into a run. Your second longest was 47. Your best was 103.">
+    <span class="rr-fill"></span>
+    <span class="rr-notch"></span>
+  </div>
+  <div class="rr-marks">
+    <span class="rr-near">5 days from your second longest</span>
+    <span class="rr-far">best 103</span>
+  </div>
+  <div class="rr-foot">6 of the last 7 days. Last week, 4.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Frequency goals. The competitive restarter who has stopped and started many times.<span class="bf__x">Skip if first run ever, nothing to rank against</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-event">
+    <header class="sect__hd"><h2>An event to reach</h2><p>pass the bar, first hive, publish the book</p></header>
+    <div class="grid"><figure class="slot slot--pick" id="today-n-act">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The part</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-n-act">
+  <div class="v-today-n-act__top">
+    <span class="v-today-n-act__goal">Keep bees by spring</span>
+    <span class="v-today-n-act__count">part 3 of 4</span>
+  </div>
+
+  <div class="v-today-n-act__rail">
+    <div class="v-today-n-act__seg v-today-n-act__seg--done"><i></i><b>Learn</b></div>
+    <div class="v-today-n-act__seg v-today-n-act__seg--done"><i></i><b>Equip</b></div>
+    <div class="v-today-n-act__seg v-today-n-act__seg--now"><i></i><b>Install</b></div>
+    <div class="v-today-n-act__seg"><i></i><b>Tend</b></div>
+  </div>
+
+  <div class="v-today-n-act__lab">Today</div>
+  <div class="v-today-n-act__move">Mount the hive stand and level it.</div>
+
+  <p class="v-today-n-act__foot">Finished Equip 9 days ago. Three more moves to finish Install.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Milestone goals run in stages: which act they are in, and today&#x27;s move inside it<span class="bf__x">Skip if the plan has no stages</span></p></div>
+      </figure><figure class="slot slot--pick" id="star-n-acts">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__t">The parts</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-star-n-acts">
+  <div class="v-star-n-acts__goal"><b style="font-size:16.5px;font-weight:700;color:rgba(255,255,255,.96)">Publish the record</b></div>
+  <ol class="v-star-n-acts__list">
+    <li class="v-star-n-acts__act v-star-n-acts__act--done">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Write twelve songs</span>
+      <span class="v-star-n-acts__when">Feb 9</span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--done">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Track them all</span>
+      <span class="v-star-n-acts__when">Mar 30</span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--now">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Mix every track</span>
+      <span class="v-star-n-acts__when">7 of 12</span>
+      <span class="v-star-n-acts__rail"><i></i></span>
+    </li>
+    <li class="v-star-n-acts__act v-star-n-acts__act--next">
+      <span class="v-star-n-acts__mark"></span>
+      <span class="v-star-n-acts__name">Master and press</span>
+      <span class="v-star-n-acts__when"></span>
+    </li>
+  </ol>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Milestone goals built in stages: albums, launches, degrees, books<span class="bf__x">Skip if Goal has no natural stages</span></p></div>
+      </figure><figure class="slot slot--pick" id="consistency-ledger">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Days till</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf v-cdt"><span class="d-big">218</span><span class="d-lbl">days till the bar exam</span>
+ <p class="d-foot">412 days shown up since you signed. Best run 41.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Consistency for events with a date. The countdown leads, the body of work sits under it.<span class="bf__x">Skip if no deadline exists</span></p></div>
+      </figure><figure class="slot" id="consistency-year-ribbon">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">08</span>
+          <span class="slot__t">The year, week by week</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-year-ribbon">
+  <div class="yr-top"><span class="yr-n">187</span><span class="yr-of">days this year</span></div>
+  <div class="yr-sub">Densest stretch, late March into April.</div>
+  <div class="yr-rib" role="img" aria-label="Active days per week across the year, densest in late March into April."><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:13px"></i><i class="wk" style="--h:19px"></i><i class="wk is-off" style="--h:2px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:45px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:39px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk is-peak" style="--h:52px"></i><i class="wk is-peak" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:19px"></i><i class="wk" style="--h:26px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:32px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:52px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:39px"></i><i class="wk" style="--h:45px"></i><i class="wk" style="--h:52px"></i><i class="wk is-now" style="--h:32px"></i></div>
+  <div class="yr-ax"><span>Jan</span><span>Apr</span><span>Jul</span><span>Oct</span><span>Now</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Maintenance goals. The year-two holder with enough history to have a best stretch.<span class="bf__x">Skip if under a year in the app</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-open">
+    <header class="sect__hd"><h2>Nothing to count</h2><p>be a better father, make work I am proud of</p></header>
+    <div class="grid"><figure class="slot slot--pick" id="today-open-first">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">First thirty seconds</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-move">Phone in the drawer before dinner</p>
+ <div class="a-how">Put it there when you set the table, before you think about it.</div>
+ <button class="a-btn" type="button">Mark it done</button></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Action for open goals. The move plus what to physically do first.</p></div>
+      </figure><figure class="slot slot--pick" id="star-star-open-evidence">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__n">N1</span>
+          <span class="slot__t">Evidence, no meter</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="c-star">Be a father my kids actually talk to.</p>
+ <p class="c-why">Because I grew up in a house where nobody did.</p>
+ <p class="c-meta">61 things done in its name since June 19.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Clarity for open goals. The goal, the why that glues it, and the weight of what you have done.</p>
+          
+          
+        </div>
+      </figure><figure class="slot slot--pick" id="consistency-made-of">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">04</span>
+          <span class="slot__t">What it is made of</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-made-of">
+  <div class="mo-head">
+    <span class="mo-num">42</span>
+    <span class="mo-unit">days<br>in a row</span>
+    <span class="mo-win">last 30 days</span>
+  </div>
+  <div class="mo-bar" role="img" aria-label="26 moves, 11 reflections, 7 deep work sessions in the last 30 days.">
+    <i class="mo-a" style="width:59%"></i>
+    <i class="mo-b" style="width:25%"></i>
+    <i class="mo-c" style="width:16%"></i>
+  </div>
+  <div class="mo-key">
+    <span><i class="mo-a"></i><b>26</b> moves</span>
+    <span><i class="mo-b"></i><b>11</b> reflections</span>
+    <span><i class="mo-c"></i><b>7</b> deep work</span>
+  </div>
+  <div class="mo-foot">Reflections up 4 on the thirty before. Moves down 1.</div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Open goals. The better father with no number, who needs evidence of what he did.<span class="bf__x">Skip if only one action type logged</span></p>
+          
+          
+          
+        </div>
+      </figure><figure class="slot" id="star-star-folio">
+        <figcaption class="slot__cap"><span class="pil pil--clar">Clarity</span><span class="slot__n">13</span>
+          <span class="slot__t">Folio</span><span class="tag tag--risk">risky</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-folio">
+  <p class="v-folio__star">Get 10,000 people using something I made.</p>
+  <div class="v-folio__foot"><span>Day 34</span><span>6,400 of 10,000</span></div>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Any type in its first week. The person who wants the sentence and nothing else.<span class="bf__x">Skip if week two, it shows state not change</span></p>
+          
+          
+          
+        </div>
+      </figure></div>
+  </section>
+  <section class="sect" id="s-edge">
+    <header class="sect__hd"><h2>Days one, off, and stalled</h2><p>the first day, a quiet season, a plan that is not working</p></header>
+    <div class="grid"><figure class="slot slot--pick" id="today-n-first">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">Minute one</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-today-n-first">
+  <p class="v-today-n-first__said">&ldquo;I want to stop feeling behind in my own life.&rdquo;</p>
+
+  <div class="v-today-n-first__move">Write 500 words.</div>
+  <div class="v-today-n-first__how">Open the doc before you open anything else.</div>
+
+  <div class="v-today-n-first__row">
+    <span class="v-today-n-first__day">Day 1</span>
+    <span class="v-today-n-first__dots">
+      <i class="v-today-n-first__d v-today-n-first__d--now"></i>
+      <i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i>
+      <i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i><i class="v-today-n-first__d"></i>
+    </span>
+  </div>
+
+  <p class="v-today-n-first__foot">Do it tonight and the record starts.</p>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Day one from a rough sentence, before Clarity finishes: one move, no history<span class="bf__x">Skip if any proof event already exists</span></p></div>
+      </figure><figure class="slot slot--pick" id="today-n-check">
+        <figcaption class="slot__cap"><span class="pil pil--act">Action</span><span class="slot__t">The check day</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg><span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path></svg></div>
+          <section class="cc-card"><div class="v v-nf"><p class="a-sup" style="margin:0">Weigh in, every Thursday</p>
+ <p class="ck-day">Thursday <span>in 2 days</span></p>
+ <p class="d-foot">Today is not a check day. The plan is holding.</p></div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Check-cadence goals on a day that is not their day. Calm, correct, and quiet.<span class="bf__x">Skip if the cadence is daily</span></p></div>
+      </figure><figure class="slot" id="consistency-n-cadence">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__t">Back on rhythm</span>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone"><div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-cad">
+  <div class="v-cad__head">Six quiet days.</div>
+  <div class="v-cad__sub">Your plan asks for three a week, not seven.</div>
+
+  <div class="v-cad__weeks">
+    <div class="v-cad__wk">
+      <span class="v-cad__wl">Last week</span>
+      <span class="v-cad__dots">
+        <i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--kept"></i><i class="v-cad__d"></i><i class="v-cad__d"></i>
+      </span>
+      <span class="v-cad__wc v-cad__wc--ok">3 of 3</span>
+    </div>
+    <div class="v-cad__wk">
+      <span class="v-cad__wl">This week</span>
+      <span class="v-cad__dots">
+        <i class="v-cad__d"></i><i class="v-cad__d"></i><i class="v-cad__d"></i><i class="v-cad__d v-cad__d--today"></i><i class="v-cad__d v-cad__d--open"></i><i class="v-cad__d v-cad__d--open"></i><i class="v-cad__d v-cad__d--open"></i>
+      </span>
+      <span class="v-cad__wc">0 of 3</span>
+    </div>
+  </div>
+
+  <div class="v-cad__foot">Four days left. Three is still reachable.</div>
+</div><div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></section>
+        </div>
+        <div class="slot__meta"><p class="bf">Frequency plans (3x a week) shown to someone returning after a quiet stretch<span class="bf__x">Skip if Plan is daily, so a gap is a real miss</span></p></div>
+      </figure><figure class="slot slot--pick" id="consistency-not-moving">
+        <figcaption class="slot__cap"><span class="pil pil--cons">Consistency</span><span class="slot__n">N2</span>
+          <span class="slot__t">Doing it, not working</span><svg class="star" width="12" height="12" viewBox="0 0 24 24" fill="#ffd866" aria-label="recommended"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/></svg>
+          <span class="tag tag--new">new</span></figcaption>
+        <div class="phone">
+          <div class="phone__glow" aria-hidden="true"></div>
+          <div class="phone__memento" aria-hidden="true"><svg viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg></div>
+          <section class="cc-card"><div class="v v-consistency-not-moving">
+  <p class="nm-hd">You kept every day. The number did not move.</p>
+  <div class="nm-two">
+    <span><b>19</b>of 21 days kept</span>
+    <span><b>0.4</b>lbs in 3 weeks</span>
+  </div>
+  <p class="nm-say">The plan expected 4.5. Something in it is wrong, not you.</p>
+  <button class="nm-btn" type="button">Redo the plan</button>
+</div>
+            <div class="cc-dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          </section>
+        </div>
+        <div class="slot__meta">
+          <p class="bf">Quantity goals with a target. The dieter keeping every rep as the scale sits still.<span class="bf__x">Skip if Open goals, no number to stall</span></p>
+          
+          
+        </div>
+      </figure></div>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<style>
+[data-c="t-stamp"]{--day:#3fd94e;--day-rgb:63,217,78;--ink:235,238,248}
+[data-c="t-stamp"] .ts{position:relative;display:flex;flex-direction:column;align-items:center}
+[data-c="t-stamp"] .ts-breath{position:absolute;left:50%;top:-96px;width:280px;height:280px;
+  margin-left:-140px;pointer-events:none;opacity:0;
+  background:radial-gradient(circle closest-side,rgba(var(--day-rgb),.085),rgba(var(--day-rgb),.028) 44%,transparent 72%)}
+[data-c="t-stamp"] .ts-stamp{position:relative;display:flex;align-items:center;gap:14px;opacity:0}
+[data-c="t-stamp"] .ts-d{font-size:68px;font-weight:800;line-height:.86;letter-spacing:-.055em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.96)}
+[data-c="t-stamp"] .ts-side{text-align:left;padding-bottom:2px}
+[data-c="t-stamp"] .ts-wd{font-size:15.5px;font-weight:650;letter-spacing:-.012em;color:rgba(var(--ink),.90)}
+[data-c="t-stamp"] .ts-my{font-size:13px;font-weight:500;letter-spacing:-.005em;margin-top:3px;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.50)}
+[data-c="t-stamp"] .ts-rule{position:relative;width:58px;height:2px;border-radius:2px;background:var(--day);
+  margin-top:20px;transform:scaleX(0)}
+[data-c="t-stamp"] .ts-tally{position:relative;font-size:14.5px;font-weight:500;letter-spacing:-.01em;
+  color:rgba(var(--ink),.62);margin-top:17px;opacity:0}
+[data-c="t-stamp"] .ts-tally b{color:rgba(var(--ink),.96);font-weight:650;font-variant-numeric:tabular-nums}
+[data-c="t-stamp"] .ts-rec{position:relative;margin-top:32px;display:flex;flex-direction:column;
+  align-items:center;gap:8px;opacity:0}
+[data-c="t-stamp"] .ts-r{font-size:13px;font-weight:500;letter-spacing:-.005em;font-variant-numeric:tabular-nums;
+  color:rgba(var(--ink),.56)}
+[data-c="t-stamp"] .ts-r:nth-child(2){color:rgba(var(--ink),.50)}
+[data-c="t-stamp"] .ts-r:nth-child(3){color:rgba(var(--ink),.44)}
+[data-c="t-stamp"] .ts-r:nth-child(4){color:rgba(var(--ink),.38)}
+[data-c="t-stamp"] .ts-r:nth-child(5){color:rgba(var(--ink),.33)}
+[data-c="t-stamp"] .ts-r:nth-child(6){color:rgba(var(--ink),.28)}
+[data-c="t-stamp"] .ts-first{font-size:13.5px;font-weight:500;letter-spacing:-.005em;color:rgba(var(--ink),.50)}
+[data-c="t-stamp"] .ts-more{font-size:12.5px;font-weight:500;letter-spacing:-.005em;
+  color:rgba(var(--ink),.24);margin-top:5px}
+[data-c="t-stamp"] .ts-mark{position:absolute;left:50%;bottom:50px;width:14px;height:14px;margin-left:-7px;
+  fill:rgba(var(--ink),.13);opacity:0}
+
+[data-c="t-stamp"].on .ts-breath{animation:tsBreath_tstamp 900ms ease-out 170ms both}
+[data-c="t-stamp"].on .ts-stamp{animation:tsPress_tstamp 400ms cubic-bezier(.2,.9,.25,1) 90ms both}
+[data-c="t-stamp"].on .ts-rule{animation:tsDraw_tstamp 340ms cubic-bezier(.2,.9,.25,1) 380ms both}
+[data-c="t-stamp"].on .ts-tally{animation:tsRise_tstamp 400ms ease-out 460ms both}
+[data-c="t-stamp"].on .ts-rec{animation:tsRise_tstamp 420ms ease-out 550ms both}
+[data-c="t-stamp"].on .ts-mark{animation:tsFade_tstamp 460ms ease-out 740ms both}
+@keyframes tsFade_tstamp{from{opacity:0}to{opacity:1}}
+@keyframes tsRise_tstamp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@keyframes tsBreath_tstamp{from{opacity:0;transform:scale(.86)}to{opacity:1;transform:none}}
+@keyframes tsPress_tstamp{0%{opacity:0;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes tsDraw_tstamp{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){
+  [data-c="t-stamp"] *{animation:none!important}
+  [data-c="t-stamp"] .ts-breath,[data-c="t-stamp"] .ts-stamp,[data-c="t-stamp"] .ts-tally,
+  [data-c="t-stamp"] .ts-rec,[data-c="t-stamp"] .ts-mark{opacity:1!important;transform:none!important}
+  [data-c="t-stamp"] .ts-rule{transform:none!important}
+}
+</style>
+<div class="ph" data-c="t-stamp" data-state="d1"><div class="dst">
+  <div class="ts">
+    <div class="ts-breath"></div>
+    <div class="ts-stamp">
+      <div class="ts-d">01</div>
+      <div class="ts-side"><div class="ts-wd">Saturday</div><div class="ts-my">August 2026</div></div>
+    </div>
+    <div class="ts-rule"></div>
+    <div class="ts-tally"><b>1</b> day recorded</div>
+    <div class="ts-rec"><div class="ts-first">This is the first entry.</div></div>
+  </div>
+  <svg class="ts-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-stamp" data-state="w1"><div class="dst">
+  <div class="ts">
+    <div class="ts-breath"></div>
+    <div class="ts-stamp">
+      <div class="ts-d">08</div>
+      <div class="ts-side"><div class="ts-wd">Saturday</div><div class="ts-my">August 2026</div></div>
+    </div>
+    <div class="ts-rule"></div>
+    <div class="ts-tally"><b>7</b> days recorded</div>
+    <div class="ts-rec"><div class="ts-r">Fri, Aug 7</div><div class="ts-r">Thu, Aug 6</div><div class="ts-r">Wed, Aug 5</div><div class="ts-r">Mon, Aug 3</div><div class="ts-r">Sun, Aug 2</div><div class="ts-r">Sat, Aug 1</div></div>
+  </div>
+  <svg class="ts-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>
+<div class="ph" data-c="t-stamp" data-state="m1"><div class="dst">
+  <div class="ts">
+    <div class="ts-breath"></div>
+    <div class="ts-stamp">
+      <div class="ts-d">31</div>
+      <div class="ts-side"><div class="ts-wd">Monday</div><div class="ts-my">August 2026</div></div>
+    </div>
+    <div class="ts-rule"></div>
+    <div class="ts-tally"><b>30</b> days recorded</div>
+    <div class="ts-rec"><div class="ts-r">Sun, Aug 30</div><div class="ts-r">Sat, Aug 29</div><div class="ts-r">Fri, Aug 28</div><div class="ts-r">Thu, Aug 27</div><div class="ts-r">Wed, Aug 26</div><div class="ts-r">Tue, Aug 25</div><div class="ts-more">23 more before these</div></div>
+  </div>
+  <svg class="ts-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+</div><div class="hint">Tap to replay</div></div>

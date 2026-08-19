@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan &amp; billing, the You panel grown up</title>
+<!-- The app's REAL stylesheet, so every card, row and hairline here is the
+     app's own, never a lookalike. Falls back to the live-mirror layout. -->
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="_shared.css">
+<style>
+  body { background:#0a0b0d; }
+  .phone {
+    width:390px; border-radius:44px; overflow:hidden; position:relative;
+    background:var(--surface-0, #040405);
+    box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.07);
+    flex:none; padding:54px 20px 40px;
+  }
+  /* the app's own panel feel: content column, ledger rhythm */
+  .phone .you-h:first-of-type { margin-top:18px; }
+
+  /* The status line inside the Plan drawer. Same grammar as the sync line in
+     the Account drawer: dot + quiet text, tabular where numbers live. */
+  /* One flex child for the words (the dot is the other), so the line wraps as
+     a sentence instead of the date breaking off into its own column. */
+  .pb-status { display:flex; align-items:baseline; gap:7px; font-size:0.78rem; color:var(--text-2); margin:2px 0 14px; line-height:1.45; }
+  .pb-status > span:last-child { flex:1; min-width:0; }
+  .pb-status b { color:var(--text-1); font-weight:650; white-space:nowrap; }
+  .pb-dot { width:6px; height:6px; border-radius:50%; background:var(--color-consistency, #3fd94e); flex:none; position:relative; top:-1px; }
+  .pb-dot--off { background:rgba(var(--ink), 0.28); }
+
+  /* Buttons: fill + inset highlight, no border (Malik's standing rule for
+     boxes; the old bordered account buttons are the thing being replaced). */
+  .pb-btn {
+    -webkit-appearance:none; appearance:none; display:block; width:100%;
+    font:inherit; font-size:0.9rem; font-weight:650; text-align:center; cursor:pointer;
+    background:var(--kfill-06, rgba(var(--ink), 0.06)); color:var(--text-1);
+    border:0; border-radius:calc(10px * var(--rx, 1));
+    box-shadow:inset 0 1px 0 rgba(var(--ink), 0.07);
+    padding:12.5px 14px; margin:0 0 8px;
+  }
+  .pb-btn--quiet { color:var(--text-2); }
+  .pb-note { font-size:0.6875rem; color:var(--text-3); line-height:1.45; margin:10px 0 12px; }
+  .pb-note b { color:var(--text-2); font-weight:650; }
+
+  /* the plan chip under the name, unchanged from the app */
+  .pb-sub { font-size:0.78rem; color:var(--text-2); margin-top:2px; }
+
+  /* signed-out: the sign-in line under the unlock row */
+  .pb-signin { font-size:0.78rem; color:var(--color-clarity, #3ad9f5); font-weight:650; }
+
+  .item { width:390px; }
+  /* on an actual phone the gallery stacks and each frame fits the screen */
+  @media (max-width: 768px) {
+    .item, .phone { width:100%; max-width:390px; }
+    .phone { padding:40px 16px 34px; }
+  }
+</style>
+</head>
+<body>
+<div class="gal">
+  <h1>Plan &amp; billing</h1>
+  <p class="gal__sub">The You panel with a real billing destination. Everything here is wired to things that already exist: the plan and renewal date come from the verified access receipt (<code>currentAccess().validUntil</code>, fetched today, shown nowhere), Manage plan opens the Polar portal (<code>openPortal()</code>), the guarantee row opens the existing refund dialog. New backend needed: none. The Account drawer keeps sign out, sync and delete; billing moves out of it into its own section. Four states, left to right: a monthly subscriber, a Founder, a subscriber whose renewal is off, and a paid user who signed out on a new device.</p>
+
+  <div class="grid">
+
+    <!-- ============ 1. MONTHLY, ACTIVE ============ -->
+    <div class="item">
+      <p class="item__label"><span class="item__n">1</span><span class="item__name">Monthly, active</span></p>
+      <div class="phone">
+        <div class="you-head" style="padding-top:0;">
+          <div class="you-avatar">S</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:1.2rem; font-weight:800; letter-spacing:-0.01em;">Sam</div>
+            <div class="pb-sub">Pro &middot; monthly &middot; Synced &middot; 2 min ago</div>
+          </div>
+        </div>
+
+        <div class="you-h">Plan</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow" aria-expanded="true">
+            <span class="you-vrow__label">Pro</span>
+            <span class="you-vrow__val">Monthly &middot; $30</span>
+            <span class="you-chev you-chev--turn is-open" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <div class="you-drawer">
+            <div class="pb-status"><span class="pb-dot"></span><span>Active &middot; renews <b>August 30, 2026</b></span></div>
+            <button type="button" class="pb-btn">Manage plan</button>
+            <button type="button" class="pb-btn pb-btn--quiet">Payment method and receipts</button>
+            <button type="button" class="pb-btn pb-btn--quiet">Locked-In Guarantee</button>
+            <div class="pb-note">Cancel anytime in Manage plan. Your access stays until <b>August 30</b>, and everything you have built stays on this device either way.</div>
+          </div>
+        </div>
+
+        <div class="you-h">Data</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Account</span>
+            <span class="you-vrow__val">sam@example.com</span>
+            <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Download backup</span>
+          </button>
+        </div>
+      </div>
+      <p class="item__note">The row under the name was already there; now it is a real destination. Renewal date is <b>already on the client</b>, just never rendered. The three buttons are the Account drawer's own button recipe, so nothing here invents a style.</p>
+    </div>
+
+    <!-- ============ 2. FOUNDER ============ -->
+    <div class="item">
+      <p class="item__label"><span class="item__n">2</span><span class="item__name">Founder, lifetime</span></p>
+      <div class="phone">
+        <div class="you-head" style="padding-top:0;">
+          <div class="you-avatar">S</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:1.2rem; font-weight:800; letter-spacing:-0.01em;">Sam</div>
+            <div class="pb-sub">Founder &middot; Synced &middot; 2 min ago</div>
+          </div>
+        </div>
+
+        <div class="you-h">Plan</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow" aria-expanded="true">
+            <span class="you-vrow__label">Founder</span>
+            <span class="you-vrow__val">Lifetime</span>
+            <span class="you-chev you-chev--turn is-open" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <div class="you-drawer">
+            <div class="pb-status"><span class="pb-dot"></span><span>Yours for life &middot; nothing renews, nothing expires</span></div>
+            <button type="button" class="pb-btn pb-btn--quiet">Payment method and receipts</button>
+            <button type="button" class="pb-btn pb-btn--quiet">Locked-In Guarantee</button>
+          </div>
+        </div>
+
+        <div class="you-h">Data</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Account</span>
+            <span class="you-vrow__val">sam@example.com</span>
+            <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Download backup</span>
+          </button>
+        </div>
+      </div>
+      <p class="item__note">A lifetime owner never sees the word cancel. No Manage plan, no renewal line, no upsell. The card states the fact and stops: <b>yours for life</b>.</p>
+    </div>
+
+    <!-- ============ 3. RENEWAL OFF ============ -->
+    <div class="item">
+      <p class="item__label"><span class="item__n">3</span><span class="item__name">Renewal switched off</span></p>
+      <div class="phone">
+        <div class="you-head" style="padding-top:0;">
+          <div class="you-avatar">S</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:1.2rem; font-weight:800; letter-spacing:-0.01em;">Sam</div>
+            <div class="pb-sub">Pro &middot; monthly &middot; Synced &middot; 2 min ago</div>
+          </div>
+        </div>
+
+        <div class="you-h">Plan</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow" aria-expanded="true">
+            <span class="you-vrow__label">Pro</span>
+            <span class="you-vrow__val">Monthly &middot; ends soon</span>
+            <span class="you-chev you-chev--turn is-open" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <div class="you-drawer">
+            <div class="pb-status"><span class="pb-dot pb-dot--off"></span><span>Renewal is off &middot; access until <b>August 30, 2026</b></span></div>
+            <button type="button" class="pb-btn">Keep my Memento going</button>
+            <button type="button" class="pb-btn pb-btn--quiet">Payment method and receipts</button>
+            <div class="pb-note">Nothing is deleted when access ends. Your Memento stays on this device, and picking the plan back up relights it exactly where it stands.</div>
+          </div>
+        </div>
+
+        <div class="you-h">Data</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Account</span>
+            <span class="you-vrow__val">sam@example.com</span>
+            <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Download backup</span>
+          </button>
+        </div>
+      </div>
+      <p class="item__note">Cancelled is a state, not a scolding. The dot goes quiet, the date is plain, and the one bright button is the way back. No guilt copy, no dark patterns, the reassurance is <b>factual</b>: nothing is deleted.</p>
+    </div>
+
+    <!-- ============ 4. PAID, BUT SIGNED OUT ============ -->
+    <div class="item">
+      <p class="item__label"><span class="item__n">4</span><span class="item__name">Paid, but signed out</span></p>
+      <div class="phone">
+        <div class="you-head" style="padding-top:0;">
+          <div class="you-avatar">S</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:1.2rem; font-weight:800; letter-spacing:-0.01em;">Sam</div>
+            <div class="pb-sub">On this device</div>
+          </div>
+        </div>
+
+        <div class="you-h">Memento</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Unlock Memento</span>
+            <span class="you-vrow__val" style="color:var(--color-clarity, #3ad9f5);">$250 once</span>
+            <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label" style="font-weight:500; color:var(--text-2);">Already bought Memento?</span>
+            <span class="pb-signin">Sign in</span>
+          </button>
+        </div>
+
+        <div class="you-h">Data</div>
+        <div class="you-card">
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Account</span>
+            <span class="you-vrow__val">On this device</span>
+            <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+          </button>
+          <button type="button" class="you-vrow">
+            <span class="you-vrow__label">Download backup</span>
+          </button>
+        </div>
+      </div>
+      <p class="item__note">The trust fix. Today a paying customer who signs out sees only a buy button for the thing they own. One quiet row under it says the true thing: <b>sign in and it comes back</b>. The server already refuses double purchases; now the UI never even walks them toward one.</p>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

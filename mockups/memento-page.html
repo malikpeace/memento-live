@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Memento page, composed</title>
+<link rel="stylesheet" href="../memento-app/css/base.css" onerror="this.href='../css/base.css'">
+<link rel="stylesheet" href="../memento-app/css/dashboard.css" onerror="this.href='../css/dashboard.css'">
+<link rel="stylesheet" href="../memento-app/css/daycard-living.css" onerror="this.href='../css/daycard-living.css'">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;overflow-x:clip;background:#050609;color:var(--hi);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  :root{--hi:rgba(245,246,250,.97);--mid:rgba(238,241,247,.78);--lo:rgba(232,236,244,.50);
+    --fill:rgba(255,255,255,.055);--inset:inset 0 1px 0 rgba(255,255,255,.07);
+    --clar:#3ad9f5;--cons:#3fd94e;--act:#eef2fb;--safe-t:0px;--safe-b:0px}
+  body{min-height:100lvh}
+  .screen{position:relative;z-index:1;max-width:430px;margin:0 auto;padding:26px 20px 90px}
+  .cage{width:200px!important}
+  .hero{padding:6px 0 0}
+  .mori{font-size:18px;font-weight:250;letter-spacing:.11em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .gr{color:var(--cons)}
+  .dim{font-size:12px;color:var(--mid);font-variant-numeric:tabular-nums}
+  .brand{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--mid)}
+  .brand svg{width:18px;height:18px;fill:var(--act)}
+  p{margin:0}
+
+  /* the material's light on every block. Radial and fading well inside its own
+     bounds (the v682 law), so it can never draw an edge. */
+  :root{--mtint:#3ad9f5}
+  .mats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .mats button{width:30px;height:30px;border:0;border-radius:50%;cursor:pointer;padding:0;
+    background:var(--sw);box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 4px 14px rgba(0,0,0,.5)}
+  .mats button.is-on{box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 0 0 2.5px rgba(5,6,9,1), 0 0 0 4.5px var(--sw), 0 4px 14px rgba(0,0,0,.5)}
+  .mats button.mats__void{background:#000;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28), 0 4px 14px rgba(0,0,0,.5)}
+  .mats__note{margin-top:12px;font-size:12px;color:var(--mid);text-align:center}
+  .slip__in,.post,.relb,.now,.tkt,.lgt,.wal,.cbk,.tnw,.wks,.wrd,.mth{position:relative;overflow:hidden}
+  .post::before,.relb::before,.now::before,.tkt::before,.lgt::before,.wal::before,
+  .cbk::before,.tnw::before,.wks::before,.mth::before,.slip__in::before,.rr::after{
+    content:"";position:absolute;left:-10%;right:-10%;top:-30%;height:60%;pointer-events:none;
+    background:radial-gradient(52% 60% at 50% 30%, color-mix(in srgb, var(--mtint) 22%, transparent), transparent 72%);
+    transition:background .5s ease-out}
+  .slip__in>*,.post>*,.relb>*,.now>*,.tkt>*,.lgt>*,.wal>*,.cbk>*,.tnw>*,.wks>*,.wrd>*,.mth>*,.rr>*,.seal>*{position:relative}
+  .rr::after{content:"";z-index:0}
+  .brand svg,.slip__head svg{fill:var(--mtint);transition:fill .5s ease-out}
+  .post__hero b{text-shadow:0 0 70px color-mix(in srgb, var(--mtint) 32%, transparent)}
+  .cbk__hero b{text-shadow:0 0 60px color-mix(in srgb, var(--mtint) 26%, transparent)}
+  body.is-void .post::before,body.is-void .relb::before,body.is-void .now::before,
+  body.is-void .tkt::before,body.is-void .lgt::before,body.is-void .wal::before,
+  body.is-void .cbk::before,body.is-void .tnw::before,body.is-void .wks::before,
+  body.is-void .wrd::before,body.is-void .mth::before,body.is-void .slip__in::before{background:none}
+  body.is-void .brand svg,body.is-void .slip__head svg{fill:var(--act)}
+  body.is-void .post__hero b,body.is-void .cbk__hero b{text-shadow:none}
+
+  /* section chrome */
+  .sec{margin-top:58px}
+  .sec__hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .sec__t{font-size:13.5px;font-weight:680;color:var(--mid)}
+  .sec__ctl{display:inline-flex;gap:6px}
+  .sw{border:0;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);
+    box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:11.5px;font-weight:640;cursor:pointer}
+  .sw::after{content:" \21bb";color:var(--lo)}
+  .sw.solo{opacity:0;pointer-events:none}
+  .sh{display:grid;place-items:center;width:29px;height:29px;border:0;border-radius:999px;
+    background:rgba(255,255,255,.07);box-shadow:var(--inset);color:var(--hi);cursor:pointer}
+  .sh svg{width:13px;height:13px}
+  .out{display:none}
+  .out.is-on{display:block}
+
+  /* everything: receipt */
+  .slip{width:min(292px,100%);margin:0 auto;filter:drop-shadow(0 16px 36px rgba(0,0,0,.5))}
+  .slip__tear{height:11px;background:#0d0e13;
+    clip-path:polygon(0 100%,4% 0,8% 100%,12% 0,16% 100%,20% 0,24% 100%,28% 0,32% 100%,36% 0,40% 100%,44% 0,48% 100%,52% 0,56% 100%,60% 0,64% 100%,68% 0,72% 100%,76% 0,80% 100%,84% 0,88% 100%,92% 0,96% 100%,100% 0,100% 100%)}
+  .slip__tear--b{transform:scaleY(-1)}
+  .slip__in{background:#0d0e13;padding:18px 18px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .slip__head{text-align:center}
+  .slip__head svg{width:20px;height:20px;fill:var(--act);opacity:.9}
+  .slip__store{margin-top:3px;font-size:16px;font-weight:740;color:var(--hi)}
+  .slip__meta{margin-top:2px;font-size:11.5px;color:var(--mid)}
+  .slip__items{margin-top:14px;padding-top:10px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+  .slip__r{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:13.5px}
+  .slip__r span{color:var(--mid);white-space:nowrap}
+  .slip__r i{flex:1;height:1px;background-image:radial-gradient(circle, rgba(255,255,255,.3) 1px, transparent 1.2px);
+    background-size:6px 2px;background-repeat:repeat-x;background-position:bottom}
+  .slip__r b{font-weight:650;color:var(--hi);font-variant-numeric:tabular-nums}
+  .slip__sub{padding-left:15px;font-size:12.5px}
+  .slip__sub b{color:var(--mid);font-weight:550}
+  .slip__total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;
+    padding-top:10px;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.14)}
+  .slip__total span{font-size:13px;font-weight:700;color:var(--hi)}
+  .slip__total b{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .slip__policy{margin-top:9px;font-size:11px;color:var(--mid);text-align:center}
+
+  /* everything: poster */
+  .post{border-radius:20px;padding:18px 18px 16px;background:#08090d;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .post__top{display:flex;justify-content:space-between;align-items:center}
+  .post__hero{display:flex;align-items:center;gap:14px;margin-top:14px}
+  .post__hero b{font-size:92px;font-weight:800;letter-spacing:-.06em;line-height:.85;color:var(--hi);
+    font-variant-numeric:tabular-nums;text-shadow:0 0 70px rgba(63,217,78,.25)}
+  .post__hero span{font-size:19px;font-weight:660;line-height:1.25;color:var(--mid)}
+  .post__sub{margin-top:12px;font-size:13.5px;color:var(--mid)}
+  .post__row{display:flex;gap:1px;margin-top:16px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.07)}
+  .post__row>div{flex:1;background:#0a0b10;padding:10px 6px;text-align:center}
+  .post__row b{display:block;font-size:17px;font-weight:740;letter-spacing:-.02em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .post__row span{display:block;margin-top:2px;font-size:10px;color:var(--lo)}
+
+  /* everything: card back */
+  .relb{border-radius:20px;padding:18px;background:linear-gradient(170deg,#0c0d12,#08090d);
+    box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .relb__top{display:flex;justify-content:space-between;align-items:center}
+  .relb__name{margin-top:16px;font-size:22px;font-weight:760;letter-spacing:-.02em;color:var(--hi)}
+  .relb__since{margin-top:3px;font-size:12px;color:var(--mid)}
+  .relb__tbl{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:14px;
+    border-radius:12px;overflow:hidden;background:rgba(255,255,255,.07)}
+  .relb__tbl>div{background:#0a0b10;padding:10px 10px}
+  .relb__tbl span{display:block;font-size:10.5px;color:var(--lo)}
+  .relb__tbl b{display:block;margin-top:2px;font-size:17px;font-weight:740;color:var(--hi);font-variant-numeric:tabular-nums}
+  .relb__note{margin-top:12px;font-size:12.5px;line-height:1.55;color:var(--mid)}
+
+  /* current: plain */
+  .now{border-radius:20px;padding:17px 17px 15px;background:var(--fill);box-shadow:var(--inset)}
+  .now__goal{font-size:18px;font-weight:700;letter-spacing:-.02em;color:var(--hi)}
+  .now__line{margin-top:6px;font-size:13.5px;color:var(--mid);font-variant-numeric:tabular-nums}
+  .now__bar{height:6px;margin-top:12px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .now__bar i{display:block;height:100%;border-radius:999px;background:var(--mtint);transition:background .5s ease-out}
+  body.is-void .now__bar i{background:var(--act)}
+  .now__pace{margin-top:11px;font-size:13px;line-height:1.5;color:var(--mid)}
+
+  /* current: ticket */
+  .tkt{border-radius:20px;overflow:hidden;background:linear-gradient(176deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+    box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5);padding:17px 17px 14px}
+  .tkt__route{display:flex;align-items:center;gap:12px}
+  .tkt__end b{display:block;font-size:24px;font-weight:780;letter-spacing:-.03em;color:var(--hi);font-variant-numeric:tabular-nums}
+  .tkt__end span{display:block;margin-top:2px;font-size:10.5px;color:var(--lo);white-space:nowrap}
+  .tkt__r{text-align:right}
+  .tkt__line{position:relative;flex:1;display:flex;align-items:center}
+  .tkt__line i{flex:62;height:2px;background:rgba(238,242,251,.85);border-radius:2px}
+  .tkt__line u{flex:38;height:0;border-bottom:2px dotted rgba(238,242,251,.3)}
+  .tkt__you{position:absolute;left:62%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:4px;
+    padding:3px 8px;border-radius:999px;background:#eef2fb;color:#07080b;font-style:normal}
+  .tkt__you svg{width:11px;height:11px;fill:#07080b}
+  .tkt__you b{font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+  .tkt__delay{display:flex;align-items:center;gap:9px;margin-top:16px;font-size:14px}
+  .tkt__delay s{color:var(--mid)}
+  .tkt__delay b{font-weight:720;color:var(--hi)}
+  .tkt__chip{margin-left:auto;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.09);
+    box-shadow:var(--inset);font-size:11px;font-weight:700;color:var(--hi)}
+  .tkt__perf{height:0;margin:14px -17px;border-top:2px dashed rgba(255,255,255,.14)}
+  .tkt__stub{display:flex;gap:14px}
+  .tkt__stub>div{flex:1}
+  .tkt__stub span{display:block;font-size:10px;color:var(--lo)}
+  .tkt__stub b{display:block;margin-top:2px;font-size:14px;font-weight:700;color:var(--hi);font-variant-numeric:tabular-nums}
+
+  /* days */
+  .lgt{border-radius:20px;padding:14px 14px 15px;background:#040507;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.55)}
+  .lgt svg,.wal canvas{display:block;width:100%;height:auto}
+  .lgt__line{margin-top:11px;font-size:14px;line-height:1.45;color:var(--mid)}
+  .lgt__line b{color:var(--hi);font-weight:700}
+  .wal{border-radius:20px;padding:14px;background:#060709;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .cbk{border-radius:20px;padding:17px;background:radial-gradient(110% 60% at 50% 0%, rgba(63,217,78,.08), transparent 60%),#08090d;
+    box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .cbk__hero{display:flex;align-items:center;gap:13px}
+  .cbk__hero b{font-size:64px;font-weight:800;letter-spacing:-.055em;line-height:.85;color:var(--hi);font-variant-numeric:tabular-nums}
+  .cbk__hero span{font-size:15px;font-weight:640;line-height:1.35;color:var(--hi)}
+  .cbk__hero em{font-style:normal;color:var(--cons)}
+  .cbk__strip{display:flex;gap:2px;height:13px;margin-top:16px;border-radius:7px;overflow:hidden}
+  .cbk__strip i{background:rgba(63,217,78,.8);border-radius:2px}
+  .cbk__strip u{background:rgba(255,255,255,.09);border-radius:2px}
+  .cbk__strip .cur{background:var(--act)}
+  .cbk__line{margin-top:12px;font-size:13.5px;font-weight:640;color:var(--hi)}
+
+  /* then and now */
+  .tnw{border-radius:20px;padding:15px;background:#07080c;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .tnw__cols{display:flex;gap:1px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.08)}
+  .tnw__col{flex:1;padding:13px 12px 14px}
+  .tnw__then{background:#0a0b0f}
+  .tnw__now{background:linear-gradient(180deg, rgba(63,217,78,.10), rgba(63,217,78,.03)),#0a0b0f}
+  .tnw__when{font-size:11.5px;font-weight:720;color:var(--mid)}
+  .tnw__now .tnw__when{color:var(--cons)}
+  .tnw__col p:not(.tnw__when){margin-top:9px;font-size:13px;font-weight:600;line-height:1.4;color:var(--hi)}
+  .tnw__then p:not(.tnw__when){color:var(--mid);font-weight:560}
+  .tnw__line{margin-top:13px;font-size:13.5px;font-weight:650;color:var(--hi);text-align:center}
+
+  /* weeks */
+  .wks{border-radius:20px;padding:15px;background:#060709;box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.55)}
+  .wks__mori{margin-bottom:14px;font-size:14.5px;line-height:1.5;color:var(--mid)}
+  .wks__mori b{color:var(--hi);font-weight:760;font-variant-numeric:tabular-nums}
+  .wks-tiles{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;margin:14px 0 0;
+    border-radius:12px;overflow:hidden;background:rgba(255,255,255,.07)}
+  .wks-tiles>div{background:#0a0b10;padding:11px 6px;text-align:center}
+  .wks-tiles b{display:block;font-size:16.5px;font-weight:750;letter-spacing:-.02em;color:var(--hi);
+    font-variant-numeric:tabular-nums}
+  .wks-tiles span{display:block;margin-top:2px;font-size:10px;color:var(--lo)}
+  .wks-ways{margin:12px 0 16px;font-size:13.5px;line-height:1.55;color:var(--mid)}
+  .wks canvas{display:block;width:100%;max-width:312px;height:auto;margin:0 auto}
+  .wks__cap{margin-top:12px;font-size:13px;line-height:1.5;color:var(--mid);text-align:center}
+
+  /* words */
+    .wrd,.seal{
+    --vink1:rgba(9,20,13,.94);--vink2:rgba(16,30,21,.68);--vink3:rgba(16,30,21,.5)}
+  .wrd{border-radius:22px;padding:20px 19px 18px;
+    background:
+      radial-gradient(62% 44% at 24% 10%, color-mix(in srgb, var(--cons) 16%, transparent), transparent 70%),
+      radial-gradient(56% 46% at 84% 92%, color-mix(in srgb, var(--cons) 22%, transparent), transparent 72%),
+      linear-gradient(165deg,#e8f0ea,#c9dacd);
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),
+      0 0 40px color-mix(in srgb, var(--cons) 26%, transparent), 0 18px 44px rgba(0,0,0,.5)}
+  .wrd__q{font-size:20px;font-weight:700;letter-spacing:-.022em;line-height:1.34;color:var(--vink1);font-style:italic}
+  .wrd__m{margin-top:12px;font-size:12.5px;font-weight:640;color:var(--vink2)}
+  .wrd__m.gr{color:color-mix(in srgb, var(--cons) 60%, #063313)}
+  .wrd__lead{font-size:13px;font-weight:640;color:var(--vink2);margin-bottom:9px}
+  .wrd__pic{font-style:normal}
+  .wrd__pic .w{opacity:.2;transition:opacity .7s ease,text-shadow .7s ease}
+  .wrd__pic .w.lit{opacity:1;text-shadow:0 0 20px color-mix(in srgb, var(--cons) 45%, transparent)}
+  .wrd__open{font-size:14px;font-weight:680;color:var(--vink1)}
+  .wrd__b{margin-top:11px;font-size:14px;line-height:1.6;color:var(--vink1)}
+  .wrd__sign{margin-top:14px;font-size:13px;line-height:1.5;font-weight:640;color:var(--vink2)}
+
+  /* month */
+  .mth{border-radius:20px;padding:15px 17px;background:radial-gradient(120% 66% at 50% 0%, rgba(63,217,78,.08), transparent 62%),#08090d;
+    box-shadow:var(--inset),0 18px 44px rgba(0,0,0,.5)}
+  .mth__row{display:flex;align-items:baseline;gap:10px}
+  .mth__row b{font-size:26px;font-weight:780;letter-spacing:-.03em;color:var(--hi)}
+  .mth__row span{font-size:15px;font-weight:680}
+  .mth__dots{display:flex;gap:6px;margin-top:11px}
+  .mth__dots i{width:11px;height:11px;border-radius:50%;background:var(--cons);box-shadow:0 0 9px rgba(63,217,78,.5)}
+  .mth__v{margin-top:10px;font-size:13px;color:var(--mid)}
+
+  /* the relic as the BACK of the Memento card: the card's own light face,
+     glowing rim and halo, the record struck into it in dark ink */
+  .rr{position:relative;overflow:hidden;border-radius:24px;padding:22px 20px 18px;
+    --ink1:rgba(13,17,25,.94);--ink2:rgba(24,28,36,.68);--ink3:rgba(24,28,36,.48);
+    background:
+      radial-gradient(60% 42% at 22% 12%, color-mix(in srgb, var(--clar) 13%, transparent), transparent 70%),
+      radial-gradient(58% 44% at 82% 90%, color-mix(in srgb, var(--cons) 15%, transparent), transparent 70%),
+      linear-gradient(165deg,#e9edf4,#cbd3df);
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.92),
+      0 0 44px rgba(200,210,255,.26), 0 22px 54px rgba(0,0,0,.55)}
+  .rr .brand{color:var(--ink2)}
+  .rr .brand svg,.rr-wm{fill:#3a4150}
+  .rr-head{display:flex;align-items:center;justify-content:space-between}
+  .rr-serial{padding:4px 11px;border-radius:999px;background:rgba(16,20,28,.08);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5);font-size:11.5px;color:var(--ink2);
+    font-variant-numeric:tabular-nums}
+  .rr-name{margin-top:18px;font-size:24px;font-weight:770;letter-spacing:-.025em;color:var(--ink1);
+    text-shadow:0 1px 1px rgba(255,255,255,.85), 0 -1px .5px rgba(0,0,0,.16)}
+  .rr-since{margin-top:4px;font-size:12.5px;line-height:1.45;color:var(--ink2)}
+  .rr-hero{display:flex;align-items:center;gap:13px;margin-top:16px}
+  .rr-hero>b{font-size:64px;font-weight:800;letter-spacing:-.05em;line-height:.9;color:var(--ink1);
+    font-variant-numeric:tabular-nums;text-shadow:0 1px 1px rgba(255,255,255,.8), 0 -1px .5px rgba(0,0,0,.14)}
+  .rr-herol{font-size:14px;font-weight:620;line-height:1.3;color:var(--ink2)}
+  .rr-heror{margin-left:auto;text-align:right;font-size:13px;line-height:1.45;color:var(--ink2)}
+  .rr-heror b{font-weight:720;color:var(--ink1)}
+  .rr-star{display:flex;gap:11px;align-items:flex-start;margin-top:18px;border-radius:14px;
+    padding:12px 14px;background:color-mix(in srgb, var(--clar) 15%, rgba(255,255,255,.4));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+  .rr-star__dot{flex:0 0 9px;height:9px;margin-top:5px;border-radius:50%;
+    background:var(--clar);box-shadow:0 0 12px color-mix(in srgb, var(--clar) 70%, transparent)}
+  .rr-star__l{font-size:11.5px;font-weight:640;color:var(--ink2)}
+  .rr-star__g{margin-top:2px;font-size:16px;font-weight:700;letter-spacing:-.015em;color:var(--ink1)}
+  .rr-items{margin-top:16px;padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .rr-items--tight{margin-top:12px}
+  .rr-cols{display:flex;align-items:baseline;gap:7px;padding:0 0 5px;font-size:11.5px;color:var(--ink3)}
+  .rr-cols i{flex:1}
+  .rr-cols b,.rr-r b{font-weight:640;font-variant-numeric:tabular-nums}
+  .rr-cd,.rr-r b:nth-of-type(1){width:40px;text-align:right}
+  .rr-cu,.rr-r b:nth-of-type(2){width:40px;text-align:right}
+  .rr-r{display:flex;align-items:baseline;gap:7px;padding:4px 0;font-size:13.5px}
+  .rr-r span{color:var(--ink2);white-space:nowrap}
+  .rr-r i{flex:1;height:1px;background-image:radial-gradient(circle, rgba(16,20,28,.34) 1px, transparent 1.2px);
+    background-size:6px 2px;background-repeat:repeat-x;background-position:bottom}
+  .rr-r b{color:var(--ink1)}
+  .rr-best span,.rr-best b{color:var(--ink1);font-weight:700}
+  .rr-best b:nth-of-type(1){color:color-mix(in srgb, var(--cons) 62%, #063313)}
+  .rr-sum{margin-top:5px;padding-top:9px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .rr-sum span{color:var(--ink1);font-weight:700}
+  .rr-meta span,.rr-meta b{font-size:12.5px}
+  .rr-meta b{color:var(--ink2);font-weight:560}
+  .rr-wide{width:auto!important;white-space:nowrap}
+  .rr-total{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:12px;
+    padding-top:11px;box-shadow:inset 0 1.5px 0 rgba(16,20,28,.16)}
+  .rr-total span{font-size:13.5px;font-weight:740;color:var(--ink1)}
+  .rr-total b{font-size:34px;font-weight:800;letter-spacing:-.04em;color:var(--ink1);
+    font-variant-numeric:tabular-nums;text-shadow:0 1px 1px rgba(255,255,255,.8)}
+  .rr-total em{font-style:normal;font-size:15px;font-weight:600;color:var(--ink2)}
+  .rr-notes{margin-top:14px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  .rr-quote{margin:14px 0 0;padding:2px 0 2px 13px;box-shadow:inset 2.5px 0 0 var(--clar);
+    font-size:15px;font-style:italic;line-height:1.5;color:var(--ink1)}
+  .rr-quote span{display:block;margin-top:5px;font-size:11.5px;font-style:normal;color:var(--ink2)}
+  .rr-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:16px;
+    padding-top:12px;box-shadow:inset 0 1px 0 rgba(16,20,28,.14)}
+  .rr-foot__n{font-size:14.5px;font-weight:720;color:var(--ink1)}
+  .rr-foot__s{margin-top:2px;font-size:11.5px;color:var(--ink2)}
+  .rr-tag{position:relative;text-align:left}
+  .rr-code{display:flex;gap:2.5px;height:26px}
+  .rr-code i{width:2px;background:rgba(16,20,28,.8)}
+  .rr-code i:nth-child(3n){width:4px}
+  .rr-code i:nth-child(5n){width:1.5px;opacity:.55}
+  .rr-code i:nth-child(7n){width:5px}
+  .rr-digits{margin-top:6px;font-size:12px;letter-spacing:.14em;line-height:1.35;
+    color:var(--ink3);font-variant-numeric:tabular-nums}
+  .rr-policy{margin-top:12px;font-size:11px;color:var(--ink2);text-align:center}
+  .rr-wm{position:absolute;right:-14px;bottom:26px;width:168px;height:168px;
+    fill:rgba(16,20,28,.05);pointer-events:none}
+
+  /* then and now: the card itself, dead against lit */
+  .tnc{border-radius:22px;padding:20px 16px 18px;background:#060709;
+    box-shadow:var(--inset), 0 22px 54px rgba(0,0,0,.55)}
+  .tnc-cards{display:flex;gap:14px;justify-content:center}
+  .tnc-side{flex:1;max-width:150px;text-align:center}
+  .cage-sm{width:100%;max-width:128px;margin:0 auto}
+  .cage-sm .daycard-ns__name{display:none!important}
+  .cage-sm *{animation:none!important;will-change:auto!important}
+  .tnc-when{margin-top:12px;font-size:12px;font-weight:720;color:var(--mid)}
+  .tnc-now{color:var(--cons)}
+  .tnc-f{margin-top:7px;font-size:13px;font-weight:600;line-height:1.35;color:var(--hi)}
+  .tnc-side:first-child .tnc-f{color:var(--mid);font-weight:560}
+  .tnc-line{margin-top:18px;font-size:15px;font-weight:680;letter-spacing:-.015em;color:var(--hi);text-align:center}
+  body.d0 #sec-then{display:none}
+
+  /* day one: the page before anything has happened */
+  .d0btn{display:block;margin:14px auto 0;padding:9px 16px;border:0;border-radius:10px;
+    background:rgba(255,255,255,.07);box-shadow:var(--inset);color:var(--hi);
+    font:inherit;font-size:12.5px;font-weight:640;cursor:pointer}
+  .out--d0{display:none}
+  body.d0 .out{display:none!important}
+  body.d0 .out--d0{display:block}
+  body.d0 .sw{opacity:0;pointer-events:none}
+  body.d0 .door,body.d0 .door__sub{display:none}
+  .lgt__dark{min-height:150px;border-radius:12px;background:#030405;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+  .tnw__wait{color:var(--mid)!important;font-weight:560!important;font-style:italic}
+  .mth__hollow{background:transparent!important;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.4)!important}
+
+  /* the sealed note: written at the start, locked into vivere forever */
+  .seal{margin-top:14px;border-radius:22px;padding:18px 19px 15px;
+    background:
+      radial-gradient(58% 46% at 78% 88%, color-mix(in srgb, var(--cons) 18%, transparent), transparent 72%),
+      linear-gradient(165deg,#e6efe9,#c6d7cb);
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.88),
+      0 0 34px color-mix(in srgb, var(--cons) 20%, transparent), 0 18px 44px rgba(0,0,0,.5)}
+  .seal__hd{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:680;color:var(--vink2)}
+  .seal__lock{width:14px;height:14px;color:var(--vink2)}
+  .seal__b{margin-top:12px;font-size:14.5px;line-height:1.6;letter-spacing:-.008em;color:var(--vink1)}
+  .seal__sign{margin-top:12px;font-size:13px;font-style:italic;color:var(--vink2)}
+  .seal__law{margin-top:14px;padding-top:11px;box-shadow:inset 0 1px 0 rgba(16,30,21,.16);
+    font-size:11.5px;color:var(--vink3)}
+  .seal--d0{display:none}
+  body.d0 .seal{display:none}
+  body.d0 .seal--d0{display:block}
+
+  /* the clean scroll: controls float light, headings live in the flow */
+  .sec__hd--slim{justify-content:flex-end;margin-bottom:9px;min-height:0}
+  .flowh{margin:64px 0 16px;font-size:22px;font-weight:750;letter-spacing:-.025em;color:var(--hi)}
+  .flowh--viv{margin-top:70px}
+  .sec--flow{margin-top:0}
+
+  /* the origin plaque, ported verbatim from the app's v1133 dark-room variant:
+     a white plaque the date is struck INTO, standing off the dark room */
+  .org{position:relative;margin:70px 0 0;padding:30px 22px 28px;border-radius:18px;
+    text-align:center;overflow:hidden;
+    background:linear-gradient(180deg, rgba(244,246,250,.96), rgba(228,232,240,.92));
+    box-shadow:inset 0 2px 3px rgba(255,255,255,.9), inset 0 -1px 0 rgba(20,24,32,.10),
+               0 10px 30px rgba(0,0,0,.45)}
+  .org::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--mtint) 12%, transparent), transparent 72%)}
+  .org>*{position:relative}
+  .org__k{display:block;font-size:12px;font-weight:600;color:rgba(24,28,36,.55)}
+  .org__d{display:block;margin:9px 0 0;font-size:20px;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;color:rgba(16,20,28,.92);
+    text-shadow:0 1px 1px rgba(255,255,255,.9), 0 -1px .5px rgba(0,0,0,.18)}
+  .org__t{display:block;margin:9px 0 0;font-size:13px;color:rgba(24,28,36,.62);
+    font-variant-numeric:tabular-nums}
+  body.is-void .org::before{background:none}
+
+  /* door + toast */
+  .door{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:30px;
+    padding:15px 17px;border:0;border-radius:16px;background:rgba(255,255,255,.06);
+    box-shadow:var(--inset);color:var(--hi);font:inherit;font-size:15px;font-weight:660;cursor:pointer}
+  .door span{color:var(--lo);font-size:19px}
+  .door__sub{margin-top:8px;font-size:12px;color:var(--lo);text-align:center}
+  .toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,16px);z-index:60;
+    padding:10px 17px;border-radius:12px;background:rgba(20,22,27,.94);box-shadow:var(--inset),0 12px 30px rgba(0,0,0,.5);
+    color:var(--hi);font-size:13px;font-weight:640;opacity:0;pointer-events:none;
+    transition:opacity .25s ease,transform .25s ease}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+<style id="mv">
+  :root{
+    --hi: rgba(245,246,250,.97);
+    --mid: rgba(238,241,247,.78);
+    --lo: rgba(232,236,244,.50);
+    --fill: rgba(255,255,255,.055);
+    --fill-2: rgba(255,255,255,.085);
+    --inset: inset 0 1px 0 rgba(255,255,255,.07);
+    --clar: #3ad9f5;
+    --cons: #3fd94e;
+    --act: #eef2fb;
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; }
+
+  /* the room the card sits in: a single soft pool behind the hero, fading
+     radially so it can never draw an edge (the v682 law) */
+  /* The chosen material lights the room. Radial and fading to transparent well
+     inside its own bounds, so it can never draw an edge (the v682 law). */
+  .room{ position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(64% 30% at 50% 14%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 26%, transparent), transparent 72%),
+      radial-gradient(130% 70% at 50% 8%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 10%, transparent), transparent 76%),
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--tint, #3ad9f5) 5%, transparent) 0%,
+        color-mix(in srgb, var(--tint, #3ad9f5) 3%, transparent) 46%,
+        transparent 100%);
+    transition:background .5s ease-out; }
+  /* Void takes light OUT of the room instead of adding it. */
+  body.is-void .room{ background:
+      radial-gradient(88% 52% at 50% 20%, rgba(0,0,0,.92), transparent 74%); }
+
+  /* ── the material drives the app's OWN layers, nothing more ───────────── */
+  .cage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .cage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .cage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  .cage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+  .cage:not(.is-stock) .daycard-ns__emblem path{ fill:var(--mark)!important; }
+  .cage .daycard-ns__name{ color:var(--ink)!important; }
+
+  /* flat: an opaque painted object, every colour layer off */
+  .flat .daycard-theme-living .daycard-ns__liquid{ display:none!important; }
+  .flat .daycard-theme-living .daycard-bloom,
+  .flat .daycard-wrap__aura{ opacity:0!important; }
+  .flat .daycard-ns__plat, .flat .daycard-ns__iri, .flat .daycard-ns__sheen,
+  .flat .daycard-ns__burn, .flat .daycard-ns__tint{ opacity:0!important; }
+  .flat .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9))!important; }
+  .flat .daycard-ns{ box-shadow:0 0 46px 8px var(--halo, rgba(238,244,255,.34)),
+    inset 0 1px 0 rgba(255,255,255,.06)!important; }
+
+  /* void: nothing inside it emits, and the room around it darkens */
+  .void .daycard-ns{ background:#000!important;
+    box-shadow:0 0 60px 20px #000, 0 0 120px 40px rgba(0,0,0,.9)!important; }
+  .void .daycard-ns__rim{ opacity:0!important; box-shadow:none!important; }
+  .void .daycard-living-stage{ box-shadow:0 0 60px 10px rgba(0,0,0,.98)!important; }
+  .void .daycard-wrap__aura, .void .daycard-bloom{ opacity:0!important; }
+  /* nothing inside it emits either: the app's own edge highlight and face lift
+     are what was drawing a visible outline on a card that must have none */
+  .void .daycard-ns::before, .void .daycard-ns__body::before,
+  .void .daycard-ns__liquid, .void .daycard-ns__iri, .void .daycard-ns__sheen,
+  .void .daycard-ns__burn, .void .daycard-ns__plat,
+  .void .daycard-ns__tint{ opacity:0!important; background:none!important; }
+
+  /* the chips are the same card, small */
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b1{ background:radial-gradient(circle, var(--sk1), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b2{ background:radial-gradient(circle, var(--sk2), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b3{ background:radial-gradient(circle, var(--sk3), transparent 65%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b4{ background:radial-gradient(circle, var(--sk4, var(--sk1)), transparent 66%)!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b5{ background:radial-gradient(circle, var(--sk2), transparent 68%)!important; opacity:.5!important; }
+  .chipcage:not(.is-stock) .daycard-theme-living .blob.b6{ opacity:0!important; }
+  .chipcage:not(.is-stock) .daycard-ns__plat{ opacity:var(--plat-op,.28)!important; }
+  /* the chips are a catalogue, not the user's card, so the app's "star not lit
+     yet" gate must not drain them. Specificity has to beat body:not(.ns-bloom). */
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__liquid{ opacity:1!important; }
+  body:not(.ns-bloom) .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim,
+  body .strip .chip .chipcage .daycard-theme-living .daycard-ns__rim{ opacity:1!important; }
+  /* at 62px the halo is bigger than the card and every material reads white.
+     Kill the room light on the chips so the face is what you are choosing. */
+  .chipcage .daycard-wrap__aura, .chipcage .daycard-bloom{ opacity:0!important; }
+  .chipcage .daycard-living-stage{ box-shadow:none!important; }
+  .chipcage .daycard-ns__rim{ opacity:1!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important; }
+  .chipcage.flat .daycard-ns, .chipcage.void .daycard-ns{ box-shadow:none!important; }
+  .chipcage:not(.is-stock) .daycard-ns{ background:var(--face)!important; }
+
+  /* ── the customiser sheet. Held open from the card. Glass over a scrim, so
+     the card stays visible behind it and you can see what you are changing. */
+  .hint{ margin:26px 0 0; text-align:center; font-size:12.5px; color:var(--lo); }
+  .sheetwrap{ position:fixed; inset:0; z-index:60; display:flex;
+    align-items:flex-end; justify-content:center; }
+  .sheetwrap__scrim{ position:absolute; inset:0; background:rgba(4,5,7,.62);
+    backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    opacity:0; transition:opacity .22s ease-out; }
+  .sheetwrap.is-open .sheetwrap__scrim{ opacity:1; }
+  .sheet{ position:relative; width:100%; max-width:470px;
+    padding:10px 20px calc(20px + var(--safe-b));
+    border-radius:20px 20px 0 0;
+    background:rgba(16,18,23,.82);
+    backdrop-filter:blur(34px) saturate(1.5);
+    -webkit-backdrop-filter:blur(34px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 -20px 60px rgba(0,0,0,.6);
+    transform:translateY(102%); transition:transform .26s cubic-bezier(.32,.72,0,1); }
+  .sheetwrap.is-open .sheet{ transform:translateY(0); }
+  .sheet__grab{ display:block; width:38px; height:4px; margin:0 auto 14px;
+    border-radius:999px; background:rgba(255,255,255,.2); }
+  .sheet .strip{ margin:0 -20px; padding:2px 20px 12px; }
+  .sheet__done{ display:block; width:100%; margin:16px 0 0; padding:15px;
+    border:0; border-radius:13px; background:#f2f3f6; color:#0b0c0e;
+    font:inherit; font-size:15.5px; font-weight:650; cursor:pointer; }
+  @media (prefers-reduced-motion: reduce){
+    .sheet{ transition:none; } .sheetwrap__scrim{ transition:none; } }
+
+  /* pressing and holding the card: it gives, so the gesture is felt.
+     iOS kills a long press three separate ways, so all three are shut off:
+     the callout/magnifier, text selection, and the tap highlight. touch-action
+     stays pan-y so the page still scrolls when the finger actually moves. */
+  .cage{ transition:transform .18s ease-out;
+    touch-action:pan-y;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:transparent; }
+  .cage *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  .cage.is-pressing{ transform:scale(.968); }
+  /* the hint is also a button, so the customiser is never gesture-only */
+  .hint{ background:none; border:0; font:inherit; display:block; width:100%;
+    cursor:pointer; }
+
+  /* ── the bar. Glass, only a back arrow, the name arrives on scroll ─────── */
+  .bar{ position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px;
+    height:52px; margin:0 -20px; padding:calc(var(--safe-t) + 4px) 14px 4px;
+    background:rgba(6,7,10,.62); backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4); }
+  .bar__back{ display:grid; place-items:center; width:34px; height:34px; border:0; padding:0;
+    border-radius:9px; background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    cursor:pointer; }
+  .bar__back svg{ width:17px; height:17px; }
+  .bar__title{ font-size:15px; font-weight:650; letter-spacing:-.01em; opacity:0;
+    transition:opacity .22s ease-out; }
+  .bar.is-scrolled .bar__title{ opacity:1; }
+
+  /* ── 1 · the card ─────────────────────────────────────────────────────── */
+  .hero{ padding:26px 0 0; }
+  .cage{ position:relative; width:min(74vw, 286px); margin:0 auto; }
+  .cage .daycard-wrap{ margin:0; width:100%; }
+  .cage .daycard-living-stage{ width:100% !important; margin:0; }
+  .cage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0; }
+  /* The shipped card hides the name outright (dashboard.css: display:none), so
+     this is new. It is cut INTO the face at the bottom-left: dark along the top
+     edge of each letter, a catch of light along the bottom, the way an
+     engraving reads. A maker's mark sits in a corner, not centred. */
+  .cage .daycard-ns__foot{ position:absolute; left:8.5%; right:auto; bottom:5.2%;
+    z-index:7; display:block; width:auto; text-align:left; }
+  .cage .daycard-ns__name{ display:inline; font-size:10.5px; font-weight:700;
+    letter-spacing:.15em; text-transform:uppercase;
+    color:color-mix(in srgb, var(--ink, rgba(24,28,36,.82)) 78%, transparent);
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.5), 0 1px 0.6px rgba(255,255,255,.26); }
+  /* on a dark face the engraving flips: the light catch goes on top */
+  .cage.flat .daycard-ns__name, .cage.void .daycard-ns__name{
+    text-shadow: 0 -0.5px 0.6px rgba(0,0,0,.75), 0 1px 0.6px rgba(255,255,255,.16); }
+
+  .hero__name{ margin:22px 0 7px; text-align:center; font-size:22px; font-weight:700;
+    letter-spacing:-.02em; }
+  .hero__sub{ margin:0; text-align:center; font-size:13.5px; line-height:1.55; color:var(--mid); }
+  /* the countdown ticks, because a number that moves is the whole argument */
+  /* a thin clock, not a sentence. Light weight and open tracking so the digits
+     read as a running timer rather than a statistic. */
+  #mori{ font-size:19px; font-weight:250; letter-spacing:.11em; color:var(--hi);
+    font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1; }
+
+  /* ── shared section head. Sentence case, no tracked kickers. ──────────── */
+  .sect{ margin:38px 0 12px; }
+  .sect h2{ margin:0 0 4px; font-size:17px; font-weight:680; letter-spacing:-.015em; }
+  .sect p{ margin:0; font-size:13.5px; line-height:1.5; color:var(--mid); }
+
+  /* ── their own note, in their own words, said back to them. No panel, no
+     label, no explanation. Italic is the only thing marking it as theirs. */
+  .note{ margin:26px auto 0; max-width:31ch; text-align:center;
+    font-size:16px; line-height:1.6; letter-spacing:-.008em; font-style:italic;
+    color:var(--hi); outline:none; }
+  .note:empty::before{ content:'Tap to write a note to yourself.';
+    font-style:italic; color:var(--lo); }
+  .note__d{ margin:10px 0 0; text-align:center; font-size:12.5px;
+    font-style:normal; color:var(--lo); }
+
+  /* ── 4 · the material ─────────────────────────────────────────────────── */
+  .strip{ display:flex; gap:11px; overflow-x:auto; scroll-snap-type:x mandatory;
+    margin:0 -20px; padding:4px 20px 14px; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; }
+  .strip::-webkit-scrollbar{ display:none; }
+  .chip{ flex:none; scroll-snap-align:center; width:62px; cursor:pointer;
+    background:none; border:0; padding:0; }
+  /* block, or the span's own line box adds a dead strip above the card that
+     the selected fill then paints as a grey bar */
+  .chipcage{ display:block; position:relative; width:62px; border-radius:10px; padding:3px;
+    background:transparent; transition:background .16s ease-out, transform .16s ease-out; }
+  .chip[aria-pressed="true"] .chipcage{ background:var(--fill-2); transform:translateY(-2px); }
+  .chipcage .daycard-wrap{ margin:0; width:100%; }
+  .chipcage .daycard-living-stage{ width:100% !important; margin:0; }
+  .chipcage .daycard-ns{ width:100%; min-height:0; aspect-ratio:320/452; margin:0;
+    border-radius:7px; clip-path:inset(0 round 7px); }
+  .chipcage .daycard-ns__foot, .chipcage .daycard-ns__body{ display:none; }
+  .chip__n{ display:block; margin-top:7px; font-size:10.5px; line-height:1.25;
+    color:var(--lo); letter-spacing:-.005em; }
+  .chip[aria-pressed="true"] .chip__n{ color:var(--hi); }
+
+  /* ring + mark: two small choices that ride on top of the material */
+  .tog{ display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px; }
+  .tog__g{ display:flex; gap:2px; padding:2px; border-radius:999px;
+    background:var(--fill); box-shadow:var(--inset); }
+  .tog__g button{ font:inherit; font-size:12px; font-weight:620; letter-spacing:-.005em;
+    color:var(--mid); background:none; border:0; cursor:pointer;
+    padding:7px 13px; border-radius:999px; transition:background .15s ease-out; }
+  .tog__g button.on{ color:#0b0c0e; background:#f2f3f6; }
+
+  /* colour-matched ring: the rim and the room glow take the card's own colour */
+  body.ring-colour .cage .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,.85)),
+                inset 0 0 16px 2px color-mix(in srgb, var(--edge, #fff) 28%, transparent) !important; }
+  body.ring-colour .cage.flat .daycard-ns__rim{
+    box-shadow: inset 0 0 0 1.5px var(--edge, rgba(255,255,255,.9)) !important; }
+  /* the mark, pulled toward the card's colour. Tinted, never fully coloured. */
+  body.mark-tint .cage .daycard-ns__emblem path{
+    fill: color-mix(in srgb, var(--mark, #484f58) 72%, var(--edge, #ffffff) 28%) !important; }
+  body.mark-tint .cage .daycard-ns__name{
+    color: color-mix(in srgb, var(--ink, #333) 78%, var(--edge, #ffffff) 22%) !important; }
+
+  .matnote{ margin:2px 0 0; font-size:13px; line-height:1.5; color:var(--mid); }
+
+  /* ── 4 · the record ───────────────────────────────────────────────────── */
+  .tally{ margin:30px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    border-radius:15px; overflow:hidden; }
+  .tal{ padding:14px 8px 13px; text-align:center; background:var(--fill); box-shadow:var(--inset); }
+  .tal b{ display:block; font-size:23px; font-weight:700; letter-spacing:-.03em; }
+  .tal span{ display:block; margin-top:3px; font-size:11.5px; line-height:1.3; color:var(--mid); }
+  /* the one number that can go back to zero tonight */
+  .tal.is-live b{ color:var(--cons); }
+
+  .trail{ margin:16px 0 0; }
+
+  /* ── a month. Closed it is one row that still shows its whole weight: a dot
+     per mark, and the count. Open it drops the full list underneath. */
+  .mo + .mo{ margin-top:2px; }
+  .mo__h{ display:flex; align-items:center; gap:11px; width:100%;
+    padding:13px 14px; border:0; border-radius:12px; cursor:pointer;
+    background:var(--fill); box-shadow:var(--inset); color:var(--hi);
+    font:inherit; text-align:left; transition:background .15s ease-out; }
+  .mo__h:active{ background:var(--fill-2); }
+  .mo__n{ flex:none; font-size:14px; font-weight:640; letter-spacing:-.01em; }
+  .mo__dots{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:3px;
+    align-content:center; overflow:hidden; max-height:13px; }
+  .mo__dot{ width:5px; height:5px; border-radius:50%;
+    background:rgba(255,255,255,.24); }
+  .mo__dot.is-act{ background:var(--cons); }
+  .mo__dot.is-mark{ background:var(--act); }
+  .mo__dot.is-clar{ background:var(--clar); }
+  .mo__c{ flex:none; font-size:12.5px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+  .mo__x{ flex:none; width:15px; height:15px; color:var(--lo);
+    transition:transform .2s ease-out; }
+  .mo.is-open .mo__x{ transform:rotate(180deg); }
+  .mo.is-open .mo__dots{ opacity:0; }
+  .mo__b{ display:none; padding:16px 2px 4px; }
+  .mo.is-open .mo__b{ display:block; }
+  @media (prefers-reduced-motion: reduce){ .mo__x{ transition:none; } }
+  .ev{ position:relative; display:flex; gap:13px; padding:0 0 15px 0; }
+  /* the spine: drawn on the row, stopping before the last one so it never
+     dangles past the final entry */
+  .ev::before{ content:''; position:absolute; left:5px; top:16px; bottom:-2px; width:1px;
+    background:rgba(255,255,255,.10); }
+  .ev:last-child::before{ display:none; }
+  .ev__dot{ flex:none; width:11px; height:11px; margin-top:4px; border-radius:50%;
+    background:rgba(255,255,255,.18); }
+  .ev__dot.is-act{ background:var(--cons); box-shadow:0 0 12px rgba(63,217,78,.45); }
+  .ev__dot.is-mark{ background:var(--act); box-shadow:0 0 12px rgba(238,242,251,.4); }
+  .ev__dot.is-clar{ background:var(--clar); box-shadow:0 0 12px rgba(58,217,245,.45); }
+  .ev__b{ flex:1; min-width:0; }
+  .ev__t{ display:block; font-size:14.5px; line-height:1.4; letter-spacing:-.01em; }
+  .ev__m{ display:block; margin-top:2px; font-size:12.5px; line-height:1.45; color:var(--mid); }
+  .ev__d{ flex:none; font-size:12.5px; color:var(--lo); padding-top:2px; }
+
+  /* ── the last block on the screen, and the oldest thing on it. Recessed
+     rather than raised: a well cut into the page, with the date struck INTO
+     the surface the same way the name is struck into the card. Same engraving
+     language, so the beginning and the object agree. */
+  .origin{ position:relative; margin:34px 0 0; padding:30px 22px 28px;
+    border-radius:18px; text-align:center; overflow:hidden;
+    background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.16));
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.55),
+                inset 0 -1px 0 rgba(255,255,255,.07); }
+  /* one soft pool of the card's own light, radial so it never draws an edge */
+  .origin::before{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(76% 90% at 50% 118%,
+      color-mix(in srgb, var(--tint, #3ad9f5) 16%, transparent), transparent 72%); }
+  .origin > *{ position:relative; }
+  .origin__k{ display:block; font-size:12px; font-weight:600; color:var(--lo); }
+  .origin__d{ display:block; margin:9px 0 0; font-size:20px; font-weight:700;
+    letter-spacing:.14em; text-transform:uppercase; color:rgba(228,233,242,.9);
+    text-shadow: 0 -1px 1px rgba(0,0,0,.85), 0 1px 0.5px rgba(255,255,255,.16); }
+  .origin__t{ display:block; margin:9px 0 0; font-size:13px; color:var(--mid);
+    font-variant-numeric:tabular-nums; }
+
+  /* ── desktop: the same column, given air, with the card held beside it ── */
+  
+</style>
+</head><body>
+
+<div class="room" aria-hidden="true"></div>
+<div class="screen">
+  <div class="hero"><div class="cage" id="cage"></div>
+    <p class="hero__name">Your Memento</p>
+    <p class="hero__sub"><span class="mori">20967:16:41:52</span></p>
+  </div>
+
+  <div class="mats" id="mats" aria-label="Your Memento's material tints the whole page"></div>
+  <p class="mats__note">The page wears your Memento. Pick a material and every section takes its light.</p>
+  <button class="d0btn" id="d0btn" type="button">What day one looks like</button>
+
+  <!-- THE RECORD: the relic-receipt, everything ever, the star stated plainly -->
+  <section class="sec" id="sec-all">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="out is-on shot" data-out="The relic">
+      <div class="rr">
+        <div class="rr-head">
+          <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+          <span class="rr-serial">No. 0001</span>
+        </div>
+        <p class="rr-name">Malik Peace.</p>
+        <p class="rr-since">On the path since October 12. Printed August 7, day 300.</p>
+
+        <div class="rr-hero">
+          <b>231</b>
+          <span class="rr-herol">days with<br>a mark</span>
+          <span class="rr-heror"><b>312 actions</b><br>3 promises</span>
+        </div>
+
+        <div class="rr-star">
+          <span class="rr-star__dot"></span>
+          <div>
+            <p class="rr-star__l">The star, now</p>
+            <p class="rr-star__g">Get to 100 paying users.</p>
+          </div>
+        </div>
+
+        <div class="rr-items">
+          <div class="rr-cols"><span>Month</span><i></i><b class="rr-cd">Marks</b><b class="rr-cu">Acts</b></div>
+          <div class="rr-r"><span>October</span><i></i><b>18</b><b>24</b></div>
+          <div class="rr-r"><span>November</span><i></i><b>24</b><b>31</b></div>
+          <div class="rr-r"><span>December</span><i></i><b>26</b><b>35</b></div>
+          <div class="rr-r"><span>January</span><i></i><b>22</b><b>29</b></div>
+          <div class="rr-r"><span>February</span><i></i><b>18</b><b>25</b></div>
+          <div class="rr-r"><span>March</span><i></i><b>21</b><b>28</b></div>
+          <div class="rr-r"><span>April</span><i></i><b>19</b><b>26</b></div>
+          <div class="rr-r"><span>May</span><i></i><b>26</b><b>36</b></div>
+          <div class="rr-r rr-best"><span>June</span><i></i><b>28</b><b>39</b></div>
+          <div class="rr-r"><span>July</span><i></i><b>22</b><b>30</b></div>
+          <div class="rr-r"><span>August</span><i></i><b>7</b><b>9</b></div>
+          <div class="rr-r rr-sum"><span>Subtotal</span><i></i><b>231</b><b>312</b></div>
+          <div class="rr-r rr-meta"><span>Days you did not show up</span><i></i><b>69</b><b>0</b></div>
+        </div>
+
+        <div class="rr-total"><span>Total</span><b>231<em> / 300</em></b></div>
+
+        <div class="rr-items rr-items--tight">
+          <div class="rr-r rr-meta"><span>Promises made</span><i></i><b class="rr-wide">3</b></div>
+          <div class="rr-r rr-meta"><span>Finished, Run the half</span><i></i><b class="rr-wide">Jan 17</b></div>
+          <div class="rr-r rr-meta"><span>Set down, Morning pages</span><i></i><b class="rr-wide">day 40</b></div>
+          <div class="rr-r rr-meta"><span>Longest run</span><i></i><b class="rr-wide">23 days</b></div>
+          <div class="rr-r rr-meta"><span>Times you came back</span><i></i><b class="rr-wide">14</b></div>
+        </div>
+
+        <p class="rr-notes">Career notes: Run the half finished January 17 after 127 days. Morning pages set down at day 40, kept on the record. The open star is at day 186 with 62 people paying.</p>
+
+        <blockquote class="rr-quote">Because I am done building things nobody pays for.<span>The open star, in your words.</span></blockquote>
+
+        <div class="rr-foot">
+          <div>
+            <p class="rr-foot__n">Malik Peace</p>
+            <p class="rr-foot__s">1 of 1. Three promises, 300 days, still here.</p>
+          </div>
+          <div class="rr-tag" aria-hidden="true">
+            <div class="rr-code"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <p class="rr-digits">0300 /<br>0231</p>
+          </div>
+        </div>
+        <p class="rr-policy">Get the most out of your existence.</p>
+        <svg class="rr-wm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div>
+    </div>
+    <div class="out shot" data-out="Poster">
+      <div class="post">
+        <div class="post__top"><span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span><span class="dim">Day 300</span></div>
+        <div class="post__hero"><b>231</b><span>days you<br>showed up</span></div>
+        <p class="post__sub">Across every promise since October 12.</p>
+        <div class="post__row">
+          <div><b>312</b><span>actions</span></div>
+          <div><b>3</b><span>promises</span></div>
+          <div><b>23</b><span>day record</span></div>
+          <div><b>14</b><span>comebacks</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="out--d0">
+      <div class="rr">
+        <div class="rr-head">
+          <span class="brand"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>Memento</span>
+          <span class="rr-serial">No. 0001</span>
+        </div>
+        <p class="rr-name">Malik Peace.</p>
+        <p class="rr-since">On the path since today. Day 1.</p>
+        <div class="rr-items rr-items--tight">
+          <div class="rr-r rr-meta"><span>Days with a mark</span><i></i><b class="rr-wide">0</b></div>
+          <div class="rr-r rr-meta"><span>Actions completed</span><i></i><b class="rr-wide">0</b></div>
+          <div class="rr-r rr-meta"><span>Promises made</span><i></i><b class="rr-wide">1</b></div>
+        </div>
+        <div class="rr-star">
+          <span class="rr-star__dot"></span>
+          <div>
+            <p class="rr-star__l">The star, now</p>
+            <p class="rr-star__g">Get to 100 paying users.</p>
+          </div>
+        </div>
+        <p class="rr-policy">The ledger opens with the first mark. That can be tonight.</p>
+        <svg class="rr-wm" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- THEN AND NOW: the card itself, dead against lit -->
+  <section class="sec" id="sec-then">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="out is-on shot" data-out="Two cards">
+      <div class="tnc">
+        <div class="tnc-cards">
+          <div class="tnc-side">
+            <div class="cage-sm" id="tncA"></div>
+            <p class="tnc-when">Day 1</p>
+            <p class="tnc-f">Dark. Zero marks.</p>
+            <p class="tnc-f">A goal you did not believe.</p>
+          </div>
+          <div class="tnc-side">
+            <div class="cage-sm" id="tncB"></div>
+            <p class="tnc-when tnc-now">Day 300</p>
+            <p class="tnc-f">Lit. 231 marks.</p>
+            <p class="tnc-f">62 people paying.</p>
+          </div>
+        </div>
+        <p class="tnc-line">Same card. You lit it.</p>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="flowh">Memento mori</h2>
+  <section class="sec sec--flow" id="sec-weeks">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="out is-on shot" data-out="The weeks">
+      <div class="wks">
+        <p class="wks__mori"><b>20,967</b> days left, give or take. 300 of them went to the path.</p>
+        <div class="wks-tiles">
+          <div><b>57</b><span>years</span></div>
+          <div><b>689</b><span>months</span></div>
+          <div><b>2,996</b><span>weeks</span></div>
+          <div><b>20,967</b><span>days</span></div>
+        </div>
+        <p class="wks-ways">57 more summers. 2,996 more Saturdays. About 689 more first-of-the-months. The same time, counted four ways, and none of the counts is large.</p>
+        <canvas id="weeksGrid" aria-label="an 80 year life in weeks"></canvas>
+        <p class="wks__cap">The filled ones are spent. The green ones are the 43 you gave to the path. 2,996 are still yours.</p>
+      </div>
+    </div>
+    <div class="out--d0">
+      <div class="wks">
+        <p class="wks__mori"><b>21,267</b> days left, give or take. None of them have gone to the path yet.</p>
+        <div class="wks-tiles">
+          <div><b>58</b><span>years</span></div>
+          <div><b>699</b><span>months</span></div>
+          <div><b>3,038</b><span>weeks</span></div>
+          <div><b>21,267</b><span>days</span></div>
+        </div>
+        <p class="wks-ways">58 more summers. 3,038 more Saturdays. The counts only ever go down. What they bought is the only column you write.</p>
+        <canvas id="weeksGrid0" aria-label="an 80 year life in weeks, none on the path yet"></canvas>
+        <p class="wks__cap">The filled ones are spent either way. The first green cell is this week, if you make it one.</p>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="flowh flowh--viv">Memento vivere</h2>
+  <section class="sec sec--flow" id="sec-words">
+    <div class="sec__hd sec__hd--slim"><span class="sec__ctl"><button class="sw" type="button" data-sw>%s</button><button class="sh" type="button" data-sh aria-label="Share this section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M4 13v6h16v-6"/></svg></button></span></div>
+    <div class="out shot" data-out="The vow">
+      <div class="wrd">
+        <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
+        <p class="wrd__m">Written February 3. Kept 186 days.</p>
+      </div>
+    </div>
+    <div class="out is-on shot" data-out="The picture">
+      <div class="wrd">
+        <p class="wrd__lead">You said this is what it looks like when it works:</p>
+        <p class="wrd__q wrd__pic" id="picQuote">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</p>
+        <p class="wrd__m gr">186 days closer than the day you wrote it.</p>
+      </div>
+    </div>
+    <div class="out shot" data-out="The letter">
+      <div class="wrd wrd--ltr">
+        <p class="wrd__open">To the you of October 12,</p>
+        <p class="wrd__b">You downloaded an app because the notebook was not working. By February you finally wrote the real goal down. In April you went missing for nine days and came back, which mattered more than the goal did.</p>
+        <p class="wrd__b">Today, 62 people pay for the thing you almost did not build.</p>
+        <p class="wrd__sign">From the you of August 7,<br>231 marks later.</p>
+      </div>
+    </div>
+    <div class="out--d0">
+      <div class="wrd">
+        <p class="wrd__q">&ldquo;Because I am done building things nobody pays for.&rdquo;</p>
+        <p class="wrd__m">Written today. The only thing on the page you control completely.</p>
+      </div>
+    </div>
+
+    <div class="seal">
+      <div class="seal__hd">
+        <svg class="seal__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Sealed October 12, day one</span>
+      </div>
+      <p class="seal__b">I am writing this the night before day one. I can see the finished thing so clearly it hurts. If you are reading this because it got hard, good. It was always going to get hard.</p>
+      <p class="seal__b">You wanted this badly enough to write it down. Do not let the person reading this take it away from the person writing it.</p>
+      <p class="seal__sign">you, at the start</p>
+      <p class="seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
+    </div>
+
+    <div class="seal seal--d0">
+      <div class="seal__hd">
+        <svg class="seal__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span>Unsealed, until tonight</span>
+      </div>
+      <p class="seal__b">Tonight you write one note to the person you are doing this for. It seals when you finish it, and it never changes again.</p>
+      <p class="seal__b">Some day you will need proof that you once wanted this badly. This is where the proof will live.</p>
+      <p class="seal__law">Written once. It cannot be edited, only kept. Only you can open it.</p>
+    </div>
+  </section>
+
+  <div class="org">
+    <span class="org__k">Creation of Your Memento</span>
+    <span class="org__d">October 12, 2025</span>
+    <span class="org__t">6:42 AM</span>
+  </div>
+</div>
+<div class="toast" id="toast">Shared, in this look</div>
+
+<script>
+function realCard(vars, o){
+  o = o || {};
+  const B = o.blobs || blobPlan(o.name || 'memento');
+  const style = Object.entries(vars).map(([k,v])=>k+':'+v).join(';');
+  const blobs = B.map((s,i)=>`<i class="blob b${i+1}" style="${s}"></i>`).join('');
+  return `<div class="daycard-wrap daycard-theme-living daycard-reveal daycard--bright" style="${style}">
+    <span class="daycard-wrap__aura" aria-hidden="true"></span>
+    <div class="daycard-living-stage">
+      <span class="daycard-bloom" aria-hidden="true">${blobs}</span>
+      <div class="daycard-ns">
+        <span class="daycard-ns__liquid" aria-hidden="true">${blobs}</span>
+        <span class="daycard-ns__iri" aria-hidden="true"></span>
+        <span class="daycard-ns__sheen" aria-hidden="true"></span>
+        <span class="daycard-ns__burn" aria-hidden="true"></span>
+        <span class="daycard-ns__plat" aria-hidden="true"></span>
+        <span class="daycard-ns__tint" aria-hidden="true"></span>
+        <span class="daycard-ns__rim" aria-hidden="true"></span>
+        <div class="daycard-ns__body">
+          <svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"></path>
+          </svg>
+        </div>
+        <div class="daycard-ns__foot"><span class="daycard-ns__name">${o.name||''}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let x=seed>>>0;return function(){x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+function blobPlan(name){
+  const r=rng(hash((name||'memento')+'::blobs')), out=[];
+  for(let i=0;i<6;i++){
+    out.push(`transform:translate(${(r()*130-65).toFixed(1)}%,${(r()*130-65).toFixed(1)}%) scale(${(0.62+r()*0.95).toFixed(3)})`);
+  }
+  return out;
+}
+
+/* a handful of materials from the skin library, enough to show the picker */
+const MATS = [
+ /* The card as it ships. No material overrides at all: the app's own cyan and
+    green are the whole appearance, so the three earned layers ARE the colour. */
+ {n:'Default', stock:true, tint:'rgba(58,217,245,1)',
+  note:'The card as it ships. Its colour is whatever you have earned so far.'},
+ {n:'Toxic', tint:'rgba(190,255,60,1)', sk1:'rgba(190,255,60,1)', sk2:'rgba(120,255,140,.9)', sk3:'rgba(90,190,30,1)', sk4:'rgba(220,255,110,.85)',
+  plat:'.14', face:'linear-gradient(165deg,#0d1505,#060903)', mark:'rgba(246,255,226,.96)', ink:'rgba(228,255,190,.9)',
+  note:'Yours since the day you started. Assigned, not picked.'},
+ {n:'Void', tint:'rgba(0,0,0,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0', face:'#000000',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(150,155,164,.62)', cls:'flat void',
+  edge:'rgba(0,0,0,1)', halo:'rgba(0,0,0,1)', note:'Emits nothing. The only card with no edge.'},
+ {n:'Gold', tint:'rgba(255,214,110,1)', sk1:'rgba(255,214,110,1)', sk2:'rgba(255,240,190,.9)', sk3:'rgba(190,140,30,1)', sk4:'rgba(255,228,150,.85)',
+  plat:'.3', face:'linear-gradient(165deg,#1a1408,#0b0904)', mark:'rgba(255,248,228,.96)', ink:'rgba(255,238,200,.9)',
+  note:'The heaviest material in the set.'},
+ {n:'Ice', tint:'rgba(150,205,255,1)', sk1:'rgba(150,205,255,1)', sk2:'rgba(220,240,255,.9)', sk3:'rgba(90,150,220,1)', sk4:'rgba(190,225,255,.85)',
+  plat:'.34', face:'linear-gradient(165deg,#0a1119,#05080c)', mark:'rgba(240,248,255,.96)', ink:'rgba(220,238,255,.9)',
+  note:'Cold and clear. Reads almost white in daylight.'},
+ {n:'Crimson', tint:'rgba(255,60,80,1)', sk1:'rgba(255,60,80,1)', sk2:'rgba(255,140,150,.9)', sk3:'rgba(160,20,40,1)', sk4:'rgba(255,110,120,.85)',
+  plat:'.16', face:'linear-gradient(165deg,#160508,#080204)', mark:'rgba(255,236,238,.96)', ink:'rgba(255,214,218,.9)',
+  note:'The loudest material. Not subtle, on purpose.'},
+ {n:'Matte Black', tint:'rgba(226,231,240,1)', sk1:'none',sk2:'none',sk3:'none',sk4:'none', plat:'0',
+  face:'linear-gradient(168deg,#1c1d20 0%,#141518 55%,#101113 100%)',
+  mark:'rgba(244,246,250,.97)', ink:'rgba(226,231,240,.75)', cls:'flat',
+  edge:'rgba(255,255,255,.92)', halo:'rgba(238,244,255,.40)',
+  note:'A solid object. No light inside it at all.'},
+ {n:'Emerald', tint:'rgba(0,220,130,1)', sk1:'rgba(0,220,130,1)', sk2:'rgba(120,255,200,.9)', sk3:'rgba(0,150,90,1)', sk4:'rgba(40,255,160,.85)',
+  plat:'.12', face:'linear-gradient(165deg,#03150e,#010806)', mark:'rgba(232,255,246,.95)', ink:'rgba(214,255,238,.9)',
+  note:'Deep and wet. Holds the M brighter than most.'},
+ {n:'Magenta', tint:'rgba(255,70,200,1)', sk1:'rgba(255,70,200,1)', sk2:'rgba(255,160,230,.9)', sk3:'rgba(170,20,130,1)', sk4:'rgba(255,120,215,.85)',
+  plat:'.2', face:'linear-gradient(165deg,#160418,#08020a)', mark:'rgba(255,236,250,.96)', ink:'rgba(255,214,244,.9)',
+  note:'Bright, close to the surface.'},
+];
+/* The app's own earned-state levels. These are what the three layers actually
+   set, so the card here is lit by the record, not by a hardcoded look. */
+function matVars(m, earned){
+  const e = earned || {clar:true, act:true, cons:true};
+  const n = (e.clar?1:0) + (e.act?1:0) + (e.cons?1:0);
+  /* Stock passes NO material overrides, so the app's own defaults render. */
+  if (m.stock) return {'--ink':'rgba(24,28,36,.82)',
+    '--clar': e.clar?'1':'0', '--act': e.act?'1':'0',
+    '--cons': e.cons?'1':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+  return {'--sk1':m.sk1,'--sk2':m.sk2,'--sk3':m.sk3,'--sk4':m.sk4,
+    '--plat-op': e.act ? m.plat : '0',
+    '--face':m.face,'--mark':m.mark,'--ink':m.ink,
+    '--edge':m.edge||m.sk1||'rgba(255,255,255,.9)',
+    '--halo':m.halo||(m.sk1&&m.sk1!=='none'?m.sk1:'rgba(238,244,255,.34)'),
+    /* A material owns the hue outright. The app's own cyan/platinum/green
+       washes stay OFF here, or they bleed through and muddy the face (the
+       green haze at the foot of Crimson). What the earned layers still drive
+       is how much light there is, which is what the copy claims. */
+    '--clar':'0', '--act':'0', '--cons':'0', '--mix':'.9',
+    '--lit': n?String(0.34 + n*0.22):'0',
+    '--glow': n?'.7':'0', '--emit': n?'.7':'0', '--ring': n?'.5':'0'};
+}
+
+
+</script>
+<script>
+
+/* the real card, one of them, wearing whichever material is picked */
+document.body.classList.add('ns-bloom');
+var matsHost=document.getElementById('mats');
+MATS.forEach(function(m,i){
+  var b=document.createElement('button');
+  b.type='button'; b.title=m.n; b.setAttribute('aria-label',m.n);
+  b.style.setProperty('--sw', m.n==='Void' ? '#000' : m.tint);
+  if(m.n==='Void') b.className='mats__void';
+  b.addEventListener('click',function(){ pick(i); });
+  matsHost.appendChild(b);
+});
+function pick(i){
+  var m=MATS[i];
+  var cage=document.getElementById('cage');
+  cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
+  cage.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:'Malik Peace'});
+  var a=document.getElementById('tncA'), b=document.getElementById('tncB');
+  if(a){a.className='cage-sm cage is-stock';
+    a.innerHTML=realCard(matVars(MATS[0],{clar:false,act:false,cons:false}),{name:''});}
+  if(b){b.className='cage-sm cage '+(m.cls||'')+(m.stock?' is-stock':'');
+    b.innerHTML=realCard(matVars(m,{clar:true,act:true,cons:true}),{name:''});}
+  document.body.classList.toggle('is-void', m.n==='Void');
+  var tint = m.n==='Void' ? 'rgba(0,0,0,1)' : m.tint;
+  document.documentElement.style.setProperty('--mtint', tint);
+  document.documentElement.style.setProperty('--tint', tint);
+  var chips=matsHost.children;
+  for(var c=0;c<chips.length;c++) chips[c].classList.toggle('is-on', c===i);
+}
+pick(0);
+
+/* day one: the card unlit (the app's own ns-bloom gate), every section empty */
+var d0btn=document.getElementById('d0btn'), curMat=0;
+var _pick=pick;
+pick=function(i){curMat=i;_pick(i);if(document.body.classList.contains('d0'))unlite();};
+function unlite(){
+  var m=MATS[curMat], cage=document.getElementById('cage');
+  cage.className='cage '+(m.cls||'')+(m.stock?' is-stock':'');
+  cage.innerHTML=realCard(matVars(m,{clar:false,act:false,cons:false}),{name:'Malik Peace'});
+}
+d0btn.addEventListener('click',function(){
+  var on=document.body.classList.toggle('d0');
+  d0btn.textContent=on?'Back to day 300':'What day one looks like';
+  if(on){document.body.classList.remove('ns-bloom');unlite();}
+  else{document.body.classList.add('ns-bloom');_pick(curMat);}
+});
+(function(){
+  var cv=document.getElementById('weeksGrid0'); if(!cv)return;
+  var cols=52,total=4175,lived=1179,cell=5,gap=1;
+  var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+  cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+  var cx=cv.getContext('2d');cx.scale(2,2);
+  for(var i=0;i<total;i++){
+    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
+    cx.fillStyle=i<lived?'rgba(255,255,255,0.42)':'rgba(255,255,255,0.10)';
+    cx.fillRect(x,y,cell,cell);
+  }
+  var c2=lived%cols,r2=Math.floor(lived/cols);
+  cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+  cx.strokeRect(c2*(cell+gap)-0.5,r2*(cell+gap)-0.5,cell+1,cell+1);
+})();
+
+/* outfit switching: the pill shows the CURRENT look, tap cycles */
+document.querySelectorAll('.sec').forEach(function(sec){
+  var outs=[].slice.call(sec.querySelectorAll('.out'));
+  var sw=sec.querySelector('[data-sw]');
+  if(outs.length<2){ if(sw){sw.textContent=outs[0].dataset.out; sw.classList.add('solo');} return; }
+  var i=Math.max(0, outs.findIndex(function(o){return o.classList.contains('is-on');}));
+  sw.textContent=outs[i].dataset.out;
+  sw.addEventListener('click',function(){
+    outs[i].classList.remove('is-on');
+    i=(i+1)%outs.length;
+    outs[i].classList.add('is-on');
+    sw.textContent=outs[i].dataset.out;
+  });
+});
+
+/* share: mock toast, in whatever look the section wears */
+var toast=document.getElementById('toast'), tt=null;
+document.querySelectorAll('[data-sh]').forEach(function(b){
+  b.addEventListener('click',function(){
+    toast.classList.add('on');
+    clearTimeout(tt); tt=setTimeout(function(){toast.classList.remove('on');},1400);
+  });
+});
+
+/* lights: 231 deterministic points */
+(function(){
+  var f=document.getElementById('lightsField'); if(!f)return;
+  var NS='http://www.w3.org/2000/svg', seed=23;
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+  for(var i=0;i<231;i++){
+    var x=8+rnd()*324, y=8+rnd()*194, r=0.8+rnd()*1.6, o=0.35+rnd()*0.65;
+    var c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x.toFixed(1));c.setAttribute('cy',y.toFixed(1));
+    c.setAttribute('r',r.toFixed(2));c.setAttribute('fill','rgba(238,242,251,'+o.toFixed(2)+')');
+    f.appendChild(c);
+    if(rnd()>0.87){var g=document.createElementNS(NS,'circle');
+      g.setAttribute('cx',x.toFixed(1));g.setAttribute('cy',y.toFixed(1));
+      g.setAttribute('r',(r*3.2).toFixed(2));g.setAttribute('fill','rgba(238,242,251,0.06)');
+      f.appendChild(g);}
+  }
+})();
+
+/* wall: 300 days, 231 lit, fixed geometry so it draws even off screen */
+(function(){
+  var cv=document.getElementById('wallGrid'); if(!cv)return;
+  var total=300,cols=25,cell=10,gap=3, seed=7;
+  function rnd(){seed=(seed*1103515245+12345)%2147483648;return seed/2147483648;}
+  var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+  cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+  var cx=cv.getContext('2d');cx.scale(2,2);
+  for(var i=0;i<total;i++){
+    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
+    var lit=rnd()<0.77;
+    cx.fillStyle=lit?'rgba(63,217,78,'+(0.45+rnd()*0.5).toFixed(2)+')':'rgba(255,255,255,0.09)';
+    cx.beginPath();
+    if(cx.roundRect)cx.roundRect(x,y,cell,cell,2.5);else cx.rect(x,y,cell,cell);
+    cx.fill();
+    if(i===total-1){cx.strokeStyle='rgba(255,255,255,0.9)';cx.lineWidth=1.2;
+      cx.beginPath();
+      if(cx.roundRect)cx.roundRect(x-1,y-1,cell+2,cell+2,3.5);else cx.rect(x-1,y-1,cell+2,cell+2);
+      cx.stroke();}
+  }
+})();
+
+/* the weeks: 4,175 cells, green band = the 43 on the path */
+(function(){
+  var cv=document.getElementById('weeksGrid'); if(!cv)return;
+  var cols=52,total=4175,lived=1179,onpath=43,cell=5,gap=1;
+  var rows=Math.ceil(total/cols), w=cols*(cell+gap)-gap, h=rows*(cell+gap)-gap;
+  cv.width=w*2;cv.height=h*2;cv.style.aspectRatio=w+' / '+h;
+  var cx=cv.getContext('2d');cx.scale(2,2);
+  for(var i=0;i<total;i++){
+    var col=i%cols,row=Math.floor(i/cols),x=col*(cell+gap),y=row*(cell+gap);
+    if(i>=lived-onpath&&i<lived)cx.fillStyle='rgba(63,217,78,1)';
+    else if(i<lived)cx.fillStyle='rgba(255,255,255,0.42)';
+    else cx.fillStyle='rgba(255,255,255,0.10)';
+    cx.fillRect(x,y,cell,cell);
+  }
+  var c2=lived%cols,r2=Math.floor(lived/cols);
+  cx.strokeStyle='rgba(255,255,255,0.95)';cx.lineWidth=1;
+  cx.strokeRect(c2*(cell+gap)-0.5,r2*(cell+gap)-0.5,cell+1,cell+1);
+})();
+
+/* the picture: light the words, then settle */
+(function(){
+  var q=document.getElementById('picQuote'); if(!q)return;
+  var words=q.textContent.split(/\s+/);
+  q.innerHTML=words.map(function(w){return '<span class="w">'+w+'</span>';}).join(' ');
+  var spans=q.querySelectorAll('.w');
+  for(var i=0;i<spans.length;i++){
+    (function(s,i){setTimeout(function(){if(s.isConnected)s.classList.add('lit');},400+i*100);})(spans[i],i);
+  }
+  setTimeout(function(){for(var i=0;i<spans.length;i++)spans[i].classList.add('lit');},4200);
+})();
+
+</script>
+</body></html>

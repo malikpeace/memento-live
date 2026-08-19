@@ -1,0 +1,47 @@
+<style>
+/* op-4 ENRICHED (Malik: goal + why alone felt meh, needs more). The why
+   quote stays the heart; underneath it the day now lands with receipts an
+   open goal really has: days carried and entries written. */
+[data-c="op-4"] .op4-goal{position:relative;max-width:288px;font-size:25px;font-weight:600;
+  line-height:1.34;letter-spacing:-.022em;color:var(--text-hi)}
+[data-c="op-4"] .op4-time{font-size:13.5px;color:var(--text-mid);margin-bottom:16px}
+[data-c="op-4"] .op4-time b{color:var(--text-hi);font-weight:650}
+[data-c="op-4"] .op4-why{width:100%;max-width:300px;text-align:left;margin:0;font-size:16.5px;
+  font-weight:500;line-height:1.56;letter-spacing:-.008em;color:var(--text-hi)}
+[data-c="op-4"] .op4-why{opacity:0;transform:translateY(8px)}
+[data-c="op-4"] .b.on .op4-why{animation:op4rise .6s cubic-bezier(.2,.8,.3,1) .2s forwards}
+@keyframes op4rise{to{opacity:1;transform:none}}
+/* the receipts row: two real numbers side by side */
+[data-c="op-4"] .op4-rc{display:flex;gap:34px;justify-content:center;margin-bottom:20px}
+[data-c="op-4"] .op4-rc > div{text-align:center}
+[data-c="op-4"] .op4-rc b{display:block;font-size:34px;font-weight:750;letter-spacing:-.03em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums}
+[data-c="op-4"] .op4-rc span{font-size:12.5px;color:var(--text-lo)}
+@media (prefers-reduced-motion:reduce){
+  [data-c="op-4"] .op4-why{opacity:1;transform:none;animation:none}
+}
+</style>
+<div class="ph" data-c="op-4">
+  <div class="st">
+
+    <div class="b b1">
+      <div class="op4-goal">&ldquo;Be someone my friends can actually reach.&rdquo;</div>
+    </div>
+
+    <div class="b b2">
+      <div class="op4-time">Why you wrote it, <b>30 days ago</b></div>
+      <p class="op4-why">&ldquo;I haven't called anyone first in about two years. I keep waiting for people to give up on me and then acting surprised when they do.&rdquo;</p>
+    </div>
+
+    <div class="b b3">
+      <div class="op4-rc">
+        <div><b data-count="0|30">30</b><span>days carried</span></div>
+        <div><b data-count="0|22">22</b><span>entries written</span></div>
+      </div>
+      <div class="deposit"><b>Day 30.</b> Still yours, in your own words.</div>
+    </div>
+
+  </div>
+  <div class="keepbtn">Keep</div>
+  <div class="hint">Tap to replay</div>
+</div>

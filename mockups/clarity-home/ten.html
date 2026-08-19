@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clarity page 2, ten layouts</title>
+<style>
+  :root{--ink:#060708;--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.60);--lo:rgba(255,255,255,.38);--hair:rgba(255,255,255,.09)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink);color:var(--hi);font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1560px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:.95rem;margin:0 0 4px;max-width:80ch}
+  header .sub{color:var(--lo);font-size:.85rem;max-width:80ch}
+  .grid{display:flex;flex-wrap:wrap;gap:34px;margin-top:34px}
+  .cell{flex:0 0 auto;width:330px}
+  .cell .cap{font-size:.95rem;font-weight:700;margin:0 0 3px}
+  .cell .capsub{color:var(--lo);font-size:.79rem;margin:0 0 14px;min-height:56px}
+  .phone{width:330px;border-radius:50px;padding:10px;background:linear-gradient(180deg,#15171c,#0a0b0e);box-shadow:0 34px 90px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  .screen{position:relative;border-radius:41px;overflow:hidden;height:690px;background:#05060a}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:106px;height:28px;border-radius:16px;background:#000;z-index:99}
+  .scrollv{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+  .scrollv::-webkit-scrollbar{display:none}
+  /* fragments */
+  /* ===== mkA Sync Box Stack ===== */
+.mkA{--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.72);--lo:rgba(255,255,255,.46);--glass:rgba(255,255,255,.05);--glass-2:rgba(255,255,255,.035);--hl:inset 0 1px 0 rgba(255,255,255,.06);--sh:0 1px 2px rgba(0,0,0,.34),0 10px 26px rgba(0,0,0,.24);--cy:#3ad9f5;padding:26px 16px 40px;background:#05060a;color:var(--hi);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.mkA *{box-sizing:border-box}
+.mkA .hdr{display:flex;align-items:center;gap:8px;margin:0 2px 16px}
+.mkA .hdr__grab{width:34px;height:4px;border-radius:999px;background:rgba(255,255,255,.14)}
+.mkA .hdr__t{margin:0;font-size:12.5px;font-weight:600;color:var(--lo)}
+.mkA .panel{position:relative;overflow:hidden;margin:0 0 10px;padding:18px 17px 17px;border-radius:15px;background:var(--glass);box-shadow:var(--sh),var(--hl);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkA .panel::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 44%)}
+.mkA .panel>*{position:relative}
+.mkA .lbl{margin:0 0 9px;font-size:12px;font-weight:600;line-height:1.3;color:var(--lo)}
+.mkA .goal{margin:0;font-size:23px;font-weight:700;line-height:1.24;letter-spacing:-.028em;color:var(--hi)}
+.mkA .goal b{font-weight:700}
+.mkA .stand{padding-bottom:15px}
+.mkA .stand__row{display:flex;align-items:flex-end;gap:10px}
+.mkA .stand__n{font-size:42px;font-weight:700;line-height:.94;letter-spacing:-.042em;color:var(--cy)}
+.mkA .stand__of{padding-bottom:4px;font-size:14.5px;font-weight:600;line-height:1;color:var(--mid)}
+.mkA .stand__bar{position:relative;height:6px;margin:16px 0 0;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:var(--hl);overflow:hidden}
+.mkA .stand__fill{position:absolute;left:0;top:0;bottom:0;width:12.4%;border-radius:999px;background:linear-gradient(90deg,rgba(58,217,245,.55),var(--cy))}
+.mkA .stand__mark{position:absolute;top:-3px;bottom:-3px;left:8.1%;width:1.5px;border-radius:999px;background:rgba(255,255,255,.34)}
+.mkA .stand__scale{display:flex;justify-content:space-between;margin:9px 0 0;font-size:11.5px;font-weight:500;color:var(--lo)}
+.mkA .stand__foot{display:flex;align-items:center;gap:10px;margin:15px 0 0;padding:11px 12px;border-radius:11px;background:var(--glass-2);box-shadow:var(--hl)}
+.mkA .stand__meta{margin:0;font-size:12px;line-height:1.42;color:var(--mid)}
+.mkA .stand__meta span{display:block;color:var(--lo)}
+.mkA .upd{display:flex;align-items:center;gap:6px;margin-left:auto;flex:none;padding:9px 13px;border:0;border-radius:10px;background:rgba(255,255,255,.075);box-shadow:var(--hl);color:var(--hi);font:inherit;font-size:13px;font-weight:650;line-height:1}
+.mkA .upd svg{width:13px;height:13px;flex:none;fill:none;stroke:var(--cy);stroke-width:1.7;stroke-linecap:round}
+.mkA .why{margin:0;font-size:16px;font-weight:520;line-height:1.5;letter-spacing:-.012em;color:rgba(255,255,255,.94)}
+.mkA .anti{margin:0;font-size:15px;font-weight:500;line-height:1.5;letter-spacing:-.008em;color:rgba(255,255,255,.5)}
+.mkA .panel--anti{background:rgba(255,255,255,.028)}
+.mkA .vow{margin:0;font-size:15.5px;font-weight:520;line-height:1.52;letter-spacing:-.01em;color:rgba(255,255,255,.94)}
+.mkA .vow__sign{display:flex;align-items:baseline;gap:8px;margin:13px 0 0;padding:12px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.mkA .vow__name{font-size:13px;font-weight:650;color:rgba(255,255,255,.9)}
+.mkA .vow__date{margin-left:auto;font-size:11.5px;font-weight:500;color:var(--lo)}
+.mkA .plan__row{display:flex;align-items:baseline;gap:8px}
+.mkA .plan__n{font-size:24px;font-weight:700;line-height:1;letter-spacing:-.03em;color:var(--hi)}
+.mkA .plan__of{font-size:13px;font-weight:550;color:var(--mid)}
+.mkA .plan__ticks{display:flex;gap:4px;margin:14px 0 0}
+.mkA .plan__ticks i{flex:1;height:5px;border-radius:2px;background:rgba(255,255,255,.08)}
+.mkA .plan__ticks i.on{background:rgba(255,255,255,.62)}
+.mkA .plan__ticks i.now{background:var(--cy)}
+.mkA .plan__here{margin:14px 0 0;padding:12px 13px;border-radius:11px;background:var(--glass-2);box-shadow:var(--hl)}
+.mkA .plan__here em{display:block;font-style:normal;font-size:11.5px;font-weight:600;color:var(--lo)}
+.mkA .plan__here b{display:block;margin:4px 0 0;font-size:15px;font-weight:620;line-height:1.35;letter-spacing:-.012em;color:rgba(255,255,255,.95)}
+/* ===== mkB The Summit Climb ===== */
+.mkB{padding:26px 18px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;color:rgba(255,255,255,.96);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.mkB *{box-sizing:border-box}
+.mkB .lbl{margin:0;font-size:12.5px;font-weight:560;color:rgba(255,255,255,.5)}
+
+.mkB .hd{margin:0 0 22px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.mkB .hd__t{margin:0;font-size:15px;font-weight:640;letter-spacing:-.015em;color:rgba(255,255,255,.94)}
+.mkB .hd__d{margin:0;font-size:12px;color:rgba(255,255,255,.5)}
+
+.mkB .climb{position:relative;margin:0 0 26px}
+.mkB .rw{position:relative;display:flex;gap:13px;align-items:center;min-height:56px}
+.mkB .rw__rail{position:relative;width:22px;flex:none;align-self:stretch}
+.mkB .rw__rail::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;border-radius:2px;background:rgba(255,255,255,.075)}
+.mkB .rw--done .rw__rail::before{background:rgba(255,255,255,.2)}
+.mkB .rw--top .rw__rail::before{top:50%}
+.mkB .rw--base .rw__rail::before{bottom:50%}
+.mkB .rw__body{flex:1;min-width:0}
+
+.mkB .tick{position:absolute;left:5px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#080a0f;box-shadow:inset 0 0 0 2px rgba(255,255,255,.17)}
+.mkB .rw--done .tick{box-shadow:inset 0 0 0 2px rgba(255,255,255,.3)}
+
+.mkB .post{display:flex;align-items:baseline;gap:9px}
+.mkB .post__n{font-size:15px;font-weight:620;letter-spacing:-.01em;color:rgba(255,255,255,.42)}
+.mkB .rw--done .post__n{color:rgba(255,255,255,.9)}
+.mkB .post__s{font-size:11.5px;color:rgba(255,255,255,.34)}
+.mkB .rw--done .post__s{color:rgba(255,255,255,.5)}
+
+.mkB .summit{min-height:96px;align-items:flex-start}
+.mkB .summit .rw__rail::before{top:52px}
+.mkB .star{position:absolute;left:-13px;top:14px;width:48px;height:48px;pointer-events:none;background:radial-gradient(closest-side,rgba(58,217,245,.55),rgba(58,217,245,.16) 42%,rgba(58,217,245,0) 72%)}
+.mkB .star__core{position:absolute;left:8px;top:22px;width:7px;height:7px;border-radius:50%;background:#bff0fb;box-shadow:0 0 10px rgba(58,217,245,.9)}
+.mkB .summit__lead{margin:0;font-size:13.5px;line-height:1.45;color:rgba(255,255,255,.62)}
+.mkB .summit__n{display:block;margin:3px 0 0;font-size:31px;font-weight:700;letter-spacing:-.035em;line-height:1.05;color:#3ad9f5}
+.mkB .summit__u{display:block;margin:4px 0 0;font-size:14px;font-weight:600;color:rgba(255,255,255,.92)}
+.mkB .summit__tf{margin:9px 0 0;font-size:12px;color:rgba(255,255,255,.5)}
+
+.mkB .here{position:relative;padding:16px 16px 14px;border-radius:14px;background:rgba(255,255,255,.062);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 26px rgba(0,0,0,.3);overflow:hidden}
+.mkB .here__glow{position:absolute;left:-30px;top:-40px;width:150px;height:140px;pointer-events:none;background:radial-gradient(closest-side,rgba(58,217,245,.18),rgba(58,217,245,0) 74%)}
+.mkB .here__lbl{position:relative;margin:0;font-size:12px;font-weight:600;color:#3ad9f5}
+.mkB .here__row{position:relative;display:flex;align-items:baseline;gap:8px;margin:6px 0 0;flex-wrap:wrap}
+.mkB .here__n{font-size:38px;font-weight:730;letter-spacing:-.04em;line-height:1;color:rgba(255,255,255,.98)}
+.mkB .here__of{font-size:13px;color:rgba(255,255,255,.6)}
+.mkB .here__foot{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 0}
+.mkB .here__upd{margin:0;font-size:12px;color:rgba(255,255,255,.55)}
+.mkB .chip{padding:8px 14px;border-radius:999px;background:rgba(58,217,245,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.09);color:#3ad9f5;font-size:12.5px;font-weight:650;white-space:nowrap}
+.mkB .here__tick{position:absolute;left:5px;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;background:#3ad9f5;box-shadow:0 0 14px rgba(58,217,245,.75)}
+
+.mkB .base .post__n{color:rgba(255,255,255,.72)}
+.mkB .base__meta{margin:3px 0 0;font-size:11.5px;color:rgba(255,255,255,.45)}
+
+.mkB .panel{margin:0 0 12px;padding:16px 16px 15px;border-radius:14px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.22)}
+.mkB .panel__l{margin:0 0 8px;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55)}
+.mkB .panel__q{margin:0;font-size:15.5px;line-height:1.5;font-weight:560;letter-spacing:-.012em;color:rgba(255,255,255,.94)}
+.mkB .panel--anti .panel__q{color:rgba(255,255,255,.5);font-weight:520;font-size:14.5px}
+.mkB .panel__sig{margin:11px 0 0;font-size:11.5px;color:rgba(255,255,255,.45)}
+
+.mkB .plan__top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.mkB .plan__c{font-size:13px;font-weight:620;color:rgba(255,255,255,.9)}
+.mkB .segs{display:flex;gap:3px;margin:11px 0 12px}
+.mkB .segs i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.09)}
+.mkB .segs i.on{background:rgba(255,255,255,.62)}
+.mkB .plan__now{margin:0;font-size:14.5px;line-height:1.45;font-weight:600;letter-spacing:-.012em;color:rgba(255,255,255,.94)}
+.mkB .plan__nowl{margin:0 0 4px;font-size:12px;color:rgba(255,255,255,.5)}
+/* ===== mkC The lit road ===== */
+.mkC{padding:26px 16px 40px;color:rgba(255,255,255,.96);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.mkC *{box-sizing:border-box}
+.mkC .rd-lbl{margin:0 0 8px;font-size:12.5px;line-height:1.3;font-weight:560;color:rgba(255,255,255,.52)}
+.mkC .rd-what{margin:0;font-size:23px;line-height:1.26;font-weight:700;letter-spacing:-.026em;color:rgba(255,255,255,.96)}
+.mkC .rd-panel{position:relative;overflow:hidden;border-radius:16px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 22px rgba(0,0,0,.28);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkC .rd-panel::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.045),transparent 46%)}
+.mkC .rd-panel>*{position:relative}
+.mkC .rd-road{margin:20px 0 0;padding:20px 16px 16px}
+.mkC .rd-rail{position:relative;height:112px}
+.mkC .rd-cur{position:absolute;left:calc(12.4% - 12px);right:0;bottom:42px}
+.mkC .rd-cur b{display:block;font-size:38px;line-height:.9;font-weight:700;letter-spacing:-.04em;color:#3ad9f5;text-shadow:0 0 26px rgba(58,217,245,.3)}
+.mkC .rd-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:9px 0 0}
+.mkC .rd-unit{font-size:12px;line-height:1.2;font-weight:560;color:rgba(255,255,255,.62)}
+.mkC .rd-upd{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border:0;border-radius:9px;background:rgba(58,217,245,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);color:#3ad9f5;font:inherit;font-size:11.5px;font-weight:640;letter-spacing:-.004em}
+.mkC .rd-upd svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.mkC .rd-stem{position:absolute;bottom:8px;width:2px;height:30px;border-radius:2px;background:linear-gradient(180deg,rgba(58,217,245,.12),rgba(58,217,245,.8))}
+.mkC .rd-track{position:absolute;left:0;right:0;bottom:0;height:8px;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.mkC .rd-done{position:absolute;left:0;top:0;bottom:0;width:12.4%;border-radius:999px;background:linear-gradient(90deg,rgba(58,217,245,.4),#3ad9f5);box-shadow:0 0 16px rgba(58,217,245,.4)}
+.mkC .rd-post{position:absolute;top:0;bottom:0;width:2px;background:rgba(255,255,255,.2)}
+.mkC .rd-post.is-start{top:-5px;background:rgba(255,255,255,.3)}
+.mkC .rd-post.is-end{top:-11px;background:rgba(255,255,255,.4);border-radius:2px}
+.mkC .rd-dot{position:absolute;top:-3px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#3ad9f5;box-shadow:0 0 0 4px #0a0c11,0 0 18px rgba(58,217,245,.55)}
+.mkC .rd-marks{display:flex;justify-content:space-between;margin:10px 0 0;font-size:10.5px;font-weight:560;color:rgba(255,255,255,.34)}
+.mkC .rd-marks span:last-child{color:rgba(255,255,255,.6)}
+.mkC .rd-foot{margin:15px 0 0;padding:13px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.6)}
+.mkC .rd-foot b{color:rgba(255,255,255,.92);font-weight:640}
+.mkC .rd-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:12px 0 0}
+.mkC .rd-cell{padding:17px 16px 16px}
+.mkC .rd-cell h3{margin:0 0 9px;font-size:12.5px;line-height:1.3;font-weight:560;color:rgba(255,255,255,.52)}
+.mkC .rd-why{margin:0;font-size:16px;line-height:1.48;font-weight:520;letter-spacing:-.01em;color:rgba(255,255,255,.94)}
+.mkC .rd-anti{background:rgba(255,255,255,.028)}
+.mkC .rd-anti p{margin:0;font-size:14px;line-height:1.45;color:rgba(255,255,255,.5)}
+.mkC .rd-promise p{margin:0;font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.92)}
+.mkC .rd-sign{margin:12px 0 0;padding:11px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);font-size:11.5px;line-height:1.45;color:rgba(255,255,255,.5)}
+.mkC .rd-steps{display:flex;gap:3px;margin:0 0 13px}
+.mkC .rd-steps i{flex:1;height:6px;border-radius:2px;background:rgba(255,255,255,.1)}
+.mkC .rd-steps i.on{background:rgba(255,255,255,.45)}
+.mkC .rd-steps i.now{background:rgba(255,255,255,.95)}
+.mkC .rd-now{margin:0;font-size:15px;line-height:1.4;font-weight:620;letter-spacing:-.012em;color:rgba(255,255,255,.94)}
+.mkC .rd-cnt{margin:8px 0 0;font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.6)}
+.mkC .rd-cnt b{color:rgba(255,255,255,.92);font-weight:640}
+/* ===== mkD The Fork ===== */
+.mkD{padding:26px 16px 34px;color:rgba(255,255,255,.96);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+.mkD *{box-sizing:border-box}.mkD .mkD-lbl{margin:0;font-size:12.5px;line-height:1.4;font-weight:560;color:rgba(255,255,255,.5)}.mkD .mkD-goal{margin:8px 0 0;font-size:23px;line-height:1.24;font-weight:680;letter-spacing:-.025em;color:rgba(255,255,255,.97)}.mkD .mkD-goal b{font-weight:680;color:#3ad9f5}.mkD .mkD-fork{position:relative;overflow:hidden;margin:22px 0 0;padding:18px 17px 17px;border-radius:16px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(0,0,0,.32);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}.mkD .mkD-fork::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 44%)}.mkD .mkD-fork > *{position:relative;z-index:1}.mkD .mkD-fork--live::after{content:'';position:absolute;left:-30px;top:-70px;width:220px;height:180px;pointer-events:none;background:radial-gradient(closest-side,rgba(58,217,245,.20),rgba(58,217,245,0) 76%)}.mkD .mkD-fork--dim{margin-top:14px;background:rgba(255,255,255,.028);box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}.mkD .mkD-fork__lbl{margin:0;font-size:12.5px;line-height:1.4;font-weight:600;color:#3ad9f5}.mkD .mkD-fork--dim .mkD-fork__lbl{color:rgba(255,255,255,.4)}.mkD .mkD-fork__line{margin:9px 0 0;font-size:17.5px;line-height:1.36;font-weight:600;letter-spacing:-.016em;color:rgba(255,255,255,.95)}.mkD .mkD-fork--dim .mkD-fork__line{color:rgba(255,255,255,.5);font-weight:550}.mkD .mkD-fork__sub{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.42)}.mkD .mkD-steps{display:flex;gap:4px;margin:16px 0 0}.mkD .mkD-steps i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.1)}.mkD .mkD-steps i.on{background:#3ad9f5}.mkD .mkD-steps i.here{background:rgba(58,217,245,.45)}.mkD .mkD-stepline{margin:11px 0 0;font-size:13px;line-height:1.5;color:rgba(255,255,255,.9)}.mkD .mkD-stepline span{color:rgba(255,255,255,.55)}.mkD .mkD-both{margin:18px 2px 10px;font-size:13.5px;line-height:1.45;font-weight:560;color:rgba(255,255,255,.9);text-align:center}.mkD .mkD-stand{position:relative;overflow:hidden;padding:15px 16px 16px;border-radius:14px;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}.mkD .mkD-stand__row{display:flex;align-items:baseline;gap:7px}.mkD .mkD-stand__n{font-size:30px;line-height:1;font-weight:700;letter-spacing:-.035em;color:#3ad9f5}.mkD .mkD-stand__of{font-size:13.5px;line-height:1;font-weight:560;color:rgba(255,255,255,.9)}.mkD .mkD-stand__tap{margin-left:auto;appearance:none;-webkit-appearance:none;border:0;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:rgba(255,255,255,.92);font:inherit;font-size:12px;font-weight:620;cursor:pointer}.mkD .mkD-stand__tap:active{opacity:.9}.mkD .mkD-rail{position:relative;height:6px;margin:14px 0 0;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}.mkD .mkD-rail i{display:block;height:100%;width:12.4%;border-radius:999px;background:#3ad9f5}.mkD .mkD-rail u{position:absolute;top:0;left:8.1%;width:2px;height:100%;background:rgba(255,255,255,.42)}.mkD .mkD-stand__meta{display:flex;gap:10px;margin:12px 0 0;font-size:11.5px;line-height:1.35;color:rgba(255,255,255,.55)}.mkD .mkD-stand__meta span{flex:1}.mkD .mkD-stand__meta b{display:block;margin:0 0 2px;font-size:12.5px;font-weight:620;color:rgba(255,255,255,.9)}.mkD .mkD-why{margin:26px 0 0;padding:0 2px}.mkD .mkD-why__q{margin:9px 0 0;font-size:16.5px;line-height:1.45;font-weight:560;letter-spacing:-.012em;color:rgba(255,255,255,.95)}.mkD .mkD-promise{margin:18px 0 0;padding:16px 16px 15px;border-radius:14px;background:rgba(255,255,255,.042);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}.mkD .mkD-promise__t{margin:0;font-size:12.5px;line-height:1.4;font-weight:560;color:rgba(255,255,255,.5)}.mkD .mkD-promise__b{margin:9px 0 0;font-size:14.5px;line-height:1.52;font-weight:520;color:rgba(255,255,255,.92)}.mkD .mkD-promise__s{margin:12px 0 0;font-size:12px;line-height:1.45;color:rgba(255,255,255,.5)}
+/* ===== mkE Standing Bento ===== */
+.mkE{padding:26px 16px 40px;color:rgba(255,255,255,.96);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;box-sizing:border-box}
+.mkE *{box-sizing:border-box}.mkE .mkE-grip{width:34px;height:4px;margin:0 auto 20px;border-radius:999px;background:rgba(255,255,255,.16)}.mkE .mkE-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.mkE .mkE-t{position:relative;overflow:hidden;padding:15px 15px 14px;border-radius:14px;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 8px 20px rgba(0,0,0,.24);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}.mkE .mkE-t--wide{grid-column:span 2}.mkE .mkE-lbl{margin:0 0 8px;font-size:11.5px;line-height:1.3;font-weight:600;color:rgba(255,255,255,.5)}.mkE .mkE-goal{margin:0;font-size:20px;line-height:1.28;font-weight:640;letter-spacing:-.02em;color:rgba(255,255,255,.96)}.mkE .mkE-goal b{font-weight:640;color:#3ad9f5}.mkE .mkE-stand{padding:17px 15px 15px}.mkE .mkE-standRow{display:flex;align-items:center;gap:14px}.mkE .mkE-num{flex:1 1 auto;min-width:0}.mkE .mkE-n{display:block;font-size:40px;line-height:1;font-weight:700;letter-spacing:-.04em;color:#3ad9f5}.mkE .mkE-of{display:block;margin:7px 0 0;font-size:13px;line-height:1.3;font-weight:500;color:rgba(255,255,255,.9)}.mkE .mkE-ring{flex:0 0 auto;position:relative;width:78px;height:78px}.mkE .mkE-ring svg{display:block;transform:rotate(-90deg)}.mkE .mkE-ringN{position:absolute;inset:0;display:grid;place-items:center;font-size:13.5px;font-weight:650;letter-spacing:-.02em;color:rgba(255,255,255,.92)}.mkE .mkE-tap{display:flex;align-items:center;gap:8px;width:100%;margin:15px 0 0;padding:11px 13px;border:0;border-radius:11px;background:rgba(255,255,255,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.92);font:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer;transition:transform 160ms ease-out,opacity 160ms ease-out}.mkE .mkE-tap:active{transform:scale(.985);opacity:.94}.mkE .mkE-tap svg{flex:0 0 auto;color:rgba(255,255,255,.7)}.mkE .mkE-tap span:last-child{margin-left:auto;font-size:12px;font-weight:500;color:rgba(255,255,255,.55)}.mkE .mkE-small .mkE-sn{display:block;font-size:22px;line-height:1;font-weight:680;letter-spacing:-.03em;color:rgba(255,255,255,.94)}.mkE .mkE-small .mkE-sk{display:block;margin:8px 0 0;font-size:12px;line-height:1.35;font-weight:500;color:rgba(255,255,255,.62)}.mkE .mkE-body{margin:0;font-size:14.5px;line-height:1.5;font-weight:450;color:rgba(255,255,255,.92)}.mkE .mkE-anti{background:rgba(255,255,255,.035)}.mkE .mkE-anti .mkE-body{color:rgba(255,255,255,.5)}.mkE .mkE-planRow{display:flex;align-items:baseline;gap:8px}.mkE .mkE-planN{font-size:22px;line-height:1;font-weight:680;letter-spacing:-.03em;color:rgba(255,255,255,.94)}.mkE .mkE-planK{font-size:12.5px;font-weight:500;color:rgba(255,255,255,.62)}.mkE .mkE-pips{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;margin:12px 0 0}.mkE .mkE-pips i{height:6px;border-radius:3px;background:rgba(255,255,255,.12)}.mkE .mkE-pips i.on{background:rgba(255,255,255,.55)}.mkE .mkE-pips i.now{background:#3ad9f5}.mkE .mkE-step{margin:12px 0 0;font-size:14px;line-height:1.4;font-weight:550;color:rgba(255,255,255,.92)}.mkE .mkE-q{margin:0;font-size:14.5px;line-height:1.52;font-weight:450;color:rgba(255,255,255,.92)}.mkE .mkE-sig{margin:12px 0 0;font-size:12px;line-height:1.5;font-weight:500;color:rgba(255,255,255,.6)}.mkE .mkE-foot{margin:14px 2px 0;font-size:11.5px;line-height:1.4;font-weight:500;color:rgba(255,255,255,.45)}
+@media (prefers-reduced-motion:reduce){.mkE-tap{transition:none}}
+/* ===== mkF The letter ===== */
+.mkF{padding:34px 20px 44px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:rgba(255,255,255,.95)}
+.mkF *{box-sizing:border-box}
+.mkF .lt-date{margin:0;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums}
+.mkF .lt-rule{margin:14px 0 0;height:1px;background:rgba(255,255,255,.08)}
+.mkF .lt-lbl{margin:0 0 8px;font-size:12.5px;font-weight:550;color:rgba(255,255,255,.5)}
+.mkF .lt-goal{margin:26px 0 0}
+.mkF .lt-goal p{margin:0;font-size:20px;font-weight:640;line-height:1.32;letter-spacing:-.02em;color:rgba(255,255,255,.96)}
+.mkF .lt-goal b{font-weight:640;font-variant-numeric:tabular-nums}
+.mkF .lt-why{margin:22px 0 0;padding-left:14px;box-shadow:inset 2px 0 0 rgba(255,255,255,.14)}
+.mkF .lt-why p{margin:0;font-size:14.5px;line-height:1.62;color:rgba(255,255,255,.9)}
+.mkF .lt-promise{margin:34px 0 0;padding:24px 20px 20px;border-radius:16px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.28);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkF .lt-promise .lt-lbl{margin-bottom:12px}
+.mkF .lt-promise p{margin:0;font-size:19px;font-weight:560;line-height:1.5;letter-spacing:-.016em;color:rgba(255,255,255,.97)}
+.mkF .lt-promise p + p{margin-top:12px;font-size:16.5px;font-weight:500;line-height:1.52;color:rgba(255,255,255,.9)}
+.mkF .lt-sign{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:20px 0 0;padding-top:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.mkF .lt-sign .lt-name{font-size:15px;font-weight:620;color:rgba(255,255,255,.94)}
+.mkF .lt-sign .lt-held{font-size:12px;font-weight:500;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums;text-align:right;line-height:1.4}
+.mkF .lt-anti{margin:30px 0 0}
+.mkF .lt-anti p{margin:0;font-size:14px;line-height:1.6;color:rgba(255,255,255,.5)}
+.mkF .lt-stand{margin:32px 0 0;padding:20px 18px 18px;border-radius:16px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.26);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkF .lt-numrow{display:flex;align-items:flex-end;gap:10px}
+.mkF .lt-num{font-size:38px;font-weight:700;line-height:.96;letter-spacing:-.035em;color:#3ad9f5;font-variant-numeric:tabular-nums}
+.mkF .lt-of{padding-bottom:3px;font-size:14px;font-weight:560;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+.mkF .lt-update{margin:14px 0 0;display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:0;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:rgba(255,255,255,.9);font:inherit;font-size:13px;font-weight:600}
+.mkF .lt-update svg{width:12px;height:12px;fill:none;stroke:rgba(255,255,255,.7);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mkF .lt-track{margin:18px 0 0;height:3px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
+.mkF .lt-track i{display:block;height:100%;width:12.4%;border-radius:999px;background:#3ad9f5}
+.mkF .lt-facts{margin:14px 0 0;padding:0;list-style:none}
+.mkF .lt-facts li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:13px;line-height:1.4;color:rgba(255,255,255,.9);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.mkF .lt-facts li:first-child{box-shadow:none;padding-top:2px}
+.mkF .lt-facts span:last-child{color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums;text-align:right}
+.mkF .lt-plan{margin:28px 0 0;padding:18px 18px 16px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.mkF .lt-ticks{display:flex;gap:4px;margin:0 0 12px}
+.mkF .lt-ticks i{flex:1;height:3px;border-radius:999px;background:rgba(255,255,255,.14)}
+.mkF .lt-ticks i.on{background:rgba(255,255,255,.5)}
+.mkF .lt-ticks i.now{background:rgba(255,255,255,.95)}
+.mkF .lt-plan .lt-step{margin:0;font-size:15px;font-weight:600;line-height:1.4;letter-spacing:-.012em;color:rgba(255,255,255,.95)}
+.mkF .lt-plan .lt-cnt{margin:6px 0 0;font-size:12.5px;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+/* ===== mkG Orbit Standing ===== */
+.mkG{padding:30px 18px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:rgba(255,255,255,.96);font-variant-numeric:tabular-nums}
+.mkG *{box-sizing:border-box}
+
+.mkG .orb{position:relative;width:196px;height:196px;margin:0 auto}
+.mkG .orb__halo{position:absolute;left:50%;top:50%;width:190px;height:190px;transform:translate(-50%,-50%);pointer-events:none;background:radial-gradient(closest-side,rgba(58,217,245,.16),rgba(58,217,245,.05) 46%,transparent 72%)}
+.mkG .orb__svg{position:relative;display:block;width:196px;height:196px}
+.mkG .orb__track{fill:none;stroke:rgba(255,255,255,.075);stroke-width:2}
+.mkG .orb__lit{fill:none;stroke:#3ad9f5;stroke-width:2;stroke-linecap:round;stroke-dasharray:54.5 385.3;transform:rotate(-90deg);transform-origin:98px 98px}
+.mkG .orb__tip{fill:#3ad9f5}
+.mkG .orb__star{position:absolute;left:50%;top:50%;width:66px;height:66px;transform:translate(-50%,-50%);pointer-events:none}
+.mkG .orb__starcore{position:absolute;left:50%;top:50%;width:11px;height:11px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 50% 42%,#ffffff,#d8f6fd 42%,rgba(58,217,245,.9) 74%,rgba(58,217,245,0) 100%);box-shadow:0 0 14px rgba(58,217,245,.55),0 0 34px rgba(58,217,245,.22)}
+.mkG .orb__bloom{position:absolute;left:50%;top:50%;width:66px;height:66px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(216,246,253,.22),rgba(58,217,245,.10) 40%,transparent 74%)}
+.mkG .orb__pct{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:11.5px;font-weight:640;letter-spacing:.005em;color:rgba(58,217,245,.92)}
+
+.mkG .now{margin:16px 0 0;text-align:center}
+.mkG .now__n{font-size:44px;font-weight:730;letter-spacing:-.04em;line-height:1;color:rgba(255,255,255,.97)}
+.mkG .now__of{margin:8px 0 0;font-size:13.5px;font-weight:560;line-height:1.4;color:rgba(255,255,255,.92)}
+.mkG .now__tap{display:inline-flex;align-items:center;gap:7px;margin:14px 0 0;padding:9px 15px;border:0;border-radius:999px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:rgba(255,255,255,.9);font:inherit;font-size:13px;font-weight:620;font-variant-numeric:tabular-nums}
+.mkG .now__tap svg{width:12px;height:12px;flex:none;fill:rgba(58,217,245,.95)}
+.mkG .now__meta{margin:13px 0 0;font-size:12px;line-height:1.55;color:rgba(255,255,255,.62)}
+
+.mkG .rows{margin:30px 0 0;padding:20px 18px 6px;border-radius:16px;background:rgba(255,255,255,.045);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 10px 26px rgba(0,0,0,.24);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkG .row{padding:0 0 18px}
+.mkG .row + .row{padding-top:18px;background-image:linear-gradient(90deg,rgba(255,255,255,.085),rgba(255,255,255,.02));background-size:100% 1px;background-repeat:no-repeat;background-position:0 0}
+.mkG .row__lab{margin:0 0 8px;font-size:12px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.55)}
+.mkG .row__what{margin:0;font-size:19.5px;font-weight:670;line-height:1.32;letter-spacing:-.022em;color:rgba(255,255,255,.97)}
+.mkG .row__what b{font-weight:730;color:#3ad9f5}
+.mkG .row__why{margin:0;font-size:14.5px;font-weight:500;line-height:1.55;color:rgba(255,255,255,.92)}
+.mkG .row__anti{margin:0;font-size:14px;font-weight:500;line-height:1.55;color:rgba(255,255,255,.5)}
+
+.mkG .promise{margin:14px 0 0;padding:18px;border-radius:16px;background:rgba(255,255,255,.038);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.mkG .promise__lab{margin:0 0 9px;font-size:12px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.55)}
+.mkG .promise__q{margin:0;font-size:14.5px;font-weight:520;line-height:1.6;color:rgba(255,255,255,.93)}
+.mkG .promise__sig{margin:13px 0 0;font-size:12px;line-height:1.55;color:rgba(255,255,255,.6)}
+
+.mkG .plan{display:flex;align-items:center;gap:13px;margin:14px 0 0;padding:15px 16px;border-radius:14px;background:rgba(255,255,255,.038);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.mkG .plan__dial{position:relative;flex:none;width:34px;height:34px}
+.mkG .plan__dial svg{display:block;width:34px;height:34px}
+.mkG .plan__track{fill:none;stroke:rgba(255,255,255,.10);stroke-width:2}
+.mkG .plan__lit{fill:none;stroke:rgba(255,255,255,.8);stroke-width:2;stroke-linecap:round;stroke-dasharray:52.5 29.2;transform:rotate(-90deg);transform-origin:17px 17px}
+.mkG .plan__body{min-width:0}
+.mkG .plan__count{margin:0;font-size:12px;line-height:1.4;color:rgba(255,255,255,.62)}
+.mkG .plan__step{margin:4px 0 0;font-size:14.5px;font-weight:620;line-height:1.4;letter-spacing:-.012em;color:rgba(255,255,255,.95)}
+/* ===== mkH The Ledger ===== */
+.mkH{padding:26px 20px 44px;color:rgba(255,255,255,.96);font-variant-numeric:tabular-nums;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mkH *{box-sizing:border-box}
+.mkH .mkH-grab{width:34px;height:4px;border-radius:999px;background:rgba(255,255,255,.16);margin:0 auto 22px}
+.mkH .mkH-lbl{margin:0 0 10px;font-size:12.5px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.5)}
+.mkH .mkH-now{display:flex;align-items:flex-end;gap:9px}
+.mkH .mkH-big{font-size:64px;font-weight:730;letter-spacing:-.045em;line-height:.86;color:#3ad9f5;font-variant-numeric:tabular-nums}
+.mkH .mkH-of{font-size:15px;font-weight:600;line-height:1.5;color:rgba(255,255,255,.62);padding-bottom:4px;font-variant-numeric:tabular-nums}
+.mkH .mkH-upd{display:inline-flex;align-items:center;gap:7px;margin:16px 0 0;padding:9px 14px;border:0;border-radius:999px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:rgba(255,255,255,.9);font:inherit;font-size:13px;font-weight:620}
+.mkH .mkH-upd i{width:6px;height:6px;border-radius:50%;background:rgba(58,217,245,.9);display:block}
+.mkH .mkH-stamp{margin:9px 0 0;font-size:12px;line-height:1.5;color:rgba(255,255,255,.5)}
+.mkH .mkH-rule{height:1px;background:rgba(255,255,255,.07);margin:24px 0}
+.mkH .mkH-rule--tight{margin:18px 0}
+.mkH .mkH-cols{display:flex;gap:26px}
+.mkH .mkH-col{flex:1}
+.mkH .mkH-num{font-size:30px;font-weight:700;letter-spacing:-.035em;line-height:1;color:rgba(255,255,255,.96);font-variant-numeric:tabular-nums}
+.mkH .mkH-sub{margin:7px 0 0;font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.58)}
+.mkH .mkH-what{margin:0;font-size:20px;font-weight:660;line-height:1.34;letter-spacing:-.022em;color:rgba(255,255,255,.96)}
+.mkH .mkH-what b{font-weight:660;color:#3ad9f5}
+.mkH .mkH-p{margin:8px 0 0;font-size:14.5px;line-height:1.62;color:rgba(255,255,255,.92)}
+.mkH .mkH-p--anti{color:rgba(255,255,255,.5)}
+.mkH .mkH-p--sign{margin:12px 0 0;font-size:12.5px;line-height:1.55;color:rgba(255,255,255,.5)}
+.mkH .mkH-plan{display:flex;align-items:flex-end;gap:9px}
+.mkH .mkH-plan span.mkH-num{font-size:30px}
+.mkH .mkH-plan span.mkH-plan-of{font-size:13px;line-height:1.5;color:rgba(255,255,255,.62);padding-bottom:2px}
+.mkH .mkH-step{margin:10px 0 0;font-size:15.5px;font-weight:620;line-height:1.42;letter-spacing:-.012em;color:rgba(255,255,255,.94)}
+/* ===== mkI The Bands ===== */
+.mkI{width:100%;background:#05060a;color:rgba(255,255,255,.96);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;padding:0 0 40px}
+.mkI *{box-sizing:border-box;margin:0}
+.mkI .bd{position:relative;padding:24px 20px 26px}
+.mkI .bd--what{padding-top:18px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.022))}
+.mkI .bd--stand{background:rgba(255,255,255,.062);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.mkI .bd--why{background:rgba(255,255,255,.026);box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
+.mkI .bd--anti{background:#010204;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.mkI .bd--promise{background:rgba(255,255,255,.036);box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
+.mkI .bd--plan{background:rgba(255,255,255,.018);box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
+.mkI .grip{display:block;width:34px;height:3px;margin:0 auto 18px;background:rgba(255,255,255,.16)}
+.mkI .lb{font-size:12.5px;font-weight:600;line-height:1;color:rgba(255,255,255,.5)}
+.mkI .lb--dim{color:rgba(255,255,255,.34)}
+.mkI .what{margin-top:12px;font-size:25px;font-weight:700;line-height:1.18;letter-spacing:-.03em;color:rgba(255,255,255,.97)}
+.mkI .what b{font-weight:700;color:rgba(255,255,255,.97)}
+.mkI .numrow{display:flex;align-items:flex-end;gap:9px;margin-top:13px}
+.mkI .num{font-size:52px;font-weight:700;line-height:.86;letter-spacing:-.045em;color:#3ad9f5}
+.mkI .of{padding-bottom:5px;font-size:15px;font-weight:600;line-height:1;color:rgba(255,255,255,.92)}
+.mkI .upd{display:inline-flex;align-items:center;gap:6px;margin:13px 0 0;padding:9px 13px;border:0;border-radius:10px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.92);font:inherit;font-size:13.5px;font-weight:620;letter-spacing:-.01em}
+.mkI .upd svg{width:13px;height:13px;flex:none;fill:none;stroke:rgba(255,255,255,.8);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.mkI .bar{position:relative;height:5px;margin-top:18px;background:rgba(255,255,255,.09);overflow:hidden}
+.mkI .bar i{position:absolute;left:0;top:0;bottom:0;width:12.4%;background:#3ad9f5}
+.mkI .bar u{position:absolute;left:8.1%;top:0;bottom:0;width:2px;background:rgba(5,6,10,.62)}
+.mkI .facts{display:flex;margin-top:13px}
+.mkI .fact{flex:1;padding-right:10px}
+.mkI .fact + .fact{padding-left:13px;box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
+.mkI .fact-k{font-size:11.5px;font-weight:600;line-height:1.3;color:rgba(255,255,255,.46)}
+.mkI .fact-v{margin-top:4px;font-size:14.5px;font-weight:650;line-height:1.2;letter-spacing:-.015em;color:rgba(255,255,255,.93)}
+.mkI .quote{margin-top:12px;font-size:17px;font-weight:560;line-height:1.4;letter-spacing:-.017em;color:rgba(255,255,255,.94)}
+.mkI .anti{margin-top:12px;font-size:15.5px;font-weight:520;line-height:1.42;letter-spacing:-.012em;color:rgba(255,255,255,.5)}
+.mkI .promise{margin-top:12px;font-size:15.5px;font-weight:540;line-height:1.46;letter-spacing:-.012em;color:rgba(255,255,255,.93)}
+.mkI .sign{margin-top:14px;font-size:12.5px;font-weight:560;line-height:1.5;color:rgba(255,255,255,.52)}
+.mkI .sign b{color:rgba(255,255,255,.9);font-weight:640}
+.mkI .planline{margin-top:11px;font-size:14px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.92)}
+.mkI .step{margin-top:13px;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.mkI .step-k{font-size:11.5px;font-weight:600;line-height:1;color:rgba(255,255,255,.46)}
+.mkI .step-v{margin-top:7px;font-size:16.5px;font-weight:650;line-height:1.28;letter-spacing:-.02em;color:rgba(255,255,255,.95)}
+/* ===== mkJ The waypoints ===== */
+.mkJ{padding:16px 14px 40px;color:rgba(255,255,255,.96);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;text-rendering:optimizeLegibility}
+.mkJ *{box-sizing:border-box}
+
+.mkJ .grip{width:34px;height:4px;margin:0 auto 20px;border-radius:999px;background:rgba(255,255,255,.13)}
+
+.mkJ .hd{padding:0 2px 6px}
+.mkJ .hd__lbl{margin:0 0 8px;font-size:12.5px;font-weight:600;line-height:1.3;color:rgba(255,255,255,.58)}
+.mkJ .hd__what{margin:0;font-size:22px;font-weight:680;line-height:1.28;letter-spacing:-.022em;color:rgba(255,255,255,.96)}
+.mkJ .hd__what .num{color:#3ad9f5}
+
+.mkJ .path{margin:18px 0 0}
+
+.mkJ .wp{display:flex;align-items:stretch}
+.mkJ .rail{position:relative;flex:none;width:74px}
+.mkJ .wpc{flex:1;min-width:0;padding:12px 0 24px}
+.mkJ .wp--plain .wpc{padding-bottom:16px}
+.mkJ .wp:last-child .wpc{padding-bottom:0}
+
+.mkJ .ln{position:absolute;width:2px;background:rgba(255,255,255,.10);border-radius:2px}
+.mkJ .ln.x-a{left:15px}
+.mkJ .ln.x-b{left:53px}
+.mkJ .ln--in{top:0;height:15px}
+.mkJ .ln--down{top:15px;bottom:0}
+.mkJ .ln--past{top:36px;bottom:0}
+.mkJ .ln--stub{top:15px;height:21px}
+.mkJ .ln--tail{top:36px;bottom:0}
+.mkJ .jog{position:absolute;top:14px;left:15px;width:40px;height:2px;border-radius:2px;background:rgba(255,255,255,.10)}
+.mkJ .lit{background:rgba(58,217,245,.55)}
+
+.mkJ .nd{position:absolute;top:36px;transform:translate(-50%,-50%);z-index:2;display:grid;place-items:center;border-radius:50%}
+.mkJ .nd.n-a{left:16px}
+.mkJ .nd.n-b{left:54px}
+.mkJ .nd--dot{width:9px;height:9px;background:rgba(255,255,255,.17)}
+.mkJ .nd--dot.is-lit{background:#3ad9f5;box-shadow:0 0 14px rgba(58,217,245,.45)}
+.mkJ .nd--you{width:30px;height:30px;background:rgba(58,217,245,.13);box-shadow:inset 0 0 0 2px rgba(58,217,245,.62),0 0 26px rgba(58,217,245,.30)}
+.mkJ .nd--you i{width:8px;height:8px;border-radius:50%;background:#3ad9f5}
+.mkJ .nd--goal{width:26px;height:26px;background:rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+.mkJ .nd--goal svg{width:13px;height:13px;display:block;fill:#3ad9f5}
+
+.mkJ .mk{margin:0;font-size:15px;font-weight:620;line-height:1.25;letter-spacing:-.012em;color:rgba(255,255,255,.92)}
+.mkJ .mk--dim{color:rgba(255,255,255,.46);font-weight:560}
+.mkJ .sub{margin:5px 0 0;font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.55)}
+
+.mkJ .panel{position:relative;overflow:hidden;margin:12px 0 0;padding:14px 14px 13px;border-radius:13px;background:rgba(255,255,255,.048);box-shadow:0 6px 18px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(28px) saturate(1.4);-webkit-backdrop-filter:blur(28px) saturate(1.4)}
+.mkJ .panel__lbl{margin:0 0 7px;font-size:11.5px;font-weight:600;line-height:1.3;color:rgba(255,255,255,.5)}
+.mkJ .panel__txt{margin:0;font-size:13.5px;line-height:1.52;color:rgba(255,255,255,.92)}
+
+.mkJ .panel--anti{background:rgba(255,255,255,.028);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.mkJ .panel--anti .panel__txt{color:rgba(255,255,255,.5)}
+.mkJ .panel--anti .panel__lbl{color:rgba(255,255,255,.36)}
+
+.mkJ .you{margin:2px 0 0;padding:16px 15px 14px}
+.mkJ .you__row{display:flex;align-items:baseline;gap:7px}
+.mkJ .you__n{font-size:36px;font-weight:700;line-height:.94;letter-spacing:-.04em;color:#3ad9f5}
+.mkJ .you__of{font-size:13.5px;font-weight:560;line-height:1;white-space:nowrap;color:rgba(255,255,255,.9)}
+.mkJ .you__meta{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.6)}
+.mkJ .tap{display:inline-flex;align-items:center;gap:7px;margin:12px 0 0;padding:8px 13px;border:0;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);color:rgba(255,255,255,.9);font:inherit;font-size:12.5px;font-weight:620;letter-spacing:-.005em;cursor:pointer;transition:transform 160ms ease-out,background 160ms ease-out}
+.mkJ .tap:active{transform:scale(.97);background:rgba(255,255,255,.1)}
+.mkJ .tap svg{width:12px;height:12px;display:block;fill:none;stroke:rgba(255,255,255,.72);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+.mkJ .plan{margin:10px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 0 rgba(255,255,255,.055)}
+.mkJ .plan__top{margin:0;font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.6)}
+.mkJ .plan__now{margin:5px 0 0;font-size:13.5px;font-weight:600;line-height:1.4;color:rgba(255,255,255,.92)}
+
+.mkJ .promise__txt{font-size:14px;line-height:1.55}
+.mkJ .promise__sig{margin:11px 0 0;font-size:12px;line-height:1.5;color:rgba(255,255,255,.55)}
+
+@media (prefers-reduced-motion:reduce){.mkJ .tap{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Clarity page 2, ten layouts</h1>
+    <p>Ten takes on "where you stand", each by a separate designer on the same brief: the what, the big why, the anti-vision, and the standing (12,400 of 100,000, started 8,100, day 41). Promise and plan optional per layout. No pace, no time-spent, no streaks, state only. Page 1 (the full-screen star with the sentence, a short why, the timeframe, and Added to Memento) is identical above all of these.</p>
+    <p class="sub">Every phone scrolls. Same data everywhere: Maya, day 41.</p>
+  </header>
+  <div class="grid">
+    <div class="cell">
+      <p class="cap">1 · Sync Box Stack</p>
+      <p class="capsub">Six full-width glass panels stacked in the app&#x27;s native sync-box language, each holding one idea with a small sentence-case label, with the standing panel carrying the only cyan in the whole page.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkA">
+  <div class="hdr">
+    <div class="hdr__grab"></div>
+    <p class="hdr__t">Where you stand</p>
+  </div>
+
+  <section class="panel">
+    <p class="lbl">The goal</p>
+    <p class="goal">Grow the channel to <b>100,000</b> subscribers.</p>
+  </section>
+
+  <section class="panel stand">
+    <p class="lbl">Where you stand today</p>
+    <div class="stand__row">
+      <div class="stand__n">12,400</div>
+      <div class="stand__of">of 100,000</div>
+    </div>
+    <div class="stand__bar">
+      <div class="stand__fill"></div>
+      <div class="stand__mark"></div>
+    </div>
+    <div class="stand__scale">
+      <span>Started at 8,100</span>
+      <span>100,000</span>
+    </div>
+    <div class="stand__foot">
+      <p class="stand__meta">Day 41<span>Last updated 2 days ago</span></p>
+      <button class="upd" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4.5h-4.5"/></svg>
+        Update
+      </button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <p class="lbl">Why you said this matters</p>
+    <p class="why">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+  </section>
+
+  <section class="panel panel--anti">
+    <p class="lbl">What happens if nothing changes</p>
+    <p class="anti">Another year of edits sitting in drafts while the ideas go stale.</p>
+  </section>
+
+  <section class="panel">
+    <p class="lbl">What you promised</p>
+    <p class="vow">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+    <div class="vow__sign">
+      <span class="vow__name">Maya</span>
+      <span class="vow__date">Made July 2, 2026. Held 41 days.</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <p class="lbl">The plan</p>
+    <div class="plan__row">
+      <span class="plan__n">9</span>
+      <span class="plan__of">of 14 steps cleared</span>
+    </div>
+    <div class="plan__ticks"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+    <div class="plan__here">
+      <em>Standing on</em>
+      <b>Post the first collab video</b>
+    </div>
+  </section>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">2 · The Summit Climb</p>
+      <p class="capsub">A vertical rail you read from the summit down: the goal burns as a small star at the top, fifth posts step down toward a lit you-are-here block holding the current number, with why and anti-vision resting as quiet panels beneath the climb.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkB">
+  <div class="hd">
+    <p class="hd__t">Where you stand</p>
+    <p class="hd__d">Day 41</p>
+  </div>
+
+  <div class="climb">
+    <div class="rw rw--top summit">
+      <div class="rw__rail">
+        <span class="star"><span class="star__core"></span></span>
+      </div>
+      <div class="rw__body">
+        <p class="summit__lead">Grow the channel to
+          <span class="summit__n">100,000</span>
+          <span class="summit__u">subscribers</span>
+        </p>
+        <p class="summit__tf">The summit. Nothing above it.</p>
+      </div>
+    </div>
+
+    <div class="rw">
+      <div class="rw__rail"><span class="tick"></span></div>
+      <div class="rw__body"><p class="post"><span class="post__n">80,000</span><span class="post__s">four fifths</span></p></div>
+    </div>
+
+    <div class="rw">
+      <div class="rw__rail"><span class="tick"></span></div>
+      <div class="rw__body"><p class="post"><span class="post__n">60,000</span><span class="post__s">three fifths</span></p></div>
+    </div>
+
+    <div class="rw">
+      <div class="rw__rail"><span class="tick"></span></div>
+      <div class="rw__body"><p class="post"><span class="post__n">40,000</span><span class="post__s">two fifths</span></p></div>
+    </div>
+
+    <div class="rw">
+      <div class="rw__rail"><span class="tick"></span></div>
+      <div class="rw__body"><p class="post"><span class="post__n">20,000</span><span class="post__s">one fifth, the next post</span></p></div>
+    </div>
+
+    <div class="rw rw--done">
+      <div class="rw__rail"><span class="here__tick"></span></div>
+      <div class="rw__body">
+        <div class="here">
+          <span class="here__glow"></span>
+          <p class="here__lbl">You are here</p>
+          <div class="here__row">
+            <span class="here__n">12,400</span>
+            <span class="here__of">of 100,000 subscribers</span>
+          </div>
+          <div class="here__foot">
+            <p class="here__upd">Updated 2 days ago</p>
+            <span class="chip">Tap to update</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rw rw--base rw--done base">
+      <div class="rw__rail"><span class="tick"></span></div>
+      <div class="rw__body">
+        <p class="post"><span class="post__n">8,100</span><span class="post__s">where you started</span></p>
+        <p class="base__meta">July 2, 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p class="panel__l">Why you are climbing, your words</p>
+    <p class="panel__q">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+  </div>
+
+  <div class="panel panel--anti">
+    <p class="panel__l">What happens if you stop</p>
+    <p class="panel__q">Another year of edits sitting in drafts while the ideas go stale.</p>
+  </div>
+
+  <div class="panel">
+    <p class="panel__l">What you promised</p>
+    <p class="panel__q">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+    <p class="panel__sig">Maya, made July 2, 2026. Held for 41 days.</p>
+  </div>
+
+  <div class="panel">
+    <div class="plan__top">
+      <p class="panel__l" style="margin:0">The plan</p>
+      <span class="plan__c">9 of 14 cleared</span>
+    </div>
+    <div class="segs"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="plan__nowl">Standing on</p>
+    <p class="plan__now">Post the first collab video</p>
+  </div>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">3 · The lit road</p>
+      <p class="capsub">A horizontal road across the panel with fifth mileposts, the traveled 12.4 percent lit cyan, and the current number standing tall on a stem straight above its marker, with the why, the cost, the promise and the plan stacked as quiet glass cells below.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkC">
+  <p class="rd-lbl">Where you stand</p>
+  <h2 class="rd-what">Grow the channel to 100,000 subscribers.</h2>
+  <div class="rd-panel rd-road">
+    <div class="rd-rail">
+      <div class="rd-cur">
+        <b>12,400</b>
+        <div class="rd-row"><span class="rd-unit">subscribers today</span>
+          <button class="rd-upd" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Update</button>
+        </div>
+      </div>
+      <div class="rd-stem" style="left:12.4%"></div>
+      <div class="rd-track">
+        <div class="rd-done"></div>
+        <span class="rd-post is-start" style="left:8.1%"></span>
+        <span class="rd-post" style="left:20%"></span>
+        <span class="rd-post" style="left:40%"></span>
+        <span class="rd-post" style="left:60%"></span>
+        <span class="rd-post" style="left:80%"></span>
+        <span class="rd-post is-end" style="right:0"></span>
+        <span class="rd-dot" style="left:12.4%"></span>
+      </div>
+    </div>
+    <div class="rd-marks"><span>0</span><span>20k</span><span>40k</span><span>60k</span><span>80k</span><span>100k</span></div>
+    <p class="rd-foot">Started at <b>8,100</b>. Day <b>41</b>, last updated 2 days ago.</p>
+  </div>
+  <div class="rd-grid">
+    <div class="rd-panel rd-cell">
+      <h3>Why you said you are doing it</h3>
+      <p class="rd-why">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+    </div>
+    <div class="rd-panel rd-cell rd-anti">
+      <h3>What it costs to stall</h3>
+      <p>Another year of edits sitting in drafts while the ideas go stale.</p>
+    </div>
+    <div class="rd-panel rd-cell rd-promise">
+      <h3>The promise you made</h3>
+      <p>I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+      <p class="rd-sign">Maya, made July 2, 2026. Held for 41 days.</p>
+    </div>
+    <div class="rd-panel rd-cell">
+      <h3>The plan</h3>
+      <div class="rd-steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+      <p class="rd-now">Post the first collab video</p>
+      <p class="rd-cnt"><b>9 of 14</b> steps cleared, you are standing on this one.</p>
+    </div>
+  </div>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">4 · The Fork</p>
+      <p class="capsub">Two stacked full-width panels stage the chosen future against the default, with the where-you-stand strip wedged between them as the live pivot point and the why closing the page.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkD">
+  <p class="mkD-lbl">Where you stand</p>
+  <h1 class="mkD-goal">Grow the channel to <b>100,000</b> subscribers.</h1>
+
+  <section class="mkD-fork mkD-fork--live">
+    <p class="mkD-fork__lbl">The future you chose</p>
+    <p class="mkD-fork__line">The edits leave drafts, the channel keeps growing, and the people who need it find it.</p>
+    <div class="mkD-steps"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="here"></i><i></i><i></i><i></i><i></i></div>
+    <p class="mkD-stepline">Standing on step 10, post the first collab video. <span>9 of 14 cleared.</span></p>
+  </section>
+
+  <p class="mkD-both">Both are still true from here.</p>
+
+  <div class="mkD-stand">
+    <div class="mkD-stand__row">
+      <span class="mkD-stand__n">12,400</span>
+      <span class="mkD-stand__of">of 100,000</span>
+      <button class="mkD-stand__tap" type="button">Update</button>
+    </div>
+    <div class="mkD-rail"><i></i><u></u></div>
+    <div class="mkD-stand__meta">
+      <span><b>8,100</b>at the start</span>
+      <span><b>Day 41</b>with this goal</span>
+      <span><b>2 days ago</b>last updated</span>
+    </div>
+  </div>
+
+  <section class="mkD-fork mkD-fork--dim">
+    <p class="mkD-fork__lbl">The default</p>
+    <p class="mkD-fork__line">Another year of edits sitting in drafts while the ideas go stale.</p>
+    <p class="mkD-fork__sub">Nothing has to change for this one to happen.</p>
+  </section>
+
+  <div class="mkD-why">
+    <p class="mkD-lbl">Why you started</p>
+    <p class="mkD-why__q">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+  </div>
+
+  <div class="mkD-promise">
+    <p class="mkD-promise__t">What you promised</p>
+    <p class="mkD-promise__b">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+    <p class="mkD-promise__s">Maya, July 2, 2026. Held for 41 days.</p>
+  </div>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">5 · Standing Bento</p>
+      <p class="capsub">A tight two-column bento of glass tiles where one wide tile pairs the big cyan standing number with a 12.4 percent ring and an inline update button, and the small started-at and day tiles sit beneath it like instrument readouts.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkE">
+  <div class="mkE-grip"></div>
+  <div class="mkE-grid">
+
+    <div class="mkE-t mkE-t--wide">
+      <p class="mkE-lbl">The goal</p>
+      <p class="mkE-goal">Grow the channel to <b>100,000</b> subscribers.</p>
+    </div>
+
+    <div class="mkE-t mkE-t--wide mkE-stand">
+      <p class="mkE-lbl">Where you stand</p>
+      <div class="mkE-standRow">
+        <div class="mkE-num">
+          <span class="mkE-n">12,400</span>
+          <span class="mkE-of">of 100,000 subscribers</span>
+        </div>
+        <div class="mkE-ring">
+          <svg width="78" height="78" viewBox="0 0 78 78" aria-hidden="true">
+            <circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="6"></circle>
+            <circle cx="39" cy="39" r="32" fill="none" stroke="#3ad9f5" stroke-width="6" stroke-linecap="round" stroke-dasharray="24.9 201.1"></circle>
+          </svg>
+          <span class="mkE-ringN">12.4%</span>
+        </div>
+      </div>
+      <button class="mkE-tap" type="button">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 3.4v9.2M3.4 8h9.2"></path></svg>
+        <span>Update the number</span>
+        <span>2 days ago</span>
+      </button>
+    </div>
+
+    <div class="mkE-t mkE-small">
+      <span class="mkE-sn">8,100</span>
+      <span class="mkE-sk">Where you started</span>
+    </div>
+    <div class="mkE-t mkE-small">
+      <span class="mkE-sn">41</span>
+      <span class="mkE-sk">Days since you set it</span>
+    </div>
+
+    <div class="mkE-t mkE-t--wide">
+      <p class="mkE-lbl">Why you set it</p>
+      <p class="mkE-body">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+    </div>
+
+    <div class="mkE-t mkE-t--wide mkE-anti">
+      <p class="mkE-lbl">What happens if nothing changes</p>
+      <p class="mkE-body">Another year of edits sitting in drafts while the ideas go stale.</p>
+    </div>
+
+    <div class="mkE-t mkE-t--wide">
+      <p class="mkE-lbl">The plan</p>
+      <div class="mkE-planRow"><span class="mkE-planN">9</span><span class="mkE-planK">of 14 steps cleared</span></div>
+      <div class="mkE-pips"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+      <p class="mkE-step">Standing on: Post the first collab video.</p>
+    </div>
+
+    <div class="mkE-t mkE-t--wide">
+      <p class="mkE-lbl">What you promised</p>
+      <p class="mkE-q">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+      <p class="mkE-sig">Maya, written July 2, 2026. Held 41 days.</p>
+    </div>
+
+  </div>
+  <p class="mkE-foot">Your number is yours to keep honest. Nothing here updates itself.</p>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">6 · The letter</p>
+      <p class="capsub">A single top-to-bottom letter to herself, dated and signed, with the promise set largest and the goal, why, refusal and standing arranged around it as quiet supporting paragraphs.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkF">
+  <p class="lt-date">July 2, 2026</p>
+  <div class="lt-rule"></div>
+
+  <div class="lt-goal">
+    <p class="lt-lbl">What I am here for</p>
+    <p>Grow the channel to <b>100,000</b> subscribers.</p>
+  </div>
+
+  <div class="lt-why">
+    <p>Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+  </div>
+
+  <section class="lt-promise">
+    <p class="lt-lbl">What I promised myself</p>
+    <p>I will show up for this channel even on the days nobody watches.</p>
+    <p>The people still stuck where I was are worth the boring Tuesdays.</p>
+    <div class="lt-sign">
+      <span class="lt-name">Maya</span>
+      <span class="lt-held">Made July 2, 2026.<br>Held for 41 days.</span>
+    </div>
+  </section>
+
+  <div class="lt-anti">
+    <p class="lt-lbl">What I refuse</p>
+    <p>Another year of edits sitting in drafts while the ideas go stale.</p>
+  </div>
+
+  <section class="lt-stand">
+    <p class="lt-lbl">Where I stand today</p>
+    <div class="lt-numrow">
+      <span class="lt-num">12,400</span>
+      <span class="lt-of">of 100,000</span>
+    </div>
+    <button class="lt-update" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      Update the number
+    </button>
+    <div class="lt-track"><i></i></div>
+    <ul class="lt-facts">
+      <li><span>Started at</span><span>8,100</span></li>
+      <li><span>Day</span><span>41</span></li>
+      <li><span>Last updated</span><span>2 days ago</span></li>
+    </ul>
+  </section>
+
+  <section class="lt-plan">
+    <p class="lt-lbl">Where I am in the plan</p>
+    <div class="lt-ticks"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+    <p class="lt-step">Post the first collab video</p>
+    <p class="lt-cnt">9 of 14 steps cleared</p>
+  </section>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">7 · Orbit Standing</p>
+      <p class="capsub">A thin cyan orbit ring holds a small star at top center with the live number reading out beneath it, and everything else falls away into three quiet stacked rows, with the circle echoed only once more as a tiny plan dial.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkG">
+  <div class="orb">
+    <div class="orb__halo"></div>
+    <svg class="orb__svg" viewBox="0 0 196 196" aria-hidden="true">
+      <circle class="orb__track" cx="98" cy="98" r="70"></circle>
+      <circle class="orb__lit" cx="98" cy="98" r="70"></circle>
+      <circle class="orb__tip" cx="98" cy="28" r="2.6"></circle>
+    </svg>
+    <div class="orb__star">
+      <div class="orb__bloom"></div>
+      <div class="orb__starcore"></div>
+    </div>
+    <div class="orb__pct">12.4% lit</div>
+  </div>
+
+  <div class="now">
+    <div class="now__n">12,400</div>
+    <p class="now__of">subscribers of 100,000</p>
+    <button class="now__tap" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 0 7.46 5.1l-1.9.7A6 6 0 1 1 12 6V4z"></path><path d="M12 1.6l3.6 2.9L12 7.4z"></path></svg>
+      Tap to update the number
+    </button>
+    <p class="now__meta">Started at 8,100. Day 41. Last updated 2 days ago.</p>
+  </div>
+
+  <div class="rows">
+    <div class="row">
+      <p class="row__lab">The goal</p>
+      <p class="row__what">Grow the channel to <b>100,000</b> subscribers.</p>
+    </div>
+    <div class="row">
+      <p class="row__lab">Why, in her words</p>
+      <p class="row__why">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+    </div>
+    <div class="row">
+      <p class="row__lab">What she is refusing</p>
+      <p class="row__anti">Another year of edits sitting in drafts while the ideas go stale.</p>
+    </div>
+  </div>
+
+  <div class="promise">
+    <p class="promise__lab">The promise she made</p>
+    <p class="promise__q">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+    <p class="promise__sig">Maya, made July 2, 2026. Held for 41 days.</p>
+  </div>
+
+  <div class="plan">
+    <div class="plan__dial">
+      <svg viewBox="0 0 34 34" aria-hidden="true">
+        <circle class="plan__track" cx="17" cy="17" r="13"></circle>
+        <circle class="plan__lit" cx="17" cy="17" r="13"></circle>
+      </svg>
+    </div>
+    <div class="plan__body">
+      <p class="plan__count">9 of 14 steps cleared. Standing on</p>
+      <p class="plan__step">Post the first collab video</p>
+    </div>
+  </div>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">8 · The Ledger</p>
+      <p class="capsub">A chrome free ledger where giant tabular numbers open each block and the words sit between them as full width quiet paragraphs, hairline rules doing all the structural work instead of cards.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkH">
+  <div class="mkH-grab"></div>
+
+  <p class="mkH-lbl">Where you stand today</p>
+  <div class="mkH-now"><span class="mkH-big">12,400</span><span class="mkH-of">of 100,000</span></div>
+  <button class="mkH-upd" type="button"><i></i>Tap to update</button>
+  <p class="mkH-stamp">Last updated 2 days ago.</p>
+
+  <div class="mkH-rule"></div>
+
+  <div class="mkH-cols">
+    <div class="mkH-col"><div class="mkH-num">8,100</div><p class="mkH-sub">where you started</p></div>
+    <div class="mkH-col"><div class="mkH-num">41</div><p class="mkH-sub">days since you wrote this</p></div>
+  </div>
+
+  <div class="mkH-rule"></div>
+
+  <p class="mkH-what">Grow the channel to <b>100,000</b> subscribers.</p>
+
+  <div class="mkH-rule"></div>
+
+  <p class="mkH-lbl">Why you said it matters</p>
+  <p class="mkH-p">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+
+  <div class="mkH-rule mkH-rule--tight"></div>
+
+  <p class="mkH-lbl">What happens if nothing changes</p>
+  <p class="mkH-p mkH-p--anti">Another year of edits sitting in drafts while the ideas go stale.</p>
+
+  <div class="mkH-rule"></div>
+
+  <p class="mkH-lbl">What you promised</p>
+  <p class="mkH-p">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+  <p class="mkH-p--sign">Maya, written July 2, 2026. Held 41 days.</p>
+
+  <div class="mkH-rule"></div>
+
+  <p class="mkH-lbl">The plan</p>
+  <div class="mkH-plan"><span class="mkH-num">9</span><span class="mkH-plan-of">of 14 steps cleared</span></div>
+  <p class="mkH-step">Standing on: post the first collab video.</p>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">9 · The Bands</p>
+      <p class="capsub">Six full-bleed horizontal bands stacked edge to edge with no cards at all, each one carrying its own tone of dark, so the page reads like a magazine spread that gets brightest at the number and goes to true black at the anti-vision.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkI">
+  <section class="bd bd--what">
+    <span class="grip"></span>
+    <p class="lb">Your goal</p>
+    <p class="what">Grow the channel to <b>100,000</b> subscribers.</p>
+  </section>
+
+  <section class="bd bd--stand">
+    <p class="lb">Where you stand</p>
+    <div class="numrow">
+      <span class="num">12,400</span>
+      <span class="of">of 100,000</span>
+    </div>
+    <button class="upd" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>
+      Tap to update
+    </button>
+    <div class="bar"><i></i><u></u></div>
+    <div class="facts">
+      <div class="fact"><p class="fact-k">Started at</p><p class="fact-v">8,100</p></div>
+      <div class="fact"><p class="fact-k">Day</p><p class="fact-v">41</p></div>
+      <div class="fact"><p class="fact-k">Last updated</p><p class="fact-v">2 days ago</p></div>
+    </div>
+  </section>
+
+  <section class="bd bd--why">
+    <p class="lb">Why you said yes</p>
+    <p class="quote">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+  </section>
+
+  <section class="bd bd--anti">
+    <p class="lb lb--dim">What you refuse</p>
+    <p class="anti">Another year of edits sitting in drafts while the ideas go stale.</p>
+  </section>
+
+  <section class="bd bd--promise">
+    <p class="lb">Your promise</p>
+    <p class="promise">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+    <p class="sign"><b>Maya</b>, July 2, 2026. Held for 41 days.</p>
+  </section>
+
+  <section class="bd bd--plan">
+    <p class="lb">The plan</p>
+    <p class="planline">9 of 14 steps cleared.</p>
+    <div class="step">
+      <p class="step-k">You are standing on</p>
+      <p class="step-v">Post the first collab video</p>
+    </div>
+  </section>
+</div></div></div></div>
+    </div>
+    <div class="cell">
+      <p class="cap">10 · The waypoints</p>
+      <p class="capsub">A stepped path that zigzags down the page, start lit, the you-node enlarged with the live number, the unreached fifths dim, and the why, anti-vision, and promise hung beside the waypoints they belong to.</p>
+      <div class="phone"><div class="screen"><div class="notch"></div><div class="scrollv"><div class="mkJ">
+  <div class="grip"></div>
+
+  <div class="hd">
+    <p class="hd__lbl">Where you stand</p>
+    <h2 class="hd__what">Grow the channel to <span class="num">100,000</span> subscribers.</h2>
+  </div>
+
+  <div class="path">
+
+    <div class="wp">
+      <div class="rail">
+        <i class="ln ln--tail x-a lit"></i>
+        <span class="nd nd--dot n-a is-lit"></span>
+      </div>
+      <div class="wpc">
+        <p class="mk">Started at 8,100</p>
+        <p class="sub">July 2, 2026</p>
+        <div class="panel">
+          <p class="panel__lbl">Why you started</p>
+          <p class="panel__txt">Watching the people who matter most scroll their lives away, and knowing the channel could reach them.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wp">
+      <div class="rail">
+        <i class="ln ln--in x-a lit"></i>
+        <i class="jog lit"></i>
+        <i class="ln ln--stub x-b lit"></i>
+        <i class="ln ln--past x-b"></i>
+        <span class="nd nd--you n-b"><i></i></span>
+      </div>
+      <div class="wpc">
+        <p class="mk">You are here</p>
+        <div class="panel you">
+          <div class="you__row">
+            <span class="you__n">12,400</span>
+            <span class="you__of">of 100,000</span>
+          </div>
+          <p class="you__meta">Day 41. Last updated 2 days ago.</p>
+          <button class="tap" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10-10a2.5 2.5 0 0 0-3.5-3.5L4.5 16.5 4 20z"/></svg>
+            Tap to update
+          </button>
+        </div>
+        <div class="plan">
+          <p class="plan__top">9 of 14 steps cleared.</p>
+          <p class="plan__now">Standing on: Post the first collab video.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wp">
+      <div class="rail">
+        <i class="ln ln--in x-b"></i>
+        <i class="jog"></i>
+        <i class="ln ln--down x-a"></i>
+        <span class="nd nd--dot n-a"></span>
+      </div>
+      <div class="wpc">
+        <p class="mk mk--dim">20,000</p>
+        <p class="sub">The next waypoint.</p>
+      </div>
+    </div>
+
+    <div class="wp">
+      <div class="rail">
+        <i class="ln ln--in x-a"></i>
+        <i class="jog"></i>
+        <i class="ln ln--down x-b"></i>
+        <span class="nd nd--dot n-b"></span>
+      </div>
+      <div class="wpc">
+        <p class="mk mk--dim">40,000</p>
+        <div class="panel panel--anti">
+          <p class="panel__lbl">The road you refuse</p>
+          <p class="panel__txt">Another year of edits sitting in drafts while the ideas go stale.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wp wp--plain">
+      <div class="rail">
+        <i class="ln ln--in x-b"></i>
+        <i class="jog"></i>
+        <i class="ln ln--down x-a"></i>
+        <span class="nd nd--dot n-a"></span>
+      </div>
+      <div class="wpc"><p class="mk mk--dim">60,000</p></div>
+    </div>
+
+    <div class="wp wp--plain">
+      <div class="rail">
+        <i class="ln ln--in x-a"></i>
+        <i class="jog"></i>
+        <i class="ln ln--down x-b"></i>
+        <span class="nd nd--dot n-b"></span>
+      </div>
+      <div class="wpc"><p class="mk mk--dim">80,000</p></div>
+    </div>
+
+    <div class="wp">
+      <div class="rail">
+        <i class="ln ln--in x-b"></i>
+        <i class="jog"></i>
+        <i class="ln ln--stub x-a"></i>
+        <span class="nd nd--goal n-a"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.6c.5 4.6 2.3 7.4 6.4 8.2 1.3.3 2 .8 2 1.4s-.7 1.1-2 1.4c-4.1.8-5.9 3.6-6.4 8.2-.5-4.6-2.3-7.4-6.4-8.2-1.3-.3-2-.8-2-1.4s.7-1.1 2-1.4c4.1-.8 5.9-3.6 6.4-8.2z"/></svg></span>
+      </div>
+      <div class="wpc">
+        <p class="mk">100,000 subscribers</p>
+        <div class="panel">
+          <p class="panel__lbl">What you promised, in your words</p>
+          <p class="panel__txt promise__txt">I will show up for this channel even on the days nobody watches. The people still stuck where I was are worth the boring Tuesdays.</p>
+          <p class="promise__sig">Maya, made July 2, 2026. Held for 41 days.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div></div></div>
+    </div></div>
+</div>
+</body>
+</html>

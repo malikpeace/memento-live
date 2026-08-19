@@ -1,0 +1,243 @@
+<style>
+.ledger{
+  --bg:#050609;
+  --hi:#eef2fb;
+  --mid:#c9d1e0;
+  --lo:#767f90;
+  --clar:#3ad9f5;
+  --cons:#3fd94e;
+  --act:#eef2fb;
+  --rule:rgba(238,242,251,.11);
+  --rule-hard:rgba(238,242,251,.34);
+  width:100%;
+  max-width:350px;
+  margin:0 auto;
+  padding:30px 16px 54px;
+  box-sizing:border-box;
+  background:var(--bg);
+  color:var(--hi);
+  font-size:14.5px;
+  line-height:1.42;
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* rules */
+.ledger .rule{height:1px;background:var(--rule);}
+.ledger .rule-hard{height:1px;background:var(--rule-hard);}
+.ledger .rule-double{height:3px;border-top:1px solid var(--rule-hard);border-bottom:1px solid var(--rule-hard);}
+
+/* head */
+.ledger .head{margin:0 0 4px;}
+.ledger .mark{font-size:27px;font-weight:600;letter-spacing:-.025em;line-height:1.05;margin:0 0 3px;}
+.ledger .owner{font-size:14.5px;color:var(--mid);margin:0 0 14px;}
+.ledger .head .rule-double{margin:0 0 2px;}
+
+/* rows */
+.ledger .row{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  padding:8px 0;
+  background:linear-gradient(to top,var(--rule),var(--rule)) bottom left/100% 1px no-repeat;
+}
+.ledger .row:last-child{background:none;}
+.ledger .lab{flex:1 1 auto;color:var(--mid);}
+.ledger .lab .sub{display:block;font-size:11.5px;color:var(--lo);letter-spacing:.005em;margin-top:1px;}
+.ledger .val{flex:0 0 auto;text-align:right;color:var(--hi);font-weight:500;white-space:nowrap;}
+.ledger .val .unit{font-weight:400;color:var(--mid);font-size:13px;margin-left:3px;}
+.ledger .indent{padding-left:14px;}
+.ledger .zero{color:var(--mid);}
+
+/* totals */
+.ledger .total{padding:13px 0 15px;background:none;align-items:baseline;}
+.ledger .total .lab{color:var(--hi);}
+.ledger .big{font-size:38px;font-weight:500;letter-spacing:-.035em;line-height:.9;}
+.ledger .mid-num{font-size:25px;font-weight:500;letter-spacing:-.03em;line-height:1;}
+.ledger .cons{color:var(--cons);}
+.ledger .clar{color:var(--clar);}
+
+/* sections */
+.ledger .sec{margin-top:22px;}
+.ledger .sechead{display:flex;align-items:baseline;gap:9px;padding:13px 0 2px;}
+.ledger .numeral{flex:0 0 auto;font-size:12px;color:var(--lo);width:16px;}
+.ledger .title{font-size:20px;font-weight:600;letter-spacing:-.02em;line-height:1.15;margin:0;}
+.ledger .stand{color:var(--mid);font-size:13.5px;padding:0 0 9px 25px;}
+
+/* entries */
+.ledger .entry{padding:14px 0 15px;margin:2px 0 0;background:linear-gradient(to top,var(--rule),var(--rule)) bottom left/100% 1px no-repeat;}
+.ledger .entry .when{font-size:11.5px;color:var(--lo);margin-bottom:6px;}
+.ledger .quote{font-size:16px;line-height:1.45;color:var(--hi);padding-left:12px;box-shadow:inset 1px 0 0 var(--rule-hard);}
+.ledger .quote.long{font-size:15.5px;}
+
+/* gauge, a rule that is part full */
+.ledger .gauge{height:2px;background:rgba(238,242,251,.13);margin:12px 0 6px;}
+.ledger .gauge span{display:block;height:2px;width:9%;background:var(--clar);}
+.ledger .gaugefoot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--lo);}
+.ledger .gaugefoot b{font-weight:400;}
+
+/* foot */
+.ledger .foot{margin-top:30px;}
+.ledger .foot .rule-double{margin-bottom:12px;}
+.ledger .note{font-size:12.5px;color:var(--mid);line-height:1.5;}
+.ledger .stamp{font-size:11.5px;color:var(--lo);margin-top:10px;}
+</style>
+
+<div class="ledger">
+
+  <div class="head">
+    <div class="mark">Memento</div>
+    <div class="owner">A register of days kept by Malik Peace.</div>
+    <div class="rule-double"></div>
+    <div class="row"><div class="lab">Opened</div><div class="val">July 15, 2026, 6:42 AM</div></div>
+    <div class="row"><div class="lab">Statement to</div><div class="val">August 7, 2026</div></div>
+    <div class="row"><div class="lab">Day</div><div class="val">24</div></div>
+    <div class="rule-hard"></div>
+  </div>
+
+  <!-- I. PROGRESS SO FAR -->
+  <div class="sec">
+    <div class="rule-double"></div>
+    <div class="sechead"><div class="numeral">I</div><h2 class="title">Progress so far</h2></div>
+    <div class="stand">Everything entered between July 15 and August 7.</div>
+    <div class="rule-hard"></div>
+
+    <div class="row"><div class="lab">Days elapsed</div><div class="val">24</div></div>
+    <div class="row"><div class="lab">Days carrying a mark</div><div class="val cons">17</div></div>
+    <div class="row"><div class="lab">Days left blank</div><div class="val">7</div></div>
+
+    <div class="rule-hard" style="margin-top:6px"></div>
+    <div class="row total">
+      <div class="lab">Days kept<span class="sub">Out of 24 possible.</span></div>
+      <div class="val big cons">17</div>
+    </div>
+    <div class="rule-hard"></div>
+
+    <div class="row" style="padding-top:14px"><div class="lab indent">Actions completed</div><div class="val">21</div></div>
+    <div class="row"><div class="lab indent">Notes written</div><div class="val">7</div></div>
+    <div class="row"><div class="lab indent">Records kept</div><div class="val">3</div></div>
+
+    <div class="rule-double" style="margin-top:6px"></div>
+    <div class="row total">
+      <div class="lab">Total marks entered<span class="sub">Nothing here has ever been removed.</span></div>
+      <div class="val big">31</div>
+    </div>
+    <div class="rule-hard"></div>
+
+    <div class="row" style="padding-top:14px">
+      <div class="lab">Longest run<span class="sub">July 22 to July 27.</span></div>
+      <div class="val mid-num cons">6<span class="unit">days</span></div>
+    </div>
+    <div class="row">
+      <div class="lab">Current run<span class="sub">August 5, 6, 7.</span></div>
+      <div class="val mid-num cons">3<span class="unit">days</span></div>
+    </div>
+    <div class="row"><div class="lab">Times returned after a gap</div><div class="val">2</div></div>
+    <div class="row"><div class="lab">Times quit</div><div class="val zero">0</div></div>
+
+    <div class="rule-hard" style="margin-top:10px"></div>
+    <div class="row" style="padding-top:12px"><div class="lab">Deep work sessions</div><div class="val">6</div></div>
+    <div class="row"><div class="lab">Hours in deep work</div><div class="val">9</div></div>
+    <div class="row"><div class="lab">Words written</div><div class="val">840</div></div>
+
+    <div class="rule-hard" style="margin-top:10px"></div>
+    <div class="row" style="padding-top:12px"><div class="lab">First mark</div><div class="val">July 15, 6:42 AM</div></div>
+    <div class="row"><div class="lab">Heaviest day</div><div class="val">July 24, 4 marks</div></div>
+    <div class="row"><div class="lab">Last entry</div><div class="val">August 7</div></div>
+  </div>
+
+  <!-- II. MORI -->
+  <div class="sec">
+    <div class="rule-double"></div>
+    <div class="sechead"><div class="numeral">II</div><h2 class="title">Mori</h2></div>
+    <div class="stand">The account of time, spent and remaining.</div>
+    <div class="rule-hard"></div>
+
+    <div class="row"><div class="lab">Days lived</div><div class="val">8,254</div></div>
+    <div class="row"><div class="lab">Weeks lived</div><div class="val">1,179 <span class="unit">of 4,175</span></div></div>
+    <div class="row">
+      <div class="lab">Weeks given to this path<span class="sub">Counted from July 15.</span></div>
+      <div class="val">3</div>
+    </div>
+
+    <div class="rule-double" style="margin-top:6px"></div>
+    <div class="row total">
+      <div class="lab">Days remaining<span class="sub">The one figure on this page that falls.</span></div>
+      <div class="val big">20,967</div>
+    </div>
+    <div class="rule-hard"></div>
+
+    <div class="row" style="padding-top:12px"><div class="lab">Days spent since the record opened</div><div class="val">24</div></div>
+    <div class="row"><div class="lab">Of those, days marked</div><div class="val cons">17</div></div>
+  </div>
+
+  <!-- III. VIVERE -->
+  <div class="sec">
+    <div class="rule-double"></div>
+    <div class="sechead"><div class="numeral">III</div><h2 class="title">Vivere</h2></div>
+    <div class="stand">Promises entered by the owner, and what they are worth so far.</div>
+    <div class="rule-hard"></div>
+
+    <div class="row" style="padding-top:13px">
+      <div class="lab">Promise 1<span class="sub">Signed July 15, 2026, day 1.</span></div>
+      <div class="val">Open</div>
+    </div>
+    <div class="entry">
+      <div class="quote">Get to 100 paying users.</div>
+      <div class="gauge"><span></span></div>
+      <div class="gaugefoot"><b>9 entered</b><b>91 to enter</b></div>
+    </div>
+    <div class="row total">
+      <div class="lab">Standing<span class="sub">Paying users to date.</span></div>
+      <div class="val big clar">9<span class="unit" style="font-size:15px">of 100</span></div>
+    </div>
+    <div class="rule-hard"></div>
+
+    <div class="row" style="padding-top:12px"><div class="lab">Promises entered</div><div class="val">1</div></div>
+    <div class="row"><div class="lab">Promises open</div><div class="val">1</div></div>
+    <div class="row"><div class="lab">Promises withdrawn</div><div class="val zero">0</div></div>
+
+    <div class="rule-hard" style="margin-top:10px"></div>
+
+    <div class="entry">
+      <div class="when">The dream, entered July 15, 2026</div>
+      <div class="quote long">I run the thing I built. The work is hard and it is mine. My people can point at something real and say he made that.</div>
+    </div>
+
+    <div class="entry">
+      <div class="when">Reflection, entered July 28, 2026</div>
+      <div class="quote long">Wanted to quit at 3pm and did not.</div>
+    </div>
+  </div>
+
+  <!-- CLOSING BALANCE -->
+  <div class="sec">
+    <div class="rule-double"></div>
+    <div class="sechead"><div class="numeral"></div><h2 class="title">Closing balance</h2></div>
+    <div class="stand">Carried forward to day 25.</div>
+    <div class="rule-hard"></div>
+
+    <div class="row"><div class="lab">Days on the record</div><div class="val">24</div></div>
+    <div class="row"><div class="lab">Days kept</div><div class="val cons">17</div></div>
+    <div class="row"><div class="lab">Marks entered</div><div class="val">31</div></div>
+    <div class="row"><div class="lab">Promises open</div><div class="val clar">1</div></div>
+    <div class="row"><div class="lab">Entries removed</div><div class="val zero">0</div></div>
+    <div class="row"><div class="lab">Times quit</div><div class="val zero">0</div></div>
+
+    <div class="rule-double" style="margin-top:8px"></div>
+    <div class="row total">
+      <div class="lab">Balance carried forward<span class="sub">Marks standing against 24 days.</span></div>
+      <div class="val big">31</div>
+    </div>
+    <div class="rule-double"></div>
+  </div>
+
+  <div class="foot">
+    <div class="rule-double"></div>
+    <div class="note">This register was opened on July 15, 2026 and has been added to on 17 days since. It only adds. The figure in Mori is the only one that falls, and it falls whether or not anything is entered here.</div>
+    <div class="stamp">Statement closed August 7, 2026, day 24. Next entry opens tomorrow.</div>
+  </div>
+
+</div>

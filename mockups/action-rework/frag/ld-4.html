@@ -1,0 +1,211 @@
+<!-- ARCHETYPE: quiet fact cycle (ld-4, the chosen loader). One screen, one already-known
+     line at a time, a real elapsed clock, and the plan arriving at the end.
+     PROVENANCE: every line on this screen is the person's own words from Clarity and the
+     refine step, or arithmetic on the date they typed. Nothing is produced by the model,
+     nothing is a stage name, nothing is claimed on the model's behalf.
+     BEAUTY PASS 2026-08-13: the footer paragraph is gone (each fact already names its own
+     source, so the explainer was the AI tell), the type is one ladder (22 the line / 12 the
+     source / 13 the clock), and the arrival is staged: the title clears, the clock freezes as
+     the receipt, and one sentence lands alone in the middle. -->
+<section class="cell" data-k="ld-4">
+<style>
+[data-k=ld-4] .ph{background:#050608}
+[data-k=ld-4] .grid{opacity:.45}
+[data-k=ld-4] .col{position:absolute;left:24px;right:24px;top:56px;bottom:28px;
+  display:flex;flex-direction:column}
+
+/* head: what is happening + the real clock. On arrival the title clears and the clock stays
+   as the receipt, so nothing has to say "took" twice. */
+[data-k=ld-4] .head{flex:0 0 auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+[data-k=ld-4] .head h4{margin:0;font-size:17px;font-weight:500;letter-spacing:-.018em;
+  line-height:1.25;color:var(--text-hi);transition:opacity .5s ease}
+[data-k=ld-4] .head.gone h4{opacity:0}
+[data-k=ld-4] .clk{margin:0;font-size:13px;line-height:1.25;font-weight:500;color:rgba(var(--ink),.78);
+  font-variant-numeric:tabular-nums;letter-spacing:.01em}
+/* the box is reserved at two lines so the longer wait line can arrive without
+   shoving the fact under it up the screen mid-fade */
+[data-k=ld-4] .state{margin:8px 0 0;min-height:37px;font-size:12.5px;line-height:1.45;
+  color:rgba(var(--ink),.9);transition:opacity .45s ease}
+[data-k=ld-4] .state.swap,[data-k=ld-4] .state.gone{opacity:0}
+
+/* the fact: one at a time, held, never crowded */
+[data-k=ld-4] .stage{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;
+  padding-bottom:20px}
+[data-k=ld-4] .layer{display:grid}
+[data-k=ld-4] .layer>*{grid-area:1/1}
+[data-k=ld-4] .fact{opacity:0;transform:translateY(7px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .fact.on{opacity:1;transform:none}
+[data-k=ld-4] .fact.calm{transform:none}
+[data-k=ld-4] .src{margin:0 0 10px;font-size:12px;line-height:1.3;color:rgba(var(--ink),.78)}
+[data-k=ld-4] .say{margin:0;font-size:22px;font-weight:500;line-height:1.34;letter-spacing:-.022em;
+  color:var(--text-hi);font-variant-numeric:tabular-nums;min-height:88px}
+[data-k=ld-4] .say .q{color:var(--text-lo)}
+
+/* position in the cycle, not a claim about anything */
+[data-k=ld-4] .ticks{display:flex;gap:5px;margin:20px 0 0;transition:opacity .45s ease}
+[data-k=ld-4] .ticks.gone{opacity:0}
+[data-k=ld-4] .ticks i{width:16px;height:2px;border-radius:2px;background:rgba(var(--ink),.16);
+  transition:background .45s ease}
+[data-k=ld-4] .ticks i.on{background:rgba(var(--ink),.62)}
+
+/* arrival: one sentence, alone, on the same baseline the facts held */
+[data-k=ld-4] .arr{align-self:start;opacity:0;transform:translateY(8px);pointer-events:none;
+  transition:opacity .5s ease,transform .5s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .arr.on{opacity:1;transform:none;pointer-events:auto}
+[data-k=ld-4] .arr p{margin:0;font-size:22px;font-weight:500;line-height:1.34;letter-spacing:-.022em;
+  color:var(--text-hi)}
+
+[data-k=ld-4] .foot{flex:0 0 auto;display:flex;justify-content:center;padding:0 0 14px}
+[data-k=ld-4] .foot .more{display:inline-block;padding:6px 2px;border:0;background:none;font-family:inherit;
+  font-size:11.5px;line-height:1;color:rgba(var(--ink),.45);cursor:pointer;letter-spacing:-.005em}
+[data-k=ld-4] .foot .more[aria-pressed=true]{color:rgba(var(--ink),.78)}
+[data-k=ld-4] .cta{flex:0 0 auto}
+[data-k=ld-4] .cta button{display:block;width:100%;border:0;border-radius:14px;padding:0;height:54px;
+  font-family:inherit;font-size:15.5px;line-height:1.1;letter-spacing:-.014em;cursor:pointer;
+  background:rgba(235,238,248,.94);color:#0b0c10;font-weight:700;
+  opacity:0;transform:translateY(6px);pointer-events:none;
+  transition:opacity .45s ease,transform .45s cubic-bezier(.25,.8,.3,1)}
+[data-k=ld-4] .cta button.on{opacity:1;transform:none;pointer-events:auto}
+[data-k=ld-4] .cta button:active{transform:scale(.985)}
+
+@media (prefers-reduced-motion:reduce){
+  [data-k=ld-4] .fact,[data-k=ld-4] .arr,[data-k=ld-4] .cta button{transition:opacity .2s linear}
+  [data-k=ld-4] .fact{transform:none}
+}
+/* the M, breathing: quiet brand while the plan is written. Slow fade in
+   and out, meaning: something alive is working. */
+[data-k=ld-4] .ld-m{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);
+  z-index:5;width:16px;height:16px;pointer-events:none}
+[data-k=ld-4] .ld-m path{fill:rgba(var(--ink),.9)}
+[data-k=ld-4] .ld-m{animation:ldMBreathe 4s ease-in-out infinite alternate}
+@keyframes ldMBreathe{from{opacity:.14}to{opacity:.5}}
+@media (prefers-reduced-motion:reduce){[data-k=ld-4] .ld-m{animation:none;opacity:.3}}
+</style>
+<h3>The working list</h3><p class="cap">The wait shows only what Memento already knows, one line at a time and held for six seconds each: your star, your why, your date, and what you said you have already done. The clock is real elapsed time, and it stays on as the receipt when the plan lands.</p>
+<div class="bk"><i>All seven buckets</i></div>
+<div class="ph">
+  <div class="grid"></div>
+  <svg class="ld-m" viewBox="42 40 428 432" aria-hidden="true"><path d="M62 55 L256 249 L450 55 L450 457 L62 457 Z"/></svg>
+  <div class="col">
+    <div class="head">
+      <h4>Writing your plan.</h4>
+      <p class="clk">0:00</p>
+    </div>
+    <p class="state">This usually takes about 30 seconds.</p>
+
+    <div class="stage">
+      <div class="layer">
+        <div class="fact">
+          <p class="src"></p>
+          <p class="say"></p>
+        </div>
+        <div class="arr"><p>Your plan is ready.</p></div>
+      </div>
+      <div class="ticks"><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div class="foot">
+      <button type="button" class="more" aria-pressed="false">Demo: show a longer wait</button>
+    </div>
+    <div class="cta"><button type="button">Open your plan</button></div>
+  </div>
+</div>
+<script>
+(function(){
+  var r=document.querySelector('[data-k="ld-4"]'); if(!r) return;
+  var fact=r.querySelector('.fact'), src=r.querySelector('.src'), say=r.querySelector('.say'),
+      arr=r.querySelector('.arr'),
+      ticks=r.querySelectorAll('.ticks i'), tickRow=r.querySelector('.ticks'),
+      head=r.querySelector('.head'), title=r.querySelector('.head h4'), clk=r.querySelector('.clk'),
+      state=r.querySelector('.state'),
+      more=r.querySelector('.more'), cta=r.querySelector('.cta button');
+
+  /* Their own words. Star and why come from Clarity, the date is the one they typed,
+     the last two are their answers in the refine step. Nothing else exists here. */
+  var FACTS=[
+    {s:'Your star, in your words.',
+     t:'I will get to $3,000 a month so I can quit the warehouse.',q:1},
+    {s:'Why you said it matters.',
+     t:'So I stop missing my daughter going to school.',q:1},
+    {s:'The date you set.',
+     t:'31 October. That is 11 weeks from today.'},
+    {s:'The numbers you typed in the refine step.',
+     t:'31 people have bought from you. 8 of them bought twice.'},
+    {s:'What you said you already do.',
+     t:'You message past customers. You said it is not consistent.'}
+  ];
+  var HOLD=6000, STATES=['This usually takes about 30 seconds.',
+                         'Still creating. This one is taking longer. You have big plans lol',
+                         'Still creating.'];
+
+  var timers=[], t0=0, tick=null, pass=0, idx=0, longer=false, done=false;
+  function clear(){ timers.forEach(clearTimeout); timers=[]; }
+  function at(ms,fn){ timers.push(setTimeout(fn,ms)); }
+  function fmt(ms){ var s=Math.floor(ms/1000); return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
+
+  function setState(i){
+    var txt=STATES[Math.min(i,STATES.length-1)];
+    if(state.textContent===txt) return;
+    state.classList.add('swap');
+    at(450,function(){ state.textContent=txt; state.classList.remove('swap'); });
+  }
+  function marks(n){
+    for(var i=0;i<ticks.length;i++) ticks[i].classList.toggle('on',i<=n);
+  }
+
+  /* one fact in, held, out. On a repeat pass the order rotates and the entry is a
+     plain fade, so a long wait reads calmer rather than louder. */
+  function show(){
+    var order=FACTS.slice(pass).concat(FACTS.slice(0,pass)),
+        f=order[idx];
+    fact.classList.toggle('calm',pass>0);
+    src.textContent=f.s;
+    say.innerHTML = f.q ? '<span class="q">“</span>'+f.t+'<span class="q">”</span>' : f.t;
+    marks(idx);
+    at(20,function(){ fact.classList.add('on'); });
+    at(HOLD-600,function(){ fact.classList.remove('on'); });
+    at(HOLD,function(){
+      idx++;
+      if(idx<order.length) return show();
+      idx=0; pass++;
+      if(longer && pass<3){ setState(pass); return show(); }
+      land();
+    });
+  }
+
+  /* arrival: everything that was carrying the wait steps back, one sentence steps forward */
+  function land(){
+    done=true;
+    if(tick){ clearInterval(tick); tick=null; }
+    clk.textContent=fmt(Date.now()-t0);
+    head.classList.add('gone');
+    state.classList.remove('swap'); state.classList.add('gone');
+    tickRow.classList.add('gone');
+    at(120,function(){ arr.classList.add('on'); });
+    at(280,function(){ cta.classList.add('on'); });
+  }
+
+  function run(){
+    clear(); if(tick) clearInterval(tick);
+    pass=0; idx=0; done=false;
+    fact.classList.remove('on','calm'); arr.classList.remove('on'); cta.classList.remove('on');
+    tickRow.classList.remove('gone'); marks(-1);
+    head.classList.remove('gone'); title.textContent='Writing your plan.';
+    state.classList.remove('swap','gone'); state.textContent=STATES[0];
+    t0=Date.now(); clk.textContent='0:00';
+    tick=setInterval(function(){ if(!done) clk.textContent=fmt(Date.now()-t0); },250);
+    at(650,show);
+  }
+
+  more.addEventListener('click',function(){
+    longer=!longer;
+    more.setAttribute('aria-pressed',longer?'true':'false');
+    more.textContent=longer?'Demo: longer wait on':'Demo: show a longer wait';
+    if(done) run();
+  });
+  cta.addEventListener('click',run);
+  run();
+})();
+</script>
+</section>
