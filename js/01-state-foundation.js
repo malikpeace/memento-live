@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1177';
+window.MEMENTO_JS_BUILD = 'v1180';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -2207,6 +2207,15 @@ function migrateState() {
       state.meta.proofEventsDerivedV1 = true;
     } catch (e) { if (state.meta) state.meta.proofEventsDerivedV1 = true; }
   }
+
+  // CLARITY-MERGE phase 2. Writing a note counts as showing up, so every note
+  // writes its own reflection-save through the js/04 chokepoint AT SAVE TIME
+  // (dedupeKey 'clarnote-<id>'). This call is the one-time backfill for notes
+  // that already existed, plus the one-time migration of the Memento card's
+  // old editable wall into state.clarityNotes. Both are guarded by their own
+  // meta flags. It lives in js/02 (Clarity owns the store) and is called from
+  // here so it runs at boot even if Clarity is never opened.
+  try { if (typeof clarityNotesMigrateV1 === 'function') clarityNotesMigrateV1(); } catch (e) {}
 
   // v22: move any inline image dataURLs (Vivere cards + reflection notes) out of
   // localStorage and into IndexedDB. Async + idempotent; flag set only on full

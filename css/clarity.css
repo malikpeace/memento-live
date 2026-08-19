@@ -4871,3 +4871,241 @@ html.theme-light .cp-note__sig { color: rgba(24, 26, 33, 0.42); }
 html.theme-light .cp-empty { color: rgba(24, 26, 33, 0.75); }
 html.theme-light .cp-ghost .cp-note__txt, html.theme-light .cp-ghost .cp-note__sig { color: rgba(24, 26, 33, 0.8); }
 html.theme-light .cp-ghosttag { color: rgba(24, 26, 33, 0.4); }
+
+/* ============================================================
+   CLARITY NOTES, phases 2 and 3 (CLARITY-MERGE-CHECKLIST.md)
+   Ported from mockups/clarity-home/notes-flow.html: geometry, spacing, type
+   scale and copy are the mock's. Light mode is derived from
+   clarity-pages.html's .lt recipe, additive html.theme-light overrides only,
+   no :has() opt-outs. Colours are literal for the same reason the pager's
+   are: the shipped html.theme-light .clarity-exp:has(.ns-star-scene) rule
+   pins --ink white across the overlay, so the token lies on these surfaces.
+   ============================================================ */
+
+/* ---- page 3: the long press ----
+   Delete is a long press, so iOS must not raise its own callout or start a
+   text selection on the same gesture. That costs text selection inside a
+   note, which is the trade the gesture requires. */
+.cp-note[data-cn-id] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+  /* NO radius here: the divider between two notes is an inset 1px top
+     shadow, and a radius bends it into a visible rounded box. */
+  transition: transform 0.6s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.6s ease;
+}
+.cp-note[data-cn-id].is-pressing { transform: scale(0.975); opacity: 0.72; }
+@media (prefers-reduced-motion: reduce) {
+  .cp-note[data-cn-id] { transition: none; }
+  .cp-note[data-cn-id].is-pressing { transform: none; }
+}
+
+/* ---- the confirm dialog (the mock's dlgWrap/dlg, ported) ---- */
+.cn-dlgwrap {
+  position: fixed; inset: 0; z-index: 100060;
+  display: flex; align-items: center; justify-content: center; padding: 34px;
+  background: rgba(2, 4, 8, 0.62);
+  opacity: 0; transition: opacity 0.18s ease;
+}
+.cn-dlgwrap.is-on { opacity: 1; }
+.cn-dlg {
+  width: 100%; max-width: 290px; border-radius: 18px; padding: 24px 22px 18px;
+  background: #101319; text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.cn-dlg h4 { margin: 0 0 8px; font-size: 17px; font-weight: 800; color: #fff; }
+.cn-dlg p { margin: 0 0 18px; font-size: 13.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+.cn-dlgbtn {
+  display: flex; justify-content: center; align-items: center; width: 100%;
+  padding: 13px 0; border-radius: 999px; border: 0;
+  font-family: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cn-dlgbtn--danger { background: #ff3b30; color: #fff; }
+.cn-dlgbtn--quiet { background: none; color: rgba(255, 255, 255, 0.5); font-weight: 600; margin-top: 6px; }
+.cn-dlgbtn:active { transform: scale(0.985); }
+
+/* ---- the writer ----
+   Above the Clarity overlay AND above its close X (100001), because the
+   writer's own Cancel is the only way out of it. */
+.cn-writer {
+  position: fixed; inset: 0; z-index: 100050;
+  background: #04050a; color: rgba(255, 255, 255, 0.96);
+  --cn-acc: #8be9fa;
+  --cn-acc-soft: rgba(139, 233, 250, 0.16);
+  --cn-acc-ring: rgba(139, 233, 250, 0.45);
+  opacity: 0; transition: opacity 0.2s ease;
+  overflow: hidden;
+}
+.cn-writer.is-on { opacity: 1; }
+.cn-step { position: relative; height: 100%; display: flex; flex-direction: column; }
+.cn-neb { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+
+/* step 1, writing */
+.cn-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(var(--safe-t, 0px) + 14px) 20px 14px;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+.cn-bar button {
+  border: 0; background: none; font-family: inherit; cursor: pointer;
+  padding: 4px 2px; -webkit-tap-highlight-color: transparent;
+}
+.cn-bar__x { color: rgba(255, 255, 255, 0.4); font-size: 15px; font-weight: 600; }
+.cn-bar__t { font-size: 15px; font-weight: 700; color: rgba(255, 255, 255, 0.9); }
+.cn-bar__done { color: var(--cn-acc); font-size: 15px; font-weight: 700; }
+.cn-bar__done[disabled] { color: rgba(255, 255, 255, 0.25); cursor: default; }
+.cn-body {
+  padding: 22px 22px 0; display: flex; flex-direction: column; min-height: 0;
+  width: 100%; max-width: 520px; margin: 0 auto;
+}
+/* THE HIGH FIELD, the precondition bindKeyboardSettle needs. Its box ends
+   around a third of the way down, so the settle's zero-pan is a position iOS
+   accepts. Long notes scroll inside the field instead of pushing the caret
+   toward the keyboard. */
+.cn-field {
+  width: 100%; min-height: 96px; max-height: 26vh; overflow-y: auto;
+  resize: none; border: 0; background: none; padding: 0;
+  font-family: inherit; font-size: 19px; line-height: 1.55; font-weight: 500;
+  color: rgba(255, 255, 255, 0.96); caret-color: var(--cn-acc);
+  -webkit-appearance: none; outline: none;
+}
+.cn-field::placeholder { color: rgba(255, 255, 255, 0.3); }
+/* The jog chips sit under the field, not pinned to the bottom of the screen:
+   the settle resets the pan to zero, so anything the user needs while typing
+   has to be high by construction, never by measuring the keyboard. */
+.cn-jog { margin-top: 20px; }
+.cn-jog__lab { color: rgba(255, 255, 255, 0.4); font-size: 12px; font-weight: 650; margin-bottom: 10px; }
+.cn-jog__chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.cn-jog__chips::-webkit-scrollbar { display: none; }
+.cn-jchip {
+  white-space: nowrap; flex: none; padding: 9px 14px; border-radius: 999px;
+  border: 0; font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-tap-highlight-color: transparent;
+}
+.cn-jchip.is-on {
+  background: var(--cn-acc-soft); color: var(--cn-acc);
+  box-shadow: inset 0 0 0 1px var(--cn-acc-ring);
+}
+/* DESKTOP VARIANT. On a phone the keyboard owns the bottom half, which is why
+   the field is capped and the chips ride just under it. A pointer device has
+   no keyboard, so the field takes the room instead of leaving a dead void and
+   the chips settle at the foot of the page. Touch (phone and iPad, both
+   pointer: coarse) keeps the high geometry the settle recipe requires. */
+@media (hover: hover) and (pointer: fine) {
+  .cn-body { flex: 1; padding-bottom: calc(var(--safe-b, 0px) + 22px); }
+  .cn-field { max-height: none; flex: 1; }
+  .cn-jog { margin-top: 18px; }
+  /* a scroll strip reads as a cut-off row without a finger to swipe it */
+  .cn-jog__chips { flex-wrap: wrap; overflow-x: visible; }
+}
+
+/* step 2, the tag */
+.cn-tagstage {
+  position: relative; min-height: 100%;
+  width: 100%; max-width: 520px; margin: 0 auto;
+  padding: calc(var(--safe-t, 0px) + 24px) 24px calc(var(--safe-b, 0px) + 30px);
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+/* the content block, optically centered in the room above the pill */
+.cn-tagcontent {
+  flex: 1; min-height: 0; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.cn-lab {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5); margin-bottom: 16px;
+}
+.cn-quote { font-size: 17px; line-height: 1.55; color: rgba(255, 255, 255, 0.9); font-weight: 500; max-width: 290px; }
+.cn-h { font-size: 19px; font-weight: 800; margin: 26px 0 6px; }
+.cn-sub { color: rgba(255, 255, 255, 0.6); font-size: 14px; margin: 0 auto 18px; max-width: 250px; }
+.cn-tagchips { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; max-width: 300px; margin: 0 auto; }
+.cn-tagchip {
+  padding: 10px 15px; border-radius: 999px; border: 0; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-tap-highlight-color: transparent;
+}
+.cn-tagchip.is-on {
+  background: var(--cn-acc-soft); color: var(--cn-acc);
+  box-shadow: inset 0 0 0 1px var(--cn-acc-ring);
+}
+.cn-tagchip--add { color: rgba(255, 255, 255, 0.4); }
+.cn-own { width: 100%; max-width: 300px; margin: 16px auto 0; }
+.cn-owninput {
+  width: 100%; padding: 13px 16px; border-radius: 12px; border: 0;
+  background: rgba(255, 255, 255, 0.07); color: rgba(255, 255, 255, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-family: inherit; font-size: 16px; font-weight: 600; text-align: center;
+  outline: none; -webkit-appearance: none;
+}
+.cn-owninput::placeholder { color: rgba(255, 255, 255, 0.32); }
+/* Writing your own tag re-anchors the step to the top so the input, the pill
+   and the skip all stay above the keyboard. Same law, no measuring. */
+.cn-step--tag.is-own .cn-tagcontent { flex: none; justify-content: flex-start; }
+/* The quote already did its job; dropping it here is what keeps the input,
+   the pill AND the skip line clear of the keyboard on a 390x844 phone. */
+.cn-step--tag.is-own .cn-lab,
+.cn-step--tag.is-own .cn-quote { display: none; }
+.cn-step--tag.is-own .cn-h { margin-top: 4px; }
+.cn-step--tag.is-own .cn-cta { margin-top: 22px; }
+.cn-step--tag.is-own .cn-skip { margin-bottom: auto; }
+.cn-cta {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; max-width: 420px; margin: 0 auto;
+  padding: 17px 22px; border-radius: 999px; border: 0; cursor: pointer;
+  background: #fff; color: #0b1112; font-family: inherit; font-size: 16px; font-weight: 700;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  -webkit-tap-highlight-color: transparent;
+}
+.cn-cta:active { transform: scale(0.99); }
+.cn-skip {
+  display: block; margin: 16px auto 0; border: 0; background: none; cursor: pointer;
+  color: rgba(255, 255, 255, 0.4); font-family: inherit; font-size: 14px; font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---- LIGHT MODE, additive only (the mock's .lt recipe) ---- */
+html.theme-light .cn-writer {
+  background: #eef0f3; color: rgba(24, 26, 33, 0.96);
+  --cn-acc: #0d8ca6;
+  --cn-acc-soft: rgba(13, 140, 166, 0.1);
+  --cn-acc-ring: rgba(13, 140, 166, 0.35);
+}
+html.theme-light .cn-bar { box-shadow: inset 0 -1px 0 rgba(24, 26, 33, 0.1); }
+html.theme-light .cn-bar__x { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cn-bar__t { color: rgba(24, 26, 33, 0.9); }
+html.theme-light .cn-bar__done[disabled] { color: rgba(24, 26, 33, 0.28); }
+html.theme-light .cn-field { color: rgba(24, 26, 33, 0.94); }
+html.theme-light .cn-field::placeholder { color: rgba(24, 26, 33, 0.35); }
+html.theme-light .cn-jog__lab { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cn-jchip,
+html.theme-light .cn-tagchip {
+  background: rgba(24, 26, 33, 0.06); color: rgba(24, 26, 33, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html.theme-light .cn-jchip.is-on,
+html.theme-light .cn-tagchip.is-on {
+  background: rgba(13, 140, 166, 0.1); color: #0d8ca6;
+  box-shadow: inset 0 0 0 1px rgba(13, 140, 166, 0.35);
+}
+html.theme-light .cn-tagchip--add { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cn-lab { color: rgba(24, 26, 33, 0.5); }
+html.theme-light .cn-quote { color: rgba(24, 26, 33, 0.9); }
+html.theme-light .cn-sub { color: rgba(24, 26, 33, 0.6); }
+html.theme-light .cn-owninput {
+  background: rgba(24, 26, 33, 0.06); color: rgba(24, 26, 33, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+html.theme-light .cn-owninput::placeholder { color: rgba(24, 26, 33, 0.35); }
+/* the white pill flips to dark solid, v497 tokens */
+html.theme-light .cn-cta { background: #181a21; color: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18); }
+html.theme-light .cn-skip { color: rgba(24, 26, 33, 0.5); }
+html.theme-light .cn-dlgwrap { background: rgba(24, 26, 33, 0.28); }
+html.theme-light .cn-dlg { background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22); }
+html.theme-light .cn-dlg h4 { color: rgba(24, 26, 33, 0.96); }
+html.theme-light .cn-dlg p { color: rgba(24, 26, 33, 0.55); }
+html.theme-light .cn-dlgbtn--quiet { color: rgba(24, 26, 33, 0.5); }

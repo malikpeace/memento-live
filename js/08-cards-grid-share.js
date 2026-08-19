@@ -6901,7 +6901,10 @@ function _mfDerive() {
     if (!d.firstEv || t < d.firstEv.ts) d.firstEv = { ts: t, type: 'action-complete', histOnly: true };
   }
   // words: first and latest reflection with text, and the hardest days
-  const refl = withTs.filter(e => e.type === 'reflection-save' && String(e.text || '').trim());
+  // clarity notes count as marks but never as quoted lines: the glance below
+  // already shows the note itself, the record must not read it back twice
+  const refl = withTs.filter(e => e.type === 'reflection-save' && String(e.text || '').trim() &&
+    String((e.metadata && e.metadata.dedupeKey) || '').indexOf('clarnote-') !== 0);
   d.firstLine = refl[0] || null;
   d.lastLine = refl.length > 1 ? refl[refl.length - 1] : null;
   const backSet = {}; d.wallDays.forEach(w => { if (w.k === 'is-back') backSet[w.iso] = 1; });
@@ -7175,12 +7178,30 @@ function _mfInsideHtml(d, trailHtml) {
       '</ol></div></div>';
   }
 
-  /* the wall: notes the user pinned; the old private note lives here now */
-  const wall = Array.isArray(state.wall) ? state.wall : [];
-  h += '<div class="viv-wall" id="mfWall">' +
-    wall.map((n, i) => '<div class="viv-wall__note"><p>' + E(String(n.text || '').slice(0, 300)) + '</p><span>' + E(n.at ? _mfFmtD(new Date(n.at)) : '') + '</span></div>').join('') +
-    '<button class="viv-wall__add" id="mfWallAdd" type="button">Add a note</button>' +
-    '</div>';
+  /* THE NOTES GLANCE (Malik, 2026-08-19). The card's old editable wall is
+     gone: its entries migrated into state.clarityNotes (js/02
+     clarityNotesMigrateV1) and writing lives in Clarity page 3 now. What
+     stays here is the second window on the same store, read-only: the latest
+     note, and a way back to the whole stack. state.wall itself is untouched
+     in storage, it is simply no longer rendered or written. */
+  const cnLive = (typeof clarityNotesLive === 'function') ? clarityNotesLive() : [];
+  const cnLatest = (typeof clarityNotesLatest === 'function') ? clarityNotesLatest() : null;
+  if (cnLatest) {
+    const cnTag = (typeof clarityNoteTag === 'function') ? clarityNoteTag(cnLatest) : 'A note';
+    h += '<div class="cn-glance" id="mfNotesGlance" role="button" tabindex="0">' +
+      '<div class="cn-glance__lab">Latest note</div>' +
+      '<div class="cn-glance__tag">' + E(cnTag) + '</div>' +
+      '<p class="cn-glance__txt">' + E(String(cnLatest.text || '').slice(0, 300)) + '</p>' +
+      '<div class="cn-glance__more">' +
+        (cnLive.length > 1 ? 'Read all ' + cnLive.length : 'Open your notes') + ' &rarr;</div>' +
+      '</div>';
+  } else {
+    h += '<div class="cn-glance cn-glance--empty" id="mfNotesGlance" role="button" tabindex="0">' +
+      '<div class="cn-glance__lab">Notes to yourself</div>' +
+      '<p class="cn-glance__txt">Nothing here yet. Clarity is where you leave one.</p>' +
+      '<div class="cn-glance__more">Open your notes &rarr;</div>' +
+      '</div>';
+  }
 
   /* THE SEAL */
   const seal = (state.seal && typeof state.seal === 'object') ? state.seal : null;
@@ -7308,29 +7329,21 @@ function _mfInsideWire(ov, d, sig) {
     code.innerHTML = bars;
   })();
 
-  // the wall: add a note inline (their words, dated, persisted, synced)
+  // the notes glance: read-only, and it taps through to the whole stack in
+  // Clarity page 3 (the resume carve-out: an intentional tap may deep link).
+  // The record closes first so Clarity does not open behind a card in flight.
   (function () {
-    const add = ov.querySelector('#mfWallAdd');
-    const wall = ov.querySelector('#mfWall');
-    if (!add || !wall) return;
-    on(add, 'click', () => {
-      if (wall.querySelector('.viv-wall__write')) return;
-      const w = document.createElement('div');
-      w.className = 'viv-wall__note viv-wall__write';
-      w.innerHTML = '<textarea rows="3" maxlength="300" placeholder="A line worth keeping."></textarea>' +
-        '<button type="button" class="viv-wall__keep">Keep it</button>';
-      wall.insertBefore(w, add);
-      const ta = w.querySelector('textarea');
-      ta.focus();
-      w.querySelector('.viv-wall__keep').addEventListener('click', () => {
-        const txt = String(ta.value || '').trim().slice(0, 300);
-        if (!txt) { w.remove(); return; }
-        if (!Array.isArray(state.wall)) state.wall = [];
-        state.wall.push({ text: txt, at: Date.now() });
-        try { persistNow(); } catch (e) {}
-        w.classList.remove('viv-wall__write');
-        w.innerHTML = '<p>' + esc(txt) + '</p><span>' + esc(_mfFmtD(new Date())) + '</span>';
-      }, sig || {});
+    const g = ov.querySelector('#mfNotesGlance');
+    if (!g) return;
+    const go = () => {
+      try { MementoView.close(); } catch (e) {}
+      setTimeout(() => {
+        try { if (typeof clarityOpenNotesPage === 'function') clarityOpenNotesPage(); } catch (e) {}
+      }, 480);
+    };
+    on(g, 'click', go);
+    on(g, 'keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
     });
   })();
 
@@ -7401,18 +7414,10 @@ function _mfBuildOverlay() {
     const d = _mfDerive();
     const moriEnd = d.moriEnd;
     const evs = Array.isArray(state.proofEvents) ? state.proofEvents.slice() : [];
-    // the old private note becomes the first wall note, still theirs (spec's
-    // migration rule); the source field survives untouched for Mori's sheet.
-    try {
-      const noteTxt0 = String((state.mori && state.mori.futureSelfNote) || '').trim();
-      if (noteTxt0 && !(state.meta && state.meta.noteMigratedToWall)) {
-        if (!Array.isArray(state.wall)) state.wall = [];
-        state.wall.unshift({ text: noteTxt0.slice(0, 300), at: (state.mori && state.mori.futureSelfNoteAt) || d.creationAt });
-        if (!state.meta) state.meta = {};
-        state.meta.noteMigratedToWall = true;
-        persistNow();
-      }
-    } catch (e) {}
+    // (the old private Mori note used to be copied into the card's wall here.
+    // The wall is gone: js/02's clarityNotesMigrateV1 now carries both it and
+    // the wall's own entries into state.clarityNotes, once, at boot. The
+    // source field survives untouched for Mori's sheet.)
     // THE TRAIL: every event the app has written, grouped by month, newest
     // month open. A closed month is one row that still carries its weight (a
     // dot per mark + the count); only the open month renders its list, which
