@@ -11365,9 +11365,16 @@ function _cpBindSummaryPage(pager) {
   if (upd) upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
   const twk = pager.querySelector('#cpTweak');
   if (twk) twk.addEventListener('click', function () { clarityOpenTweak(); });
-  // the numberless goal's door: same tweak flow, reached from the nudge
+  // the numberless goal's door: the intent is already known (same goal, add a
+  // number), so it skips the tweak fork and opens Refine directly (v1186,
+  // Malik: the what-do-you-want-to-do-with-it screen is wrong here)
   const gn = pager.querySelector('#cpGiveNumber');
-  if (gn) gn.addEventListener('click', function () { clarityOpenTweak(); });
+  if (gn) gn.addEventListener('click', function () {
+    try {
+      _cpStampRefine();
+      openNeutronStarRefineDialog(function () { _cpRepaintSummaryPage({}); });
+    } catch (e) {}
+  });
 }
 
 /* Repaint page 2 in place after a save, and walk the rail from where it was
