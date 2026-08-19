@@ -34,6 +34,13 @@ function actionMissionTexts(primaryAction) {
 
 function actionCompletionMatchesMission(entry, primaryAction) {
   if (!entry) return false;
+  // merge 3.1 (v1197): the NEW Action flow writes missionId 'plan_<starHash>'
+  // with no legacy primaryAction behind it. A plan-flow record matches when
+  // it belongs to the LIVE plan, so the home recognises a completed day.
+  if (entry.missionId && String(entry.missionId).indexOf('plan_') === 0) {
+    const ap = state.actionPlan;
+    return !!(ap && ap.starHash && entry.missionId === 'plan_' + ap.starHash);
+  }
   const pa = primaryAction || (state.action && state.action.primaryAction) || {};
   const missionId = ensureActionMissionId(pa);
   if (!missionId) return false;

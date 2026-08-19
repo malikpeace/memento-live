@@ -5130,8 +5130,18 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   background: rgba(var(--ink), 0.55); transition: background 0.18s ease, height 0.18s ease;
 }
 .afl-q__own:focus-within i, .afl-q__own.is-lit i { background: rgba(var(--ink), 0.95); height: 22px; }
+/* THE CARET GLITCH (v1197, Malik on-device: tapping the field put the caret
+   BELOW the box until the first character landed, then it jumped into place).
+   Root cause: height:100% stretched the input to the full 60px row while its
+   line box stayed `normal`, so an EMPTY input had a 60px content box with a
+   ~25px line box in it. iOS positions an empty caret against that line box's
+   own placement inside the over-tall box, which lands low; typing creates a
+   real text node and the caret snaps to the text. Fixed by construction: the
+   input is its own line box tall, with an EXPLICIT line-height, and the row's
+   align-items:center does the centring. Empty and filled now share one box. */
 .afl-q__own input {
-  flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none;
+  flex: 1; min-width: 0; height: auto; border: 0; background: none; outline: none;
+  padding: 0; margin: 0; line-height: 1.4;
   font-family: inherit; font-size: 17.6px; letter-spacing: -0.008em; color: rgba(var(--ink), 0.96);
 }
 .afl-q__own input::placeholder { color: rgba(var(--ink), 0.66); }
@@ -5372,56 +5382,110 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 @keyframes aflLgIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .afl-lg__in.is-reveal { animation: none; } }
 .afl-lg__star {
-  margin: 0 0 18px; font-size: 31px; font-weight: 700; line-height: 1.28;
+  margin: 0 0 22px; font-size: 33px; font-weight: 700; line-height: 1.26;
   letter-spacing: -0.027em; color: var(--text-hi); text-wrap: pretty;
 }
-.afl-lg__b { margin: 0 0 18px; font-size: 16.9px; line-height: 1.58; color: rgba(var(--ink), 0.92); text-wrap: pretty; }
-.afl-lg__b--ind { padding-left: 14px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14); }
-/* the before and after: one arrow line, nothing to decode */
+/* v1197: everything on this page steps up. It is the one page a person
+   actually READS, and it was set at chip sizes. Body 16.9 -> 18.2, section
+   heads become real headers, and the vertical rhythm opens with them. */
+.afl-lg__b { margin: 0 0 22px; font-size: 18.2px; line-height: 1.6; color: rgba(var(--ink), 0.92); text-wrap: pretty; }
+.afl-lg__b--ind { padding-left: 16px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14); }
+/* the before and after: one arrow line, nothing to decode.
+   v1197 (his screenshot: the arrow sat high and to the right). It was
+   baseline-aligned against two figures of different size and weight, which
+   pins a glyph with almost no descender above the optical middle. Centre
+   alignment plus a 1:1 line box puts it exactly between them, and the two
+   figures take equal space either side so it is centred horizontally too. */
 .afl-lg__ar {
-  display: flex; align-items: baseline; justify-content: center; gap: 13px;
-  margin: 0 0 21px; padding: 17px 0;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin: 0 0 24px; padding: 19px 0;
   box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16), inset 0 -1px 0 rgba(var(--ink), 0.16);
 }
-.afl-lg__ar b { font-size: 21.5px; font-weight: 700; letter-spacing: -0.015em; color: var(--text-hi); }
+/* the figures keep their NATURAL width. Equal halves either side would centre
+   the arrow in the column, but it squeezes the longer figure onto two lines,
+   which is worse than the thing it fixes. His note was "between the two
+   figures": one gap value on both sides does exactly that. */
+.afl-lg__ar b {
+  flex: 0 1 auto; min-width: 0;
+  font-size: 23px; font-weight: 700; letter-spacing: -0.015em; color: var(--text-hi);
+}
 .afl-lg__ar b.is-from { color: rgba(var(--ink), 0.62); font-weight: 500; }
-.afl-lg__ar i { font-style: normal; font-size: 19.5px; color: rgba(var(--ink), 0.55); }
-.afl-lg__lead { margin: 0 0 12px; font-size: 16.3px; font-weight: 600; color: rgba(var(--ink), 0.80); }
+.afl-lg__ar i {
+  flex: 0 0 auto; display: block; font-style: normal;
+  font-size: 20px; line-height: 1; color: rgba(var(--ink), 0.55);
+}
+.afl-lg__lead { margin: 0 0 15px; font-size: 18.2px; font-weight: 700; letter-spacing: -0.014em; color: rgba(var(--ink), 0.92); }
 .afl-lg__acts { margin: 0 0 10px; }
-.afl-lg__row { display: flex; gap: 12px; padding: 9px 0; }
+.afl-lg__row { display: flex; gap: 13px; padding: 11px 0; }
 .afl-lg__row i { font-style: normal; flex: 0 0 auto; color: rgba(var(--ink), 0.45); font-size: 17px; line-height: 1.4; }
 .afl-lg__row div { min-width: 0; }
-.afl-lg__row.is-star b { font-size: 19px; font-weight: 700; letter-spacing: -0.014em; color: var(--text-hi); line-height: 1.35; }
-.afl-lg__row:not(.is-star) b { display: block; font-size: 16.9px; font-weight: 600; color: var(--text-hi); line-height: 1.35; }
-.afl-lg__row span { display: block; margin-top: 1px; font-size: 14.3px; line-height: 1.4; color: rgba(var(--ink), 0.75); }
-.afl-lg__st { margin: 3px 0 13px; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92); }
+.afl-lg__row.is-star b { font-size: 20.5px; font-weight: 700; letter-spacing: -0.014em; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__row:not(.is-star) b { display: block; font-size: 18.2px; font-weight: 600; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__row span { display: block; margin-top: 3px; font-size: 15.6px; line-height: 1.45; color: rgba(var(--ink), 0.78); }
+.afl-lg__st { margin: 6px 0 16px; font-size: 17.6px; line-height: 1.55; color: rgba(var(--ink), 0.92); }
 .afl-lg__st b { font-weight: 600; color: var(--text-hi); }
 .afl-lg__no {
-  margin: 0 0 5px; padding: 14px 0; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92);
+  margin: 0 0 6px; padding: 16px 0; font-size: 17.6px; line-height: 1.55; color: rgba(var(--ink), 0.92);
   box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16), inset 0 -1px 0 rgba(var(--ink), 0.16);
 }
 .afl-lg__no b { font-weight: 700; color: var(--text-hi); }
 .afl-lg__h {
-  margin: 18px 0 16px; padding-top: 17px; font-size: 17.6px; font-weight: 700;
-  letter-spacing: -0.012em; color: var(--text-hi); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16);
+  margin: 26px 0 18px; padding-top: 22px; font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-hi); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16);
 }
+/* the questions header carries the most weight of the three (his note) */
+.afl-lg__h--big { font-size: 25px; letter-spacing: -0.024em; }
 .afl-lg__eq {
-  display: flex; flex-direction: column; gap: 10px; margin: 0 0 21px;
-  padding-left: 14px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14);
+  display: flex; flex-direction: column; gap: 13px; margin: 0 0 24px;
+  padding-left: 16px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14);
 }
 .afl-lg__eq div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
-.afl-lg__eq s { text-decoration: none; font-size: 15.6px; color: rgba(var(--ink), 0.78); }
+.afl-lg__eq s { text-decoration: none; font-size: 16.9px; line-height: 1.4; color: rgba(var(--ink), 0.82); }
 /* inline-block so a re-checked number can arrive with the change animation */
-.afl-lg__eq b { display: inline-block; font-size: 18.2px; font-weight: 700; color: var(--text-hi); white-space: nowrap; }
+.afl-lg__eq b { display: inline-block; font-size: 19.5px; font-weight: 700; color: var(--text-hi); white-space: nowrap; }
 .afl-lg__eq .is-result { padding-top: 12px; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.13); }
-.afl-lg__eq .is-result b { font-size: 21.5px; }
-.afl-lg__q { margin: 0 0 7px; font-size: 16.9px; font-weight: 700; letter-spacing: -0.012em; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__eq .is-result b { font-size: 23px; }
+.afl-lg__q { margin: 0 0 9px; font-size: 18.2px; font-weight: 700; letter-spacing: -0.012em; color: var(--text-hi); line-height: 1.35; }
 .afl-lg__qa {
-  margin: 0 0 19px; padding-left: 14px; font-size: 16.3px; line-height: 1.56;
+  margin: 0 0 23px; padding-left: 16px; font-size: 17.6px; line-height: 1.6;
   color: rgba(var(--ink), 0.92); text-wrap: pretty; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.10);
 }
-.afl-lg__src { margin: 3px 0 0; font-size: 15px; line-height: 1.45; color: rgba(var(--ink), 0.78); }
-.afl-lg__fair { margin: 16px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.018em; color: var(--text-hi); }
+/* ==========================================================================
+   THE NON-NEGOTIABLES PICKER (round 5, Malik). The positive twin of the NO
+   list: the unmoving things they hold. Six candidates, they keep 1 or 2, and
+   the agree hold will not wake until at least one is lit.
+   Same chip language as the refine answers (flat ruled rows, a dash at the
+   end when lit) so it reads as the app talking, not a new control.
+   ========================================================================== */
+.afl-nn { margin: 26px 0 0; padding-top: 22px; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16); }
+.afl-nn__lead {
+  margin: 0 0 6px; font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-hi);
+}
+.afl-nn__list { margin: 0; }
+.afl-nn__a {
+  position: relative; display: flex; align-items: center; gap: 15.6px; width: 100%;
+  text-align: left; min-height: 58px; padding: 14px 3px; border: 0; border-radius: 0;
+  font-family: inherit; font-size: 17.6px; font-weight: 500; line-height: 1.35;
+  letter-spacing: -0.012em; color: rgba(var(--ink), 0.80); cursor: pointer;
+  background: none; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12);
+  -webkit-user-select: none; user-select: none;
+  transition: color 0.18s ease;
+}
+.afl-nn__a:last-child { box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12), inset 0 -1px 0 rgba(var(--ink), 0.12); }
+.afl-nn__a::after {
+  content: ''; margin-left: auto; flex: 0 0 auto; width: 21px; height: 3.25px;
+  border-radius: 2px; background: transparent; transition: background 0.18s ease;
+}
+.afl-nn__a:hover { color: rgba(var(--ink), 0.95); }
+.afl-nn__a:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: -2px; }
+.afl-nn__a.is-on { color: var(--text-hi); font-weight: 700; }
+.afl-nn__a.is-on::after { background: rgba(var(--ink), 0.95); }
+.afl-nn__a[disabled] { cursor: default; opacity: 0.55; }
+@media (prefers-reduced-motion: reduce) { .afl-nn__a, .afl-nn__a::after { transition: none; } }
+
+.afl-lg__src { margin: 6px 0 0; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.82); }
+.afl-lg__fair { margin: 22px 0 0; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-hi); }
 /* the refresher drawer: closed by default, nobody is forced through it */
 .afl-ref { margin: 3px 0 18px; }
 .afl-ref__t {
@@ -5633,11 +5697,15 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 .afl-day__sup.is-lapse .afl-day__box { background: rgba(var(--ink), 0.06); }
 .afl-day.is-signed .afl-day__sup { pointer-events: none; }
 .afl-day__sup:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 1px; }
-/* the NO line: the plan's refusals, one quiet row under the day */
-/* 0.82, not 0.55 (v1191): it is the one line the green rise washes hardest,
-   and a dim body line is against his standing rule anyway. */
-.afl-day__no { margin: 10px 0 0; font-size: 13.7px; line-height: 1.4; color: rgba(var(--ink), 0.82); font-weight: 500; }
-.afl-day__no:empty { display: none; }
+/* v1197: the NO line is GONE from the day screen ("takes way too much space
+   in the main card", Malik on-device). The full list lives on the logic page.
+   The row it freed is where the non-negotiable line now sits. */
+.afl-day__nn {
+  margin: 12px 0 0; font-size: 14.3px; line-height: 1.4;
+  color: rgba(var(--ink), 0.62); font-weight: 500;
+}
+.afl-day__nn:empty { display: none; }
+html.theme-light .afl-day__nn { color: rgba(var(--ink), 0.70); }
 /* beat 4: HOLD IT DONE. The button stays PUT: the background's own green rise
    is the whole feedback. App button recipe. */
 /* THE SIGNED CROSSFADE (v1191). The hold button used to display:none and the
@@ -5739,7 +5807,6 @@ html.theme-light .afl { --afl-rise-a: 0.82; --afl-wash-a: 0.42; }
    same hierarchy (base.css does the same for its text tiers). These are the
    quiet-layer values that go too pale on the off-white canvas. Dark mode keeps
    the mockup's own numbers untouched. */
-html.theme-light .afl-day__no { color: rgba(var(--ink), 0.82); }
 html.theme-light .afl-day__rail i { background: rgba(var(--ink), 0.30); }
 html.theme-light .afl-day__rail i.is-mk { background: rgba(var(--ink), 0.44); }
 html.theme-light .afl-day__rail i.is-n2 { background: rgba(var(--ink), 0.46); }

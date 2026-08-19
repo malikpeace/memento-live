@@ -5393,32 +5393,51 @@ HARD RULES (the judge rejects violations):
    Every compute expr must be arithmetic on values present in rows or in
    their answers. The client re-runs your exprs; a wrong figure kills the
    plan. The reasoning paragraphs may reference the results but any
-   number appearing in prose must match the eq block.
+   number appearing in prose must match the eq block. Row labels are short plain
+   words the person would use, 2 to 5 words: "Sessions per week" never
+   "Build days per week", "Avg. deep work session length" never
+   "Protected block length"; the checkpoint row is called "First check-in".
 6. THE WALK-IT-THROUGH: the final reasoning paragraph ties the acts
    mechanically to the goal until missing it reads as the strange ending.
    Mechanism, not hype.
 7. NO LIST: 2 or 3 refusals. Each traces to their own words or the
    bucket's standard enemies. Refusals are things they might actually do
-   instead of the plan (plan-shopping, new programs, busywork).
-8. ANCHORS: attach a when (clock or event) ONLY to time-shaped acts
+   instead of the plan (plan-shopping, new programs, busywork). Each item
+   is a SHORT PHRASE, 2 to 5 words, never a sentence: "sugar drinks",
+   "tool shopping", "a new diet every week". No verbs of instruction, no
+   punctuation, no explanation inside the item. The reasoning paragraphs
+   are where a refusal gets explained; the list itself stays clipped.
+8. NON-NEGOTIABLES: write EXACTLY 6 candidates in
+   nonNegotiables.candidates, and always emit nonNegotiables.chosen as
+   an empty array (the person picks 1 or 2 in the app; that is not your
+   call). A non-negotiable is an unmoving ACT or STANDARD they hold to
+   reach the goal, the positive twin of the NO list: "The 2 hours happen
+   before email", "Weigh in every morning", "No phone in the bedroom".
+   Never motivation, never a feeling, never advice ("believe in
+   yourself", "stay consistent", "be disciplined" are all forbidden).
+   Same clipping law as the NO list: 2 to 6 words, no sentences, no
+   punctuation, no explanation inside the item. At least 3 of the 6 must
+   trace to the person's OWN words from the transcript or refine
+   answers; the rest trace to the acts and the math in this plan.
+9. ANCHORS: attach a when (clock or event) ONLY to time-shaped acts
    (boundaries, sessions, rituals) AND only when their schedule came up.
    Flexible count-acts stay unanchored.
-9. STARTERS: only for genuinely hard-to-start acts, "the first 2
+10. STARTERS: only for genuinely hard-to-start acts, "the first 2
    minutes", a physical opening move.
-10. SIZES: three named sizes, ascending, index 2 = the day you propose in
+11. SIZES: three named sizes, ascending, index 2 = the day you propose in
     the star sentence. The full ladder extends both ways sensibly.
-11. CADENCE comes from the bucket table: weight=daily morning scale,
+12. CADENCE comes from the bucket table: weight=daily morning scale,
     screen=nightly report, money/business=weekly Sunday, school=on
     results, projects=per-session choice, focus/fitness=none. The cadence
     value for projects is "per-session".
-12. SAFETY: never assign a calorie result below a safe floor, never
+13. SAFETY: never assign a calorie result below a safe floor, never
     praise restriction, never assign training volume beyond beginner
     progression, never moralize. If their stated goal implies an unsafe
     rate, plan the safe rate and say plainly that their date moves.
-13. If the transcript shows the goal is not plannable as stated (no
+14. If the transcript shows the goal is not plannable as stated (no
     judgeable target, two goals fused, or genuine crisis language), do
     NOT force a plan: return needsClarity with one plain question.
-14. THE STAR FIELD is their goal in their own words, copied verbatim
+15. THE STAR FIELD is their goal in their own words, copied verbatim
     from the transcript. You never reword it, even when your plan
     honestly renegotiates the number or the date; the honest numbers go
     in targets and the renegotiation lives in the reasoning.

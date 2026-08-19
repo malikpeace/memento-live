@@ -126,6 +126,20 @@
           }
         ],
         noList: ['sugar drinks', 'fast food', 'a new diet every week'],
+        // v1.1 (round 5): the positive twin of the NO list. Acts and standards,
+        // every one traceable to this plan or their own words. `chosen` is
+        // CLIENT-written by the logic page's picker; the AI always emits [].
+        nonNegotiables: {
+          candidates: [
+            'The walk happens after dinner',
+            'Weigh in every morning',
+            'No sugar drinks in the house',
+            'Log the meal before eating it',
+            'Water with every meal',
+            'The scale number gets typed in'
+          ],
+          chosen: []
+        },
         sizes: { unit: 'min', ladder: [20, 25, 30, 40, 50, 60], named: [20, 25, 40], estMinPerUnit: null, fmt: 'min' },
         eq: {
           rows: [
@@ -231,6 +245,17 @@
           }
         ],
         noList: ['more polish before posting', 'new niches', 'tool shopping'],
+        nonNegotiables: {
+          candidates: [
+            'The 3 hours happen before email',
+            'Post on all 3, every day',
+            'One script written the night before',
+            'No new niches this quarter',
+            'Ship before polishing',
+            'Sunday the number gets typed in'
+          ],
+          chosen: []
+        },
         sizes: { unit: 'min', ladder: [60, 120, 180, 240, 300, 360], named: [60, 120, 180], estMinPerUnit: null, fmt: 'min' },
         eq: {
           rows: [
@@ -1728,9 +1753,11 @@
     head.appendChild(clk);
     c.appendChild(head);
 
-    var STATES = ['This usually takes about 30 seconds.',
+    // v1197 (Malik, after a real generation): 30 seconds was a promise the real
+    // model does not keep, and the third line was too flat for a long wait.
+    var STATES = ['This usually takes about a minute.',
       'Still creating. This one is taking longer. You have big plans lol',
-      'Still creating.'];
+      'Still creating... almost done I promise.'];
     var state = el('p', 'afl-ld__state', STATES[0]);
     c.appendChild(state);
 
@@ -2037,7 +2064,7 @@
     }
     if (plan.noList && plan.noList.length) {
       var no = el('p', 'afl-lg__no');
-      no.appendChild(el('b', null, 'Say NO to:'));
+      no.appendChild(el('b', null, 'NO LIST:'));
       no.appendChild(document.createTextNode(' ' + plan.noList.join(', ') + '.'));
       box.appendChild(no);
     }
@@ -2047,7 +2074,7 @@
     // fitness rarely have one) skip the whole part, heading included, and part
     // three closes the gap with no divider left hanging.
     var hasMath = !!(plan.eq || (plan.reasoning && plan.reasoning.length));
-    if (hasMath) box.appendChild(el('p', 'afl-lg__h', 'The math behind this'));
+    if (hasMath) box.appendChild(el('p', 'afl-lg__h', 'The Math'));
     var eqOk = true;
     if (plan.eq) {
       var eq = el('div', 'afl-lg__eq');
@@ -2092,13 +2119,82 @@
 
     // ---- part three: the questions -----------------------------------------
     if (plan.qas && plan.qas.length) {
-      box.appendChild(el('p', 'afl-lg__h', 'Questions you might have'));
+      box.appendChild(el('p', 'afl-lg__h afl-lg__h--big', 'Questions You Might Have'));
       plan.qas.forEach(function (x) {
         box.appendChild(el('p', 'afl-lg__q', x.q));
         box.appendChild(el('p', 'afl-lg__qa', x.a));
       });
     }
     box.appendChild(el('p', 'afl-lg__src', 'Every line above came from what you told Memento.'));
+
+    // ---- THE NON-NEGOTIABLES PICKER (round 5, Malik) -----------------------
+    // The positive twin of the NO list, and the last thing they touch before
+    // agreeing: the unmoving things they hold. Six candidates, they keep 1 or
+    // 2. A plan written before schema v1.1 has no field at all, and then this
+    // whole section does not exist and the hold gates on scroll alone.
+    // THE GATE HOOK. This file is 'use strict', so a function declared inside
+    // the else block below is BLOCK scoped and the picker cannot see it. It is
+    // declared here, in openLogic's own scope, and assigned there.
+    var gateSync = function () {};
+    var nnChosen = [];
+    var nnCands = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.candidates))
+      ? plan.nonNegotiables.candidates.filter(function (t) { return t && String(t).trim(); }).slice(0, 6)
+      : [];
+    var nnOn = !opts.standing && nnCands.length > 0;
+    var nnChips = [];
+    // Already chosen? Show it. This is what makes the standing door (the M) a
+    // true reference view of the plan instead of a blank picker, and it means
+    // re-opening the page before agreeing does not lose the pick.
+    try {
+      var prevPick = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.chosen)) ? plan.nonNegotiables.chosen : [];
+      prevPick.forEach(function (t) {
+        var at = nnCands.indexOf(t);
+        if (at > -1 && nnChosen.indexOf(at) < 0 && nnChosen.length < 2) nnChosen.push(at);
+      });
+    } catch (e) {}
+    if (nnCands.length) {
+      var nnWrap = el('div', 'afl-nn');
+      nnWrap.appendChild(el('p', 'afl-nn__lead', 'Pick 1 or 2 non-negotiables.'));
+      var nnList = el('div', 'afl-nn__list');
+      nnCands.forEach(function (t, k) {
+        var b = btn('afl-nn__a', t);
+        b.setAttribute('aria-pressed', 'false');
+        b.setAttribute('role', 'checkbox');
+        if (!nnOn) { b.disabled = true; b.tabIndex = -1; }
+        b.addEventListener('click', function () {
+          if (!nnOn) return;
+          var at = nnChosen.indexOf(k);
+          if (at > -1) nnChosen.splice(at, 1);
+          else {
+            // MAX 2, and a third tap BOUNCES THE OLDEST rather than doing
+            // nothing. An inert tap on a live-looking chip reads as broken;
+            // dropping the oldest keeps the gesture always meaningful and
+            // makes the cap visible the moment they hit it.
+            nnChosen.push(k);
+            if (nnChosen.length > 2) nnChosen.shift();
+          }
+          nnPaint();
+        });
+        nnList.appendChild(b);
+        nnChips.push(b);
+      });
+      nnWrap.appendChild(nnList);
+      box.appendChild(nnWrap);
+      nnChips.forEach(function (b, k) {
+        var on = nnChosen.indexOf(k) > -1;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+    function nnPaint() {
+      nnChips.forEach(function (b, k) {
+        var on = nnChosen.indexOf(k) > -1;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      gateSync();
+    }
+
     box.appendChild(el('p', 'afl-lg__fair', 'Ready?'));
 
     var nav = navRow();
@@ -2129,8 +2225,12 @@
       // first frame. A tall desktop window, a short plan and a phone all land
       // on the same rule. Recomputed on scroll, on resize, and once after the
       // fonts settle, because scrollHeight before webfont layout is a lie.
+      // TWO GATES NOW (round 5). Scrolled AND picked. The scroll half still
+      // LATCHES (reading is not undone by scrolling back up); the pick half
+      // is live, because deselecting really is withdrawing the answer. The
+      // button reads the AND of them, so whichever lands last wakes it.
       var GATE = 0.8;
-      var eligible = false;
+      var eligible = false;          // the scroll latch
       go.disabled = true;
       go.setAttribute('aria-disabled', 'true');
 
@@ -2140,15 +2240,21 @@
         if (h <= v + 2) return 1;                 // nothing to scroll: fully read
         return Math.min(1, (sc.scrollTop + v) / h);
       }
-      function gateSync() {
-        if (eligible) return;
-        if (gateProgress() < GATE) return;
-        eligible = true;
-        go.disabled = false;
-        go.removeAttribute('aria-disabled');
-        // the live look arrives on .afl-cta's own 200ms background/colour
-        // transition, so the wake up is a fade, never a snap.
-      }
+      // a plan with no candidates (anything written before schema v1.1) has no
+      // picker on the page, so this half is simply always satisfied.
+      function picked() { return !nnOn || nnChosen.length >= 1; }
+      function gatesPass() { return eligible && picked(); }
+      gateSync = function () {
+        if (!eligible && gateProgress() >= GATE) eligible = true;
+        var open = gatesPass();
+        if (go.disabled !== !open) {
+          go.disabled = !open;
+          // the live look arrives on .afl-cta's own 200ms background/colour
+          // transition, so the wake up is a fade, never a snap.
+        }
+        if (open) go.removeAttribute('aria-disabled');
+        else go.setAttribute('aria-disabled', 'true');
+      };
       sc.addEventListener('scroll', gateSync, { passive: true });
       var onResize = function () { eligible ? null : gateSync(); };
       window.addEventListener('resize', onResize);
@@ -2164,8 +2270,20 @@
 
       bindCtaHold(go, 900, function () {
         go.classList.add('is-done');
+        // THE PICK IS WRITTEN AT AGREE TIME, onto the live plan, so it lands
+        // in the same object the day screen reads and persistence saves. The
+        // AI never writes `chosen`; this is the only writer of it.
+        try {
+          if (nnOn && nnChosen.length) {
+            if (!plan.nonNegotiables || typeof plan.nonNegotiables !== 'object') plan.nonNegotiables = { candidates: nnCands.slice(), chosen: [] };
+            plan.nonNegotiables.chosen = nnChosen.map(function (k) { return nnCands[k]; });
+            var lp = livePlan();
+            if (lp && lp !== plan && lp.nonNegotiables) lp.nonNegotiables.chosen = plan.nonNegotiables.chosen.slice();
+            var pn = G('persistNow'); if (pn) pn();
+          }
+        } catch (e) {}
         if (typeof opts.onAgree === 'function') opts.onAgree();
-      }, function () { return eligible; });
+      }, function () { return gatesPass(); });
     }
     // the page arrives in two beats: the title, then everything under it.
     enterFade(starEl, 0);
@@ -2314,6 +2432,19 @@
         out.completion = completion;
       }
 
+      // 2b. THE LEGACY "Day 1." MOMENT IS NOT OURS (v1197, Malik on-device: his
+      //     first real close fired the old first-win cinematic). js/04's
+      //     _maybeFirstWinMoment hangs off every 'action-complete' proof write
+      //     and gates on state.meta.firstActionDone, so claiming the flag HERE,
+      //     before the write below, makes it a no-op for anything the new flow
+      //     closes. js/04 is untouched: the moment still exists for the old
+      //     home path, and the Rewards phase owns the real ceremony for this
+      //     one. Claiming it is also honest bookkeeping: an action WAS done.
+      try {
+        if (!st.meta || typeof st.meta !== 'object') st.meta = {};
+        st.meta.firstActionDone = true;
+      } catch (e) {}
+
       // 3. the shadow referee, then the receipt, in creditTodayAction's order.
       try {
         var shadow = G('rewardShadow');
@@ -2433,8 +2564,16 @@
       plate.appendChild(b);
       return b;
     });
-    var noLine = el('p', 'afl-day__no');
-    plate.appendChild(noLine);
+    // v1197 (Malik, on-device): THE NO LIST IS OFF THE DAY SCREEN. "Takes way
+    // too much space in the main card." The full list still lives on the logic
+    // page, which is one swipe or one tap on the M away.
+    //
+    // Round 5: the row it freed carries the NON-NEGOTIABLES they picked. One
+    // quiet line, never loud and never tappable: it is a standard they are
+    // holding, not another thing to do. A plan with nothing chosen (or one
+    // written before schema v1.1) renders no line at all.
+    var nnLine = el('p', 'afl-day__nn');
+    plate.appendChild(nnLine);
     day.appendChild(plate);
 
     var nav = navRow();
@@ -2589,9 +2728,12 @@
       drawPlate();
       drawRail();
       dw.classList.toggle('is-gone', !(starAct.session && !off));
-      // both of these change on a rest day and on a size change. They fade.
-      swapText(noLine, (off || !plan.noList || !plan.noList.length) ? ''
-        : 'NO list: ' + plan.noList.join(' · '), 1);
+      // the non-negotiables they picked. Singular or a dot-joined pair.
+      var nnPick = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.chosen))
+        ? plan.nonNegotiables.chosen.filter(function (t) { return t && String(t).trim(); }) : [];
+      swapText(nnLine, (off || !nnPick.length) ? ''
+        : 'Non-negotiable: ' + nnPick.join(' \u00b7 '), 1);
+      // this changes on a rest day. It fades.
       swapText(hold.querySelector('span'), off ? 'Hold to close the day' : 'Hold to complete', 1);
     }
     function railSet(y) {
@@ -2726,6 +2868,14 @@
       // the row can no longer be taken back, so the control that says it can
       // has to leave with the window.
       try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
+      // THE HOME HAS TO KNOW (v1197, Malik on-device: he closed the flow after
+      // completing and the homepage, sync box included, showed nothing). The
+      // old path did this in completeTodayActionFromHome (js/08:3653): credit,
+      // then renderAll. This flow wrote the same records and never repainted.
+      // Same call, no new machinery: renderAll re-renders the command centre,
+      // which is where the sync box lives, plus the day card, the consistency
+      // block, the heat and the sidebar.
+      try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
       // ======================= THE CLOSE SEAM ============================
       // THE ONE REWARD CALL ATTACHES HERE (THE-MERGE resolution B, Rewards
       // phase). The order from this line on is: the pulse asks its one number
@@ -2795,8 +2945,72 @@
       if (undoT) { clearTimeout(undoT); undoT = null; commitDay(); }
     };
 
-    mBtn.addEventListener('click', function () {
+    function toLogic() {
       openLogic(key, { plan: plan, standing: true, onClose: function () { openDay(key, opts); } });
+    }
+    mBtn.addEventListener('click', toLogic);
+
+    // ---- THE SWIPE DOWN DOOR (v1197, Malik) ---------------------------------
+    // A deliberate downward pull opens the logic page, the same door the M
+    // opens (the M stays; this is a second way in, not a replacement).
+    //
+    // DELIBERATE IS THE WHOLE POINT. Everything here exists so an accidental
+    // or scroll-ish gesture can never trigger it:
+    //   - it only starts on OPEN BACKGROUND. A pointerdown on the rail, a
+    //     support, the CTA, the M, the deep work door or the signed row is that
+    //     control's gesture and this never sees it.
+    //   - 130px of travel, which is a third of a phone screen, not a flick.
+    //   - it must stay a PULL: more than 55px of horizontal drift cancels, and
+    //     so does any upward correction of more than 30px past the low point.
+    //   - one finger only; a second pointer cancels.
+    //   - pointercancel cancels (iOS fires it when it claims a gesture).
+    // The card follows the finger a little on the way down, so the gesture
+    // shows it is being received without announcing itself. Reduced motion
+    // skips the follow and just opens.
+    var SWIPE_GO = 130, SWIPE_DRIFT = 55, SWIPE_BACK = 30;
+    var swStart = null, swMax = 0, swLive = false;
+    function swipeReset(animate) {
+      swStart = null; swLive = false; swMax = 0;
+      if (!day) return;
+      if (animate && !reduced()) {
+        day.style.transition = 'transform 0.22s var(--ease-out)';
+        day.style.transform = '';
+        setTimeout(function () { if (day) day.style.transition = ''; }, 260);
+      } else {
+        day.style.transition = ''; day.style.transform = '';
+      }
+    }
+    function swipeBlocked(t) {
+      if (!t || !t.closest) return true;
+      return !!t.closest('.afl-day__rail, .afl-day__sup, .afl-day__hold, .afl-day__m, .afl-day__dw, .afl-day__done, .afl-nav');
+    }
+    day.addEventListener('pointerdown', function (e) {
+      if (swLive || swStart) { swipeReset(false); return; }   // second finger
+      if (swipeBlocked(e.target)) return;
+      swStart = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      swMax = 0;
+    });
+    day.addEventListener('pointermove', function (e) {
+      if (!swStart || e.pointerId !== swStart.id) return;
+      var dy = e.clientY - swStart.y, dx = Math.abs(e.clientX - swStart.x);
+      if (dx > SWIPE_DRIFT || dy < -8) { swipeReset(swLive); return; }   // not a pull
+      if (dy > swMax) swMax = dy;
+      if (swMax - dy > SWIPE_BACK) { swipeReset(swLive); return; }        // pulled back
+      if (dy <= 0) return;
+      swLive = true;
+      if (!reduced()) {
+        // a fraction of the travel, easing off: received, never dragged around
+        day.style.transition = 'none';
+        day.style.transform = 'translateY(' + (Math.min(dy, SWIPE_GO * 1.4) * 0.22).toFixed(1) + 'px)';
+      }
+      if (dy >= SWIPE_GO) {
+        var go = true;
+        swipeReset(false);
+        if (go) toLogic();
+      }
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+      day.addEventListener(ev, function () { if (swStart) swipeReset(swLive); });
     });
 
     // ---- THE CLOSED DAY (merge 3.1, the re-open) ----------------------------
