@@ -4829,6 +4829,17 @@ html.theme-light .afl { --afl-bg: var(--surface-0); --afl-bg-rgb: 238, 240, 243;
     rgba(var(--afl-bg-rgb), 0) 100%);
 }
 
+/* THE ENTRANCE (v1192, Malik on-device: "EVERYTIME a page changes or a next
+   body of text appears, I would love if it came in with a fade").
+   The shell cross fade moves the ROOM; this moves the CONTENT into it, so a
+   screen's first paint arrives rather than being already there. --2 is the
+   second beat of the ONLY stagger in the module (the logic page's body after
+   its title). Both classes are pulled on animationend, so no `both` fill keeps
+   a layer alive. */
+.afl-enter { animation: aflEnter 0.24s var(--ease-out) both; }
+.afl-enter--2 { animation-delay: 0.13s; }
+@keyframes aflEnter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
 /* A NUMBER THAT CHANGES arrives, it never hard swaps (his on-device note).
    200ms, from the direction the change came from, once, nothing loops. */
 .afl-swap--up { animation: aflSwapUp 0.2s var(--ease-out) both; }
@@ -4849,6 +4860,7 @@ html.theme-light .afl { --afl-bg: var(--surface-0); --afl-bg-rgb: 238, 240, 243;
 }
 @media (prefers-reduced-motion: reduce) {
   .afl.is-in, .afl.is-exiting,
+  .afl-enter, .afl-enter--2,
   .afl-swap--up, .afl-swap--dn { animation: none; }
 }
 /* These are full-screen experiences: the mobile top fade would paint a band
@@ -5052,8 +5064,13 @@ html.theme-light .afl--cine {
   min-height: 100px; flex: none; display: flex; align-items: flex-end;
 }
 .afl-q__q.is-fade { animation: aflQIn 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-/* the unit slot exists on every step so the beats share one skeleton */
+/* the unit slot exists on every step so the beats share one skeleton. On a time
+   question it carries what Clarity already heard (v1192): same slot, so the
+   line costs no layout, one step quieter than a unit because it is a reminder
+   and not an instruction. */
 .afl-q__unit { margin: 10px 0 0; min-height: 23px; flex: none; font-size: 16.3px; line-height: 1.4; color: rgba(var(--ink), 0.90); }
+.afl-q__unit.is-said { color: rgba(var(--ink), 0.72); }
+html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 .afl-q__as { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
 .afl-q__as.is-enter { animation: aflQIn 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) 0.06s both; }
 .afl-q__a {
@@ -5092,8 +5109,14 @@ html.theme-light .afl--cine {
   position: absolute; left: -9999px; top: 0; white-space: pre; visibility: hidden;
   font-family: inherit; font-weight: 700; letter-spacing: -0.055em; font-variant-numeric: tabular-nums;
 }
-/* the free field, on EVERY question: the chips are the fast path, never the
-   only path (Malik's rule, 2026-08-19). */
+/* THE FREE FIELD DIET (v1192). It is no longer on every question: it appears
+   where their own words add something, and a question that already has a
+   structured control (the rulers, the number steps) does without it. Removing
+   the row does NOT move the CTA, because the nav is bottom anchored and the
+   button is its last child. See wantsFree() in js/30 for the standing rule. */
+.afl-q__own.is-off { display: none; }
+/* the free field: the chips are the fast path, never the only path
+   (Malik's rule, 2026-08-19). */
 .afl-nav--q { display: flex; flex-direction: column; gap: 13px; }
 .afl-q__own {
   position: relative; display: flex; align-items: center; gap: 12px; padding: 0 3px;

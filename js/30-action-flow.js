@@ -63,6 +63,11 @@
         star: 'Lose 50lbs in 6 months so I look good for summer.',
         why: 'So I look good for summer.',
         deadline: '2027-02-15',
+        // What Clarity already heard about their available time. THE SEAM: read
+        // only through getClarityTimeAnswer(), which the wiring phase repoints
+        // at the real transcript. Null here on purpose, so one fixture proves
+        // the absent case (no line, no preselect) and business proves the other.
+        clarityTime: null,
         // ob-1 presses the star apart into lines. Clarity does not store this
         // decomposition yet (see the report): the wall is fed it explicitly.
         wall: [
@@ -168,6 +173,9 @@
         star: 'Get the studio to $10k a month so I can hire my brother.',
         why: 'So I can hire my brother.',
         deadline: null,
+        // their own words from the Clarity conversation, not a normalised value:
+        // the line quotes them, and the chip match is done on top of it.
+        clarityTime: '2-3 hours',
         wall: [
           { sm: 'I will get the studio to', num: '$10k', mid: 'a month' },
           { sm: 'so I can', big: 'hire my brother' }
@@ -275,62 +283,78 @@
   // ---------------------------------------------------------------------------
   var OPENER = 'So, what have you actually done to make progress toward this?';
 
+  // v3 (Malik, on-device 2026-08-19), three rules that live in the data:
+  //
+  //  multi: true       the answers COEXIST, so the chips are multi tap. The
+  //                    opener is multi in every bucket (a person has tried
+  //                    several things), and so is the business bottleneck.
+  //                    Stored comma joined in the order they were tapped.
+  //  free: false       THE FREE FIELD DIET. The field is no longer on every
+  //                    question (that was the v2 rule). It appears only where
+  //                    their own words ADD something, so anything with a
+  //                    structured control loses it: the rulers keep "Type it
+  //                    instead" as their only escape, and the number steps have
+  //                    the number. See wantsFree() for the standing rule; this
+  //                    flag is only for the exceptions to it.
+  //  clarityTime: true this question is about how much TIME they have, which
+  //                    Clarity usually already asked. If the transcript has an
+  //                    answer, the question says so and preselects the chip.
   var QUESTIONS = {
     weight: [
-      { q: OPENER, chips: ['Nothing yet, this is day one', 'Tried diets before', 'I work out sometimes', 'I lose it, then gain it back'] },
+      { q: OPENER, multi: true, chips: ['Nothing yet, this is day one', 'Tried diets before', 'I work out sometimes', 'I lose it, then gain it back'] },
       { q: 'Your height and sex? The math needs both.', kind: 'ruler', ruler: 'height', unit: 'Drag to set it.', chips: ['Male', 'Female'] },
       { q: 'How often do you move in a normal week?', chips: ['Rarely', '1-2 workouts', '3-4 workouts', '5+ or active job'] },
       { q: 'What do you think is the biggest problem?', chips: ['Late night eating', 'Fast food days', 'Sugar drinks', 'Weekends'] },
       { q: 'What does the scale say this morning?', kind: 'ruler', ruler: 'weight', unit: 'Drag to set it.' }
     ],
     screen: [
-      { q: OPENER, chips: ['Nothing yet', 'Deleted apps before, they came back', 'Tried screen limits', 'I go cold turkey, then relapse'] },
+      { q: OPENER, multi: true, chips: ['Nothing yet', 'Deleted apps before, they came back', 'Tried screen limits', 'I go cold turkey, then relapse'] },
       { q: 'Which apps take most of it?', chips: ['TikTok', 'Instagram', 'YouTube', 'Games'], multi: true },
       { q: 'If those hours came back, what would you want them for?', chips: ['A project I keep putting off', 'Reading or learning', 'Training'] },
       { q: 'What does your Screen Time report say per day right now?', kind: 'num', unit: 'Hours a day', prefix: '', decimals: true }
     ],
     fitness: [
-      { q: OPENER, chips: ['Day one', 'On and off for years', 'Consistent until life hits', 'Coming back from a break'] },
+      { q: OPENER, multi: true, chips: ['Day one', 'On and off for years', 'Consistent until life hits', 'Coming back from a break'] },
       { q: 'How many days a week can you actually train?', chips: ['2', '3', '4', '5+'] },
       { q: 'Which days fit your life best?', chips: ['Mon/Wed/Fri', 'Tue/Thu/Sat', 'Weekends included'] },
       { q: 'What kind of training?', chips: ['Gym lifting', 'Running or cardio', 'Home workouts', 'A sport'] }
     ],
     money: [
-      { q: OPENER, chips: ['Nothing yet', 'I have an offer or service', 'I have had clients before', 'I get leads but do not close'] },
+      { q: OPENER, multi: true, chips: ['Nothing yet', 'I have an offer or service', 'I have had clients before', 'I get leads but do not close'] },
       { q: 'Where has money actually come from before?', chips: ['People I reached out to', 'Referrals', 'Posting content', 'Nowhere yet'] },
       { q: 'What is one client or sale worth, roughly?', kind: 'num', unit: 'Dollars, one sale', prefix: '$', decimals: false },
       { q: 'What did you bring in last month?', kind: 'num', unit: 'Dollars last month', prefix: '$', decimals: false }
     ],
     'money-job': [
-      { q: OPENER, chips: ['Nothing yet', 'Updated my resume', 'Applied to some places', 'Interviews, no offers'] },
+      { q: OPENER, multi: true, chips: ['Nothing yet', 'Updated my resume', 'Applied to some places', 'Interviews, no offers'] },
       { q: 'What is the target: more pay where you are, or a new job?', chips: ['A raise or promotion', 'A new job, same field', 'A new field'] },
       { q: 'How many applications or asks have you made this month?', kind: 'num', unit: 'Applications this month', prefix: '', decimals: false },
       { q: 'What do you earn now, roughly?', kind: 'num', unit: 'Dollars a month', prefix: '$', decimals: false, skippable: true }
     ],
     business: [
-      { q: OPENER, chips: ['Just an idea', 'It is built, nobody sees it', 'Some sales, not steady', 'Steady but stuck'] },
-      { q: 'What is the bottleneck, honestly?', chips: ['Not enough people see it', 'Not enough of it is finished', 'Price or offer feels off'] },
+      { q: OPENER, multi: true, chips: ['Just an idea', 'It is built, nobody sees it', 'Some sales, not steady', 'Steady but stuck'] },
+      { q: 'What is the bottleneck, honestly?', multi: true, chips: ['Not enough people see it', 'Not enough of it is finished', 'Price or offer feels off'] },
       { q: 'What is one sale or project worth, roughly?', kind: 'num', unit: 'Dollars, one project', prefix: '$', decimals: false },
-      { q: 'How many hours a day can you give it?', chips: ['1', '2-3', '4-5', 'Most of the day'] },
+      { q: 'How many hours a day can you give it?', clarityTime: true, chips: ['1', '2-3', '4-5', 'Most of the day'] },
       { q: 'What did the business make last month?', kind: 'num', unit: 'Dollars last month', prefix: '$', decimals: false }
     ],
     school: [
-      { q: OPENER, chips: ['Nothing yet, just stress', 'Made study plans, did not stick', 'I study, but last minute', 'I go to class, that is about it'] },
+      { q: OPENER, multi: true, chips: ['Nothing yet, just stress', 'Made study plans, did not stick', 'I study, but last minute', 'I go to class, that is about it'] },
       { q: 'Which classes are pulling the average down?', chips: ['All about equal'], free: 'The classes' },
       { q: 'When can study hours actually happen?', chips: ['Mornings', 'Between classes', 'Evenings', 'Nights'] },
       { q: 'What is your GPA right now, if you know it?', kind: 'num', unit: 'Your GPA', prefix: '', decimals: true, skippable: true }
     ],
     projects: [
-      { q: OPENER, chips: ['Blank page', 'Started, then stalled', 'Half built', 'Nearly done, will not finish'] },
+      { q: OPENER, multi: true, chips: ['Blank page', 'Started, then stalled', 'Half built', 'Nearly done, will not finish'] },
       { q: 'List the pieces still standing between here and done.', chips: [], free: 'One piece per line' },
       { q: 'Which piece unlocks the most others?', chips: [], free: 'The one that unlocks the rest' },
-      { q: 'How many hours a day can you give it?', chips: ['1', '2-3', '4-5', 'Most of the day'] }
+      { q: 'How many hours a day can you give it?', clarityTime: true, chips: ['1', '2-3', '4-5', 'Most of the day'] }
     ],
     focus: [
-      { q: OPENER, chips: ['I plan, then the day eats it', 'I start late and drift', 'I work but shallow', 'Day one of trying'] },
+      { q: OPENER, multi: true, chips: ['I plan, then the day eats it', 'I start late and drift', 'I work but shallow', 'Day one of trying'] },
       { q: 'What is the deep work FOR right now?', chips: [], free: 'What the block is for' },
       { q: 'When is your best uninterrupted stretch?', chips: ['First thing', 'Mid morning', 'Afternoon', 'Night'] },
-      { q: 'How long can a protected block realistically be?', chips: ['30 min', '60 min', '90 min', '2 hours+'] }
+      { q: 'How long can a protected block realistically be?', clarityTime: true, chips: ['30 min', '60 min', '90 min', '2 hours+'] }
     ]
   };
 
@@ -352,6 +376,62 @@
   function rulerText(kind, v) {
     if (kind === 'height') return Math.floor(v / 12) + "'" + (v % 12) + '"';
     return String(v);
+  }
+
+  // ---------------------------------------------------------------------------
+  // THE FREE FIELD DIET (v3, Malik on-device 2026-08-19). The v2 rule was "every
+  // question carries a free field". He replaced it: the field appears only where
+  // their own words ADD something. A question that already has a structured
+  // control does not qualify, because the control IS the answer.
+  //   ruler steps  -> no field. "Type it instead" is the escape hatch, and the
+  //                   sex chips ride the height ruler, so they lose it too.
+  //   number steps -> no field, the number is the answer. UNLESS the step is
+  //                   skippable, where words ("not sure", "I never checked")
+  //                   are the only way to move on.
+  //   chip steps   -> keep it. These are the story-flavoured ones (what have you
+  //                   done, the biggest problem, the bottleneck) and a person's
+  //                   own sentence is worth more than any chip.
+  // A question can still opt out explicitly with free: false.
+  // ---------------------------------------------------------------------------
+  function wantsFree(d) {
+    if (!d) return false;
+    if (d.free === false) return false;
+    if (d.kind === 'ruler') return false;
+    if (d.kind === 'num') return !!d.skippable;
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------
+  // THE CLARITY TIME SEAM (v3, Malik). Some refine questions ask how much time a
+  // person has, which Clarity has usually already asked. Where an answer exists,
+  // the question says so in their own words and preselects the chip, still
+  // changeable. Where it does not, the line simply is not there.
+  //
+  // ONE seam. The wiring phase replaces the body of this function with the real
+  // transcript read; nothing else in the module knows where the value came from.
+  // ---------------------------------------------------------------------------
+  function getClarityTimeAnswer(intake) {
+    try {
+      var v = intake && intake.clarityTime;
+      return (typeof v === 'string' && v.trim()) ? v.trim() : null;
+    } catch (e) { return null; }
+  }
+  // "2-3 hours" has to find the [2-3] chip without matching [1]. Compare on
+  // letters and digits only, and let the LONGEST matching chip win, so a short
+  // chip can never steal a match from a more specific one.
+  function normKey(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function matchChip(answer, chips) {
+    var a = normKey(answer);
+    if (!a || !chips || !chips.length) return -1;
+    var best = -1, bestLen = 0;
+    chips.forEach(function (c, k) {
+      var n = normKey(c);
+      if (!n) return;
+      if (a.indexOf(n) > -1 || n.indexOf(a) > -1) {
+        if (n.length > bestLen) { bestLen = n.length; best = k; }
+      }
+    });
+    return best;
   }
 
   // ---------------------------------------------------------------------------
@@ -488,6 +568,28 @@
     try {
       if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide();
     } catch (e) {}
+  }
+
+  // THE ENTRANCE (v1192, Malik on-device: "EVERYTIME a page changes or a next
+  // body of text appears, I would love if it came in with a fade").
+  // The shell cross fade moves the ROOM. This moves the CONTENT into it, so a
+  // screen's first paint arrives instead of being already there. `group` is 0
+  // or 1: 1 is the second beat of a two part entrance (the logic page's body
+  // after its title), and that is the only stagger in the module. Never a per
+  // element cascade, that would be decorative animation.
+  function enterFade(node, group) {
+    if (!node || reduced()) return;
+    var cls = group ? 'afl-enter afl-enter--2' : 'afl-enter';
+    node.classList.remove('afl-enter', 'afl-enter--2');
+    void node.offsetWidth;
+    cls.split(' ').forEach(function (c) { node.classList.add(c); });
+    var off = function (e) {
+      if (e && e.target !== node) return;          // child animations bubble
+      node.classList.remove('afl-enter', 'afl-enter--2');
+      node.removeEventListener('animationend', off);
+    };
+    node.addEventListener('animationend', off);
+    setTimeout(off, 700);                          // iOS drops animationend
   }
 
   function fadeIn(node) {
@@ -817,6 +919,8 @@
       });
     });
     sync();
+    enterFade(type);
+    enterFade(nav);
     return root;
   }
 
@@ -842,6 +946,7 @@
       if (typeof opts.onDone === 'function') opts.onDone();
     }, opts.ms || NOTE_MS);
     current.teardown = function () { if (t) clearTimeout(t); };
+    enterFade(wrap);
     return root;
   }
 
@@ -849,15 +954,16 @@
   // 2.2  q-2, THE REFINE CONVERSATION
   // One question owns the screen, the answers are flat ruled rows, the progress
   // bar renders ONE SEGMENT PER QUESTION (3 to 5, capped at 5) and fills as
-  // each is answered. Every question carries a free field underneath: the chips
-  // are the fast path, never the only path. The last question, where a number
-  // exists, is the baseline itself, so the flow ends on their own number.
+  // each is answered. The free field appears where their own words add
+  // something (wantsFree, v3), not on every question. The last question, where
+  // a number exists, is the baseline itself, so the flow ends on their number.
   // ===========================================================================
   function openRefine(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
     var bucket = opts.bucket || fx.intake.bucket;
     var D = (QUESTIONS[bucket] || QUESTIONS.weight).slice(0, 5);
+    var clarityTime = getClarityTimeAnswer(fx.intake);
     var col = shell('refine', { label: 'A few questions' });
 
     var wrap = el('div', 'afl-q');
@@ -915,6 +1021,10 @@
     // the resting position is a starting point, never an answer.
     var rulerVal = D.map(function (d) { return (RULERS[d.ruler] || RULERS.height).start; });
     var rulerSet = D.map(function () { return false; });
+    // THE CLARITY PRESELECT (v3). Applied ONCE per question, the first time it
+    // is painted: after that the person owns the answer, and deselecting must
+    // not be undone by walking back and forth.
+    var presetDone = D.map(function () { return false; });
     var mirror = el('span', 'afl-q__mirror');
     wrap.appendChild(mirror);
     var numInput = null;
@@ -960,7 +1070,9 @@
       // by the chips' OWN order, not their position in the body: a ruler step
       // puts the ruler in front of them and every index would be off by one.
       [].forEach.call(body.querySelectorAll('.afl-q__a'), function (b, k) {
-        b.classList.toggle('is-on', D[i].multi ? multi[i].indexOf(k) > -1 : picked[i] === k);
+        var on = D[i].multi ? multi[i].indexOf(k) > -1 : picked[i] === k;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
     }
     function clean(raw, dec) {
@@ -983,10 +1095,25 @@
       numInput.style.width = Math.max(83, Math.ceil(mirror.getBoundingClientRect().width) + 13) + 'px';
     }
     function buildChips() {
+      // Clarity already asked about their time on some questions. Where it has
+      // an answer, the matching chip arrives lit, once, and stays changeable.
+      if (D[i].clarityTime && clarityTime && !presetDone[i]) {
+        presetDone[i] = true;
+        var pre = matchChip(clarityTime, D[i].chips || []);
+        if (pre > -1) {
+          if (D[i].multi) { if (multi[i].indexOf(pre) < 0) multi[i].push(pre); }
+          else if (picked[i] === null) picked[i] = pre;
+        }
+      }
       (D[i].chips || []).forEach(function (t, k) {
         var b = btn('afl-q__a', t);
+        b.setAttribute('aria-pressed', 'false');
+        if (D[i].multi) b.setAttribute('role', 'checkbox');
         b.addEventListener('click', function () {
           if (D[i].multi) {
+            // MULTI TAP (v3): these answers coexist, so tapping lights another
+            // one instead of moving the light. Order of tapping is the order
+            // they are stored in.
             var at = multi[i].indexOf(k);
             if (at > -1) multi[i].splice(at, 1); else multi[i].push(k);
           } else {
@@ -1215,18 +1342,28 @@
     function paintStep() {
       var d = D[i];
       qEl.textContent = d.q;
-      unit.textContent = (d.kind === 'num' || d.kind === 'ruler') ? (d.unit || '') : '';
+      // THE SLOT UNDER THE QUESTION carries the unit on a number or ruler step,
+      // and on a time question it carries what Clarity already heard. It is
+      // reserved on every step (css min-height), so using it costs no layout.
+      // "You said", never "You typed": they said it to Clarity, in a conversation.
+      var said = (d.clarityTime && clarityTime) ? ('You said ' + clarityTime + ' in Clarity.') : '';
+      unit.textContent = said || ((d.kind === 'num' || d.kind === 'ruler') ? (d.unit || '') : '');
+      unit.classList.toggle('is-said', !!said);
       numInput = null;
       body.className = 'afl-q__as';
       body.innerHTML = '';
       if (d.kind === 'num') buildNum();
       else if (d.kind === 'ruler') buildRuler();
       else buildChips();
-      // EVERY question keeps its free field. The number step's field takes the
-      // note that goes with the number ("skip", "not sure", their own words).
+      // THE FREE FIELD DIET (v3): the field is only on the questions where their
+      // own words add something. See wantsFree() for the standing rule.
+      var showFree = wantsFree(d);
+      own.classList.toggle('is-off', !showFree);
+      own.setAttribute('aria-hidden', showFree ? 'false' : 'true');
+      free.disabled = !showFree;
       free.value = typed[i];
-      free.setAttribute('placeholder', d.free || 'In your own words');
-      own.classList.toggle('is-lit', typed[i].trim().length > 0);
+      free.setAttribute('placeholder', (typeof d.free === 'string' ? d.free : '') || 'In your own words');
+      own.classList.toggle('is-lit', showFree && typed[i].trim().length > 0);
       back.classList.toggle('is-ghost', i === 0);
       syncCta();
     }
@@ -1263,16 +1400,25 @@
 
     function collect() {
       return D.map(function (d, k) {
+        // MULTI (v3): every lit chip is part of the answer, comma joined in the
+        // order they were tapped, because that order is their own ranking.
+        // chipList keeps them separated for the brain; chip is the readable one.
+        var list = d.multi
+          ? multi[k].map(function (x) { return d.chips[x]; })
+          : (picked[k] === null ? [] : [d.chips[picked[k]]]);
         return {
           q: d.q,
-          chip: d.multi ? multi[k].map(function (x) { return d.chips[x]; })
-            : (picked[k] === null ? null : d.chips[picked[k]]),
+          multi: !!d.multi,
+          chip: list.length ? list.join(', ') : null,
+          chipList: list,
           // the ruler lands where every other number lands, written plainly:
           // 6'1" for a height, 218 for a weight.
           num: d.kind === 'ruler'
             ? (rulerSet[k] ? rulerText(d.ruler, rulerVal[k]) : null)
             : (nums[k] || null),
-          free: typed[k] || null
+          free: typed[k] || null,
+          // provenance: a preselected chip came from Clarity, not from a tap
+          fromClarity: !!(d.clarityTime && clarityTime) || undefined
         };
       });
     }
@@ -1301,6 +1447,8 @@
       if (e.key === 'Enter') { e.preventDefault(); free.blur(); if (!go.disabled && !go.classList.contains('afl-cta--hold')) go.click(); }
     });
     render(false);
+    enterFade(wrap);
+    enterFade(nav);
     return root;
   }
 
@@ -1441,6 +1589,7 @@
     });
     tickT = setInterval(function () { if (!landed) clk.textContent = fmt(Date.now() - t0); }, 250);
     at(650, show);
+    enterFade(c);
     current.teardown = function () {
       timers.forEach(clearTimeout);
       if (tickT) clearInterval(tickT);
@@ -1476,7 +1625,16 @@
     col.appendChild(c);
 
     // ---- part one -----------------------------------------------------------
-    box.appendChild(el('p', 'afl-lg__star', plan.star));
+    // THE TWO BEAT ENTRANCE (v1192, his words: "if the title faded in first,
+    // then the [body] would be nice"). The star is its own beat; everything
+    // else lives in one wrapper and arrives a moment later. Reassigning `box`
+    // here means every append below lands in the second beat without touching
+    // any of them. TWO groups, never a per element cascade.
+    var starEl = el('p', 'afl-lg__star', plan.star);
+    box.appendChild(starEl);
+    var rest = el('div', 'afl-lg__rest');
+    box.appendChild(rest);
+    box = rest;
     if (plan.commitment) box.appendChild(el('p', 'afl-lg__b', plan.commitment));
     if (plan.arrow) {
       var ar = el('div', 'afl-lg__ar');
@@ -1630,18 +1788,10 @@
         if (typeof opts.onAgree === 'function') opts.onAgree();
       }, function () { return eligible; });
     }
-    // the page itself arrives, it does not appear (v1191). ONE motion on the
-    // whole column, not a stagger cascade.
-    if (!reduced()) {
-      box.classList.add('is-reveal');
-      var offReveal = function (e) {
-        if (e && e.target !== box) return;
-        box.classList.remove('is-reveal');
-        box.removeEventListener('animationend', offReveal);
-      };
-      box.addEventListener('animationend', offReveal);
-      lgTimers.push(setTimeout(offReveal, 600));
-    }
+    // the page arrives in two beats: the title, then everything under it.
+    enterFade(starEl, 0);
+    enterFade(rest, 1);
+    enterFade(nav, 1);
     return root;
   }
 
@@ -2064,6 +2214,8 @@
     });
 
     paint();
+    enterFade(day);
+    enterFade(nav);
     return root;
   }
 
