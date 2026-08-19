@@ -204,3 +204,10 @@
 - map.html DELETED (obsolete since the cleanup).
 - ACTION-MERGE-PLAN.md created at repo root: 6 phases incl. his two
   flagged items (server-side generation, the close/Clarity data contract).
+
+## 2026-08-18 pt 10: green rise, centered bar, ob copy
+- u-1 hold: the rising layer is GREEN now (gradient to spring), one language
+  with the daily beat. Inversion is dead.
+- q-2: progress bar truly centered (right spacer mirrors the back chevron).
+  Question count goes dynamic at the port (3-5, bar renders per question).
+- ob-1: "From Clarity" + button "Confirm".
