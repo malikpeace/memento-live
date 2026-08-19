@@ -256,6 +256,13 @@
   .lt .dlg h4{color:rgba(24,26,33,.96)}
   .lt .dlg p{color:rgba(24,26,33,.55)}
   .lt .dlgBtn--quiet{color:rgba(24,26,33,.5)}
+
+  .whyBtn{margin:16px auto 0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.09);color:rgba(255,255,255,.62);font-size:13px;font-weight:700;cursor:pointer;
+    -webkit-user-select:none;user-select:none}
+  .whyBody{max-height:0;overflow:hidden;transition:max-height .35s ease, opacity .25s ease;opacity:0}
+  .whyBody.open{max-height:340px;opacity:1}
+  .lt .whyBtn{background:rgba(24,26,33,.08);color:rgba(24,26,33,.6)}
 </style>
 </head>
 <body>
@@ -399,8 +406,9 @@ function fulfilConfirm(){
   <div class="stage" style="text-align:center;align-items:center">
     <div class="spacer"></div>
     <div class="eyebrow">Neutron Star Fulfilled</div>
-    <div class="fsq" style="margin-top:22px">Did you really reach it?</div>
-    <div class="fsWarn" style="margin-top:16px">This is the most serious button in Memento. Fulfilling your Neutron Star closes this chapter: the star you forged, the pages, and the plan are sealed into your history, and Memento will walk you toward forging your next one. This cannot be tapped by accident, and it should never be tapped lightly.</div>
+    <div class="fsq" style="margin-top:22px">You did it??</div>
+    <div class="whyBtn">?</div>
+    <div class="whyBody"><div class="fsWarn" style="margin-top:14px">Fulfilling your Neutron Star means your big goal is completed and we can close this chapter. The star, actions and progress are sealed into your history. After, Memento will walk you toward your next star to continue building. This cannot be tapped by accident, and it should never be tapped lightly.</div></div>
     <div class="spacer"></div>
     <div class="holdCircle"><svg viewBox="0 0 86 86"><circle class="ringTrack" cx="43" cy="43" r="39"/><circle class="ringDraw" cx="43" cy="43" r="39"/></svg><span class="dot"></span></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
@@ -412,8 +420,9 @@ function changeConfirm(){
   <div class="stage" style="text-align:center;align-items:center">
     <div class="spacer"></div>
     <div class="eyebrow">Completely change it</div>
-    <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
-    <div class="fsWarn" style="margin-top:16px">Your current star, plan, and pages will be rebuilt around a new goal from scratch. Your notes and history stay, but everything else starts over. If you only want to reword the goal, move the date, or adjust the number, go back and choose Refine instead.</div>
+    <div class="fsq" style="margin-top:22px">Create a new Neutron Star?</div>
+    <div class="whyBtn">?</div>
+    <div class="whyBody"><div class="fsWarn" style="margin-top:14px">This means you haven't completed your current star and it's either not what you want, or completely wrong. Your current star, plan, and pages will be rebuilt around a new goal from scratch. Your notes and history stay, but everything else starts over. If you only want to reword the goal, move the date, or adjust the number, go back and choose Refine instead. This can't be undone.</div></div>
     <div class="spacer"></div>
     <div class="holdCircle"><svg viewBox="0 0 86 86"><circle class="ringTrack" cx="43" cy="43" r="39"/><circle class="ringDraw" cx="43" cy="43" r="39"/></svg><span class="dot"></span></div>
     <div class="holdHint">Press and hold for 3 seconds</div>
@@ -426,13 +435,13 @@ function finalCheck(){
   <div class="stage" style="filter:blur(2px);opacity:.45;text-align:center;align-items:center">
     <div class="spacer"></div>
     <div class="eyebrow">Completely change it</div>
-    <div class="fsq" style="margin-top:22px">Forge a new Neutron Star?</div>
+    <div class="fsq" style="margin-top:22px">Create a new Neutron Star?</div>
     <div class="spacer"></div>
   </div>
   <div class="dlgWrap"><div class="dlg">
     <h4>Last check.</h4>
     <p>Your Memento rebuilds around a new goal. There is no undo.</p>
-    <div class="dlgBtn dlgBtn--danger">Forge a new star</div>
+    <div class="dlgBtn dlgBtn--danger">Create a new star</div>
     <div class="dlgBtn dlgBtn--quiet">Cancel</div>
   </div></div>`;
 }
@@ -446,7 +455,7 @@ const CELLS=[
  {cap:'Tweak, full screen', sub:'What the page-2 button opens, full screen: Refine (reword, same foundation) or Completely change it. Picking either leads to its own confirm, nothing major happens in one tap.', render:s=>tweakSheet(s)},
  {cap:'Fulfilled, the confirm', sub:'The gate behind the lock chip. Two gates deep already (chip, then this), and the pill is hold-to-confirm, 3 seconds. Impossible to hit by accident.', render:()=>fulfilConfirm()},
  {cap:'Complete change, the confirm', sub:'The gate behind Completely change it. Hold-to-confirm, with the escape hatch pointing back to Refine for anyone who only meant to adjust wording, date, or number.', render:()=>changeConfirm()},
- {cap:'Complete change, last check', sub:'After the 3-second hold, one final dialog. Three gates total for forging a new star: the menu, the hold, and this. Nothing this big happens by momentum.', render:()=>finalCheck()},
+ {cap:'Complete change, last check', sub:'After the 3-second hold, one final dialog. Three gates total for creating a new star: the menu, the hold, and this. Nothing this big happens by momentum.', render:()=>finalCheck()},
 ];
 
 function render(){
@@ -470,6 +479,12 @@ const tgTheme=document.getElementById('tgTheme');
 tgTheme.innerHTML += '<button data-id="dark" style="--accSwatch:#8be9fa">Dark</button><button data-id="light" style="--accSwatch:#8be9fa">Light</button>';
 tgTheme.addEventListener('click',e=>{const b=e.target.closest('button'); if(!b)return; curTheme=b.dataset.id; render();});
 render();
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.whyBtn'); if(!b) return;
+  const body=b.parentElement.querySelector('.whyBody');
+  if(body) body.classList.toggle('open');
+});
 
 /* press-and-hold: the ring closes around the dot over 3s; release before that unwinds it */
 const RING_LEN = 2 * Math.PI * 39;   // 245.04
