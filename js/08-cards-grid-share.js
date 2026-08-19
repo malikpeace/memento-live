@@ -1909,6 +1909,12 @@ const CreatorTools = {
     bind('creatorJumpCelebration', () => this.jumpCelebration());
     bind('creatorJumpFinalQ', () => this.jumpFinalQuestion());
     bind('creatorJumpSynth', () => this.jumpSynth());
+    // Straight to the finished summary (star + summary + notes pages), no
+    // ceremony beats. DevCeremony plants the filler star when none exists.
+    bind('creatorJumpClarityEnd', () => {
+      try { this._closeAll(); } catch (e) {}
+      try { if (window.DevCeremony) DevCeremony.summary(); } catch (e) {}
+    });
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpPaywall', () => this.jumpPaywall());
     // The post-payment unlock ceremony (unlock.html in an iframe). dev:true =
