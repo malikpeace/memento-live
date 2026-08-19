@@ -3613,7 +3613,9 @@ const Sidebar = {
         add(null, cmd('Capture a thought', 'Saves to Notes', () => { this.close(); setTimeout(() => { try { if (typeof showQuickCapture === 'function') showQuickCapture(); } catch (_) {} }, 120); }));
         add(null, cmd('Open Updates', 'Grace days, records, your weekly card', () => openExp(() => Sheet.open('inbox'))));
         add(null, cmd('Open Clarity', 'Your goal', () => openExp(() => { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); })));
-        add('action', cmd('Open Action', 'Your plan', () => openExp(() => { if (typeof ActionExperience !== 'undefined') ActionExperience.open(); })));
+        // merge 3.1: Action opens the NEW flow (js/30). ActionFlow.start runs
+        // the same gate the old door ran and picks the resume screen itself.
+        add('action', cmd('Open Action', 'Your plan', () => openExp(() => { if (window.ActionFlow) ActionFlow.start(); else if (typeof ActionExperience !== 'undefined') ActionExperience.open(); })));
         add('streak', cmd('Open Consistency', 'Your streak', () => openExp(() => Sheet.open('streak'))));
         add(null, cmd('Open Memento Mori', 'Time left', () => openExp(() => Sheet.open('mori'))));
         if (!(typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED)) add('vivere', cmd('Open Memento Vivere', 'Vision board', () => openExp(() => Sheet.open('vivere'))));
@@ -4076,7 +4078,9 @@ const Sidebar = {
                 (state.clarity && state.clarity.completed && ClarityExperience.openSummary) ? ClarityExperience.openSummary() : ClarityExperience.open();
               }
             } else if (nav === 'action') {
-              if (typeof ActionExperience !== 'undefined') ActionExperience.open();
+              // merge 3.1: the NEW Action flow (js/30), same gate, resume-aware.
+              if (window.ActionFlow) ActionFlow.start();
+              else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
             } else if (typeof Sheet !== 'undefined' && Sheet.open) {
               Sheet.open(nav);
             }
@@ -4541,7 +4545,13 @@ const TabBar = {
         try { if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show(); } catch (e) {}
         return;
       }
-      try { if (typeof ActionExperience !== 'undefined' && ActionExperience.open) ActionExperience.open(); } catch (e) {}
+      // merge 3.1: [Do] opens the NEW Action flow (js/30). start() lands on the
+      // person's own resume point (intent / logic / day) and carries the same
+      // wall + First 7 Days + paywall gate the old module ran.
+      try {
+        if (window.ActionFlow) ActionFlow.start();
+        else if (typeof ActionExperience !== 'undefined' && ActionExperience.open) ActionExperience.open();
+      } catch (e) {}
       return;
     }
     // Path / Reflect are paid surfaces; free taps open the paywall.
@@ -6284,7 +6294,10 @@ function restoreLastView() {
     if (v === 'claritySummary' && hasSummaryContent) {
       ClarityExperience.openSummary();
     } else if (v === 'action') {
-      ActionExperience.open();
+      // merge 3.1: a saved Action view reopens the NEW flow, which decides the
+      // screen from state (same spot or behind, never ahead).
+      if (window.ActionFlow) ActionFlow.start();
+      else ActionExperience.open();
     } else {
       state.ui.lastView = null;
       persistNow();

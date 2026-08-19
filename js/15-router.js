@@ -66,6 +66,8 @@
       var ms = document.getElementById('moreSpace');
       if (ms && ms.classList.contains('open')) return 'modules';
       if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return 'clarity';
+      // merge 3.1: the NEW Action flow (js/30) is the same 'action' screen.
+      if (typeof ActionFlow !== 'undefined' && ActionFlow.isOpen) return 'action';
       if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) return 'action';
       if (typeof Sheet !== 'undefined' && Sheet.isOpen && Sheet.currentWidget) return moduleSlug(Sheet.currentWidget);
       if (typeof TabBar !== 'undefined' && TabBar.activeTab && TabBar.activeTab !== 'home') return TabBar.activeTab;
@@ -198,7 +200,12 @@
       }
       else if (slug === 'modules') { if (typeof MoreSpace !== 'undefined') MoreSpace.close(); }
       else if (slug === 'clarity') { if (typeof exitToModules === 'function') exitToModules('clarity'); }
-      else if (slug === 'action') { if (typeof exitToModules === 'function') exitToModules('action'); }
+      // merge 3.1: back out of the NEW flow through its own close; the old
+      // module still leaves the way it always did.
+      else if (slug === 'action') {
+        if (typeof ActionFlow !== 'undefined' && ActionFlow.isOpen) ActionFlow.close();
+        else if (typeof exitToModules === 'function') exitToModules('action');
+      }
       else if (slug.indexOf('m/') === 0) { if (typeof Sheet !== 'undefined') Sheet.close(); }
       else if (slug === 'profile') { if (typeof TabBar !== 'undefined') TabBar.switchTo('home'); }
     } catch (e) {}
@@ -236,7 +243,10 @@
         }
         resolved = currentTopSlug();
       } else if (slug === 'action') {
-        if (typeof ActionExperience !== 'undefined') ActionExperience.open();
+        // merge 3.1: #action is the NEW flow. start() carries the wall +
+        // paywall gate, so a locked deep link still resolves to 'paywall'.
+        if (typeof ActionFlow !== 'undefined') ActionFlow.start();
+        else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
         resolved = currentTopSlug();
       } else if (slug === 'memento-full') {
         if (typeof openMementoFull === 'function') openMementoFull();
@@ -298,6 +308,8 @@
     if (typeof TabBar !== 'undefined') { wrapAround(TabBar, 'switchTo'); }
     if (typeof ClarityExperience !== 'undefined') { wrapAround(ClarityExperience, 'open'); wrapAround(ClarityExperience, 'openSummary'); }
     if (typeof ActionExperience !== 'undefined') { wrapAround(ActionExperience, 'open'); }
+    // merge 3.1: the NEW Action flow reports its own open/close the same way.
+    if (typeof ActionFlow !== 'undefined') { wrapAround(ActionFlow, 'start'); wrapAround(ActionFlow, 'close'); }
     if (typeof MoreSpace !== 'undefined') { wrapAround(MoreSpace, 'open'); wrapAround(MoreSpace, 'close'); }
     if (typeof ClarityPaywall !== 'undefined') { wrapAround(ClarityPaywall, 'show'); wrapAround(ClarityPaywall, 'hide'); }
     wrapGlobal('openMementoFull');

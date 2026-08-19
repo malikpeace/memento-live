@@ -601,8 +601,10 @@
       return MON[d.getMonth()] + ' ' + d.getDate();
     } catch (e) { return iso; }
   }
-  function stamp() {
-    var d = new Date(), h = d.getHours();
+  // the clock time a thing happened. No argument = now; a reopened closed day
+  // passes the time it was actually held.
+  function stamp(at) {
+    var d = at ? new Date(at) : new Date(), h = d.getHours();
     return (h % 12 || 12) + ':' + ('0' + d.getMinutes()).slice(-2) + (h >= 12 ? 'pm' : 'am');
   }
   function dayKey(d) {
@@ -772,6 +774,12 @@
   }
 
   function destroy() {
+    // leaving the flow clears the saved view, the way the old module's close
+    // did (js/02 ~2896), so a refresh after an exit lands on the home.
+    try {
+      var rc = G('recallView'), rv = G('rememberView');
+      if (rv && (!rc || rc() === 'action')) rv(null);
+    } catch (e) {}
     if (escBound) { document.removeEventListener('keydown', escBound); escBound = null; }
     if (current && typeof current.teardown === 'function') {
       try { current.teardown(); } catch (e) {}
@@ -786,6 +794,10 @@
         if (n.parentNode) n.parentNode.removeChild(n);
       });
     } catch (e) {}
+    // merge 3.1: the exit chip and Escape close the flow from INSIDE, so the
+    // router is told directly (the same seam MementoView uses) instead of
+    // through a wrapped method it never sees.
+    try { if (window.Router && Router.sync) Router.sync(); } catch (e) {}
   }
 
   // The app's standing bottom-button recipe (Clarity's nav geometry). Every
@@ -2787,6 +2799,55 @@
       openLogic(key, { plan: plan, standing: true, onClose: function () { openDay(key, opts); } });
     });
 
+    // ---- THE CLOSED DAY (merge 3.1, the re-open) ----------------------------
+    // Today's record already exists, so this day was held and written. It has
+    // to come back the way it was LEFT, or the screen asks a person to do a day
+    // they already did. Same locked state the screen reaches after commitDay
+    // (the signed row, no Undo, the rail out of reach, the supports as they
+    // were ticked), entered from the render instead of from the hold.
+    //
+    // QUIETLY. The green rise is the GESTURE, and the gesture is over: it never
+    // replays, and nothing here animates. Tomorrow is a new actionDayKey, so
+    // this simply does not fire and the day renders fresh.
+    function closedToday() {
+      try {
+        var r = ((S() || {}).dayRecords || {})[dayKey()];
+        if (!r) return null;
+        // a record belonging to a retired goal is not this plan's day
+        var mine = plan.starHash || liveStarHash();
+        if (r.starHash && mine && r.starHash !== mine) return null;
+        return r;
+      } catch (e) { return null; }
+    }
+    function restoreClosed(r) {
+      signed = true;
+      written = true;                  // the stores already hold this day
+      off = !!r.off;                   // the record decides, not today's calendar
+      var sup = Array.isArray(r.supports) ? r.supports : null;
+      if (sup) {
+        ticks = ticks.map(function (_, k) { return !!sup[k]; });
+        // the plate showed star + supports; the array's length is what it was
+        actCount = Math.min(MAX_ACTS, Math.max(1, sup.length + 1));
+      }
+      if (hasSize && !off && r.size != null) { val = r.size; lastVal = r.size; }
+      var dt = doneRow.querySelector('.afl-day__dt');
+      if (dt) dt.textContent = 'Done at ' + stamp(r.at) + '.';
+      // the write is final, so the control that says it can be taken back is not
+      // on the screen (commitDay's own two lines).
+      try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
+      // the settled green wash belongs to the signed state, so it is THERE, but
+      // it must not animate itself in on a re-entry: it is already how the day
+      // ended. Killed for the first paint, handed back after it.
+      try {
+        wash.style.transition = 'none';
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { if (wash.isConnected) wash.style.transition = ''; });
+        });
+      } catch (e) {}
+    }
+    var closedRec = closedToday();
+    if (closedRec) restoreClosed(closedRec);
+
     paint();
     enterFade(day);
     enterFade(nav);
@@ -2856,10 +2917,116 @@
     return { star: star, why: why, deadline: deadline, wall: wall, facts: facts, bucket: ctx.bucket };
   }
 
+  // ===========================================================================
+  // 3.1  THE GATE  (merge phase 3.1, entry wiring)
+  // The SAME sequence the old door ran (js/02 ActionExperience.open, ~2781),
+  // reused rather than re-decided, so entitlement behaviour is unchanged
+  // (ACTION-MERGE-PLAN 6.1: Action is paid):
+  //   1. THE WALL. No Clarity, no Action. Above the paywall on purpose: a paid
+  //      account with no star has nothing to build a plan from. It also scrubs
+  //      the saved view, or a stale one retries this door on every boot.
+  //   2. FIRST 7 DAYS, once, for everyone. It is the trust timeline, not the
+  //      sell, so it runs before the branch.
+  //   3. THE PAYWALL. Locked -> show it and stop. Paid -> straight in.
+  // Returns true when it CONSUMED the tap (the flow must not open).
+  // ===========================================================================
+  function gateBlocks(retry) {
+    var st = S();
+    if (!(st && st.clarity && st.clarity.completed)) {
+      try { var rv = G('rememberView'); if (rv) rv(null); } catch (e) {}
+      return true;
+    }
+    try {
+      if (typeof ClarityPaywall !== 'undefined') {
+        st.meta = st.meta || {};
+        var n7 = G('showNext7Days');
+        if (n7 && !st.meta.next7DaysSeen) {
+          st.meta.next7DaysSeen = true;
+          try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+          n7(function () {
+            try {
+              if (ClarityPaywall.isPaid()) retry();
+              else if (ClarityPaywall.show) ClarityPaywall.show();
+            } catch (e) {}
+          });
+          return true;
+        }
+        if (ClarityPaywall.isLockedByPaywall('action')) { ClarityPaywall.show(); return true; }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // THE AGREEMENT. The logic page's hold is a one-time commitment, so it has to
+  // survive a reload, and the plan object is where it belongs: same store, same
+  // starHash, dies with the plan it was given for. (js/01 is another builder's
+  // file this phase, so nothing new is added to the state shape.)
+  // ---------------------------------------------------------------------------
+  function markAgreed() {
+    try {
+      var st = S(), p = st && st.actionPlan;
+      if (!p || p.v !== 1) return;
+      if (!p.agreedAt) p.agreedAt = Date.now();
+      var pn = G('persistNow'); if (pn) pn();
+    } catch (e) {}
+  }
+  function planAgreed(plan) {
+    if (!plan) return false;
+    if (plan.agreedAt) return true;
+    // A day already held for this plan IS the agreement: a day record can only
+    // exist past the logic page, so an agreement lost to a crash is recovered
+    // from the records instead of being asked for twice.
+    try {
+      var recs = (S() || {}).dayRecords || {};
+      for (var k in recs) {
+        if (Object.prototype.hasOwnProperty.call(recs, k) &&
+            recs[k] && recs[k].starHash && recs[k].starHash === plan.starHash) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  // THE RESUME POINT (the resume law, v764: a relaunch lands on the same spot
+  // or a step BEHIND, never ahead).
+  //
+  //   no plan                  -> intent. This covers three states on purpose:
+  //                               nothing started, refine abandoned halfway,
+  //                               and a generation killed mid-flight. Nothing
+  //                               persists an in-flight marker, so those three
+  //                               are indistinguishable from the outside, and
+  //                               the only honest answer is the furthest-back
+  //                               one. Their refine answers are still stored,
+  //                               so nothing they typed is lost.
+  //   plan, never agreed to    -> THE LOGIC page. The plan landed while they
+  //                               were away from it; the agreement was never
+  //                               given, so it is asked for now.
+  //   plan, agreed             -> THE DAY. Rest days and a closed day are the
+  //                               day screen's own states, it renders them.
+  // ---------------------------------------------------------------------------
+  function resumePoint() {
+    var plan = livePlan();
+    if (!plan) return 'intent';
+    return planAgreed(plan) ? 'day' : 'logic';
+  }
+
   function start(opts) {
     opts = opts || {};
+    // Every real entry point comes through here, so the gate lives here too: no
+    // caller can forget it. Probes and the cheat bar pass skipGate.
+    // The retry after the First 7 Days beat re-enters through the PUBLIC start,
+    // not this closure: the router wraps ActionFlow.start to learn a screen
+    // opened, and a private call would open the flow behind its back.
+    if (!opts.skipGate && gateBlocks(function () {
+      var pub = (window.ActionFlow && window.ActionFlow.start) || start;
+      pub(opts);
+    })) return null;
     var star = liveStar();
     if (!star) return null;                 // no star, no plan: Clarity comes first
+    // Where they ARE, remembered the way every other module remembers it, so a
+    // refresh reopens the flow and resumePoint decides the screen again.
+    try { var rv2 = G('rememberView'); if (rv2) rv2('action'); } catch (e) {}
     var routed = resolveBucket();
     var ctx = { star: star, shape: liveShape(), bucket: routed.bucket };
 
@@ -2901,11 +3068,11 @@
       });
     }
     function toLogic() {
-      openLogic(null, { onAgree: function () { setTimeout(toDay, 320); } });
+      openLogic(null, { onAgree: function () { markAgreed(); setTimeout(toDay, 320); } });
     }
     function toDay() { openDay(null, {}); }
 
-    var from = opts.from || 'intent';
+    var from = opts.from || resumePoint();
     if (from === 'refine') return toRefine();
     if (from === 'loading') return toLoading();
     if (from === 'logic') return toLogic();
@@ -2944,9 +3111,15 @@
     openLogic: openLogic,
     openDay: openDay,
     close: destroy,
-    // THE REAL WALK (phase 3). Nothing calls it yet: entry wiring is 3.1.
+    // THE REAL WALK. Every entry point calls this (phase 3.1): the bottom bar's
+    // [Do], the sidebar, the router, the boot restore, and every remaining
+    // ActionExperience.open() caller via the redirect below.
     start: start,
     demo: demo,
+    resumePoint: resumePoint,
+    markAgreed: markAgreed,
+    planAgreed: planAgreed,
+    legacyRedirect: true,
     fixtures: FIXTURES,
     questions: QUESTIONS,
     // the data half, exported so the wiring phase and the probes can reach the
@@ -2969,4 +3142,42 @@
     get isOpen() { return !!root; }
   };
   window.ActionFlow = ActionFlow;
+
+  // ===========================================================================
+  // 3.1  THE OLD DOOR  (merge phase 3.1, entry wiring)
+  // The named entry points are wired directly (js/09's [Do] slot, the sidebar,
+  // the command palette, the boot restore; js/15's #action route). But
+  // ActionExperience.open() is still called from a dozen everyday surfaces that
+  // belong to other files this phase (the home Today card's "Build my plan",
+  // the pillar tap, the module faces, the widget tiles, the sheet nav), and the
+  // brief for phase 3.1 is that the old module is reachable from NO primary
+  // path. So the door itself is re-pointed, here, in this module's own file:
+  // one wrapper, the old code untouched underneath it.
+  //
+  //   - the old open stays as ActionExperience.openLegacy() (the retirement
+  //     brief and the dev state browser need it),
+  //   - ?dev=action-states still gets the OLD module, because that browser
+  //     exists to render the old module's states (3.3 updates it),
+  //   - kill switch: ActionFlow.legacyRedirect = false before the first tap,
+  //     or delete this block. Nothing else changes.
+  //
+  // The gate is NOT re-run here: start() runs it, and it is the same gate the
+  // old open ran, so the wall, the First 7 Days beat and the paywall behave
+  // exactly as before.
+  // ===========================================================================
+  (function installOldDoorRedirect() {
+    try {
+      if (typeof ActionExperience === 'undefined' || !ActionExperience) return;
+      if (ActionExperience.openLegacy) return;              // already installed
+      var legacy = ActionExperience.open;
+      if (typeof legacy !== 'function') return;
+      ActionExperience.openLegacy = function () { return legacy.apply(ActionExperience, arguments); };
+      ActionExperience.open = function () {
+        var devStates = false;
+        try { devStates = /[?&]dev=action-states\b/.test(location.search); } catch (e) {}
+        if (ActionFlow.legacyRedirect && !devStates) return ActionFlow.start();
+        return legacy.apply(ActionExperience, arguments);
+      };
+    } catch (e) {}
+  })();
 })();
