@@ -841,7 +841,20 @@ const Backend = {
       if (!pending.length) return;
       pending.forEach(item => {
         item.status = 'sending';
-        this._req('/api/feedback', { method: 'POST', auth: false, body: { kind: item.kind, text: item.text, ts: item.ts, email: (state.support.contacts && state.support.contacts.email) || '' } })
+        // THE MERGE foundation (2026-08-19): the old '/api/feedback' target
+        // never existed, so "Sent." was a lie. Feedback now lands in the
+        // submit-feedback edge function -> public.feedback table.
+        const _fbUrl = (window.MEMENTO_SUPABASE_URL || 'https://lipuxymlsowdrbummqxw.supabase.co') + '/functions/v1/submit-feedback';
+        fetch(_fbUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': window.MEMENTO_SUPABASE_ANON || '',
+            'Authorization': 'Bearer ' + (window.MEMENTO_SUPABASE_ANON || ''),
+            'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
+          },
+          body: JSON.stringify({ kind: item.kind, text: item.text, email: (state.support.contacts && state.support.contacts.email) || '', appVersion: String(window.MEMENTO_VERSION || '') })
+        })
           .then(r => {
             if (r && r.ok) { item.status = 'sent'; state.support.feedbackQueue = state.support.feedbackQueue.filter(x => x.status !== 'sent'); }
             else { item.status = 'queued'; }

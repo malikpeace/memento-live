@@ -424,6 +424,69 @@ const CloudSync = (function () {
       merged.checkins = unionByKey(lNewer ? local.checkins : cloud.checkins, lNewer ? cloud.checkins : local.checkins, (x) => x && x.iso, 800);
     } catch (e) {}
     try { merged.streak = mergeStreak(local.streak, cloud.streak, (lm.streak || lGlobal) >= (cm.streak || cGlobal)); } catch (e) {}
+    // THE MERGE foundation (2026-08-19): unions for the new stores.
+    // Clarity notes: union entries by id, union tombstones, and a tombstoned
+    // id NEVER re-enters entries on any device (the zombie-note rule).
+    // Same-id conflict: latest day wins.
+    try {
+      const ln = local.clarityNotes || { entries: [], tombstones: [] };
+      const cn = cloud.clarityNotes || { entries: [], tombstones: [] };
+      const tomb = Array.from(new Set([].concat(ln.tombstones || [], cn.tombstones || [])));
+      const byId = {};
+      [].concat(ln.entries || [], cn.entries || []).forEach((e2) => {
+        if (!e2 || !e2.id) return;
+        if (!byId[e2.id] || String(e2.day || '') > String(byId[e2.id].day || '')) byId[e2.id] = e2;
+      });
+      const entries = Object.keys(byId).filter((id) => tomb.indexOf(id) === -1).map((id) => byId[id]);
+      entries.sort((a, b2) => String(a.day || '').localeCompare(String(b2.day || '')));
+      merged.clarityNotes = { entries: entries, tombstones: tomb };
+    } catch (e) {}
+    // Finale receipts + reward ledgers: fired = witnessed on ANY device.
+    // Union of keys; when both sides carry one, the EARLIER day wins (first
+    // witness is the truth). Applies to the shadow twins the same way.
+    try {
+      const unionEarliest = (a, b2) => {
+        const out2 = Object.assign({}, a || {});
+        Object.keys(b2 || {}).forEach((k) => {
+          if (!(k in out2)) { out2[k] = b2[k]; return; }
+          const av = out2[k], bv = b2[k];
+          const ad = (av && av.day) || av, bd = (bv && bv.day) || bv;
+          if (String(bd) < String(ad)) out2[k] = bv;
+        });
+        return out2;
+      };
+      merged.goalDone = unionEarliest(local.goalDone, cloud.goalDone);
+      const lr = local.rewards || {}, cr = cloud.rewards || {};
+      merged.rewards = Object.assign({}, cr, lr);
+      merged.rewards.ledger = unionEarliest(lr.ledger, cr.ledger);
+      merged.rewards.shadow = {
+        ledger: unionEarliest(lr.shadow && lr.shadow.ledger, cr.shadow && cr.shadow.ledger),
+        goalDone: unionEarliest(lr.shadow && lr.shadow.goalDone, cr.shadow && cr.shadow.goalDone)
+      };
+    } catch (e) {}
+    // Day records: union by day key; a day both devices wrote keeps the copy
+    // from the side whose action module edited more recently.
+    try {
+      const lNewer = (lm.action || lGlobal) >= (cm.action || cGlobal);
+      const base = lNewer ? (local.dayRecords || {}) : (cloud.dayRecords || {});
+      const other = lNewer ? (cloud.dayRecords || {}) : (local.dayRecords || {});
+      merged.dayRecords = Object.assign({}, other, base);
+    } catch (e) {}
+    // completionHistory is the app's activity spine (12 external readers):
+    // newest-module-wins on state.action must never drop the other device's
+    // day of completions, so the arrays union by record id inside the winner.
+    try {
+      if (merged.action && (local.action || cloud.action)) {
+        const la = (local.action && local.action.completionHistory) || [];
+        const ca = (cloud.action && cloud.action.completionHistory) || [];
+        const lNewer = (lm.action || lGlobal) >= (cm.action || cGlobal);
+        merged.action.completionHistory = unionByKey(
+          lNewer ? la : ca, lNewer ? ca : la,
+          (h) => h && (h.id || h.missionId ? String(h.id || '') + '|' + String(h.missionId || '') + '|' + String(h.completedAt || h.date || '') : null),
+          1200
+        );
+      }
+    } catch (e) {}
     return merged;
   }
 

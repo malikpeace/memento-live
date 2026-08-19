@@ -1576,6 +1576,8 @@ function ensureGoalTarget() {
     gp.unit = found ? found.unit : '';
     gp.baseline = null; gp.current = null; gp.updatedAt = ''; gp.askedDay = '';
     gp.history = [];
+    // THE MERGE foundation: shape + custom marks are star-scoped too.
+    gp.shape = ''; gp.customMarks = [];
     try { persistNow(); } catch (e) {}
     return gp;
   } catch (e) { return state.goalProgress || null; }
@@ -1589,6 +1591,7 @@ function goalProgressUpdate(value) {
     const n = Number(value);
     if (!isFinite(n) || n < 0) return false;
     const day = (typeof actionDayKey === 'function') ? actionDayKey(new Date()) : new Date().toISOString().slice(0, 10);
+    const _prevPulse = gp.current;   // THE MERGE phase 0: read BEFORE the write
     if (gp.baseline === null) gp.baseline = n;
     gp.current = n;
     gp.updatedAt = day;
@@ -1596,6 +1599,8 @@ function goalProgressUpdate(value) {
     if (last && last.day === day) last.value = n;
     else gp.history.push({ day: day, value: n });
     if (gp.history.length > 400) gp.history.splice(0, gp.history.length - 400);
+    // THE MERGE phase 0: shadow-mode referee observation (pulse-crossed marks).
+    try { if (typeof rewardShadow === 'function') rewardShadow('js03-pulse', { prevValue: _prevPulse }); } catch (_) {}
     try { persistNow(); } catch (e) {}
     return true;
   } catch (e) { return false; }
@@ -1609,20 +1614,27 @@ function goalDistanceLine() {
     if (gp.current === null) return `GOAL TARGET: ${gp.target} ${gp.unit} (no progress pulse recorded yet).`;
     let line = `GOAL DISTANCE: ${gp.current} of ${gp.target} ${gp.unit}`;
     if (gp.baseline !== null && gp.baseline !== gp.current) line += ` (started at ${gp.baseline})`;
+    // THE MERGE foundation (MERGE-0 §3, pre-existing bug): direction-aware.
+    // A down-goal (weight, debt, screen time) gains by FALLING; the old code
+    // assumed rising and told losers-of-weight they had "SLIPPED".
+    const down = (typeof MilestoneChooser !== 'undefined')
+      ? MilestoneChooser.direction(gp, (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) || '') === 'down'
+      : (gp.baseline !== null && gp.target !== null && gp.target < gp.baseline);
     if (gp.history.length >= 2) {
       const first = gp.history[0];
       const lastPt = gp.history[gp.history.length - 1];
       const days = Math.max(1, Math.round((new Date(lastPt.day) - new Date(first.day)) / 86400000));
-      const gained = lastPt.value - first.value;
-      if (gained > 0) {
-        const remaining = gp.target - gp.current;
-        const eta = remaining > 0 ? Math.ceil(remaining / (gained / days)) : 0;
-        line += `. Pace: +${gained} in ${days} day${days === 1 ? '' : 's'}` + (eta > 0 ? `, ~${eta} days to target at this pace` : '');
-      } else if (gained < 0) {
-        line += `. It has SLIPPED by ${Math.abs(gained)} since tracking began.`;
+      const moved = down ? (first.value - lastPt.value) : (lastPt.value - first.value);
+      if (moved > 0) {
+        const remaining = down ? (gp.current - gp.target) : (gp.target - gp.current);
+        const eta = remaining > 0 ? Math.ceil(remaining / (moved / days)) : 0;
+        line += `. Pace: ${down ? '-' : '+'}${moved} in ${days} day${days === 1 ? '' : 's'}` + (eta > 0 ? `, ~${eta} days to target at this pace` : '');
+      } else if (moved < 0) {
+        line += `. It has SLIPPED by ${Math.abs(moved)} since tracking began.`;
       }
     }
-    if (gp.current >= gp.target) line += '. THE TARGET IS REACHED.';
+    const reached = down ? (gp.current <= gp.target) : (gp.current >= gp.target);
+    if (reached) line += '. THE TARGET IS REACHED.';
     return line;
   } catch (e) { return ''; }
 }

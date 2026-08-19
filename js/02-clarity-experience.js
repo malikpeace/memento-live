@@ -408,6 +408,9 @@ const ClarityExperience = {
     // covers the dashboard from frame 1 (no flash of translucent overlay).
     const summary = normalizeClaritySummary(state.clarity.answers);
     this.pageWrap.innerHTML = `<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">${renderNeutronStarSummary(summary, { allowContinue: true, showRestart: true })}</div>`;
+    // Three swipeable pages: the star, the summary, the notes (phase 1 of the
+    // Clarity merge). Always lands page 1, the pager is rebuilt on every open.
+    clarityUpgradeSummaryToPager(this.pageWrap);
     this.navEl.innerHTML = '';
 
     // Fade clarity-exp in (one smooth transition, no staggered classes)
@@ -2135,6 +2138,9 @@ const ClarityExperience = {
           setTimeout(() => ClarityExperience.open(), 500);
         });
       }
+      // Three swipeable pages: the star, the summary, the notes (phase 1 of
+      // the Clarity merge). The wizard's own synthesis step lands here too.
+      clarityUpgradeSummaryToPager(container);
       // Init the 3D card on the neutron star summary
       const _wizSelf = this;
       setTimeout(() => initNeutronStarCard(null, () => _wizSelf.prev()), 50);
@@ -6484,6 +6490,8 @@ Return ONLY the sentence text. No quotes, no labels.`;
       if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
       const completion = createActionCompletionRecord(pa3, tier, actionText);
       state.action.completionHistory.push(completion);
+      // THE MERGE phase 0: shadow-mode referee observation.
+      try { if (typeof rewardShadow === 'function') rewardShadow('js02-action-loop'); } catch (_) {}
       try { writeProofEvent('action-complete', { title: actionText || pa3.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
       if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
       try { persistNow(); } catch (_) {}
@@ -9124,6 +9132,7 @@ function _fireIgnition(root) {
       if (ClarityExperience && ClarityExperience.isOpen) {
         const summary = normalizeClaritySummary(state.clarity.answers);
         ClarityExperience.pageWrap.innerHTML = `<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">${renderNeutronStarSummary(summary, { allowContinue: true, showRestart: true })}</div>`;
+        clarityUpgradeSummaryToPager(ClarityExperience.pageWrap);
         ClarityExperience.navEl.innerHTML = '';
         requestAnimationFrame(() => initNeutronStarCard(ClarityExperience.pageWrap, () => { ClarityExperience.isOpen = false; ClarityExperience.open(); }));
         ClarityExperience.bindWizardInFullscreen();
@@ -10052,6 +10061,7 @@ function _bindStarPlacard(root) {
       if (ClarityExperience && ClarityExperience.isOpen) {
         const summary = normalizeClaritySummary(state.clarity.answers);
         ClarityExperience.pageWrap.innerHTML = `<div class="clarity-exp__page-inner clarity-exp__page-inner--summary">${renderNeutronStarSummary(summary, { allowContinue: true, showRestart: true })}</div>`;
+        clarityUpgradeSummaryToPager(ClarityExperience.pageWrap);
         ClarityExperience.navEl.innerHTML = '';
         requestAnimationFrame(() => initNeutronStarCard(ClarityExperience.pageWrap, () => { ClarityExperience.isOpen = false; ClarityExperience.open(); }));
         ClarityExperience.bindWizardInFullscreen();
@@ -10263,3 +10273,300 @@ function _bindStarPlacard(root) {
     }
   } catch (e) {}
 })();
+
+/* ============================================================
+   CLARITY PAGER, phase 1 of the Clarity merge.
+   (plan: CLARITY-MERGE-CHECKLIST.md, mock: mockups/clarity-home/clarity-pages.html)
+
+   The post-run Clarity surface becomes three swipeable pages with dots:
+     1. the Neutron Star (the shipped scene, moved into the pager untouched)
+     2. the summary: standing, why, anti-vision, Tweak
+     3. your notes: the stack, Add at the top
+   Resume law (v764): re-entering Clarity always lands page 1. The pager is
+   built fresh on every open, so scrollLeft starts at 0 every time.
+
+   Pages 2 and 3 are their OWN sibling sections. They are never nested inside
+   .ns-star-scene: base.css re-pins --ink to white on that element so the star
+   stays a space scene in both themes, and inheriting that would make the
+   locked light mode white on white. Styling lives in css/clarity.css.
+
+   Phase 1 is layout only. Update progress, Neutron Star Fulfilled, Tweak and
+   Add are rendered and tappable but their flows are phases 3 and 4; every
+   handler here is a logging no-op.
+   ============================================================ */
+
+const CP_ICON_EDIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const CP_ICON_PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+const CP_ICON_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+function _cpStub(what) {
+  try { console.info('[clarity-pager] ' + what + ': the flow lands in a later phase, nothing wired yet.'); } catch (e) {}
+}
+
+function _cpNum(n) {
+  const v = Number(n);
+  if (!isFinite(v)) return '';
+  try { return v.toLocaleString('en-US', { maximumFractionDigits: 2 }); } catch (e) { return String(v); }
+}
+
+function _cpDayToDate(day) {
+  const t = Date.parse(String(day || '') + 'T00:00:00');
+  return isFinite(t) ? new Date(t) : null;
+}
+
+function _cpLongDate(d) {
+  if (!d) return '';
+  try { return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) { return ''; }
+}
+
+// the "as of" stamp. Plain words, no invented precision.
+function _cpAsOf(day) {
+  const d = _cpDayToDate(day);
+  if (!d) return '';
+  const n = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (n <= 0) return 'as of today';
+  if (n === 1) return 'as of yesterday';
+  if (n < 7) return 'as of ' + n + ' days ago';
+  if (n < 14) return 'as of last week';
+  if (n < 60) return 'as of ' + Math.round(n / 7) + ' weeks ago';
+  const m = Math.round(n / 30);
+  return 'as of ' + m + ' month' + (m === 1 ? '' : 's') + ' ago';
+}
+
+/* The 6-type to 3-face table (checklist audit amendment, 2026-08-19).
+   ccGoalShape() in js/08 is the single resolver; nothing here re-classifies.
+     quantity_up    -> number
+     quantity_down  -> number, direction-aware
+     milestone      -> dated wall when a deadline exists, else why-led
+     maintenance    -> why-led
+     frequency      -> why-led
+     open           -> why-led
+   Never a fake number: a number face with no parsed target falls back to
+   why-led rather than inventing one. */
+function _cpFace() {
+  let shape = null, gp = null;
+  try { shape = (typeof ccGoalShape === 'function') ? ccGoalShape() : null; } catch (e) { shape = null; }
+  try { gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : (state.goalProgress || null); } catch (e) { gp = state.goalProgress || null; }
+  let face = 'why';
+  if (shape) {
+    if (shape.type === 'quantity_up' || shape.type === 'quantity_down') face = 'number';
+    else if (shape.type === 'milestone' && shape.deadline) face = 'dated';
+  }
+  if (face === 'number' && !(gp && gp.target !== null && gp.target !== undefined && isFinite(Number(gp.target)))) face = 'why';
+  if (face === 'dated' && !(shape && shape.deadline)) face = 'why';
+  return { face: face, shape: shape || {}, gp: gp || {} };
+}
+
+function _cpWhyBlock(why) {
+  if (!why) return '';
+  return '<div class="cp-div"></div><div class="cp-lab">Why this matters</div>' +
+    '<div class="cp-why">' + esc(why) + '</div>';
+}
+
+// The standing block. One of three faces, never a fourth.
+function _cpStanding(f, why) {
+  const gp = f.gp, shape = f.shape;
+
+  if (f.face === 'number') {
+    const unit = String(gp.unit || shape.unit || '').trim();
+    const cur = Number(gp.current);
+    const hasCur = gp.current !== null && gp.current !== undefined && isFinite(cur);
+    let html = '<div class="cp-lab">Where you stand</div>';
+    if (hasCur) {
+      html += '<div class="cp-num">' + _cpNum(cur) +
+        (unit ? '<span class="cp-num__unit">' + esc(unit) + '</span>' : '') + '</div>';
+      const asOf = _cpAsOf(gp.updatedAt);
+      if (asOf) html += '<div class="cp-asof">' + esc(asOf) + '</div>';
+      const base = (gp.baseline !== null && gp.baseline !== undefined && isFinite(Number(gp.baseline))) ? Number(gp.baseline) : null;
+      const tgt = Number(gp.target);
+      if (base !== null && isFinite(tgt)) {
+        // pct = (current - baseline) / (target - baseline), clamped 0..1.
+        // Direction-safe by construction: on a down-goal both halves are
+        // negative, so the ratio still reads as progress toward the target.
+        let pct = (tgt === base) ? 1 : (cur - base) / (tgt - base);
+        if (!isFinite(pct)) pct = 0;
+        pct = Math.max(0, Math.min(1, pct));
+        html += '<div class="cp-prog"><div class="cp-track">' +
+          '<span class="cp-track__fill" style="width:' + (pct * 100).toFixed(2) + '%"></span></div>' +
+          '<div class="cp-pts"><span>' + _cpNum(base) + '</span><span>' + _cpNum(tgt) + '</span></div></div>';
+        const down = tgt < base;
+        const left = Math.max(0, down ? (cur - tgt) : (tgt - cur));
+        html += '<div class="cp-rem">' + (left === 0 ? '0' : (down ? '-' : '+') + _cpNum(left)) +
+          '<s>to go</s></div>';
+      }
+    } else {
+      html += '<div class="cp-none">No number logged yet.</div>';
+    }
+    html += '<button type="button" class="cp-upd" id="cpUpdate">' + CP_ICON_EDIT + 'Update progress</button>';
+    /* Adjudicated (Fable, 2026-08-19): the "Neutron Star Fulfilled" lock chip
+       lives on the UPDATE SCREEN only (checklist Completion section + the
+       canonical mock's page 2, which shows no chip). Renders in Phase 4. */
+    return html + _cpWhyBlock(why);
+  }
+
+  if (f.face === 'dated') {
+    // The wall. It moves itself, so there is no update button here.
+    const ms = shape.deadline.getTime() - Date.now();
+    const days = Math.max(0, Math.ceil(ms / 86400000));
+    const label = String(shape.deadlineText || '').trim();
+    const sub = 'to ' + (label ? label + ', ' : '') + _cpLongDate(shape.deadline);
+    return '<div class="cp-lab">Where you stand</div>' +
+      '<div class="cp-num">' + _cpNum(days) +
+      '<span class="cp-num__unit">' + (days === 1 ? 'day' : 'days') + '</span></div>' +
+      '<div class="cp-asof">' + esc(sub) + '</div>' +
+      _cpWhyBlock(why);
+  }
+
+  // why-led: no standing block at all, the why leads the page in large type.
+  return why ? '<div class="cp-why cp-why--hero">' + esc(why) + '</div>' : '';
+}
+
+function _cpNebula() {
+  return '<div class="cp-neb" aria-hidden="true">' +
+    '<div class="clarity-exp__neb1"></div><div class="clarity-exp__neb2"></div></div>';
+}
+
+function _clarityPageSummary() {
+  let sum = {};
+  try {
+    const ans = (state.clarity && state.clarity.answers) || {};
+    sum = (typeof normalizeClaritySummary === 'function') ? normalizeClaritySummary(ans) : {};
+  } catch (e) { sum = {}; }
+  const why = String(sum.coreWhy || '').trim();
+  const anti = String(sum.antiVision || '').trim();
+  const f = _cpFace();
+  return _cpNebula() +
+    '<div class="cp-stage cp-stage--top cp-stage--center">' +
+      _cpStanding(f, why) +
+      (anti ? '<div class="cp-div"></div><div class="cp-lab">If nothing changes</div>' +
+        '<div class="cp-anti">' + esc(anti) + '</div>' : '') +
+      '<div class="cp-spacer"></div>' +
+      '<button type="button" class="cp-tweak" id="cpTweak">Tweak your Neutron Star</button>' +
+    '</div>';
+}
+
+function _clarityPageNotes() {
+  const store = (state.clarityNotes && typeof state.clarityNotes === 'object')
+    ? state.clarityNotes : { entries: [], tombstones: [] };
+  const tomb = Array.isArray(store.tombstones) ? store.tombstones : [];
+  const live = (Array.isArray(store.entries) ? store.entries : [])
+    .filter(n => n && n.id && tomb.indexOf(n.id) === -1);
+  // founding message pinned on top, then newest first
+  const founding = live.filter(n => n.founding);
+  const rest = live.filter(n => !n.founding)
+    .sort((a, b) => String(b.day || '').localeCompare(String(a.day || '')));
+  const ordered = founding.concat(rest);
+
+  const head = '<div class="cp-stackhead"><div class="cp-lab">Your notes to yourself</div>' +
+    '<button type="button" class="cp-add" id="cpAddNote">' + CP_ICON_PLUS + 'Add</button></div>';
+
+  let body;
+  if (!ordered.length) {
+    body = '<div class="cp-empty">No notes yet. Leave something here for the version of you who forgets why this mattered.</div>' +
+      '<div class="cp-ghost" aria-hidden="true"><div class="cp-note cp-note--founding">' +
+        '<span class="cp-note__tag">A reminder</span>' +
+        '<div class="cp-note__txt">The kind of thing you might write: "Remember, you chose this because..."</div>' +
+        '<div class="cp-note__sig">someday soon</div></div></div>' +
+      '<div class="cp-ghosttag">Only you ever see these.</div>';
+  } else {
+    body = ordered.map(function (n) {
+      const tag = String(n.tag || (n.founding ? 'The message you started with' : 'A note'));
+      const sig = _cpLongDate(_cpDayToDate(n.day));
+      return '<div class="cp-note' + (n.founding ? ' cp-note--founding' : '') + '">' +
+        '<span class="cp-note__tag">' + esc(tag) + '</span>' +
+        '<div class="cp-note__txt">' + esc(String(n.text || '')) + '</div>' +
+        (sig ? '<div class="cp-note__sig">' + esc(sig) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+
+  return _cpNebula() +
+    '<div class="cp-stage cp-stage--top">' + head + body + '<div class="cp-spacer"></div></div>';
+}
+
+// Grow the rail in once per page-show. A class swap, not a fill mode, so the
+// end state is the resting state and no GPU layer is held (the v768 law).
+function _cpReplayRail(page) {
+  try {
+    const fill = page.querySelector('.cp-track__fill');
+    if (!fill) return;
+    fill.classList.remove('is-grow');
+    void fill.offsetWidth;
+    fill.classList.add('is-grow');
+  } catch (e) {}
+}
+
+function _bindClarityPager(pager) {
+  const scroll = pager.querySelector('.clarity-pager__scroll');
+  const pages = Array.prototype.slice.call(pager.querySelectorAll('.clarity-pager__page'));
+  const dots = Array.prototype.slice.call(pager.querySelectorAll('.clarity-pager__dots i'));
+  if (!scroll || !pages.length) return;
+
+  // Resume law: always land page 1, never a deeper page.
+  try { scroll.scrollLeft = 0; } catch (e) {}
+
+  let pending = 0;
+  const sync = function () {
+    pending = 0;
+    const w = scroll.clientWidth || 1;
+    const pos = scroll.scrollLeft / w;
+    const idx = Math.max(0, Math.min(pages.length - 1, Math.round(pos)));
+    pages.forEach(function (p, i) {
+      p.classList.toggle('is-visible', Math.abs(pos - i) < 0.999);
+      const wasActive = p.classList.contains('is-active');
+      const now = (i === idx);
+      p.classList.toggle('is-active', now);
+      p.setAttribute('aria-hidden', now ? 'false' : 'true');
+      if (now && !wasActive) _cpReplayRail(p);
+    });
+    dots.forEach(function (d, i) { d.classList.toggle('is-on', i === idx); });
+  };
+  const queue = function () { if (!pending) pending = requestAnimationFrame(sync); };
+
+  scroll.addEventListener('scroll', queue, { passive: true });
+  try {
+    if (typeof ResizeObserver === 'function') {
+      const ro = new ResizeObserver(queue);
+      ro.observe(scroll);
+    }
+  } catch (e) {}
+  requestAnimationFrame(sync);
+
+  // Phase 1 stubs. They render and they are tappable; the flows land later.
+  const upd = pager.querySelector('#cpUpdate');
+  if (upd) upd.addEventListener('click', function () { _cpStub('Update progress'); });
+  const twk = pager.querySelector('#cpTweak');
+  if (twk) twk.addEventListener('click', function () { _cpStub('Tweak your Neutron Star'); });
+  const add = pager.querySelector('#cpAddNote');
+  if (add) add.addEventListener('click', function () { _cpStub('Add a note'); });
+}
+
+/* Wrap an already-rendered Neutron Star summary into the three-page pager.
+   Called right after every place that paints the summary; a DOM upgrade
+   rather than four copies of the markup, so page 1 keeps rendering through
+   the shipped renderNeutronStarSummary path exactly as it does today. */
+function clarityUpgradeSummaryToPager(root) {
+  try {
+    const host = root || document;
+    if (!host || !host.querySelector) return;
+    const scene = host.querySelector('#nsScene');
+    if (!scene) return;
+    if (scene.closest && scene.closest('.clarity-pager')) return;
+    const parent = scene.parentNode;
+    if (!parent) return;
+
+    const pager = document.createElement('div');
+    pager.className = 'clarity-pager';
+    pager.id = 'clarityPager';
+    pager.innerHTML =
+      '<div class="clarity-pager__scroll">' +
+        '<section class="clarity-pager__page clarity-pager__page--star is-active is-visible" data-cp="0" aria-label="Your Neutron Star"></section>' +
+        '<section class="clarity-pager__page clarity-pager__page--sum" data-cp="1" aria-label="Summary">' + _clarityPageSummary() + '</section>' +
+        '<section class="clarity-pager__page clarity-pager__page--notes" data-cp="2" aria-label="Your notes">' + _clarityPageNotes() + '</section>' +
+      '</div>' +
+      '<div class="clarity-pager__dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>';
+
+    parent.insertBefore(pager, scene);
+    pager.querySelector('.clarity-pager__page--star').appendChild(scene);
+    _bindClarityPager(pager);
+  } catch (e) {}
+}

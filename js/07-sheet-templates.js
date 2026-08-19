@@ -641,6 +641,8 @@ const SHEET_TEMPLATES = {
       try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
       if (typeof recalculateStreak === 'function') { try { recalculateStreak(); } catch (_) {} }
       try { persistNow(); } catch (_) {}
+      // THE MERGE phase 0: shadow-mode referee observation, zero user-facing writes.
+      try { if (typeof rewardShadow === 'function') rewardShadow('js07-bookend'); } catch (_) {}
       return true;
     },
     _ensureStyles() {

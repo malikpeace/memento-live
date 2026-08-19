@@ -97,6 +97,23 @@ const DEFAULT_STATE = {
   // target === null means the star has no number: every distance surface
   // stays dormant and asks for nothing.
   goalProgress: { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [] },
+  // THE MERGE foundation (2026-08-19). goalDone = finale receipts keyed by
+  // starHash: fired = witnessed = never re-earned; cleared ONLY by the
+  // explicit surgical goal reset, NEVER tied to entitlement. rewards holds
+  // the chooser's once-only ledger + the user's daily-page style; .shadow
+  // is phase-0 shadow mode's persisted twin (real once-only proofs with
+  // zero user-facing writes). dayRecords: one record per actionDayKey day,
+  // { starHash, star:true, supports:[bool], size, off } — feeds the per-goal
+  // completedCount the daily reward page renders.
+  goalDone: {},
+  rewards: { ledger: {}, dailyStyle: 'path', shadow: { ledger: {}, goalDone: {} } },
+  dayRecords: {},
+  // Clarity notes (CLARITY-MERGE Phase 2 store, added in the foundation solo
+  // window because js/01 is SHARED). One store, two windows: written in
+  // Clarity page 3, latest shown read-only on the Memento card. Entries:
+  // { id, text, tag, day, starHash, founding }. Tombstoned ids NEVER
+  // re-enter entries on any device (the zombie-note rule, enforced in js/12).
+  clarityNotes: { entries: [], tombstones: [] },
   streak: { count: 0, lastCheckDate: null, history: [], minutesReclaimed: 0, bestEver: 0, bestEverShown: 0, milestonesShown: [], grace: { bank: 0, lastEarnMilestone: 0, used: {} } },
   flow: { items: JSON.parse(JSON.stringify(DEFAULT_FLOW_ITEMS)) },
   // Day Card look. 'platinum' = the classic glass hero; 'living' = the
@@ -1939,6 +1956,24 @@ function migrateState() {
   }
   if (!Array.isArray(state.goalProgress.history)) state.goalProgress.history = [];
   if (state.goalProgress.askedDay === undefined) state.goalProgress.askedDay = '';
+  // THE MERGE foundation: resolved reward shape + custom sub-goal marks live
+  // ON goalProgress so they are computed once and reset with the star.
+  if (state.goalProgress.shape === undefined) state.goalProgress.shape = '';
+  if (!Array.isArray(state.goalProgress.customMarks)) state.goalProgress.customMarks = [];
+  // Reward stores (absent fields initialize empty; nothing backfills, an
+  // existing user's first mark may fire late rather than wrongly).
+  if (!state.goalDone || typeof state.goalDone !== 'object') state.goalDone = {};
+  if (!state.rewards || typeof state.rewards !== 'object') state.rewards = { ledger: {}, dailyStyle: 'path', shadow: { ledger: {}, goalDone: {} } };
+  if (!state.rewards.ledger || typeof state.rewards.ledger !== 'object') state.rewards.ledger = {};
+  if (typeof state.rewards.dailyStyle !== 'string') state.rewards.dailyStyle = 'path';
+  if (!state.rewards.shadow || typeof state.rewards.shadow !== 'object') state.rewards.shadow = { ledger: {}, goalDone: {} };
+  if (!state.rewards.shadow.ledger || typeof state.rewards.shadow.ledger !== 'object') state.rewards.shadow.ledger = {};
+  if (!state.rewards.shadow.goalDone || typeof state.rewards.shadow.goalDone !== 'object') state.rewards.shadow.goalDone = {};
+  if (!state.dayRecords || typeof state.dayRecords !== 'object') state.dayRecords = {};
+  // Clarity notes store.
+  if (!state.clarityNotes || typeof state.clarityNotes !== 'object') state.clarityNotes = { entries: [], tombstones: [] };
+  if (!Array.isArray(state.clarityNotes.entries)) state.clarityNotes.entries = [];
+  if (!Array.isArray(state.clarityNotes.tombstones)) state.clarityNotes.tombstones = [];
   // v1121: the card material (Job B of the memento-view port). id '' = the
   // house card; 'name' = coded to their name; else a library skin name.
   if (!state.cardSkin || typeof state.cardSkin !== 'object') state.cardSkin = { id: '', ring: 0, mark: 0 };
@@ -3050,3 +3085,47 @@ const DragDrop = {
     document.body.style.touchAction = '';
   }
 };
+
+/* ====================================================================
+   THE MERGE foundation (2026-08-19), resolution A: the SURGICAL GOAL
+   RESET. The one sanctioned "fresh start". It resets GOAL data only,
+   field by field, and NEVER touches accounts, logins, payments, device
+   identity, or push. localStorage.clear() is banned everywhere except
+   the explicit account-deletion flow (js/12), which owns its own rules.
+   What resets: the Action module's state, goalProgress, dayRecords.
+   What is deliberately KEPT: goalDone (a witnessed finale is never
+   un-witnessed), reward ledgers (once-only stays once-only across
+   goals), clarityNotes (notes belong to the person, not the star),
+   reflection, checkins, mori, people, settings, and every account/
+   billing/push key. proofEvents are kept too: the past happened.
+   Cloud: the mutation runs through persistNow, so _stampModuleEdits
+   stamps the changed modules with fresh edit times and the cloud ADOPTS
+   the reset instead of resurrecting the old copy (audit blocker fix).
+   Invocation: the new Action flow calls this once when it lands
+   (THE-MERGE decision 10). Dev: window.goalStateReset() from console. */
+async function goalStateReset() {
+  try {
+    // 1) Flush queued purchase-guarantee receipts FIRST: their proof ids
+    //    point into completionHistory, and the flush loop drops any
+    //    receipt whose proof vanished (audit: silent guarantee void).
+    try {
+      if (typeof PolarBilling !== 'undefined' && PolarBilling.flushActionReceipts) {
+        await Promise.race([
+          PolarBilling.flushActionReceipts(),
+          new Promise((res) => setTimeout(res, 6000))
+        ]);
+      }
+    } catch (e) {}
+    // 2) Reset the goal-state fields, by name, from the defaults.
+    state.action = JSON.parse(JSON.stringify(DEFAULT_STATE.action));
+    state.goalProgress = { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [], shape: '', customMarks: [] };
+    state.dayRecords = {};
+    // 3) Derived structures recompute from the now-empty history.
+    try { if (typeof recalculateStreak === 'function') recalculateStreak(); } catch (e) {}
+    // 4) Persist: stamps bump, cloud adopts.
+    try { persistNow(); } catch (e) {}
+    try { console.info('[goalStateReset] goal state reset; accounts, payments, notes, and history untouched.'); } catch (e) {}
+    return true;
+  } catch (e) { return false; }
+}
+try { window.goalStateReset = goalStateReset; } catch (e) {}

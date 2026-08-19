@@ -3558,6 +3558,8 @@ function creditTodayAction() {
     // (for truth). A later same-day Door cannot inherit this completion.
     const completion = createActionCompletionRecord(pa, tier, actionText);
     state.action.completionHistory.push(completion);
+    // THE MERGE phase 0: shadow-mode referee observation.
+    try { if (typeof rewardShadow === 'function') rewardShadow('js08-home'); } catch (_) {}
     try { writeProofEvent('action-complete', { title: actionText || pa.title || 'Action completed', module: 'action', metadata: { tier, missionId: completion.missionId } }); } catch (_) {}
     try { Analytics.track('action_done', { tier }); } catch (_) {} // Activation Point
     try { window.MementoPush && MementoPush.sync(); } catch (_) {} // reminder context: day is done

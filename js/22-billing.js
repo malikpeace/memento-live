@@ -890,7 +890,8 @@ const PolarBilling = (function () {
     showRefundDialog,
     refundStatus,
     claimRefund,
-    recordActionCompletion
+    recordActionCompletion,
+    flushActionReceipts
   };
 })();
 
