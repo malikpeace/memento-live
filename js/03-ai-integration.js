@@ -5293,8 +5293,16 @@ function actionTranscriptAssemble() {
 
 /* The refine harvest. The new Action flow (js/30) writes state.actionRefine;
    this reads it and never writes it. Shape:
-     state.actionRefine = { bucket, variant, updatedAt,
-       answers: [ { id, question, chips: [..], text: '' } ] } */
+     state.actionRefine = { bucket, variant, updatedAt, baseline,
+       answers: [ { id, question, chips: [..], chipList: [..], text: '', num } ] }
+   THE THREE ANSWER FIELDS ARE THREE DIFFERENT THINGS and the prompt must not
+   flatten them, because the provenance rule is checked against this text:
+     chips  what they PICKED (chipList carries the same array under the name
+            the multi-select port promised; either one reads the same)
+     text   what they WROTE, their own sentence
+     num    what they ENTERED on a number step or a ruler, with its unit
+   A number folded into "Picked" would read as a chip they tapped, and folded
+   into "Wrote" as a sentence they typed. It gets its own line. */
 function actionRefineAssemble() {
   const store = (state.actionRefine && typeof state.actionRefine === 'object') ? state.actionRefine : {};
   const list = Array.isArray(store.answers) ? store.answers : [];
@@ -5302,11 +5310,14 @@ function actionRefineAssemble() {
   list.forEach((a, i) => {
     if (!a) return;
     const q = String(a.question || a.id || ('Question ' + (i + 1))).trim();
-    const chips = Array.isArray(a.chips) ? a.chips.filter(Boolean).map(String) : [];
+    const picked = Array.isArray(a.chips) ? a.chips : (Array.isArray(a.chipList) ? a.chipList : []);
+    const chips = picked.filter(Boolean).map(String);
     const free = String(a.text || '').trim();
-    if (!chips.length && !free) return;
+    const num = (a.num === 0 || a.num) ? String(a.num).trim() : '';
+    if (!chips.length && !free && !num) return;
     let block = 'Q' + (i + 1) + '. ' + q;
     if (chips.length) block += '\n  Picked: ' + chips.join(', ');
+    if (num) block += '\n  Entered: ' + num;
     if (free) block += '\n  Wrote: ' + free;
     blocks.push(block);
   });

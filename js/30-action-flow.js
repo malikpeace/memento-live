@@ -68,6 +68,11 @@
         // at the real transcript. Null here on purpose, so one fixture proves
         // the absent case (no line, no preselect) and business proves the other.
         clarityTime: null,
+        // a fixture is a closed world: getClarityTimeAnswer must not reach into
+        // the real transcript here, or a demo on a real account would start
+        // quoting the account back at itself and the absent branch would never
+        // be provable again.
+        fixture: true,
         // ob-1 presses the star apart into lines. Clarity does not store this
         // decomposition yet (see the report): the wall is fed it explicitly.
         wall: [
@@ -176,6 +181,7 @@
         // their own words from the Clarity conversation, not a normalised value:
         // the line quotes them, and the chip match is done on top of it.
         clarityTime: '2-3 hours',
+        fixture: true,
         wall: [
           { sm: 'I will get the studio to', num: '$10k', mid: 'a month' },
           { sm: 'so I can', big: 'hire my brother' }
@@ -379,6 +385,54 @@
   }
 
   // ---------------------------------------------------------------------------
+  // THE APP, reached safely. `state` is a bare top-level `let` in js/01, so it
+  // is NOT on window: every read goes through here and the module stays inert
+  // (and testable) if it is ever loaded on its own.
+  // ---------------------------------------------------------------------------
+  function S() {
+    try { return (typeof state !== 'undefined' && state) ? state : null; } catch (e) { return null; }
+  }
+  function G(name) {
+    try { return (typeof window[name] === 'function') ? window[name] : null; } catch (e) { return null; }
+  }
+  function liveStar() {
+    var st = S();
+    return (st && st.clarity && st.clarity.answers && String(st.clarity.answers.neutronStar || '').trim()) || '';
+  }
+  function liveShape() {
+    var st = S();
+    var s = st && st.clarity && st.clarity.answers && st.clarity.answers.goalShape;
+    return (s && typeof s === 'object') ? s : null;
+  }
+  // The app's own hash of the LIVE star. ensureGoalTarget owns it (it re-keys
+  // goalProgress whenever the star changes), so asking it is the only way to be
+  // sure a stored plan still belongs to the goal on screen.
+  function liveStarHash() {
+    try {
+      var g = G('ensureGoalTarget');
+      if (g) { var gp = g(); if (gp && gp.starHash) return gp.starHash; }
+    } catch (e) {}
+    try {
+      var star = liveStar(), h = 2166136261;
+      for (var i = 0; i < star.length; i++) { h ^= star.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return (h >>> 0).toString(16);
+    } catch (e) { return ''; }
+  }
+  // THE PLAN THE SURFACES RENDER. state.actionPlan, but only while it still
+  // belongs to the star on screen: a plan written for a retired goal must never
+  // paint over the new one. Returns null otherwise and the caller falls back.
+  function livePlan() {
+    try {
+      var cur = G('actionPlanCurrent');
+      var p = cur ? cur() : null;
+      if (!p) return null;
+      var live = liveStarHash();
+      if (p.starHash && live && p.starHash !== live) return null;
+      return p;
+    } catch (e) { return null; }
+  }
+
+  // ---------------------------------------------------------------------------
   // THE FREE FIELD DIET (v3, Malik on-device 2026-08-19). The v2 rule was "every
   // question carries a free field". He replaced it: the field appears only where
   // their own words ADD something. A question that already has a structured
@@ -407,13 +461,78 @@
   // the question says so in their own words and preselects the chip, still
   // changeable. Where it does not, the line simply is not there.
   //
-  // ONE seam. The wiring phase replaces the body of this function with the real
-  // transcript read; nothing else in the module knows where the value came from.
+  // ONE seam. WIRED (phase 3.6): an explicit intake.clarityTime still wins, so
+  // the fixtures keep proving both branches, and everything else reads the REAL
+  // Clarity conversation. Nothing else in the module knows where it came from.
+  //
+  // THE EXTRACTION RULE, and why it is this narrow. The line it feeds says
+  // "You said X in Clarity.", so a wrong X is Memento putting words in their
+  // mouth. It only accepts a sentence that carries BOTH a time quantity and a
+  // per-day availability context, and it returns null the moment it is unsure.
+  // Never invent: no answer, no line, and the question simply asks.
   // ---------------------------------------------------------------------------
+  // "2-3 hours", "2 to 3 hours", "about an hour", "90 minutes", "half an hour".
+  var CT_QTY = /\b(?:about |around |maybe |roughly |like )?((?:\d{1,2}(?:\.\d)?\s*(?:-|–|to)\s*)?\d{1,2}(?:\.\d)?|an|a|one|two|three|four|five|half an)\s*(hours?|hrs?|h|minutes?|mins?)\b/i;
+  var CT_ALLDAY = /\b(all day|most of the day|the whole day|whenever i want|full time)\b/i;
+  // the sentence has to be ABOUT how much time they have for this
+  var CT_CTX = /\b(a day|per day|each day|daily|every day|a night|an evening|free|spare|to give|give it|give to|i have|i've got|i got|available|realistically|block|blocks|session|sessions|work on|put in|carve out|after work|before work|between)\b/i;
+  var CT_WORDNUM = { a: '1', an: '1', one: '1', two: '2', three: '3', four: '4', five: '5', 'half an': 'half an' };
+
+  function ctNormalize(m) {
+    var n = String(m[1] || '').trim().toLowerCase();
+    var u = String(m[2] || '').trim().toLowerCase();
+    if (CT_WORDNUM[n]) n = CT_WORDNUM[n];
+    n = n.replace(/\s*(?:-|–|to)\s*/, '-');
+    u = /^h/.test(u) ? (n === '1' ? 'hour' : 'hours') : 'minutes';
+    if (n === 'half an') return 'half an hour';
+    return n + ' ' + u;
+  }
+  function ctScan(text) {
+    var sentences = String(text || '').split(/(?<=[.!?\n])\s+|\n/);
+    for (var i = sentences.length - 1; i >= 0; i--) {   // the latest answer wins
+      var s = sentences[i];
+      if (!s || s.length > 260) continue;
+      // THE CONTEXT GATE COMES FIRST, for every branch. It was second, and
+      // "I drink soda all day" (an answer about the PROBLEM) came back as their
+      // available time. A time phrase only counts inside a sentence that is
+      // about how much time they have.
+      if (!CT_CTX.test(s)) continue;
+      if (CT_ALLDAY.test(s)) return s.match(CT_ALLDAY)[1].toLowerCase();
+      var m = s.match(CT_QTY);
+      if (!m) continue;
+      var out = ctNormalize(m);
+      // a number with no unit, or a unit with no number, is not an answer
+      if (!/\d|half/.test(out)) continue;
+      return out;
+    }
+    return null;
+  }
   function getClarityTimeAnswer(intake) {
     try {
       var v = intake && intake.clarityTime;
-      return (typeof v === 'string' && v.trim()) ? v.trim() : null;
+      if (typeof v === 'string' && v.trim()) return v.trim();
+      if (intake && intake.fixture) return null;   // a fixture is a closed world
+      var out = null;
+      // 1. the Clarity conversation, THEIR turns only (Memento's own questions
+      //    are full of hours and would answer themselves).
+      var st = S();
+      var conv = (st && st.clarity && st.clarity.answers
+        && Array.isArray(st.clarity.answers.aiConversation)) ? st.clarity.answers.aiConversation : [];
+      var mine = [];
+      conv.forEach(function (m) {
+        if (!m || m.role !== 'user') return;
+        var body = String((m._rawAnswer != null ? m._rawAnswer : (m.content || m.text || '')) || '').trim();
+        if (body) mine.push(body);
+      });
+      out = ctScan(mine.join('\n'));
+      if (out) return out;
+      // 2. anything they already wrote in a previous refine pass
+      var prev = (st && st.actionRefine && Array.isArray(st.actionRefine.answers))
+        ? st.actionRefine.answers : [];
+      var words = prev.map(function (a) {
+        return [a && a.text, (a && a.chips || []).join(' ')].filter(Boolean).join('. ');
+      }).filter(Boolean).join('\n');
+      return ctScan(words);
     } catch (e) { return null; }
   }
   // "2-3 hours" has to find the [2-3] chip without matching [1]. Compare on
@@ -835,7 +954,9 @@
   function openIntent(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
-    var ink = fx.intake;
+    // opts.intake is the REAL path (built by realIntake from live state); the
+    // fixture is the demo's closed world. Nothing else on this screen changes.
+    var ink = opts.intake || fx.intake;
     var col = shell('intent', { cine: true, label: 'Your star' });
 
     var type = el('div', 'afl-int__type');
@@ -963,7 +1084,7 @@
     var fx = FIXTURES[key] || FIXTURES.weight;
     var bucket = opts.bucket || fx.intake.bucket;
     var D = (QUESTIONS[bucket] || QUESTIONS.weight).slice(0, 5);
-    var clarityTime = getClarityTimeAnswer(fx.intake);
+    var clarityTime = getClarityTimeAnswer(opts.intake || fx.intake);
     var col = shell('refine', { label: 'A few questions' });
 
     var wrap = el('div', 'afl-q');
@@ -1407,6 +1528,12 @@
           ? multi[k].map(function (x) { return d.chips[x]; })
           : (picked[k] === null ? [] : [d.chips[picked[k]]]);
         return {
+          // the descriptor travels with the answer so the STORE WRITER can key
+          // it, tell a ruler from a number, and find the baseline question
+          // without re-deriving anything from the question text.
+          id: d.id || (bucket + '-q' + (k + 1)),
+          kind: d.kind || 'chip',
+          ruler: d.ruler || null,
           q: d.q,
           multi: !!d.multi,
           chip: list.length ? list.join(', ') : null,
@@ -1416,6 +1543,11 @@
           num: d.kind === 'ruler'
             ? (rulerSet[k] ? rulerText(d.ruler, rulerVal[k]) : null)
             : (nums[k] || null),
+          // the same number the way a person writes it, so the brain reads
+          // "300 lb" and "$4,500" instead of a bare figure with no unit.
+          numText: d.kind === 'ruler'
+            ? (rulerSet[k] ? (rulerText(d.ruler, rulerVal[k]) + ((RULERS[d.ruler] || {}).unit ? ' ' + RULERS[d.ruler].unit : '')) : null)
+            : (nums[k] ? ((d.prefix || '') + nums[k]) : null),
           free: typed[k] || null,
           // provenance: a preselected chip came from Clarity, not from a tap
           fromClarity: !!(d.clarityTime && clarityTime) || undefined
@@ -1453,18 +1585,120 @@
   }
 
   // ===========================================================================
+  // 3.1  REFINE -> THE STORE  (merge phase 3, the data half)
+  // The refine screen stays a pure surface: it collects and hands back. This is
+  // the only place the harvest becomes state, and it writes exactly the shape
+  // the brain reads (js/01's contract, js/03's actionRefineAssemble):
+  //
+  //   state.actionRefine = { bucket, variant, updatedAt,
+  //     answers: [ { id, question, chips[], text, num, chipList, fromClarity } ] }
+  //
+  // chips[] is the contract field the assembler reads. chipList is the same
+  // array under the name the multi-select port promised (HANDOFF v1192: "the
+  // brain must read answer.chipList, the joined chip string is ambiguous"), so
+  // both names are present and neither can drift from the other.
+  // `bucket` here is the resolved bucket, NOT the question-set key: the money
+  // job variant asks the money-job set but is still bucket 'money', variant
+  // 'job', and the brain's own rule is that a stored bucket overrides its
+  // router downstream.
+  // ===========================================================================
+  function writeRefineStore(bucket, variant, answers) {
+    var st = S();
+    if (!st) return null;
+    var store = {
+      bucket: String(bucket || ''),
+      variant: String(variant || ''),
+      updatedAt: new Date().toISOString(),
+      answers: (answers || []).map(function (a, k) {
+        var chips = (a && Array.isArray(a.chipList)) ? a.chipList.slice() : [];
+        var text = String((a && a.free) || '').trim();
+        var out = {
+          id: (a && a.id) || ('q' + (k + 1)),
+          question: (a && a.q) || '',
+          chips: chips,
+          chipList: chips,
+          text: text
+        };
+        // the number is its own field: it is not a chip they picked and it is
+        // not a sentence they wrote, and folding it into either would be a lie
+        // about where it came from.
+        var nt = (a && a.numText) || (a && a.num) || '';
+        if (nt) out.num = String(nt);
+        if (a && a.fromClarity) out.fromClarity = true;
+        return out;
+      })
+    };
+    st.actionRefine = store;
+    return store;
+  }
+
+  // THE BASELINE. REFINE-QUESTIONS.md: "Q-final is always the pulse baseline
+  // (their current number) where a number exists." That is the LAST number step
+  // in the set; the height ruler is a body fact, never a baseline, so only the
+  // weight ruler counts among the rulers. No number step, no baseline, and
+  // nothing is invented.
+  function baselineFrom(answers) {
+    for (var k = (answers || []).length - 1; k >= 0; k--) {
+      var a = answers[k];
+      if (!a) continue;
+      var isNum = (a.kind === 'num') || (a.kind === 'ruler' && a.ruler === 'weight');
+      if (!isNum) continue;
+      var raw = String(a.num == null ? '' : a.num).replace(/[^0-9.]/g, '');
+      if (!raw) return null;                    // they skipped it: nothing to pulse
+      var n = Number(raw);
+      return isFinite(n) ? { value: n, id: a.id, question: a.q } : null;
+    }
+    return null;
+  }
+
+  // THE SEAM THE BRAIN LEAVES OPEN. actionPlanLand deliberately leaves
+  // gp.current null (a reading only exists once a person enters one). This is
+  // where their own first number fills it, and goalProgressUpdate is the app's
+  // ONE writer for that: it stamps the day, appends the history point, and
+  // fires the referee's shadow hook on the way through.
+  //
+  // ORDER TRAP, handled: at refine time the plan has not landed, so
+  // goalProgress may still have target === null and goalProgressUpdate is a
+  // no-op by design. The number is therefore also kept on the refine store, and
+  // the landing retries the pulse once the AI's target is in. Retrying is safe:
+  // goalProgressUpdate overwrites the same day's history point instead of
+  // appending a second one.
+  function pulseBaseline(value) {
+    var st = S();
+    var out = { value: value, applied: false, held: false };
+    if (!isFinite(value)) return out;
+    if (st && st.actionRefine) { st.actionRefine.baseline = value; out.held = true; }
+    var up = G('goalProgressUpdate');
+    if (up) { try { out.applied = !!up(value); } catch (e) {} }
+    try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+    return out;
+  }
+
+  // ===========================================================================
   // 2.3  ld-4, THE WORKING LIST
   // The wait shows only what Memento already knows, one line at a time, with a
   // real elapsed clock and the bare M breathing at the foot. Nothing here is
   // produced by the model and nothing is a stage name.
   // NOTE (phase 5): generation moves server side. This screen already accepts a
   // promise, so the swap is one argument.
+  //
+  // REAL MODE (merge phase 3.2). opts.real drives the actual brain: the screen
+  // starts actionPlanGenerate(), shows the working list for as long as it takes,
+  // lands the plan on success, and has TWO honest terminal states instead of a
+  // spinner that never ends:
+  //   needsClarity -> the model's one plain question, and the way back to
+  //                   Clarity. Nothing is half-written.
+  //   error        -> one plain line naming what actually happened (signed out,
+  //                   not paid yet, the network) and a retry.
+  // Both reuse this screen's own type and the standing CTA. No new language.
+  // The fixture path (ActionFlow.demo) is untouched: no opts.real, no AI call.
   // ===========================================================================
   var HOLD_MS = 6000;
   function openLoading(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
-    var FACTS = fx.intake.facts || [];
+    var intake = opts.intake || fx.intake;
+    var FACTS = intake.facts || [];
     var col = shell('loading', { label: 'Writing your plan' });
     var hold = ActionFlow._holdMs || HOLD_MS;
 
@@ -1530,6 +1764,7 @@
     function marks(n) { ticks.forEach(function (t, k) { t.classList.toggle('is-on', k <= n); }); }
 
     function show() {
+      if (!FACTS.length) return;          // nothing known: the state line stands alone
       var order = FACTS.slice(pass % FACTS.length).concat(FACTS.slice(0, pass % FACTS.length));
       var f = order[idx];
       fact.classList.toggle('is-calm', pass > 0);
@@ -1553,9 +1788,12 @@
         if (idx < order.length) return show();
         idx = 0;
         pass++;
-        if (opts.promise || longer) {
+        // REAL MODE waits as long as the brain does: the list keeps cycling and
+        // only runBrain (or a terminal state) ever ends this screen. Landing on
+        // a timer would tell a person the plan is ready before it exists.
+        if (opts.promise || opts.real || longer) {
           if (longer && pass < 3) { setState(pass); return show(); }
-          if (opts.promise && !landed) { setState(pass); return show(); }
+          if ((opts.promise || opts.real) && !landed) { setState(pass); return show(); }
         }
         land();
       });
@@ -1580,15 +1818,134 @@
       at(120, function () { arr.classList.add('is-on'); });
       at(280, function () { go.classList.remove('is-waiting'); });
     }
+
+    // ---- THE TERMINAL STATES (real mode) ------------------------------------
+    // Same clearing move as land(): the working list leaves on a fade and the
+    // screen is left with one sentence, one quiet line, and one control. The
+    // type is this screen's own (.afl-ld__say geometry), the button is the
+    // app's standing CTA. Nothing new is invented for a bad outcome.
+    var endBlock = null;
+    function clearWork() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      if (tickT) { clearInterval(tickT); tickT = null; }
+      head.classList.add('is-gone');
+      state.classList.remove('is-swap');
+      state.classList.add('is-gone');
+      tickRow.classList.add('is-gone');
+      fact.classList.remove('is-on');
+      m.classList.add('is-gone');
+      fadeOutNode(m, 400);
+    }
+    function endState(line, sub, ctaText, onTap) {
+      if (landed) return;
+      landed = true;
+      clearWork();
+      if (endBlock && endBlock.parentNode) endBlock.parentNode.removeChild(endBlock);
+      endBlock = el('div', 'afl-ld__end');
+      endBlock.appendChild(el('p', 'afl-ld__say', line));
+      if (sub) endBlock.appendChild(el('p', 'afl-ld__endsub', sub));
+      layer.appendChild(endBlock);
+      ctaLabel(go, ctaText);
+      go.dataset.end = '1';
+      at(120, function () { endBlock.classList.add('is-on'); });
+      at(280, function () { go.classList.remove('is-waiting'); });
+      go.__endTap = onTap;
+    }
+
+    // The honest line for a failure, in their language, never a code. The
+    // reading law applies here as much as anywhere else.
+    function errorLine(msg) {
+      var m2 = String(msg || '').toLowerCase();
+      if (m2.indexOf('sign in') > -1) {
+        return { line: 'You are signed out.', sub: 'Sign back in, then try this again. Nothing you answered is lost.' };
+      }
+      if (m2.indexOf('paid') > -1 || m2.indexOf('403') > -1) {
+        return { line: 'Action is not unlocked on this account yet.', sub: 'Your answers are saved. The plan writes as soon as it is.' };
+      }
+      if (m2.indexOf('timeout') > -1 || m2.indexOf('timed out') > -1 || m2.indexOf('abort') > -1) {
+        return { line: 'That took too long.', sub: 'The connection gave out before the plan came back. Your answers are saved.' };
+      }
+      return { line: 'That did not come back.', sub: 'Something went wrong on the way. Your answers are saved, so this only costs you the tap.' };
+    }
+
+    // ---- REAL MODE: run the brain -------------------------------------------
+    var running = false;
+    function runBrain() {
+      if (running) return;
+      running = true;
+      var gen = G('actionPlanGenerate');
+      if (!gen) {
+        running = false;
+        endState('The plan writer is not loaded.', 'Reload Memento and try again.', 'Try again', function () { location.reload(); });
+        return;
+      }
+      var p;
+      try { p = gen(opts.generateOptions || {}); } catch (err) {
+        running = false;
+        var e0 = errorLine(err && err.message);
+        return endState(e0.line, e0.sub, 'Try again', retry);
+      }
+      p.then(function (report) {
+        running = false;
+        if (!report || (!report.ok && !report.needsClarity)) {
+          var e1 = errorLine((report && report.error) || '');
+          return endState(e1.line, e1.sub, 'Try again', retry);
+        }
+        if (report.needsClarity) {
+          // Rule 13 of the creed, or two plans that failed review. Either way
+          // the answer is one question, not a plan nobody should follow.
+          var q = String(report.question || 'What number do you want to hit, and by when?');
+          if (typeof opts.onNeedsClarity === 'function') return opts.onNeedsClarity(report);
+          return endState(q, 'Answer this in Clarity and the plan can be written.', 'Back to Clarity', backToClarity);
+        }
+        // SUCCESS. The plan lands BEFORE the screen says it is ready: the
+        // receipt writes before the render, always.
+        var landFn = G('actionPlanLand');
+        var res = null;
+        try { res = landFn ? landFn(report.plan, report.inputs) : null; } catch (e) {}
+        if (landFn && (!res || !res.ok)) {
+          return endState('The plan came back but could not be saved.',
+            'Try again. Nothing you answered is lost.', 'Try again', retry);
+        }
+        ActionFlow._lastReport = report;
+        if (typeof opts.onLanded === 'function') { try { opts.onLanded((res && res.plan) || report.plan, report); } catch (e) {} }
+        at(0, land);
+      }, function (err) {
+        running = false;
+        var e2 = errorLine(err && err.message);
+        endState(e2.line, e2.sub, 'Try again', retry);
+      });
+    }
+    function retry() {
+      // A retry is the same screen from the top, never a second one stacked on
+      // it: the shell rebuilds and the old one's timers die with it.
+      openLoading(key, opts);
+    }
+    // The way back into Clarity is Clarity's own door, never a second one:
+    // the summary once the wizard is done, the wizard if it somehow is not.
+    // ClarityExperience is a bare const in js/02, so it is reached by name.
+    function backToClarity() {
+      destroy();
+      try {
+        if (typeof ClarityExperience === 'undefined') return;
+        var st = S();
+        if (st && st.clarity && st.clarity.completed && ClarityExperience.openSummary) ClarityExperience.openSummary();
+        else if (ClarityExperience.open) ClarityExperience.open();
+      } catch (e) {}
+    }
+
     if (opts.promise && typeof opts.promise.then === 'function') {
       opts.promise.then(function () { at(0, land); }, function () { at(0, land); });
     }
     go.addEventListener('click', function () {
       if (go.classList.contains('is-waiting')) return;
+      if (go.dataset.end === '1') { if (typeof go.__endTap === 'function') go.__endTap(); return; }
       if (typeof opts.onOpen === 'function') opts.onOpen();
     });
     tickT = setInterval(function () { if (!landed) clk.textContent = fmt(Date.now() - t0); }, 250);
     at(650, show);
+    if (opts.real) runBrain();
     enterFade(c);
     current.teardown = function () {
       timers.forEach(clearTimeout);
@@ -1610,7 +1967,11 @@
   function openLogic(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
-    var plan = opts.plan || fx.plan;
+    // THE REAL PLAN WINS (merge phase 3.3). An explicitly passed plan is the
+    // demo (and the standing door, which hands its own object down); otherwise
+    // the person's own landed plan renders, and the fixture is only ever the
+    // last resort for a surface opened with nothing behind it.
+    var plan = opts.plan || livePlan() || fx.plan;
     // top: the only scrolling surface in the flow, so the only one that needs
     // the flow's own top scrim (his "the goal title gets sliced" note).
     var col = shell('logic', { label: 'Why this plan', top: true });
@@ -1670,7 +2031,11 @@
     }
 
     // ---- part two: the math -------------------------------------------------
-    box.appendChild(el('p', 'afl-lg__h', 'The math behind this'));
+    // A heading over nothing is an orphan. Plans without an eq block (focus and
+    // fitness rarely have one) skip the whole part, heading included, and part
+    // three closes the gap with no divider left hanging.
+    var hasMath = !!(plan.eq || (plan.reasoning && plan.reasoning.length));
+    if (hasMath) box.appendChild(el('p', 'afl-lg__h', 'The math behind this'));
     var eqOk = true;
     if (plan.eq) {
       var eq = el('div', 'afl-lg__eq');
@@ -1714,11 +2079,13 @@
     });
 
     // ---- part three: the questions -----------------------------------------
-    box.appendChild(el('p', 'afl-lg__h', 'Questions you might have'));
-    (plan.qas || []).forEach(function (x) {
-      box.appendChild(el('p', 'afl-lg__q', x.q));
-      box.appendChild(el('p', 'afl-lg__qa', x.a));
-    });
+    if (plan.qas && plan.qas.length) {
+      box.appendChild(el('p', 'afl-lg__h', 'Questions you might have'));
+      plan.qas.forEach(function (x) {
+        box.appendChild(el('p', 'afl-lg__q', x.q));
+        box.appendChild(el('p', 'afl-lg__qa', x.a));
+      });
+    }
     box.appendChild(el('p', 'afl-lg__src', 'Every line above came from what you told Memento.'));
     box.appendChild(el('p', 'afl-lg__fair', 'Ready?'));
 
@@ -1845,10 +2212,137 @@
   var DAY_HOLD = 3000;
   var WEEK = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
+  // ===========================================================================
+  // 3.4  THE CLOSE WRITES  (merge phase 3, the data half)
+  // One held day produces THREE records, and this is the only place they are
+  // written, so they can never drift apart:
+  //
+  //  1. state.dayRecords[<actionDayKey>]  the new store. Keyed by the 4am day
+  //     key (js/02's actionDayKey, the app's one day boundary), carrying
+  //     starHash + star + supports + size, which is what the per-goal
+  //     completedCount and the heatmap read.
+  //  2. state.action.completionHistory    THE SPINE. Twelve external readers
+  //     already bind to it, so the record is built by the app's OWN factory
+  //     (createActionCompletionRecord in js/02), not by a hand-rolled copy:
+  //     same fields, same id shape, same billing hook, by construction.
+  //  3. a typed proof event               'action-complete' with a dedupeKey,
+  //     so a second hold on the same day for the same goal is a no-op instead
+  //     of a second receipt.
+  //
+  // The rest of the sequence is the writers the app already runs on a
+  // completion, in the same order js/08's creditTodayAction runs them:
+  // rewardShadow (the phase-0 referee observation every completion writer
+  // fires), the proof event, analytics, the push context, the streak, persist.
+  // rewardShadow is the SHADOW twin, never rewardMoment: the one real referee
+  // call still has no caller and attaches in the Rewards phase.
+  //
+  // IDEMPOTENCE. The dedupeKey is checked BEFORE anything is pushed, because
+  // writeProofEvent's own dedupe fires after the completion record would
+  // already be in the spine. A repeat updates the day record (a bigger size,
+  // another support ticked) and writes nothing else.
+  // ===========================================================================
+  function closeDedupeKey(rec) {
+    return 'action-day-' + (rec.starHash || 'nostar') + '-' + rec.day;
+  }
+  // The 5-tier vocabulary the spine already speaks, from the shape of the day
+  // they actually held. A rest day is the smallest kept day there is.
+  function closeTier(rec) {
+    if (rec.off) return 'tiny';
+    var n = 1 + (rec.supports || []).filter(function (x) { return x; }).length;
+    return n >= 3 ? 'heavy' : (n === 2 ? 'moderate' : 'light');
+  }
+  function writeDayClose(rec, plan) {
+    var out = { ok: false, deduped: false, dayRecord: null, completion: null, proof: null, shadow: false };
+    var st = S();
+    if (!st || !rec) return out;
+    try {
+      var dkey = closeDedupeKey(rec);
+      var already = Array.isArray(st.proofEvents) && st.proofEvents.some(function (e) {
+        return e && e.metadata && e.metadata.dedupeKey === dkey;
+      });
+
+      // 1. the day record. Written on a repeat too: the day is one row, and the
+      //    latest state of it is the truth.
+      if (!st.dayRecords || typeof st.dayRecords !== 'object') st.dayRecords = {};
+      var dayRec = {
+        starHash: rec.starHash || '',
+        star: rec.star !== false,
+        supports: (rec.supports || []).slice(),
+        size: (rec.size == null) ? null : rec.size,
+        off: !!rec.off,
+        text: rec.text || '',
+        at: rec.at || Date.now()
+      };
+      st.dayRecords[rec.day] = dayRec;
+      out.dayRecord = dayRec;
+
+      if (already) {
+        out.deduped = true;
+        out.ok = true;
+        try { var p0 = G('persistNow'); if (p0) p0(); } catch (e) {}
+        return out;
+      }
+
+      // 2. the spine. The factory owns the shape; the shim only gives it the
+      //    title and a stable mission id keyed to the goal, so every day of one
+      //    plan shares one mission the way the old primaryAction did.
+      var tier = closeTier(rec);
+      var text = rec.text || '';
+      var mk = G('createActionCompletionRecord');
+      var shim = {
+        title: (plan && plan.star) || liveStar() || '',
+        missionId: 'plan_' + (rec.starHash || 'nostar'),
+        shape: 'plan'
+      };
+      var completion = mk ? mk(shim, tier, text) : null;
+      if (completion) {
+        if (!st.action || typeof st.action !== 'object') st.action = {};
+        if (!Array.isArray(st.action.completionHistory)) st.action.completionHistory = [];
+        st.action.completionHistory.push(completion);
+        out.completion = completion;
+      }
+
+      // 3. the shadow referee, then the receipt, in creditTodayAction's order.
+      try {
+        var shadow = G('rewardShadow');
+        if (shadow) { shadow('js30-day-close'); out.shadow = true; }
+      } catch (e) {}
+      try {
+        var wp = G('writeProofEvent');
+        if (wp) {
+          out.proof = wp('action-complete', {
+            title: text || shim.title || 'Action completed',
+            module: 'action',
+            metadata: {
+              tier: tier,
+              missionId: completion ? completion.missionId : shim.missionId,
+              starHash: rec.starHash || '',
+              day: rec.day,
+              size: dayRec.size,
+              supports: dayRec.supports.filter(function (x) { return x; }).length,
+              off: dayRec.off
+            },
+            dedupeKey: dkey
+          });
+        }
+      } catch (e) {}
+      try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('action_done', { tier: tier }); } catch (e) {}
+      try { if (window.MementoPush && MementoPush.sync) MementoPush.sync(); } catch (e) {}
+      try { var rs = G('recalculateStreak'); if (rs) rs(); } catch (e) {}
+      try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
+      out.ok = true;
+      return out;
+    } catch (err) {
+      out.error = (err && err.message) ? err.message : String(err);
+      return out;
+    }
+  }
+
   function openDay(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
-    var plan = opts.plan || fx.plan;
+    // the same rule the logic page follows: their plan, unless a demo hands one
+    var plan = opts.plan || livePlan() || fx.plan;
     var col = shell('day', { label: 'Today' });
 
     var acts = plan.acts || [];
@@ -1904,12 +2398,10 @@
     starEl.appendChild(post);
     day.appendChild(starEl);
 
-    // the deep work door. Rendered when the star act is session shaped, and
-    // INERT until phase 3.2 binds it to the existing timer surface.
+    // the deep work door. Rendered when the star act is session shaped; bound
+    // to the app's existing timer surface below (phase 3.2).
     var dw = btn('afl-day__dw');
     dw.appendChild(el('b', null, 'Deep work'));
-    dw.disabled = true;
-    dw.setAttribute('aria-disabled', 'true');
     day.appendChild(dw);
 
     day.appendChild(el('div', 'afl-day__sp is-b'));
@@ -1947,7 +2439,11 @@
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------
-    var actCount = 3;                        // star + both supports (arrives full)
+    // star + every support the plan actually has. It used to arrive as a flat 3,
+    // so a plan with one act or no supports drew the plate's rule above nothing
+    // (an orphaned divider). The ceiling is what exists, never what fits.
+    var MAX_ACTS = 1 + sups.length;
+    var actCount = MAX_ACTS;
     var val = hasSize ? named[named.length - 1] : 0;
     var lastVal = val;
     var ticks = sups.map(function () { return false; });
@@ -1961,10 +2457,10 @@
     }
     function actsForValue(v) {
       var hv = function (x) { return ascending ? x : -x; };
-      if (!named.length) return 3;
-      if (hv(v) <= hv(named[0])) return 1;
-      if (hv(v) <= hv(named[1])) return 2;
-      return 3;
+      if (!named.length) return MAX_ACTS;
+      if (hv(v) <= hv(named[0])) return Math.min(1, MAX_ACTS);
+      if (hv(v) <= hv(named[1])) return Math.min(2, MAX_ACTS);
+      return MAX_ACTS;
     }
     var starShape = null;                     // 'off' | 'act', only rebuilt on a change
     function drawStar() {
@@ -2026,7 +2522,7 @@
         b.tabIndex = (show && !signed) ? 0 : -1;
         b.setAttribute('aria-pressed', ticks[k] ? 'true' : 'false');
       });
-      ruleEl.classList.toggle('is-gone', actCount === 1);
+      ruleEl.classList.toggle('is-gone', actCount === 1 || !sups.length);
     }
     // THE RAIL (Malik, on-device: "animate it nicely"). It used to rebuild every
     // tick node on every change, so a brand new element started at its final
@@ -2167,25 +2663,73 @@
       onAbort: function () { if (!signed) riseAbort(); }
     });
 
+    // ---- THE CLOSE (merge phase 3.4, the data half) -------------------------
+    // THE UNDO WINDOW IS A DELAY, NOT A ROLLBACK. Resolution B says nothing
+    // persists while the signed row is up, so the write is simply deferred:
+    // undo inside the window cancels a timer and there is nothing to reverse.
+    // That is the simpler of the two correct answers, and it is the only one
+    // where a crash mid-window cannot leave a half-written day behind.
+    // If the view is torn down while the window is still open, the day FLUSHES
+    // (they did the hold and did not undo, so the record is theirs). Leaving on
+    // the X is not an undo.
+    var UNDO_MS = 1500;
+    var undoT = null;
+    var written = false;
+
     function complete() {
       signed = true;
       riseCrest();
       doneRow.querySelector('.afl-day__dt').textContent = 'Done at ' + stamp() + '.';
       paint();
-      writeDayRecordStub();
-      // ======================= THE CLOSE SEAM ============================
-      // NOT THIS PHASE. From here, per THE-MERGE resolution B, the sequence is:
-      //   1. this signed row holds its ~1.5s undo window (NOTHING persists yet)
-      //   2. the pulse asks its one number, at plan.close.cadence, if due
-      //   3. ONE rewardMoment() call with the full context
-      //   4. exactly ONE ceremony (finale > milestone > daily green page)
-      //   5. the rest line ("That's the day." / plan.restLine)
-      // The receipts and the ledger write at referee time, after the undo
-      // window. This port stops at the crest and the signed row on purpose:
-      // wiring any of it here would give the referee a second caller.
-      // ===================================================================
+      if (undoT) clearTimeout(undoT);
+      undoT = setTimeout(function () { undoT = null; commitDay(); }, UNDO_MS);
     }
+
+    function dayRecordNow() {
+      return {
+        day: dayKey(),
+        starHash: plan.starHash || liveStarHash(),
+        star: !off,
+        supports: ticks.slice(0, Math.max(0, actCount - 1)),
+        // a rest day has no size: the rail is not on the screen, so a number
+        // here would be the default pretending to be a choice they made.
+        size: (hasSize && !off) ? val : null,
+        off: off,
+        // what the screen actually SHOWED, which is the only honest text for a
+        // receipt (the v1002 law: the ledger must hold the words they read).
+        text: off ? offText() : starEl.textContent,
+        at: Date.now()
+      };
+    }
+    function offText() {
+      return (plan.offDays && plan.offDays.restLine ? plan.offDays.restLine : 'Rest day.\nEnjoy :)').replace(/\n/g, ' ');
+    }
+    function commitDay() {
+      if (written) return null;
+      written = true;
+      var rec = dayRecordNow();
+      ActionFlow._lastDayRecord = rec;
+      var res = writeDayClose(rec, plan);
+      ActionFlow._lastClose = res;
+      // the row can no longer be taken back, so the control that says it can
+      // has to leave with the window.
+      try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
+      // ======================= THE CLOSE SEAM ============================
+      // THE ONE REWARD CALL ATTACHES HERE (THE-MERGE resolution B, Rewards
+      // phase). The order from this line on is: the pulse asks its one number
+      // at plan.close.cadence if due -> ONE rewardMoment() with the full
+      // context (shape, star, gp incl. the pulse value, count/countTarget,
+      // daysHeld/daysTarget, prevValue, ledger, goalDone, userSaysDone,
+      // askedDay, today) -> exactly ONE ceremony (finale > milestone > daily
+      // green page) -> the rest line. Nothing above calls the referee, so it
+      // still has exactly one caller when it arrives.
+      // ===================================================================
+      return res;
+    }
+
     undo.addEventListener('click', function () {
+      if (written) return;                 // the window is over; the row stands
+      if (undoT) { clearTimeout(undoT); undoT = null; }
       signed = false;
       dayHold.reset();          // the day can be held again
       rise.style.transition = 'none';
@@ -2194,20 +2738,50 @@
       paint();
     });
 
-    // dayRecords WRITE STUB. The real close owns this record (starHash, star,
-    // supports, size, off, plus the completionHistory-compatible record and the
-    // typed proof event). Until then it writes nothing: a half-written record
-    // would feed Consistency counts that the close has to write again.
-    function writeDayRecordStub() {
-      ActionFlow._lastDayRecord = {
-        day: dayKey(),
-        starHash: plan.starHash,
-        star: true,
-        supports: ticks.slice(0, Math.max(0, actCount - 1)),
-        size: hasSize ? val : null,
-        off: off
-      };
+    // ---- 3.2  THE DEEP WORK DOOR --------------------------------------------
+    // Bound to the EXISTING timer (js/07's deepwork sheet, the surface the old
+    // module opened through Sheet.open). There is never a second timer here.
+    // Session-shaped star acts only, which is what renders the door at all.
+    // The sheet sits above this overlay, so on return the day screen is exactly
+    // where they left it: the size on the rail, the supports they ticked.
+    var sheetWatch = null;
+    function openDeepWork() {
+      try {
+        if (typeof Sheet === 'undefined' || !Sheet.open) return;
+        var st = S();
+        // they came for the clock, not for an introduction
+        if (st && st.introsSeen && !st.introsSeen.deepwork) {
+          st.introsSeen.deepwork = true;
+          try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+        }
+        // the length the plan proposes, or the size the rail is holding
+        var min = 0;
+        if (starAct.session && starAct.session.defaultMin) min = +starAct.session.defaultMin || 0;
+        if (!min && hasSize && (plan.sizes || {}).unit === 'min') min = val;
+        if (min > 0 && typeof SHEET_TEMPLATES !== 'undefined' && SHEET_TEMPLATES.deepwork) {
+          SHEET_TEMPLATES.deepwork._targetSec = Math.max(60, Math.round(min) * 60);
+        }
+        Sheet.open('deepwork');
+        // Sheet.open hides the app's fullscreen close (one X at a time, v1171).
+        // The flow's own X has to come back the moment the sheet leaves, or the
+        // day screen is left with no way out.
+        if (sheetWatch) clearInterval(sheetWatch);
+        sheetWatch = setInterval(function () {
+          if (typeof Sheet === 'undefined' || Sheet.isOpen) return;
+          clearInterval(sheetWatch);
+          sheetWatch = null;
+          if (root) showExit();
+        }, 250);
+      } catch (e) {}
     }
+    dw.addEventListener('click', openDeepWork);
+
+    // THE VIEW DIES CLEANLY. A pending undo window flushes (the hold happened),
+    // the sheet watcher stops, and nothing here outlives the screen.
+    current.teardown = function () {
+      if (sheetWatch) { clearInterval(sheetWatch); sheetWatch = null; }
+      if (undoT) { clearTimeout(undoT); undoT = null; commitDay(); }
+    };
 
     mBtn.addEventListener('click', function () {
       openLogic(key, { plan: plan, standing: true, onClose: function () { openDay(key, opts); } });
@@ -2220,11 +2794,134 @@
   }
 
   // ===========================================================================
+  // 3.0  THE REAL WALK
+  // The five surfaces, driven by the person's own state and the real brain,
+  // in one place. This is what phase 3.1 (entry wiring) will call; NOTHING
+  // calls it yet, so the module is still inert until something does.
+  //
+  //   intent  their star from Clarity
+  //   note    the interstitial
+  //   refine  the bucket's question set -> state.actionRefine + the baseline
+  //   loading actionPlanGenerate -> actionPlanLand
+  //   logic   the landed plan, and the agreement
+  //   day     the landed plan, and the close
+  //
+  // THE BUCKET. Resolved once here by the brain's own router, from the star and
+  // Clarity's goalShape (there is no refine text yet). It picks the question
+  // SET, then rides into state.actionRefine, where the brain's rule is that a
+  // stored bucket overrides the router downstream: the questions asked and the
+  // plan written are always for the same bucket.
+  // ===========================================================================
+  function resolveBucket() {
+    var star = liveStar();
+    var shape = liveShape();
+    var r = null;
+    try { var rt = G('actionBucketRouter'); if (rt) r = rt(star, shape, ''); } catch (e) {}
+    var bucket = (r && r.bucket) || 'focus';
+    var variant = (r && r.variant) || '';
+    // the money job variant asks its own set; the bucket it is stored under is
+    // still 'money' (ACTION-PLAN-SCHEMA's eight, never nine).
+    var qset = (bucket === 'money' && variant === 'job') ? 'money-job' : bucket;
+    return { bucket: bucket, variant: variant, qset: QUESTIONS[qset] ? qset : bucket, routed: r };
+  }
+
+  // What Memento already knows, before a plan exists: the wall of intent and
+  // the working list both render THIS, and every line of it has to be
+  // something the person actually said. Nothing is filled in.
+  function realIntake(ctx) {
+    var st = S();
+    var ans = (st && st.clarity && st.clarity.answers) || {};
+    var star = ctx.star;
+    var why = String(ans.coreWhy || '').trim();
+    var shape = ctx.shape || {};
+    var deadline = (typeof shape.deadline === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(shape.deadline)) ? shape.deadline : '';
+    // ob-1 presses the star apart into lines. Clarity does not store that
+    // decomposition (schema v1.1 wish, HANDOFF), so the honest fallback is the
+    // sentence itself: one line, their words, nothing invented.
+    var wall = [{ big: star }];
+    var facts = [];
+    if (star) facts.push({ s: 'Your star, in your words.', t: star, q: true });
+    if (why) facts.push({ s: 'Why you said it matters.', t: why, q: true });
+    if (deadline) facts.push({ s: 'The date you set.', t: '', date: deadline });
+    // their refine answers, read back. Numbers first, then what they said they
+    // had already tried, because those are the two the plan leans on.
+    var refine = (st && st.actionRefine && Array.isArray(st.actionRefine.answers)) ? st.actionRefine.answers : [];
+    var numbers = refine.filter(function (a) { return a && a.num; }).map(function (a) { return a.num; });
+    if (numbers.length) facts.push({ s: 'The numbers you typed in the refine step.', t: numbers.join('. ') + '.' });
+    var said = refine.filter(function (a) { return a && (a.chips || []).length; })
+      .map(function (a) { return a.chips.join(', '); });
+    if (said.length) facts.push({ s: 'What you told Memento just now.', t: said[0] + '.' });
+    var wrote = refine.filter(function (a) { return a && a.text; }).map(function (a) { return a.text; });
+    if (wrote.length) facts.push({ s: 'In your own words.', t: wrote[0], q: true });
+    return { star: star, why: why, deadline: deadline, wall: wall, facts: facts, bucket: ctx.bucket };
+  }
+
+  function start(opts) {
+    opts = opts || {};
+    var star = liveStar();
+    if (!star) return null;                 // no star, no plan: Clarity comes first
+    var routed = resolveBucket();
+    var ctx = { star: star, shape: liveShape(), bucket: routed.bucket };
+
+    function toIntent() {
+      openIntent(null, { intake: realIntake(ctx), onConfirm: function () { setTimeout(toNote, 420); } });
+    }
+    function toNote() { openNote(NOTE_LINE, { onDone: toRefine }); }
+    function toRefine() {
+      openRefine(null, {
+        bucket: routed.qset,
+        intake: realIntake(ctx),
+        onDone: function (answers) {
+          // THE HARVEST BECOMES STATE, then the baseline becomes the first
+          // pulse. Both before the loading screen opens, so the generator reads
+          // a store that is already complete.
+          writeRefineStore(routed.bucket, routed.variant, answers);
+          var base = baselineFrom(answers);
+          if (base) pulseBaseline(base.value);
+          setTimeout(toLoading, 320);
+        }
+      });
+    }
+    function toLoading() {
+      openLoading(null, {
+        real: true,
+        intake: realIntake(ctx),
+        onLanded: function (plan) {
+          // the AI's target is in now, so a baseline that had nothing to
+          // measure against at refine time finally lands (see pulseBaseline).
+          try {
+            var st = S();
+            var held = st && st.actionRefine && st.actionRefine.baseline;
+            var gp = st && st.goalProgress;
+            if (held != null && gp && gp.target !== null && gp.current === null) pulseBaseline(held);
+          } catch (e) {}
+          ActionFlow._plan = plan;
+        },
+        onOpen: toLogic
+      });
+    }
+    function toLogic() {
+      openLogic(null, { onAgree: function () { setTimeout(toDay, 320); } });
+    }
+    function toDay() { openDay(null, {}); }
+
+    var from = opts.from || 'intent';
+    if (from === 'refine') return toRefine();
+    if (from === 'loading') return toLoading();
+    if (from === 'logic') return toLogic();
+    if (from === 'day') return toDay();
+    return toIntent();
+  }
+
+  // ===========================================================================
   // DEV: walk all five screens against a fixture. URL-gated affordances only;
-  // nothing here runs unless it is called.
+  // nothing here runs unless it is called. The fixture plan is passed
+  // EXPLICITLY from here on: the surfaces now prefer the person's real plan,
+  // so a demo that did not name its plan would render theirs.
   // ===========================================================================
   function demo(key, from) {
     key = FIXTURES[key] ? key : 'weight';
+    var fxPlan = FIXTURES[key].plan;
     var order = ['intent', 'note', 'refine', 'loading', 'logic', 'day'];
     var at = Math.max(0, order.indexOf(from || 'intent'));
     function step(n) {
@@ -2233,8 +2930,8 @@
       if (name === 'note') return openNote(NOTE_LINE, { onDone: function () { step(2); } });
       if (name === 'refine') return openRefine(key, { onDone: function () { step(3); } });
       if (name === 'loading') return openLoading(key, { onOpen: function () { step(4); } });
-      if (name === 'logic') return openLogic(key, { onAgree: function () { setTimeout(function () { step(5); }, 320); } });
-      return openDay(key, {});
+      if (name === 'logic') return openLogic(key, { plan: fxPlan, onAgree: function () { setTimeout(function () { step(5); }, 320); } });
+      return openDay(key, { plan: fxPlan });
     }
     return step(at);
   }
@@ -2247,13 +2944,28 @@
     openLogic: openLogic,
     openDay: openDay,
     close: destroy,
+    // THE REAL WALK (phase 3). Nothing calls it yet: entry wiring is 3.1.
+    start: start,
     demo: demo,
     fixtures: FIXTURES,
     questions: QUESTIONS,
+    // the data half, exported so the wiring phase and the probes can reach the
+    // writers without going through a screen
+    resolveBucket: resolveBucket,
+    writeRefineStore: writeRefineStore,
+    baselineFrom: baselineFrom,
+    pulseBaseline: pulseBaseline,
+    writeDayClose: writeDayClose,
+    closeDedupeKey: closeDedupeKey,
+    livePlan: livePlan,
+    clarityTime: getClarityTimeAnswer,
     _holdMs: 0,
     _longWait: false,
     _lastEqCheck: true,
     _lastDayRecord: null,
+    _lastClose: null,
+    _lastReport: null,
+    _plan: null,
     get isOpen() { return !!root; }
   };
   window.ActionFlow = ActionFlow;

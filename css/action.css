@@ -5695,6 +5695,43 @@ html.theme-light .afl { --afl-rise-a: 0.82; --afl-wash-a: 0.42; }
   .afl__rise { display: none; }
   .afl-day__sup, .afl-day__rail i, .afl-day__rule, .afl-day__box svg, .afl-day__tx { transition: none; }
 }
+/* ==========================================================================
+   3.2  THE LOADING SCREEN'S TERMINAL STATES (merge phase 3, the data half)
+   A plan does not always come back. When it does not, the screen must still
+   end somewhere honest instead of spinning forever, so the working list clears
+   the way it does on a landing and ONE sentence is left on the same baseline
+   the facts held, with one quiet line under it and the standing CTA.
+   No new type, no new colour, no new layout: .afl-ld__say's geometry is reused
+   verbatim (the block is a sibling of the fact and the arrival inside the same
+   grid cell), and the sub line is .afl-ld__src's, one step down the page.
+   ========================================================================== */
+.afl-ld__end {
+  align-self: start;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+.afl-ld__end.is-on { opacity: 1; transform: none; }
+/* the question or the plain line: the fact type, and it keeps the fact's
+   reserved height so a one-line and a three-line ending sit on one baseline */
+.afl-ld__end .afl-ld__say { min-height: 0; }
+.afl-ld__endsub {
+  margin: 15px 0 0;
+  font-size: 15.6px;
+  line-height: 1.45;
+  color: rgba(var(--ink), 0.78);
+  max-width: 30ch;
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl-ld__end { transition: opacity 0.2s linear; transform: none; }
+}
+
+/* THE UNDO LEAVES WITH ITS WINDOW (merge phase 3.4). Once the ~1.5s undo
+   window closes the day is written, so the control that says it can be taken
+   back has to go: the row keeps its mark and its time and nothing else. */
+.afl-day__done.is-locked { pointer-events: none; }
+.afl-day__done.is-locked .afl-day__undo { display: none; }
+
 /* END: THE ACTION FLOW appended section */
 
 /* ---- LIGHT MODE CONTRAST PASS -------------------------------------------
