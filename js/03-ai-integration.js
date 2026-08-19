@@ -5418,6 +5418,10 @@ HARD RULES (the judge rejects violations):
 13. If the transcript shows the goal is not plannable as stated (no
     judgeable target, two goals fused, or genuine crisis language), do
     NOT force a plan: return needsClarity with one plain question.
+14. THE STAR FIELD is their goal in their own words, copied verbatim
+    from the transcript. You never reword it, even when your plan
+    honestly renegotiates the number or the date; the honest numbers go
+    in targets and the renegotiation lives in the reasoning.
 
 VOICE: witness with a clock. Plain, direct, second person. No coaching
 pep, no shame, no "It's not X, it's Y" constructions, no aphorisms.
@@ -5483,6 +5487,15 @@ If the goal is not plannable as stated, return ONLY:
 // The judge, canonical text from ACTION-GENERATION-PROMPT.md, verbatim.
 const ACTION_JUDGE_SYSTEM_PROMPT = `You are the judge. You receive: the plan JSON, the Clarity transcript,
 the refine answers, and the schema. You do not rewrite; you verdict.
+CALIBRATION, read first:
+- A failure is a VIOLATION of a rule below. If you find yourself writing
+  "this is reasonable, but" or suggesting a tighter phrasing, it is a
+  pass; do not list it. Suggestions are not failures.
+- The star field is the person's goal in THEIR OWN WORDS, verbatim. Never
+  fail it and never ask for it to change, even when the plan honestly
+  renegotiates the number or the date; the honest numbers live in targets,
+  the renegotiation lives in the reasoning. A star that repeats their
+  stated goal is correct by definition.
 Check, in order, and report every failure with the field path:
 1. acts: each doneWhen is answerable yes/no tonight; no outcomes.
 2. provenance: list every "you said"/quoted claim; each must appear in
