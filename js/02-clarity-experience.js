@@ -10459,14 +10459,12 @@ function _cpStanding(f, why) {
       _cpWhyBlock(why);
   }
 
-  // why-led: the why leads the page in large type. Below it, the honest
-  // state of the measuring: this goal carries no number, so the page says so
-  // and offers the door (the tweak flow) instead of tracking nothing.
-  // v1185 (Malik on-device: "i dont see a spot to put in any numbers").
-  return (why ? '<div class="cp-why cp-why--hero">' + esc(why) + '</div>' : '') +
-    '<div class="cp-div"></div><div class="cp-lab">Where you stand</div>' +
-    '<div class="cp-none">This goal has no number yet, so there is nothing to measure.</div>' +
-    '<button type="button" class="cp-upd" id="cpGiveNumber">' + CP_ICON_EDIT + 'Put a number on it</button>';
+  // why-led: no standing block at all, the why leads the page in large type.
+  // v1187 (Malik): a numberless goal is NOT nudged into getting one here;
+  // post-hoc number-forcing was built (v1185) and killed on sight ("feels
+  // very wrong and off"). The number question belongs INSIDE the Clarity
+  // conversation; if Clarity did not produce one, this page tracks nothing.
+  return why ? '<div class="cp-why cp-why--hero">' + esc(why) + '</div>' : '';
 }
 
 function _cpNebula() {
@@ -11365,16 +11363,6 @@ function _cpBindSummaryPage(pager) {
   if (upd) upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
   const twk = pager.querySelector('#cpTweak');
   if (twk) twk.addEventListener('click', function () { clarityOpenTweak(); });
-  // the numberless goal's door: the intent is already known (same goal, add a
-  // number), so it skips the tweak fork and opens Refine directly (v1186,
-  // Malik: the what-do-you-want-to-do-with-it screen is wrong here)
-  const gn = pager.querySelector('#cpGiveNumber');
-  if (gn) gn.addEventListener('click', function () {
-    try {
-      _cpStampRefine();
-      openNeutronStarRefineDialog(function () { _cpRepaintSummaryPage({}); });
-    } catch (e) {}
-  });
 }
 
 /* Repaint page 2 in place after a save, and walk the rail from where it was
