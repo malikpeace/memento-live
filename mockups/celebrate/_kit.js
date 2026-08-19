@@ -52,7 +52,9 @@
     var rgb = getComputedStyle(ph.closest('body')||document.body).getPropertyValue('--accent-rgb').trim() || '43,212,212';
     var p = rgb.split(',').map(Number);
     function sh(f){ return 'rgb('+p.map(function(c){ return Math.round(Math.min(255, c*f + (f>1 ? (f-1)*140 : 0))); }).join(',')+')'; }
-    var colors = [sh(1), sh(1.35), sh(.72), '#ffffff', sh(1.15)];
+    /* the white pieces flip to ink in light mode (white on white is nothing) */
+    var lite = document.body.getAttribute('data-theme') === 'light';
+    var colors = [sh(1), sh(1.35), sh(.72), lite ? '#1a1d24' : '#ffffff', sh(1.15)];
     var parts = [], t0 = performance.now();
     function burst(ox, oy, count){
       for (var i=0;i<count;i++){
@@ -146,6 +148,21 @@
         var b = e.target.closest('button'); if (!b) return;
         document.body.setAttribute('data-accent', b.getAttribute('data-a'));
         [].forEach.call(sw.querySelectorAll('button'), function(x){ x.classList.toggle('on', x===b); });
+      });
+      /* the theme toggle (Malik 2026-08-16): flip the whole gallery light /
+         dark, remembered across pages, so the theme call is made off real
+         screens. Replays reset so canvases redraw in the new palette. */
+      var tt = document.querySelector('.themebtn');
+      function setTheme(t){
+        if (t === 'light') document.body.setAttribute('data-theme','light');
+        else document.body.removeAttribute('data-theme');
+        try { localStorage.setItem('celTheme', t); } catch(e) {}
+        if (tt) tt.textContent = t === 'light' ? 'Dark' : 'Light';
+      }
+      try { setTheme(localStorage.getItem('celTheme') || 'dark'); } catch(e) {}
+      if (tt) tt.addEventListener('click', function(){
+        setTheme(document.body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+        CEL.replayAll();
       });
     },
     replayAll:function(){ [].forEach.call(document.querySelectorAll('.ph'), play); }

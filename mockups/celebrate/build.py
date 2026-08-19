@@ -6,6 +6,7 @@ the accent switcher and the page structure so no agent has to."""
 import json, os, glob, html, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+V = 'tw44'   # ONE version for every asset; bump this single constant per release
 FRAG = os.path.join(HERE, 'frag')
 
 ACCENTS = [('cyan','#2bd4d4'),('green','#3fd94e'),('amber','#ffb73d'),
@@ -71,16 +72,17 @@ def shell(title, body, back=True):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
-<link rel="stylesheet" href="_kit.css?v=tw41">
+<link rel="stylesheet" href="_kit.css?v={V}">
 </head><body data-accent="cyan">
 <div class="bar">
   {'<a href="index.html" style="color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:600">&lsaquo; All</a>' if back else ''}
   <span class="bar__t">{html.escape(title)}</span>
   <span class="sw">{sw}</span>
+  <button class="themebtn">Light</button>
   <span class="bar__n">their Memento colour drives every screen &middot; <b>tap a phone to advance or replay</b></span>
 </div>
 {body}
-<script src="chooser.js?v=tw41"></script><script src="_kit.js?v=tw18"></script><script src="_tweaks.js?v=tw18"></script>
+<script src="chooser.js?v={V}"></script><script src="_kit.js?v={V}"></script><script src="_tweaks.js?v={V}"></script>
 <script>CEL.init(); if (window.CEL_TWEAKS) CEL_TWEAKS.init();</script>
 </body></html>"""
 
