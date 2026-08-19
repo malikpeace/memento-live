@@ -70,10 +70,12 @@ phase before it is verified on-device.
 - ANALYTICS: log tier + key per fire through the existing silent activation
   analytics, so drop-off around ceremonies is measurable.
 
-## Open decisions (Malik, before or during phase 2)
-- THEME: milestone ceremonies dark-cinema (one root rule, like Clarity's
-  ceremonies) or theme-faithful (they now exist in light in the gallery,
-  look there and call it). The daily is green in both (locked); the finale
-  is accent-flood (theme-proof) with only beat 1 following the theme.
+## Open decisions — ALL RESOLVED
+- THEME, decided by Malik 2026-08-18: the milestone ceremonies are
+  THEME-FAITHFUL. They follow the app's light/dark setting (the appearance
+  picker that already exists), via ONE root rule exactly like the gallery's
+  token block, never per-screen opt-outs. The daily is green in both
+  (locked); the finale is accent-flood (theme-proof) with only beat 1
+  following the theme.
 - ms/rf leftovers: rf-gap is CUT at merge (qu-1 absorbed it); rf-fall and
   rf-rec ship in phase 2.

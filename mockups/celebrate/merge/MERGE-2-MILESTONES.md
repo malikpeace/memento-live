@@ -57,8 +57,11 @@ User-named middles ("run a 5K, then 10, then 20, then the marathon"):
 - [ ] `js/25-rewards-milestones.js` + `css/rewards-milestones.css`, ported
       fragment-by-fragment with its applier logic; router table on top.
 - [ ] Flip the shadow switch for tier 'milestone'.
-- [ ] THEME: apply Malik's dark-cinema vs theme-faithful call (pending; the
-      gallery now shows both). Either way it is ONE root rule.
+- [ ] THEME (decided 2026-08-18): THEME-FAITHFUL. Port the gallery's light
+      token block as ONE root rule keyed to the app's appearance setting;
+      redefine the composite text tokens inside it (the var()-resolution
+      trap the gallery hit), and flip confetti's white pieces to ink in
+      light. Contrast pass across all six accents in light.
 
 ## Verify
 - [ ] Each row of the map fired once via ?dev=rewards with real-shaped data.
