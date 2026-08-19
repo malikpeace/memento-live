@@ -20,6 +20,8 @@
 [data-k="q-2"] .q2-back:active{opacity:.6}
 [data-k="q-2"] .q2-back.ghost{visibility:hidden;pointer-events:none}
 [data-k="q-2"] .q2-bar{display:flex;gap:5px;align-items:center;flex:1;min-width:0}
+/* mirrors the back button so the bar sits truly centered */
+[data-k="q-2"] .q2-sp{flex:none;width:30px}
 /* each segment is a track that FILLS as its question gets answered, so progress is earned, not
    counted. Kept deliberately quiet: 2px, low ink, never a bright bar competing with the question. */
 [data-k="q-2"] .q2-seg{position:relative;height:2px;flex:1;border-radius:999px;overflow:hidden;
@@ -152,6 +154,7 @@
       <div class="q2-bar">
         <div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div>
       </div>
+      <span class="q2-sp" aria-hidden="true"></span>
     </div>
     <div class="q2-q"></div>
     <p class="q2-unit"></p>

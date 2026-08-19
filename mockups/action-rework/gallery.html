@@ -264,14 +264,14 @@ The room is Points (toggle top right, with the desktop view).
     </button>
     <p class="o1-note">
       <svg viewBox="0 0 12 14" fill="none" aria-hidden="true"><path d="M2.7 6.2V4.3a3.3 3.3 0 0 1 6.6 0v1.9" stroke="currentColor" stroke-width="1.3"/><rect x="1.2" y="6.2" width="9.6" height="7" rx="1.8" fill="currentColor" opacity=".7"/></svg>
-      Your words, from Clarity
+      From Clarity
     </p>
   </div>
   <div class="o1-foot">
     <button class="o1-cta" type="button" aria-disabled="true">
       <span class="o1-fill" aria-hidden="true"></span>
-      <span class="o1-lab">This is it</span>
-      <span class="o1-inv" aria-hidden="true"><span>This is it</span></span>
+      <span class="o1-lab">Confirm</span>
+      <span class="o1-inv" aria-hidden="true"><span>Confirm</span></span>
     </button>
     <p class="o1-sub">Tap each line to confirm</p>
   </div>
@@ -352,6 +352,8 @@ The room is Points (toggle top right, with the desktop view).
 [data-k="q-2"] .q2-back:active{opacity:.6}
 [data-k="q-2"] .q2-back.ghost{visibility:hidden;pointer-events:none}
 [data-k="q-2"] .q2-bar{display:flex;gap:5px;align-items:center;flex:1;min-width:0}
+/* mirrors the back button so the bar sits truly centered */
+[data-k="q-2"] .q2-sp{flex:none;width:30px}
 /* each segment is a track that FILLS as its question gets answered, so progress is earned, not
    counted. Kept deliberately quiet: 2px, low ink, never a bright bar competing with the question. */
 [data-k="q-2"] .q2-seg{position:relative;height:2px;flex:1;border-radius:999px;overflow:hidden;
@@ -484,6 +486,7 @@ The room is Points (toggle top right, with the desktop view).
       <div class="q2-bar">
         <div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div><div class="q2-seg"><i></i></div>
       </div>
+      <span class="q2-sp" aria-hidden="true"></span>
     </div>
     <div class="q2-q"></div>
     <p class="q2-unit"></p>
@@ -1838,11 +1841,12 @@ The room is Points (toggle top right, with the desktop view).
 [data-k=u-1] .u1-wash{position:absolute;left:0;right:0;bottom:0;height:0;z-index:1;pointer-events:none;
   background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.16));
   transition:height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease-out}
-/* the sync box gesture, here too: holding the day inverts the screen from
-   the bottom up (a white difference layer rising with the hold), and on
-   completion the wave crests and falls away. */
+/* holding the day raises GREEN from the bottom (Malik, 2026-08-18: not the
+   inversion; the rise matches the green daily beat, one language). On
+   completion it crests and falls away into the signed wash. */
 [data-k=u-1] .u1-inv{position:absolute;left:0;right:0;bottom:0;height:0;z-index:20;
-  pointer-events:none;background:#ebeef8;mix-blend-mode:difference;opacity:1}
+  pointer-events:none;opacity:1;
+  background:linear-gradient(180deg,rgba(63,217,78,0),rgba(63,217,78,.30) 45%,rgba(63,217,78,.42))}
 @media (prefers-reduced-motion:reduce){[data-k=u-1] .u1-inv{display:none}}
 [data-k=u-1] .u1.signed .u1-wash{height:44%}
 [data-k=u-1] .u1.closed .u1-wash{height:0;opacity:0}
