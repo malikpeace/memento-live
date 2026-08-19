@@ -278,10 +278,10 @@
   var QUESTIONS = {
     weight: [
       { q: OPENER, chips: ['Nothing yet, this is day one', 'Tried diets before', 'I work out sometimes', 'I lose it, then gain it back'] },
-      { q: 'Your height and sex? The math needs both.', chips: ['Male', 'Female'], free: 'Your height' },
+      { q: 'Your height and sex? The math needs both.', kind: 'ruler', ruler: 'height', unit: 'Drag to set it.', chips: ['Male', 'Female'] },
       { q: 'How often do you move in a normal week?', chips: ['Rarely', '1-2 workouts', '3-4 workouts', '5+ or active job'] },
       { q: 'What do you think is the biggest problem?', chips: ['Late night eating', 'Fast food days', 'Sugar drinks', 'Weekends'] },
-      { q: 'What does the scale say this morning?', kind: 'num', unit: 'Pounds', prefix: '', decimals: true }
+      { q: 'What does the scale say this morning?', kind: 'ruler', ruler: 'weight', unit: 'Drag to set it.' }
     ],
     screen: [
       { q: OPENER, chips: ['Nothing yet', 'Deleted apps before, they came back', 'Tried screen limits', 'I go cold turkey, then relapse'] },
@@ -333,6 +333,26 @@
       { q: 'How long can a protected block realistically be?', chips: ['30 min', '60 min', '90 min', '2 hours+'] }
     ]
   };
+
+  // ---------------------------------------------------------------------------
+  // THE DRAG RULER (v1190). Height and a body weight are hard-format answers, so
+  // the input IS the control: a flat tick strip in the day rail's own language,
+  // dragged under one bright centre mark. No box, no border, no colour.
+  //   step = pixels per unit (how far the strip travels for one inch / one pound)
+  //   maj  = a longer tick every N units (a foot on height, ten pounds on weight)
+  //   start= where the strip rests before the first drag, so it feels anchored
+  // Both of these questions are REQUIRED (Malik, on-device 2026-08-19): nothing
+  // is answered until the person actually sets a value, by drag or by typing.
+  // ---------------------------------------------------------------------------
+  var RULERS = {
+    height: { min: 48, max: 84, start: 68, step: 13, maj: 12, page: 12, unit: '', label: 'Your height' },
+    weight: { min: 80, max: 500, start: 200, step: 7, maj: 10, page: 10, unit: 'lb', label: 'Your weight' }
+  };
+  // plain, the way a person writes it: 5'10" and 218.
+  function rulerText(kind, v) {
+    if (kind === 'height') return Math.floor(v / 12) + "'" + (v % 12) + '"';
+    return String(v);
+  }
 
   // ---------------------------------------------------------------------------
   // helpers
@@ -867,12 +887,25 @@
     var multi = D.map(function () { return []; });
     var typed = D.map(function () { return ''; });
     var nums = D.map(function () { return ''; });
+    // the ruler steps carry their own value and their own "actually set" flag:
+    // the resting position is a starting point, never an answer.
+    var rulerVal = D.map(function (d) { return (RULERS[d.ruler] || RULERS.height).start; });
+    var rulerSet = D.map(function () { return false; });
     var mirror = el('span', 'afl-q__mirror');
     wrap.appendChild(mirror);
     var numInput = null;
 
     function isNum(k) { return D[k].kind === 'num'; }
+    function isRuler(k) { return D[k].kind === 'ruler'; }
     function answeredAt(k) {
+      // REQUIRED (v1190). Height and weight cannot be skipped, and words in the
+      // free field do not stand in for the number: the math needs the number.
+      // Where the same question also asks for sex, both halves must be there.
+      if (isRuler(k)) {
+        if (!rulerSet[k]) return false;
+        if ((D[k].chips || []).length) return D[k].multi ? multi[k].length > 0 : picked[k] !== null;
+        return true;
+      }
       if (isNum(k)) return nums[k].length > 0 || (D[k].skippable && typed[k].trim().length > 0);
       if (D[k].multi) return multi[k].length > 0 || typed[k].trim().length > 1;
       return picked[k] !== null || typed[k].trim().length > 1;
@@ -889,14 +922,20 @@
       go.disabled = !answeredAt(i);
       ctaLabel(go, last ? 'Create action plan' : 'Continue');
       var holdStep = last && !go.disabled;
+      // the button has to WAKE UP. Height and weight cannot be skipped now, so a
+      // person who has not set one is looking at a dead button and needs to see
+      // it come alive the moment they have answered. Same lit step the wall and
+      // the final hold already use, nothing new.
+      go.classList.toggle('is-live', !go.disabled && !holdStep);
       go.classList.toggle('afl-cta--hold', holdStep);
       if (!holdStep) stopHold();
       hint.classList.toggle('is-on', holdStep);
       segSync();
     }
     function marks() {
-      [].forEach.call(body.children, function (b, k) {
-        if (!b.classList.contains('afl-q__a')) return;
+      // by the chips' OWN order, not their position in the body: a ruler step
+      // puts the ruler in front of them and every index would be off by one.
+      [].forEach.call(body.querySelectorAll('.afl-q__a'), function (b, k) {
         b.classList.toggle('is-on', D[i].multi ? multi[i].indexOf(k) > -1 : picked[i] === k);
       });
     }
@@ -962,17 +1001,197 @@
       body.appendChild(f);
       fitNum();
     }
+    // THE RULER STEP. A big readout, the tick strip under it, and a quiet "type
+    // it instead" door for keyboards and screen readers. The strip is two
+    // repeating hairline layers whose origin is one CSS length, so dragging is a
+    // single style write per move and the ticks stay pixel aligned to the centre
+    // mark at any value.
+    function buildRuler() {
+      var d = D[i], k = i;
+      var cfg = RULERS[d.ruler] || RULERS.height;
+      body.classList.add('afl-q__as--rl');
+
+      var wrapR = el('div', 'afl-rl');
+      if (rulerSet[k]) wrapR.classList.add('is-set');
+      var val = el('p', 'afl-rl__val');
+      var nEl = el('span', 'afl-rl__n', rulerText(d.ruler, rulerVal[k]));
+      val.appendChild(nEl);
+      if (cfg.unit) val.appendChild(el('span', 'afl-rl__u', cfg.unit));
+      wrapR.appendChild(val);
+
+      var tr = el('div', 'afl-rl__tr');
+      tr.setAttribute('role', 'slider');
+      tr.setAttribute('tabindex', '0');
+      tr.setAttribute('aria-label', cfg.label);
+      var tk = el('span', 'afl-rl__tk');
+      tk.setAttribute('aria-hidden', 'true');
+      tk.style.setProperty('--step', cfg.step + 'px');
+      tk.style.setProperty('--maj', String(cfg.maj));
+      var ix = el('span', 'afl-rl__ix');
+      ix.setAttribute('aria-hidden', 'true');
+      tr.appendChild(tk);
+      tr.appendChild(ix);
+      wrapR.appendChild(tr);
+
+      var alt = btn('afl-rl__alt', 'Type it instead');
+      var row = el('div', 'afl-rl__type');
+      var fields = [];
+      function field(ph, lab, aria) {
+        var inp = document.createElement('input');
+        inp.className = 'afl-rl__in';
+        inp.type = 'text';
+        inp.setAttribute('inputmode', 'numeric');
+        inp.setAttribute('aria-label', aria);
+        inp.autocomplete = 'off';
+        inp.placeholder = ph;
+        row.appendChild(inp);
+        row.appendChild(el('span', 'afl-rl__lb', lab));
+        fields.push(inp);
+        return inp;
+      }
+      var ft = null, inch = null, lbs = null;
+      if (d.ruler === 'height') {
+        ft = field(String(Math.floor(cfg.start / 12)), 'ft', 'Feet');
+        inch = field(String(cfg.start % 12), 'in', 'Inches');
+      } else {
+        lbs = field(String(cfg.start), 'lb', 'Pounds');
+      }
+      wrapR.appendChild(alt);
+      wrapR.appendChild(row);
+      body.appendChild(wrapR);
+
+      var lastAnim = 0;
+      function fillFields() {
+        var v = rulerVal[k];
+        if (!rulerSet[k]) return;
+        if (ft) {
+          if (document.activeElement !== ft) ft.value = String(Math.floor(v / 12));
+          if (document.activeElement !== inch) inch.value = String(v % 12);
+        } else if (document.activeElement !== lbs) {
+          lbs.value = String(v);
+        }
+      }
+      function paint(dir) {
+        var v = rulerVal[k];
+        var w = tr.clientWidth || 330;
+        tk.style.setProperty('--x', (w / 2 - (v - cfg.min) * cfg.step) + 'px');
+        var t = rulerText(d.ruler, v);
+        if (nEl.textContent !== t) {
+          // the number arrives, it never hard swaps. On a fast drag the steps
+          // come faster than the 200ms animation, so those land plainly and the
+          // animation runs as the drag settles.
+          var now = Date.now();
+          if (dir && now - lastAnim > 130) { lastAnim = now; swapText(nEl, t, dir); }
+          else nEl.textContent = t;
+        }
+        tr.setAttribute('aria-valuemin', String(cfg.min));
+        tr.setAttribute('aria-valuemax', String(cfg.max));
+        tr.setAttribute('aria-valuenow', String(v));
+        tr.setAttribute('aria-valuetext', t + (cfg.unit ? ' ' + cfg.unit : ''));
+        fillFields();
+      }
+      function setV(raw, mark) {
+        var nv = Math.max(cfg.min, Math.min(cfg.max, Math.round(raw)));
+        var dir = nv > rulerVal[k] ? 1 : (nv < rulerVal[k] ? -1 : 0);
+        rulerVal[k] = nv;
+        if (mark && !rulerSet[k]) { rulerSet[k] = true; wrapR.classList.add('is-set'); }
+        paint(dir);
+        if (mark) syncCta();
+      }
+      function unset() {
+        if (!rulerSet[k]) return;
+        rulerSet[k] = false;
+        wrapR.classList.remove('is-set');
+        syncCta();
+      }
+
+      // the drag. setPointerCapture keeps the strip under the finger once it has
+      // left the ticks, touch-action: none (css) stops iOS claiming it as a pan.
+      var sx = 0, sv = 0, dragging = false;
+      tr.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        e.preventDefault();
+        dragging = true;
+        sx = e.clientX;
+        sv = rulerVal[k];
+        try { tr.setPointerCapture(e.pointerId); } catch (z) {}
+        wrapR.classList.add('is-drag');
+        setV(rulerVal[k], true);
+      });
+      tr.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        // the strip travels with the finger: pulling it left brings the bigger
+        // numbers in from the right, the way a real tape reads.
+        setV(sv - (e.clientX - sx) / cfg.step, true);
+      });
+      ['pointerup', 'pointercancel'].forEach(function (ev) {
+        tr.addEventListener(ev, function (e) {
+          if (!dragging) return;
+          dragging = false;
+          wrapR.classList.remove('is-drag');
+          try { tr.releasePointerCapture(e.pointerId); } catch (z) {}
+        });
+      });
+      tr.addEventListener('keydown', function (e) {
+        var s = 0;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') s = 1;
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') s = -1;
+        else if (e.key === 'PageUp') s = cfg.page;
+        else if (e.key === 'PageDown') s = -cfg.page;
+        else return;
+        e.preventDefault();
+        setV(rulerVal[k] + s, true);
+      });
+
+      alt.addEventListener('click', function () {
+        wrapR.classList.add('is-typing');
+        fillFields();
+        fields[0].focus();
+      });
+      function readFields() {
+        if (ft) {
+          var f = ft.value.replace(/[^0-9]/g, '').slice(0, 1);
+          var n = inch.value.replace(/[^0-9]/g, '').slice(0, 2);
+          if (ft.value !== f) ft.value = f;
+          if (inch.value !== n) inch.value = n;
+          if (!f) return unset();
+          setV(parseInt(f, 10) * 12 + (parseInt(n, 10) || 0), true);
+        } else {
+          var p = lbs.value.replace(/[^0-9]/g, '').slice(0, 3);
+          if (lbs.value !== p) lbs.value = p;
+          if (!p) return unset();
+          setV(parseInt(p, 10), true);
+        }
+      }
+      fields.forEach(function (inp) {
+        inp.addEventListener('input', readFields);
+        inp.addEventListener('blur', function () { if (rulerSet[k]) fillFields(); });
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+        });
+      });
+
+      paint(0);
+      // the strip's origin is measured from the track, which has no width until
+      // it is laid out. One more paint after layout puts the first tick exactly
+      // under the centre mark.
+      requestAnimationFrame(function () { if (tr.isConnected) paint(0); });
+      if ((d.chips || []).length) buildChips();
+    }
+
     function render(anim) {
       var d = D[i];
       qEl.classList.remove('is-fade');
       if (anim && !reduced()) { void qEl.offsetWidth; qEl.classList.add('is-fade'); }
       qEl.textContent = d.q;
-      unit.textContent = d.kind === 'num' ? (d.unit || '') : '';
+      unit.textContent = (d.kind === 'num' || d.kind === 'ruler') ? (d.unit || '') : '';
       numInput = null;
       body.className = 'afl-q__as';
       body.innerHTML = '';
       if (anim && !reduced()) { void body.offsetWidth; body.classList.add('is-enter'); }
-      if (d.kind === 'num') buildNum(); else buildChips();
+      if (d.kind === 'num') buildNum();
+      else if (d.kind === 'ruler') buildRuler();
+      else buildChips();
       // EVERY question keeps its free field. The number step's field takes the
       // note that goes with the number ("skip", "not sure", their own words).
       free.value = typed[i];
@@ -992,7 +1211,11 @@
           q: d.q,
           chip: d.multi ? multi[k].map(function (x) { return d.chips[x]; })
             : (picked[k] === null ? null : d.chips[picked[k]]),
-          num: nums[k] || null,
+          // the ruler lands where every other number lands, written plainly:
+          // 6'1" for a height, 218 for a weight.
+          num: d.kind === 'ruler'
+            ? (rulerSet[k] ? rulerText(d.ruler, rulerVal[k]) : null)
+            : (nums[k] || null),
           free: typed[k] || null
         };
       });
@@ -1011,7 +1234,9 @@
     free.addEventListener('input', function () {
       typed[i] = free.value;
       own.classList.toggle('is-lit', free.value.trim().length > 0);
-      if (free.value.trim().length > 0 && picked[i] !== null && !D[i].multi) { picked[i] = null; marks(); }
+      // on a ruler step the chips are a second dimension (sex), not another way
+      // to answer the same thing, so typing a note must not clear the pick.
+      if (free.value.trim().length > 0 && picked[i] !== null && !D[i].multi && !isRuler(i)) { picked[i] = null; marks(); }
       syncCta();
     });
     free.addEventListener('keydown', function (e) {
@@ -1040,6 +1265,10 @@
     var c = el('div', 'afl-ld');
     col.appendChild(c);
 
+    // THE CLOSE CHIP OWNS ITS CORNER (law 3a2, v1190). The elapsed clock used to
+    // sit at the row's right end, which is under the X on a real phone (his
+    // screenshot). It now reads inline after the title, and the row's box stops
+    // well short of the corner, so nothing of this screen is ever in the zone.
     var head = el('div', 'afl-ld__head');
     var title = el('h4', null, 'Writing your plan.');
     var clk = el('p', 'afl-ld__clk', '0:00');

@@ -4788,11 +4788,15 @@ html.theme-light .afl { --afl-bg: var(--surface-0); --afl-bg-rgb: 238, 240, 243;
    column at z4, under the day screen's M (z5), over everything that scrolls. */
 .afl__top {
   position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none;
-  height: max(90px, calc(var(--safe-t) + 44px));
+  /* v1190: the scrim now runs the full depth of the close chip's corner zone
+     (72px below the safe area), so scrolling text is already gone by the time
+     it could sit beside the X. */
+  height: max(112px, calc(var(--safe-t) + 74px));
   background: linear-gradient(180deg,
     rgb(var(--afl-bg-rgb)) 0,
     rgb(var(--afl-bg-rgb)) max(47px, var(--safe-t)),
-    rgba(var(--afl-bg-rgb), 0.86) max(62px, calc(var(--safe-t) + 16px)),
+    rgba(var(--afl-bg-rgb), 0.88) max(62px, calc(var(--safe-t) + 16px)),
+    rgba(var(--afl-bg-rgb), 0.55) max(90px, calc(var(--safe-t) + 52px)),
     rgba(var(--afl-bg-rgb), 0) 100%);
 }
 
@@ -4980,6 +4984,11 @@ html.theme-light .afl--cine {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   padding: max(34px, calc(var(--safe-t) + 12px)) 26px 0;
 }
+/* THE CLOSE CHIP OWNS ITS CORNER (law 3a2). The bar used to run to within 26px
+   of the screen edge, straight through the X's 72x72 zone on a phone. The
+   spacer is now wide enough to clear the zone, and the bar carries the same
+   inset on its left, so the chevron stays aligned with the question text and
+   the bar stays truly centred on the screen. */
 .afl-q__top { display: flex; align-items: center; gap: 13px; height: 39px; flex: none; }
 .afl-q__back {
   flex: none; width: 39px; height: 39px; padding: 0; border: 0; border-radius: 12px;
@@ -4988,8 +4997,8 @@ html.theme-light .afl--cine {
 }
 .afl-q__back:active { opacity: 0.6; }
 .afl-q__back.is-ghost { visibility: hidden; pointer-events: none; }
-.afl-q__bar { display: flex; gap: 6.5px; align-items: center; flex: 1; min-width: 0; }
-.afl-q__sp { flex: none; width: 39px; }
+.afl-q__bar { display: flex; gap: 6.5px; align-items: center; flex: 1; min-width: 0; margin-left: 21px; }
+.afl-q__sp { flex: none; width: 60px; }
 .afl-q__seg {
   position: relative; height: 2.6px; flex: 1; border-radius: 999px; overflow: hidden;
   background: rgba(var(--ink), 0.10); transition: background 0.3s ease;
@@ -5079,6 +5088,101 @@ html.theme-light .afl--cine {
   font-size: 16.3px; letter-spacing: -0.005em; color: rgba(var(--ink), 0.62);
 }
 .afl-q__hint.is-on { display: flex; }
+/* ---- THE DRAG RULER (v1190): height and weight ---------------------------
+   The day screen's graduation rail, laid on its side. Same tick language:
+   hairlines at low ink, a longer mark every foot / every ten pounds, and the
+   active centre at full ink. Flat and quiet: no box, no border, no colour, no
+   labels. The strip is two repeating hairline layers whose origin is ONE css
+   length (--x), so a drag is a single style write per move, and both layers
+   stay aligned to the centre mark at any value. The ends fade out under a mask
+   instead of hitting a straight cut. Sized in vh so a short phone keeps the
+   readout, the strip, the fallback link and the chips on one screen. */
+.afl-q__as--rl { justify-content: center; }
+.afl-rl { display: flex; flex-direction: column; align-items: center; width: 100%; }
+.afl-rl__val {
+  margin: 0; display: flex; align-items: baseline; gap: 7px;
+  font-size: clamp(44px, 7.6vh, 62px); font-weight: 700; line-height: 1;
+  letter-spacing: -0.045em; font-variant-numeric: tabular-nums;
+  /* untouched, the resting value reads as a placeholder, the same way the
+     baseline number's placeholder does. It goes to full ink the moment the
+     person actually sets it. */
+  color: rgba(var(--ink), 0.32); transition: color 0.2s var(--ease-out);
+}
+.afl-rl.is-set .afl-rl__val { color: rgba(var(--ink), 1); }
+.afl-rl__u { font-size: clamp(19px, 3vh, 24px); font-weight: 500; letter-spacing: -0.02em; color: rgba(var(--ink), 0.52); transition: color 0.2s var(--ease-out); }
+.afl-rl.is-set .afl-rl__u { color: rgba(var(--ink), 0.72); }
+.afl-rl__tr {
+  position: relative; width: 100%; height: 46px; margin-top: clamp(18px, 3vh, 26px);
+  cursor: ew-resize; touch-action: none; -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+/* THE GRAB AREA. The ticks are 30px of a 46px track, so this reaches ~52px
+   above and ~44px below the tallest tick: catchable well outside the lines,
+   the same allowance the day rail got, and it stops short of the chips. */
+.afl-rl__tr::before { content: ''; position: absolute; left: 0; right: 0; top: -44px; bottom: -36px; }
+.afl-rl__tk {
+  --x: 50%; --step: 13px; --maj: 12;
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(var(--ink), 0.44) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--ink), 0.19) 0 1px, transparent 1px);
+  background-size: calc(var(--step) * var(--maj)) 30px, var(--step) 17px;
+  background-repeat: repeat-x, repeat-x;
+  background-position: var(--x) bottom, var(--x) bottom;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 15%, #000 85%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 15%, #000 85%, transparent 100%);
+}
+.afl-rl__ix {
+  position: absolute; left: 50%; bottom: 0; width: 2px; height: 40px; margin-left: -1px;
+  border-radius: 1px; background: rgba(var(--ink), 0.95);
+}
+/* the keyboard door: a bare line of text, the same underlined-text control the
+   day screen uses. It also satisfies the requirement once it is filled. */
+.afl-rl__alt {
+  margin-top: clamp(15px, 2.6vh, 23px); padding: 4px 2px; border: 0; background: none;
+  font-family: inherit; font-size: 15.6px; font-weight: 500; line-height: 1.2;
+  color: rgba(var(--ink), 0.66); cursor: pointer;
+  box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.24);
+  transition: color 0.16s ease, box-shadow 0.16s ease;
+}
+.afl-rl__alt:hover { color: rgba(var(--ink), 0.92); box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.42); }
+.afl-rl__alt:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
+.afl-rl.is-typing .afl-rl__alt { display: none; }
+.afl-rl__type { display: none; margin-top: clamp(15px, 2.6vh, 23px); align-items: baseline; justify-content: center; gap: 8px; }
+.afl-rl.is-typing .afl-rl__type { display: flex; }
+.afl-rl__in {
+  -webkit-appearance: none; appearance: none; width: 74px; padding: 0 0 7px; margin: 0;
+  border: 0; outline: 0; background: none; text-align: center; font-family: inherit;
+  /* 26px: never under 16px, so iOS cannot zoom the screen on focus */
+  font-size: 26px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  color: rgba(var(--ink), 0.96); box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.26);
+  transition: box-shadow 0.16s ease;
+}
+.afl-rl__in::placeholder { color: rgba(var(--ink), 0.26); }
+.afl-rl__in:focus { box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.55); }
+.afl-rl__lb { font-size: 16.3px; font-weight: 500; color: rgba(var(--ink), 0.68); margin-right: 6px; }
+.afl-rl__lb:last-child { margin-right: 0; }
+/* the chips that share a ruler step (sex) sit under it, one clear beat away */
+.afl-rl + .afl-q__a { margin-top: clamp(16px, 3.2vh, 30px); }
+.afl-q__as--rl .afl-q__a { min-height: 62px; padding: 16px 3px; }
+/* SHORT PHONES (SE height and under). The readout, the strip and two chips do
+   not fit the tall composition, and the answer area does not scroll, so the
+   whole step steps down one size instead of colliding with the question. */
+@media (max-height: 740px) {
+  .afl-rl__val { font-size: 38px; }
+  .afl-rl__u { font-size: 18px; }
+  .afl-rl__tr { height: 38px; margin-top: 13px; }
+  .afl-rl__tk { background-size: calc(var(--step) * var(--maj)) 24px, var(--step) 14px; }
+  .afl-rl__ix { height: 32px; }
+  .afl-rl__alt { margin-top: 12px; font-size: 15px; }
+  .afl-rl__type { margin-top: 12px; }
+  .afl-rl + .afl-q__a { margin-top: 14px; }
+  .afl-q__as--rl .afl-q__a { min-height: 54px; padding: 12px 3px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl-rl__val, .afl-rl__u, .afl-rl__alt, .afl-rl__in { transition: none; }
+}
+
 @keyframes aflQIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
   .afl-q__q.is-fade, .afl-q__as.is-enter { animation: none; }
@@ -5094,7 +5198,12 @@ html.theme-light .afl--cine {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
   padding: max(73px, calc(var(--safe-t) + 26px)) 31px 0;
 }
-.afl-ld__head { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+/* THE CLOSE CHIP OWNS ITS CORNER (law 3a2, v1190). The clock was pinned to the
+   row's right end by space-between, which is under the X on a real phone (his
+   screenshot). It now reads inline after the title, and the row's own box is
+   held back from the corner by a MARGIN, not padding, so the element itself
+   never enters the zone either. */
+.afl-ld__head { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: flex-start; gap: 14px; margin-right: 56px; }
 .afl-ld__head h4 {
   margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.018em; line-height: 1.25;
   color: var(--text-hi); transition: opacity 0.5s ease;
@@ -5104,7 +5213,7 @@ html.theme-light .afl--cine {
 /* reserved at two lines so the longer wait line arrives without shoving the
    fact under it up the screen mid fade */
 .afl-ld__state {
-  margin: 10px 0 0; min-height: 48px; font-size: 16.3px; line-height: 1.45;
+  margin: 10px 56px 0 0; min-height: 48px; font-size: 16.3px; line-height: 1.45;
   color: rgba(var(--ink), 0.9); transition: opacity 0.45s ease;
 }
 .afl-ld__state.is-swap, .afl-ld__state.is-gone { opacity: 0; }
@@ -5167,7 +5276,11 @@ html.theme-light .afl--cine {
 }
 .afl-lg__sc {
   flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  padding-top: max(96px, calc(var(--safe-t) + 50px));
+  /* v1190, law 3a2: at rest the first line now starts BELOW the close chip's
+     72x72 corner zone, so nothing load bearing shares that band with the X.
+     Mid scroll the text still travels up, and .afl__top (matched to the same
+     depth) dissolves it before it reaches the chip. */
+  padding-top: max(120px, calc(var(--safe-t) + 78px));
 }
 .afl-lg__sc::-webkit-scrollbar { display: none; }
 .afl-lg__star {
@@ -5486,3 +5599,17 @@ html.theme-light .afl-ld__ticks i { background: rgba(var(--ink), 0.22); }
 html.theme-light .afl-ld__ticks i.is-on { background: rgba(var(--ink), 0.68); }
 html.theme-light .afl-day__box { background: rgba(var(--ink), 0.12); }
 html.theme-light .afl-day__sup.is-lapse .afl-day__box { background: rgba(var(--ink), 0.09); }
+/* the ruler, designed for light, not inverted into it: dark ink on off white
+   needs more alpha to hold the same tick hierarchy the dark room gets. */
+html.theme-light .afl-rl__tk {
+  background-image:
+    linear-gradient(90deg, rgba(var(--ink), 0.56) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--ink), 0.28) 0 1px, transparent 1px);
+}
+html.theme-light .afl-rl__val { color: rgba(var(--ink), 0.42); }
+html.theme-light .afl-rl.is-set .afl-rl__val { color: rgba(var(--ink), 1); }
+html.theme-light .afl-rl__u { color: rgba(var(--ink), 0.62); }
+html.theme-light .afl-rl__alt { color: rgba(var(--ink), 0.74); box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.34); }
+html.theme-light .afl-rl__lb { color: rgba(var(--ink), 0.76); }
+html.theme-light .afl-rl__in { box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.34); }
+html.theme-light .afl-rl__in::placeholder { color: rgba(var(--ink), 0.34); }
