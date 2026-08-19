@@ -4737,3 +4737,697 @@ body:has(.action-exp[data-heat]) .fullscreen-close-global {
   .aheat.is-flip .aheat-back { opacity: 1; pointer-events: auto; }
   .action-exp[data-heat] .action-exp__bg { transition: none; }
 }
+
+/* ============================================================================
+   THE ACTION FLOW, the appended section (THE MERGE, phase 2: the five surfaces)
+   Owner: js/30-action-flow.js. Nothing above this line is touched by it.
+
+   Verbatim ports of mockups/action-rework/frag/{ob-1,q-2,ld-4,lg-5,u-1}.html.
+   PORT LAW (resolution D): the mocks are authored at 77% inside a 300x650
+   frame, so every geometric value below is the mock's number x1.3 for the 390
+   device. Colours port BY ROLE onto app tokens: every rgba(var(--ink),a) flips
+   for light mode on its own, the completion green is the app's consistency
+   token, and the bottom CTA is the app's standing button recipe (Clarity's nav
+   geometry: 18px padding, --r-ctrl, --fs-lg / 600, sitting safe-b + 28px off
+   the bottom, which is 62px on a real phone).
+
+   THEME (resolution C): the day screen, the logic page, refine and loading are
+   THEME-FAITHFUL. The onboarding wall is DARK CINEMA and holds its dark room in
+   light mode through the ONE root rule on .afl--cine below. No :has() opt-outs.
+   ========================================================================== */
+
+/* ---- the shell ---------------------------------------------------------- */
+.afl {
+  --afl-bg: #050608;
+  --afl-dot: rgba(var(--ink), 0.16);
+  --afl-hold: 0.78s;
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--afl-bg); color: var(--text-hi);
+  font-family: var(--font); font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
+}
+html.theme-light .afl { --afl-bg: var(--surface-0); --afl-dot: rgba(var(--ink), 0.13); }
+/* These are full-screen experiences: the mobile top fade would paint a band
+   across the top of them (and a LIGHT band across the dark onboarding wall).
+   Same idiom misc.css already uses for the other full-screen surfaces. */
+body:has(.afl) #topFade { display: none; }
+.afl__col {
+  position: relative; z-index: 2; flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  /* 430px, the app's PHONE column, hardcoded on purpose: --max-w widens to
+     1100/1500/1640 at desktop breakpoints for the dashboard grid, and these
+     screens are a phone column on every width (the mockups' own desktop view
+     pins the same way). */
+  width: 100%; max-width: 430px; margin: 0 auto;
+}
+/* THE ROOM: Points (Malik's pick). Dots where a graph paper's lines would have
+   crossed: the workbench without the cage. Two sparse offset subsets breathe on
+   uneven cycles. Neutral ink only, never a hue. Full bleed behind the column. */
+.afl__room {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(var(--afl-dot) 1.8px, transparent 1.8px);
+  background-size: 34px 34px; background-position: 16px 16px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.8px, transparent 1.8px);
+  mask-image: linear-gradient(90deg, transparent 0, #000 1.8px, transparent 1.8px);
+  -webkit-mask-size: 34px 34px; mask-size: 34px 34px;
+  -webkit-mask-position: 16px 16px; mask-position: 16px 16px;
+}
+.afl__room::before, .afl__room::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: inherit; background-size: 101px 101px;
+  -webkit-mask-image: inherit; mask-image: inherit;
+  -webkit-mask-size: 101px 101px; mask-size: 101px 101px;
+}
+.afl__room::before {
+  background-position: 49px 83px;
+  -webkit-mask-position: 49px 83px; mask-position: 49px 83px;
+  animation: aflRoomA 9s ease-in-out infinite alternate;
+}
+.afl__room::after {
+  background-position: 83px 16px;
+  -webkit-mask-position: 83px 16px; mask-position: 83px 16px;
+  animation: aflRoomB 13s ease-in-out -5s infinite alternate;
+}
+@keyframes aflRoomA { from { opacity: 0; } to { opacity: 0.9; } }
+@keyframes aflRoomB { from { opacity: 0.85; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .afl__room::before, .afl__room::after { animation: none; opacity: 0.4; }
+}
+
+/* DARK CINEMA: the onboarding wall keeps the dark room in every theme. ONE
+   root rule, the same token block base.css gives its other dark scenes. */
+html.theme-light .afl--cine {
+  color-scheme: dark;
+  --ink: 255, 255, 255;
+  --afl-bg: #050608;
+  --afl-dot: rgba(var(--ink), 0.16);
+  --surface-0: #040405;
+  --surface-1: rgba(var(--ink), 0.04); --surface-2: rgba(var(--ink), 0.072); --surface-3: rgba(var(--ink), 0.10);
+  --hairline: rgba(var(--ink), 0.09); --hairline-strong: rgba(var(--ink), 0.16);
+  --text-hi: rgba(var(--ink), 0.96); --text-mid: rgba(var(--ink), 0.62);
+  --text-lo: rgba(var(--ink), 0.40); --text-faint: rgba(var(--ink), 0.24);
+  --kfill-04: rgba(var(--ink), 0.04); --kfill-08: rgba(var(--ink), 0.08); --kfill-12: rgba(var(--ink), 0.12);
+  --glass-highlight: inset 0 1px 0 rgba(var(--ink), 0.10);
+  --solid-bg: #ffffff; --solid-fg: #0b1112;
+}
+
+/* ---- the standing bottom control (Clarity's nav recipe, one place) ------- */
+.afl-nav {
+  position: relative; z-index: 3; flex: 0 0 auto;
+  width: 100%; padding: 16px 20px calc(var(--safe-b) + 28px);
+}
+.afl-cta {
+  position: relative; display: block; width: 100%; overflow: hidden;
+  padding: 18px; border: 0; border-radius: var(--r-ctrl);
+  font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
+  background: var(--kfill-04); color: rgba(var(--ink), 0.58);
+  cursor: default; -webkit-user-select: none; user-select: none;
+  transition: background var(--t-base) ease, color var(--t-base) ease, transform 0.15s ease;
+}
+.afl-cta__lab { position: relative; display: block; text-align: center; }
+.afl-cta__fill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: var(--solid-bg); transition: width var(--t-base) var(--ease-out);
+}
+.afl-cta__inv {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0; overflow: hidden;
+  pointer-events: none; transition: width var(--t-base) var(--ease-out);
+}
+.afl-cta__inv span {
+  position: absolute; left: 0; top: 0; bottom: 0; display: flex;
+  align-items: center; justify-content: center;
+  color: var(--solid-fg); font-size: var(--fs-lg); font-weight: 600;
+}
+/* live but not yet held: the label comes up and the fill lifts a step, but the
+   button stays quiet so the hold's light has somewhere to travel. */
+.afl-cta.is-live, .afl-cta.afl-cta--hold:not([disabled]) {
+  background: rgba(var(--ink), 0.10); color: var(--text-hi); cursor: pointer;
+}
+.afl-cta.is-holding .afl-cta__fill,
+.afl-cta.is-holding .afl-cta__inv { width: 100%; transition: width var(--afl-hold) linear; }
+.afl-cta.is-done { background: var(--solid-bg); color: var(--solid-fg); }
+.afl-cta.is-done .afl-cta__fill, .afl-cta.is-done .afl-cta__inv { width: 100%; transition: none; }
+.afl-cta:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
+.afl-cta[disabled] { background: var(--kfill-04); color: rgba(var(--ink), 0.58); cursor: default; }
+.afl-nav__sub {
+  margin: 14px 0 0; text-align: center;
+  font-size: 0.8125rem; line-height: 1.4; color: rgba(var(--ink), 0.62);
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl-cta, .afl-cta__fill, .afl-cta__inv { transition: none; }
+  .afl-cta.is-holding .afl-cta__fill,
+  .afl-cta.is-holding .afl-cta__inv { transition: width var(--afl-hold) linear; }
+}
+
+/* ==========================================================================
+   2.1  ob-1, THE WALL OF INTENT (dark cinema)
+   One type ladder (20.8 / 35 / 83), one spacing rhythm (5 / 10 / 26 / 39),
+   one focal point. Unconfirmed lines rest dim; pressing one pulls it into the
+   light and lifts the wall a step, so the screen finishes brighter than it
+   started.
+   ========================================================================== */
+.afl[data-screen="intent"] .afl__room { opacity: 0.62; transition: opacity 0.6s var(--ease-out); }
+.afl[data-screen="intent"][data-lit="1"] .afl__room { opacity: 0.8; }
+.afl[data-screen="intent"][data-lit="2"] .afl__room { opacity: 1; }
+.afl[data-screen="intent"][data-lit="3"] .afl__room { opacity: 1; }
+.afl-int__type {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center;
+  padding: max(31px, calc(var(--safe-t) + 12px)) 31px 0;
+}
+.afl-int__sm { font-size: 20.8px; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: rgba(var(--ink), 0.90); }
+.afl-int__num {
+  font-size: 83px; font-weight: 700; line-height: 0.92; letter-spacing: -0.052em;
+  color: var(--text-hi); font-variant-numeric: tabular-nums; margin: 5px 0 0 -5px;
+}
+.afl-int__mid, .afl-int__big {
+  font-size: 35px; font-weight: 500; line-height: 1.1; letter-spacing: -0.028em;
+  color: var(--text-hi); margin: 5px 0 0 -1px;
+}
+.afl-int__rule { width: 42px; height: 1px; background: rgba(var(--ink), 0.26); margin: 39px 0 0; }
+.afl-int__when { display: flex; align-items: baseline; gap: 10px; }
+.afl-int__when i { font-style: normal; font-size: 18px; font-weight: 400; color: rgba(var(--ink), 0.90); }
+.afl-int__when b { font-size: 25px; font-weight: 500; letter-spacing: -0.022em; color: var(--text-hi); }
+.afl-int__when s { text-decoration: none; font-size: 17px; color: rgba(var(--ink), 0.90); }
+.afl-int__note {
+  margin: 39px 0 0; display: flex; align-items: center; gap: 8px;
+  font-size: 15.6px; font-weight: 400; line-height: 1.3; color: rgba(var(--ink), 0.62);
+}
+.afl-int__note svg { flex: none; width: 13px; height: 15px; color: rgba(var(--ink), 0.5); }
+/* the press: each fact is a zone of the wall you can sink in. No box, no
+   chrome, the type itself moves. */
+.afl-int__z {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; width: 100%;
+  margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit;
+  text-align: left; cursor: pointer; -webkit-user-select: none; user-select: none;
+  transition: transform 0.22s var(--ease-out);
+}
+.afl-int__z:focus-visible { outline: 2px solid rgba(var(--ink), 0.5); outline-offset: 6px; border-radius: 6px; }
+.afl-int__z:active { transform: translateY(1.5px); }
+.afl-int__z > * { transition: text-shadow 0.3s ease-out, color 0.3s ease-out, opacity 0.32s ease-out, filter 0.32s ease-out; }
+.afl-int__z:not(.is-set) > * { opacity: 0.24; filter: blur(0.2px); }
+.afl-int__z--when:not(.is-set) > * { opacity: 0.3; filter: blur(0.15px); }
+.afl-int__z.is-set > * { opacity: 1; filter: none; }
+@media (hover: hover) { .afl-int__z:not(.is-set):hover > * { opacity: 0.42; filter: none; } }
+.afl-int__z--so { margin-top: 39px; }
+.afl-int__z--when { margin-top: 26px; }
+.afl-int__z.is-set { transform: translateY(1px); }
+/* engraved: a dark bite above the strokes and a hair of light under them, so
+   the words read cut into the wall. */
+.afl-int__z.is-set .afl-int__num, .afl-int__z.is-set .afl-int__mid,
+.afl-int__z.is-set .afl-int__big, .afl-int__z.is-set .afl-int__when b {
+  color: rgba(var(--ink), 0.98);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.95), 0 1px 0 rgba(var(--ink), 0.19);
+}
+.afl-int__z.is-set .afl-int__sm, .afl-int__z.is-set .afl-int__when i,
+.afl-int__z.is-set .afl-int__when s {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9), 0 1px 0 rgba(var(--ink), 0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl-int__z, .afl-int__z > *, .afl[data-screen="intent"] .afl__room { transition: none; }
+}
+
+/* ==========================================================================
+   2.2  q-2, THE REFINE CONVERSATION (theme faithful)
+   One question owns the screen. Answers are flat ruled rows: chosen goes full
+   bright and a short dash lands at the row's end, the rail's language. The
+   progress bar is one segment per question and fills as each is answered.
+   ========================================================================== */
+.afl-q {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  padding: max(34px, calc(var(--safe-t) + 12px)) 26px 0;
+}
+.afl-q__top { display: flex; align-items: center; gap: 13px; height: 39px; flex: none; }
+.afl-q__back {
+  flex: none; width: 39px; height: 39px; padding: 0; border: 0; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; background: none;
+  color: rgba(var(--ink), 0.82); cursor: pointer; transition: opacity 0.16s ease;
+}
+.afl-q__back:active { opacity: 0.6; }
+.afl-q__back.is-ghost { visibility: hidden; pointer-events: none; }
+.afl-q__bar { display: flex; gap: 6.5px; align-items: center; flex: 1; min-width: 0; }
+.afl-q__sp { flex: none; width: 39px; }
+.afl-q__seg {
+  position: relative; height: 2.6px; flex: 1; border-radius: 999px; overflow: hidden;
+  background: rgba(var(--ink), 0.10); transition: background 0.3s ease;
+}
+.afl-q__seg.is-now { background: rgba(var(--ink), 0.14); }
+.afl-q__seg i {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 999px;
+  background: rgba(var(--ink), 0.30);
+  transition: width 0.42s cubic-bezier(0.2, 0.7, 0.2, 1), background 0.3s ease;
+}
+.afl-q__seg.is-now i { width: 18%; background: rgba(var(--ink), 0.52); }
+.afl-q__seg.is-now.is-ans i { width: 100%; }
+.afl-q__seg.is-done i { width: 100%; }
+/* the question is bottom aligned in its reserve, so a two line question drops
+   its last line on the SAME baseline as a one line question. */
+.afl-q__q {
+  margin: 34px 0 0; font-size: 27.3px; line-height: 1.22; font-weight: 500;
+  letter-spacing: -0.022em; color: rgba(var(--ink), 0.96); text-wrap: balance;
+  /* reserved at THREE lines, the tallest question any bucket asks (the shared
+     opener). Bottom aligned inside the reserve, so every question in the run
+     drops its last line on the same baseline and nothing below ever shifts. */
+  min-height: 100px; flex: none; display: flex; align-items: flex-end;
+}
+.afl-q__q.is-fade { animation: aflQIn 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+/* the unit slot exists on every step so the beats share one skeleton */
+.afl-q__unit { margin: 10px 0 0; min-height: 23px; flex: none; font-size: 16.3px; line-height: 1.4; color: rgba(var(--ink), 0.90); }
+.afl-q__as { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.afl-q__as.is-enter { animation: aflQIn 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) 0.06s both; }
+.afl-q__a {
+  position: relative; display: flex; align-items: center; gap: 15.6px; width: 100%;
+  text-align: left; min-height: 68px; padding: 19.5px 3px; border: 0; border-radius: 0;
+  font-family: inherit; font-size: 19.5px; font-weight: 500; line-height: 1.3;
+  letter-spacing: -0.014em; color: rgba(var(--ink), 0.80); cursor: pointer;
+  background: none; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12);
+  transition: color 0.18s ease;
+}
+.afl-q__a:last-child { box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12), inset 0 -1px 0 rgba(var(--ink), 0.12); }
+.afl-q__a::after {
+  content: ''; margin-left: auto; width: 21px; height: 3.25px; border-radius: 2px;
+  background: transparent; transition: background 0.18s ease;
+}
+.afl-q__a:hover { color: rgba(var(--ink), 0.95); }
+.afl-q__a:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: -2px; }
+.afl-q__a.is-on { color: var(--text-hi); font-weight: 700; }
+.afl-q__a.is-on::after { background: rgba(var(--ink), 0.95); }
+/* the baseline number: a pen on a line, not a box */
+.afl-q__as--num { align-items: center; }
+.afl-q__field { width: fit-content; min-width: 195px; margin: 0 auto; }
+.afl-q__set { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+.afl-q__pre { font-size: 28.6px; font-weight: 500; line-height: 1; letter-spacing: -0.01em; color: rgba(var(--ink), 0.82); }
+.afl-q__num {
+  -webkit-appearance: none; appearance: none; border: 0; outline: 0; background: transparent;
+  padding: 0; margin: 0; width: 182px; text-align: center; font-family: inherit;
+  font-weight: 700; font-size: 130px; line-height: 1; letter-spacing: -0.055em;
+  color: rgba(var(--ink), 1); font-variant-numeric: tabular-nums;
+  caret-color: rgba(var(--ink), 0.92); transition: font-size 0.14s ease-out;
+}
+.afl-q__num::placeholder { color: rgba(var(--ink), 0.20); }
+.afl-q__rule { height: 1px; width: 100%; margin-top: 15.6px; background: rgba(var(--ink), 0.28); transition: background 0.18s ease-out; }
+.afl-q__field:focus-within .afl-q__rule { background: rgba(var(--ink), 0.55); }
+.afl-q__mirror {
+  position: absolute; left: -9999px; top: 0; white-space: pre; visibility: hidden;
+  font-family: inherit; font-weight: 700; letter-spacing: -0.055em; font-variant-numeric: tabular-nums;
+}
+/* the free field, on EVERY question: the chips are the fast path, never the
+   only path (Malik's rule, 2026-08-19). */
+.afl-nav--q { display: flex; flex-direction: column; gap: 13px; }
+.afl-q__own {
+  position: relative; display: flex; align-items: center; gap: 12px; padding: 0 3px;
+  height: 60px; background: none; box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.16);
+  transition: box-shadow 0.18s ease;
+}
+.afl-q__own.is-lit { box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.30); }
+.afl-q__own:focus-within { box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.45); }
+.afl-q__own i {
+  flex: none; display: block; width: 2px; height: 19.5px; border-radius: 1px;
+  background: rgba(var(--ink), 0.55); transition: background 0.18s ease, height 0.18s ease;
+}
+.afl-q__own:focus-within i, .afl-q__own.is-lit i { background: rgba(var(--ink), 0.95); height: 22px; }
+.afl-q__own input {
+  flex: 1; min-width: 0; height: 100%; border: 0; background: none; outline: none;
+  font-family: inherit; font-size: 17.6px; letter-spacing: -0.008em; color: rgba(var(--ink), 0.96);
+}
+.afl-q__own input::placeholder { color: rgba(var(--ink), 0.66); }
+.afl-q__hint {
+  margin: 0; display: none; align-items: center; justify-content: center; height: 22px;
+  font-size: 16.3px; letter-spacing: -0.005em; color: rgba(var(--ink), 0.62);
+}
+.afl-q__hint.is-on { display: flex; }
+@keyframes aflQIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .afl-q__q.is-fade, .afl-q__as.is-enter { animation: none; }
+  .afl-q__seg i, .afl-q__a, .afl-q__own, .afl-q__own i { transition: none; }
+}
+
+/* ==========================================================================
+   2.3  ld-4, THE WORKING LIST (theme faithful)
+   The wait shows only what Memento already knows, one line at a time, with a
+   real elapsed clock and the bare M breathing at the foot.
+   ========================================================================== */
+.afl-ld {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  padding: max(73px, calc(var(--safe-t) + 26px)) 31px 0;
+}
+.afl-ld__head { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.afl-ld__head h4 {
+  margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.018em; line-height: 1.25;
+  color: var(--text-hi); transition: opacity 0.5s ease;
+}
+.afl-ld__head.is-gone h4 { opacity: 0; }
+.afl-ld__clk { margin: 0; font-size: 17px; line-height: 1.25; font-weight: 500; color: rgba(var(--ink), 0.78); letter-spacing: 0.01em; }
+/* reserved at two lines so the longer wait line arrives without shoving the
+   fact under it up the screen mid fade */
+.afl-ld__state {
+  margin: 10px 0 0; min-height: 48px; font-size: 16.3px; line-height: 1.45;
+  color: rgba(var(--ink), 0.9); transition: opacity 0.45s ease;
+}
+.afl-ld__state.is-swap, .afl-ld__state.is-gone { opacity: 0; }
+.afl-ld__stage { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; padding-bottom: 26px; }
+.afl-ld__layer { display: grid; }
+.afl-ld__layer > * { grid-area: 1 / 1; }
+.afl-ld__fact { opacity: 0; transform: translateY(9px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.25, 0.8, 0.3, 1); }
+.afl-ld__fact.is-on { opacity: 1; transform: none; }
+.afl-ld__fact.is-calm { transform: none; }
+.afl-ld__src { margin: 0 0 13px; font-size: 15.6px; line-height: 1.3; color: rgba(var(--ink), 0.78); }
+.afl-ld__say {
+  margin: 0; font-size: 28.6px; font-weight: 500; line-height: 1.34; letter-spacing: -0.022em;
+  color: var(--text-hi); min-height: 114px;
+}
+.afl-ld__mk { color: var(--text-lo); }
+.afl-ld__ticks { display: flex; gap: 6.5px; margin: 26px 0 0; transition: opacity 0.45s ease; }
+.afl-ld__ticks.is-gone { opacity: 0; }
+.afl-ld__ticks i { width: 21px; height: 2.6px; border-radius: 2px; background: rgba(var(--ink), 0.16); transition: background 0.45s ease; }
+.afl-ld__ticks i.is-on { background: rgba(var(--ink), 0.62); }
+/* arrival: one sentence, alone, on the same baseline the facts held */
+.afl-ld__arr { align-self: start; opacity: 0; transform: translateY(10px); pointer-events: none; transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.8, 0.3, 1); }
+.afl-ld__arr.is-on { opacity: 1; transform: none; }
+.afl-ld__arr p { margin: 0; font-size: 28.6px; font-weight: 500; line-height: 1.34; letter-spacing: -0.022em; color: var(--text-hi); }
+/* the M, breathing: quiet brand while the plan writes. No fill, no forwards,
+   and the node dies with the screen, so nothing holds a layer offscreen. */
+.afl-ld__m {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--safe-b) + 60px); width: 21px; height: 21px; z-index: 5;
+  pointer-events: none; animation: aflBreathe 4s ease-in-out infinite alternate;
+}
+/* the plan has landed: the CTA takes that row, so the M steps back */
+.afl-ld__m.is-gone { display: none; }
+.afl-ld__m path { fill: rgba(var(--ink), 0.9); }
+@keyframes aflBreathe { from { opacity: 0.14; } to { opacity: 0.5; } }
+.afl[data-screen="loading"] .afl-cta.is-waiting { opacity: 0; pointer-events: none; }
+.afl[data-screen="loading"] .afl-cta {
+  background: var(--solid-bg); color: var(--solid-fg); font-weight: 700; cursor: pointer;
+  opacity: 1; transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.25, 0.8, 0.3, 1);
+}
+.afl[data-screen="loading"] .afl-cta:active { transform: scale(0.985); }
+@media (prefers-reduced-motion: reduce) {
+  .afl-ld__m { animation: none; opacity: 0.3; }
+  .afl-ld__fact { transition: opacity 0.2s linear; transform: none; }
+  .afl-ld__arr { transition: opacity 0.2s linear; transform: none; }
+}
+
+/* ==========================================================================
+   2.4  lg-5, THE LOGIC (theme faithful)
+   Flat: no glass cards. Ruled sections, hairlines above and below, more air.
+   Three parts, each of which skims alone.
+   ========================================================================== */
+.afl-lg {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  padding: max(65px, calc(var(--safe-t) + 26px)) 26px 0;
+}
+.afl-lg__sc { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.afl-lg__sc::-webkit-scrollbar { display: none; }
+.afl-lg__star {
+  margin: 0 0 18px; font-size: 31px; font-weight: 700; line-height: 1.28;
+  letter-spacing: -0.027em; color: var(--text-hi); text-wrap: pretty;
+}
+.afl-lg__b { margin: 0 0 18px; font-size: 16.9px; line-height: 1.58; color: rgba(var(--ink), 0.92); text-wrap: pretty; }
+.afl-lg__b--ind { padding-left: 14px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14); }
+/* the before and after: one arrow line, nothing to decode */
+.afl-lg__ar {
+  display: flex; align-items: baseline; justify-content: center; gap: 13px;
+  margin: 0 0 21px; padding: 17px 0;
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16), inset 0 -1px 0 rgba(var(--ink), 0.16);
+}
+.afl-lg__ar b { font-size: 21.5px; font-weight: 700; letter-spacing: -0.015em; color: var(--text-hi); }
+.afl-lg__ar b.is-from { color: rgba(var(--ink), 0.62); font-weight: 500; }
+.afl-lg__ar i { font-style: normal; font-size: 19.5px; color: rgba(var(--ink), 0.55); }
+.afl-lg__lead { margin: 0 0 12px; font-size: 16.3px; font-weight: 600; color: rgba(var(--ink), 0.80); }
+.afl-lg__acts { margin: 0 0 10px; }
+.afl-lg__row { display: flex; gap: 12px; padding: 9px 0; }
+.afl-lg__row i { font-style: normal; flex: 0 0 auto; color: rgba(var(--ink), 0.45); font-size: 17px; line-height: 1.4; }
+.afl-lg__row div { min-width: 0; }
+.afl-lg__row.is-star b { font-size: 19px; font-weight: 700; letter-spacing: -0.014em; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__row:not(.is-star) b { display: block; font-size: 16.9px; font-weight: 600; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__row span { display: block; margin-top: 1px; font-size: 14.3px; line-height: 1.4; color: rgba(var(--ink), 0.75); }
+.afl-lg__st { margin: 3px 0 13px; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92); }
+.afl-lg__st b { font-weight: 600; color: var(--text-hi); }
+.afl-lg__no {
+  margin: 0 0 5px; padding: 14px 0; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16), inset 0 -1px 0 rgba(var(--ink), 0.16);
+}
+.afl-lg__no b { font-weight: 700; color: var(--text-hi); }
+.afl-lg__h {
+  margin: 18px 0 16px; padding-top: 17px; font-size: 17.6px; font-weight: 700;
+  letter-spacing: -0.012em; color: var(--text-hi); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16);
+}
+.afl-lg__eq {
+  display: flex; flex-direction: column; gap: 10px; margin: 0 0 21px;
+  padding-left: 14px; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.14);
+}
+.afl-lg__eq div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.afl-lg__eq s { text-decoration: none; font-size: 15.6px; color: rgba(var(--ink), 0.78); }
+.afl-lg__eq b { font-size: 18.2px; font-weight: 700; color: var(--text-hi); white-space: nowrap; }
+.afl-lg__eq .is-result { padding-top: 12px; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.13); }
+.afl-lg__eq .is-result b { font-size: 21.5px; }
+.afl-lg__q { margin: 0 0 7px; font-size: 16.9px; font-weight: 700; letter-spacing: -0.012em; color: var(--text-hi); line-height: 1.35; }
+.afl-lg__qa {
+  margin: 0 0 19px; padding-left: 14px; font-size: 16.3px; line-height: 1.56;
+  color: rgba(var(--ink), 0.92); text-wrap: pretty; box-shadow: inset 2px 0 0 rgba(var(--ink), 0.10);
+}
+.afl-lg__src { margin: 3px 0 0; font-size: 15px; line-height: 1.45; color: rgba(var(--ink), 0.78); }
+.afl-lg__fair { margin: 16px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.018em; color: var(--text-hi); }
+/* the refresher drawer: closed by default, nobody is forced through it */
+.afl-ref { margin: 3px 0 18px; }
+.afl-ref__t {
+  display: flex; align-items: center; width: 100%; border: 0; background: none;
+  padding: 14px 0; cursor: pointer; font-family: var(--font); text-align: left;
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12), inset 0 -1px 0 rgba(var(--ink), 0.12);
+  color: rgba(var(--ink), 0.92); font-size: 16.3px; font-weight: 600;
+}
+.afl-ref__t svg {
+  width: 14px; height: 14px; margin-left: auto; fill: none; stroke: rgba(var(--ink), 0.72);
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.22s ease-out;
+}
+.afl-ref.is-open .afl-ref__t svg { transform: rotate(180deg); }
+.afl-ref__bd { overflow: hidden; max-height: 0; transition: max-height 0.3s ease-out; }
+.afl-ref.is-open .afl-ref__bd { max-height: 990px; }
+/* a shut drawer never animates (the hidden-animation law) */
+.afl-ref:not(.is-open) .afl-ref__bd * { animation: none !important; }
+.afl-ref__cap { margin: 0 auto 21px; font-size: 15.6px; line-height: 1.52; color: rgba(var(--ink), 0.88); text-align: center; max-width: 307px; }
+/* THE SCALE from Clarity, ported mini. The one deliberate colour on the page:
+   a Clarity callback by design. */
+.afl-sc { position: relative; width: 221px; height: 120px; margin: 18px auto 10px; }
+.afl-sc__f {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0;
+  border-left: 13px solid transparent; border-right: 13px solid transparent;
+  border-bottom: 18px solid rgba(var(--ink), 0.94);
+}
+.afl-sc__beam {
+  position: absolute; bottom: 18px; left: 6px; right: 6px; height: 4px;
+  background: rgba(var(--ink), 0.94); border-radius: 2px; transform-origin: center bottom;
+}
+.afl-sc__red, .afl-sc__cyan { position: absolute; bottom: 5px; border-radius: 6px; }
+.afl-sc__red {
+  left: -3px; width: 49px; height: 40px; background-color: #ec4227;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 46%, rgba(0,0,0,0.24) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.38), inset 0 -3px 6px rgba(0,0,0,0.28), 0 8px 16px rgba(0,0,0,0.5);
+  transform-origin: bottom center;
+}
+.afl-sc__cyan {
+  right: -1px; width: 21px; height: 17px; background-color: #4ecdec;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 46%, rgba(0,20,30,0.26) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -2px 5px rgba(0,20,30,0.3), 0 6px 14px rgba(0,0,0,0.45);
+}
+.afl-sc__hand {
+  position: absolute; right: 26px; bottom: 57px; width: 3px; height: 29px; border-radius: 1px;
+  background: rgba(var(--ink), 0.85); animation: aflScHand 3.5s ease-in-out infinite;
+}
+.afl-sc__hand::after {
+  content: ''; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%);
+  width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 8px solid rgba(var(--ink), 0.85);
+}
+.afl-sc__beam.is-tilt { animation: aflScTilt 4s ease-in-out infinite; }
+.afl-sc__beam.is-push { animation: aflScPush 3.5s ease-in-out infinite; }
+.afl-sc__beam.is-shrinkb { animation: aflScShrinkB 4s ease-in-out infinite; }
+.afl-sc__beam.is-flip { animation: aflScFlip 5s ease-in-out infinite; }
+.afl-sc__red.is-shrink { animation: aflScShrinkW 4s ease-in-out infinite; }
+.afl-sc__red.is-dim { animation: aflScDim 5s ease-in-out infinite; }
+.afl-sc__cyan.is-grow { animation: aflScGrow 5s ease-in-out infinite; }
+@keyframes aflScTilt { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(-5deg); } }
+@keyframes aflScPush { 0%, 100% { transform: rotate(-6deg); } 35% { transform: rotate(1deg); } 55% { transform: rotate(-7deg); } }
+@keyframes aflScHand { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(12px); } 55% { transform: translateY(-3px); } }
+@keyframes aflScShrinkB { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(-3deg); } }
+@keyframes aflScShrinkW { 0%, 100% { transform: scale(1); opacity: 0.95; } 50% { transform: scale(0.6); opacity: 0.55; } }
+@keyframes aflScFlip { 0%, 43% { transform: rotate(-6deg); } 56%, 90% { transform: rotate(9deg); } 100% { transform: rotate(-6deg); } }
+@keyframes aflScDim {
+  0%, 40% { transform: scale(1); opacity: 0.85; } 55% { transform: scale(0.55); opacity: 0.3; }
+  65%, 88% { transform: scale(0.5); opacity: 0.25; } 100% { transform: scale(1); opacity: 0.85; }
+}
+@keyframes aflScGrow {
+  0%, 40% { width: 21px; height: 17px; background-color: #4ecdec; }
+  52% { width: 55px; height: 46px; background-color: #4db8ff; }
+  60%, 88% { width: 51px; height: 42px; background-color: #4db8ff; }
+  100% { width: 21px; height: 17px; background-color: #4ecdec; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl-ref__bd { transition: none; }
+  .afl-sc__beam, .afl-sc__red, .afl-sc__cyan, .afl-sc__hand { animation: none !important; }
+  .afl-sc__beam { transform: rotate(-6deg); }
+  .afl-sc__beam.is-flip { transform: rotate(9deg); }
+  .afl-sc__red.is-dim { transform: scale(0.5); opacity: 0.25; }
+  .afl-sc__cyan.is-grow { width: 51px; height: 42px; background-color: #4db8ff; }
+}
+
+/* ==========================================================================
+   2.5  u-1, THE DAY (theme faithful)
+   The star act owns the screen, up to two supports sit under it, and the
+   graduation rail on the right edge is the only sizing control.
+   ========================================================================== */
+.afl-day {
+  position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column;
+  padding: max(52px, calc(var(--safe-t) + 10px)) 23px 0;
+  -webkit-user-select: none; user-select: none;
+}
+.afl-day__sp { min-height: 10px; }
+.afl-day__sp.is-a { flex: 0.55; }
+.afl-day__sp.is-b { flex: 0.9; }
+/* the M: the standing door back to the logic page. The bare notched mark, and
+   it sits BELOW the island on a real phone. */
+.afl-day__m {
+  position: absolute; top: max(44px, calc(var(--safe-t) + 10px)); left: 50%; transform: translateX(-50%);
+  z-index: 5; width: 57px; height: 39px; display: grid; place-items: center;
+  border: 0; background: none; padding: 0; cursor: pointer;
+}
+.afl-day__m svg { width: 19.5px; height: 19.5px; }
+.afl-day__m path { fill: rgba(var(--ink), 0.38); transition: fill 0.16s ease-out; }
+.afl-day__m:hover path, .afl-day__m:active path { fill: rgba(var(--ink), 0.72); }
+.afl-day__m:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; border-radius: 8px; }
+/* beat 1: SEE IT */
+.afl-day__star {
+  margin: 0; position: relative; z-index: 2; padding-right: 29px;
+  font-size: 32.5px; font-weight: 700; line-height: 1.28; letter-spacing: -0.028em;
+  color: var(--text-hi); text-wrap: pretty;
+}
+.afl-day__star.is-off { text-align: left; }
+/* beat 2: SIZE IT. the graduation rail, one small tick per size on the right
+   edge, named sizes longer, the current size a long bright mark. */
+.afl-day__rail {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: 47px; height: 234px; z-index: 4; cursor: ns-resize; touch-action: none;
+  border: 0; background: none; padding: 3px 13px 3px 0;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;
+}
+.afl-day__rail i {
+  width: 10.4px; height: 2.6px; border-radius: 1px; background: rgba(var(--ink), 0.20);
+  pointer-events: none; transition: width 0.14s ease-out, background 0.14s ease-out, height 0.14s ease-out;
+}
+.afl-day__rail i.is-mk { width: 17px; background: rgba(var(--ink), 0.32); }
+.afl-day__rail i.is-on { width: 26px; height: 3.9px; background: rgba(var(--ink), 0.95); }
+.afl-day__rail.is-hide { display: none; }
+.afl-day__rail:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; border-radius: 8px; }
+/* beat 3: the deep work door. Flat bare text with a hairline underline.
+   INERT in this phase: phase 3.2 binds it to the existing timer surface. */
+.afl-day__dw {
+  display: inline-flex; align-items: center; align-self: flex-start; margin-top: 21px;
+  position: relative; z-index: 2; border: 0; padding: 3px 0; background: none;
+  color: rgba(var(--ink), 0.85); font-family: var(--font); cursor: default;
+}
+.afl-day__dw b { font-size: 16.3px; font-weight: 500; padding-bottom: 3px; box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.30); }
+.afl-day__dw.is-gone { display: none; }
+.afl-day.is-signed .afl-day__dw { display: none; }
+/* the supports: the same day, one rank down. Plain taps; done is a tick and a
+   strikethrough. The hold belongs to the day itself. */
+.afl-day__plate { position: relative; z-index: 2; }
+.afl-day__rule { height: 1px; background: rgba(var(--ink), 0.13); margin: 0 0 5px; transition: opacity 0.22s ease-out; }
+.afl-day__rule.is-gone { opacity: 0; }
+.afl-day__sup {
+  display: block; width: 100%; height: 55px; overflow: hidden; border: 0; border-radius: var(--r-ctrl);
+  padding: 0; background: none; font-family: var(--font); text-align: left; cursor: pointer;
+  transition: height 0.26s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.18s ease-out;
+}
+.afl-day__sup.is-gone { height: 0; opacity: 0; pointer-events: none; }
+.afl-day__in { display: flex; align-items: center; gap: 14px; height: 55px; padding: 0 8px; }
+.afl-day__box {
+  position: relative; flex: 0 0 auto; width: 18px; height: 18px; border-radius: 6px;
+  overflow: hidden; background: rgba(var(--ink), 0.08);
+}
+.afl-day__box svg {
+  position: absolute; inset: 0; margin: auto; width: 12px; height: 12px; fill: none;
+  stroke: var(--solid-fg); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+  opacity: 0; transition: opacity 0.12s ease-out;
+}
+.afl-day__tx { font-size: 17.6px; font-weight: 400; line-height: 1.25; color: rgba(var(--ink), 0.90); transition: color 0.2s ease-out; }
+.afl-day__sup.is-on .afl-day__box { background: var(--success); }
+.afl-day__sup.is-on .afl-day__box svg { opacity: 1; }
+.afl-day__sup.is-on .afl-day__tx {
+  color: rgba(var(--ink), 0.60); text-decoration: line-through; text-decoration-color: rgba(var(--ink), 0.45);
+}
+/* lapsed: after the day is held, an unticked support just stops asking. No red,
+   no strike, no word about it. */
+.afl-day__sup.is-lapse { pointer-events: none; }
+.afl-day__sup.is-lapse .afl-day__tx { color: rgba(var(--ink), 0.62); }
+.afl-day__sup.is-lapse .afl-day__box { background: rgba(var(--ink), 0.06); }
+.afl-day.is-signed .afl-day__sup { pointer-events: none; }
+.afl-day__sup:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 1px; }
+/* the NO line: the plan's refusals, one quiet row under the day */
+.afl-day__no { margin: 10px 0 0; font-size: 13.7px; line-height: 1.4; color: rgba(var(--ink), 0.55); font-weight: 500; }
+.afl-day__no:empty { display: none; }
+/* beat 4: HOLD IT DONE. The button stays PUT: the background's own green rise
+   is the whole feedback. App button recipe. */
+.afl-nav--day { position: relative; z-index: 3; }
+.afl-day__hold {
+  position: relative; display: block; width: 100%; padding: 18px; border: 0;
+  border-radius: var(--r-ctrl); background: var(--solid-bg); color: var(--solid-fg);
+  font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
+  cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.38);
+}
+.afl-day__hold span { display: block; text-align: center; }
+.afl-day__hold:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
+.afl.is-signed .afl-day__hold { display: none; }
+/* beat 5a: the signed row. The undo window, the pulse, the ONE referee call and
+   the ceremony attach here in the rewards phase (THE CLOSE SEAM in js/30). */
+.afl-day__done { display: none; align-items: center; gap: 12px; padding: 18px 5px 18px 8px; }
+.afl.is-signed .afl-day__done { display: flex; }
+.afl-day__done > b { width: 10.4px; height: 10.4px; border-radius: 4px; background: var(--success); flex: 0 0 auto; }
+.afl-day__dt { font-size: 17.6px; font-weight: 400; color: rgba(var(--ink), 0.92); }
+.afl-day__undo {
+  margin-left: auto; border: 0; border-radius: var(--r-ctrl); height: 39px; padding: 0 16px;
+  background: rgba(var(--ink), 0.09); box-shadow: var(--glass-highlight);
+  color: rgba(var(--ink), 0.92); font: 500 16.3px/1 var(--font); cursor: pointer;
+}
+.afl-day__undo:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; }
+/* THE GREEN RISE. Holding the day turns the BACKGROUND green from the bottom
+   up: flat, the app's consistency green, sitting UNDER every element (z1), not
+   a mask over them. Early release drains it. */
+.afl__rise {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 1;
+  pointer-events: none; opacity: 1; background: rgba(var(--success-rgb), 0.24);
+}
+html.theme-light .afl__rise { background: rgba(var(--success-rgb), 0.30); }
+.afl__wash {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(var(--success-rgb), 0), rgba(var(--success-rgb), 0.16));
+  transition: height 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.4s ease-out;
+}
+.afl.is-signed .afl__wash { height: 44%; }
+@media (prefers-reduced-motion: reduce) {
+  .afl__rise { display: none; }
+  .afl-day__sup, .afl-day__rail i, .afl-day__rule, .afl-day__box svg, .afl-day__tx { transition: none; }
+}
+/* END: THE ACTION FLOW appended section */
+
+/* ---- LIGHT MODE CONTRAST PASS -------------------------------------------
+   Light backgrounds need more foreground weight than dark ones to hold the
+   same hierarchy (base.css does the same for its text tiers). These are the
+   quiet-layer values that go too pale on the off-white canvas. Dark mode keeps
+   the mockup's own numbers untouched. */
+html.theme-light .afl-day__no { color: rgba(var(--ink), 0.70); }
+html.theme-light .afl-day__rail i { background: rgba(var(--ink), 0.30); }
+html.theme-light .afl-day__rail i.is-mk { background: rgba(var(--ink), 0.44); }
+html.theme-light .afl-day__m path { fill: rgba(var(--ink), 0.46); }
+html.theme-light .afl-nav__sub { color: rgba(var(--ink), 0.72); }
+html.theme-light .afl-lg__ar b.is-from { color: rgba(var(--ink), 0.70); }
+html.theme-light .afl-lg__row i { color: rgba(var(--ink), 0.55); }
+html.theme-light .afl-q__seg { background: rgba(var(--ink), 0.14); }
+html.theme-light .afl-q__seg.is-now { background: rgba(var(--ink), 0.18); }
+html.theme-light .afl-q__seg i { background: rgba(var(--ink), 0.40); }
+html.theme-light .afl-q__seg.is-now i { background: rgba(var(--ink), 0.62); }
+html.theme-light .afl-ld__ticks i { background: rgba(var(--ink), 0.22); }
+html.theme-light .afl-ld__ticks i.is-on { background: rgba(var(--ink), 0.68); }
+html.theme-light .afl-day__box { background: rgba(var(--ink), 0.12); }
+html.theme-light .afl-day__sup.is-lapse .afl-day__box { background: rgba(var(--ink), 0.09); }

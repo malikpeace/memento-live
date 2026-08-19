@@ -1915,6 +1915,36 @@ const CreatorTools = {
       try { this._closeAll(); } catch (e) {}
       try { if (window.DevCeremony) DevCeremony.summary(); } catch (e) {}
     });
+    // The new Action flow (merge phase 3): walk all five surfaces on a fixture.
+    const aflDemo = (key) => {
+      try { this._closeAll(); } catch (e) {}
+      try { if (window.ActionFlow) ActionFlow.demo(key); } catch (e) {}
+    };
+    bind('creatorActionFlowWeight', () => aflDemo('weight'));
+    bind('creatorActionFlowBiz', () => aflDemo('business'));
+    // The real generation pipeline against the live proxy (needs a signed-in
+    // paid session). Renders the raw result into a scrollable dev sheet so
+    // Malik can run it from the phone with no console.
+    bind('creatorActionBrainTest', async () => {
+      if (typeof actionBrainLiveRun !== 'function') { this._devToast('brain not loaded'); return; }
+      this._devToast('Running 2 real plans, ~1-3 min...');
+      let out;
+      try { out = await actionBrainLiveRun(); } catch (e) { out = { error: String(e && e.message || e) }; }
+      const old = document.getElementById('devBrainSheet');
+      if (old) old.remove();
+      const sheet = document.createElement('div');
+      sheet.id = 'devBrainSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(5,6,8,.97);color:#e8eaef;overflow:auto;padding:calc(20px + env(safe-area-inset-top)) 16px calc(30px + env(safe-area-inset-bottom));font:12px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-word;-webkit-overflow-scrolling:touch;';
+      const x = document.createElement('button');
+      x.textContent = 'Close';
+      x.style.cssText = 'position:sticky;top:0;float:right;background:#fff;color:#000;font:600 13px Geist,sans-serif;border:0;border-radius:999px;padding:8px 16px;';
+      x.addEventListener('click', () => sheet.remove());
+      sheet.appendChild(x);
+      const pre = document.createElement('div');
+      pre.textContent = (typeof out === 'string') ? out : JSON.stringify(out, null, 2);
+      sheet.appendChild(pre);
+      document.body.appendChild(sheet);
+    });
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpPaywall', () => this.jumpPaywall());
     // The post-payment unlock ceremony (unlock.html in an iframe). dev:true =
