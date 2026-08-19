@@ -1930,6 +1930,34 @@ const CreatorTools = {
       this._devToast('Running 2 real plans, ~1-3 min...');
       let out;
       try { out = await actionBrainLiveRun(); } catch (e) { out = { error: String(e && e.message || e) }; }
+      // Ship the full result home: compact it (transcripts stripped), chunk it
+      // under the feedback row cap, and post it to the feedback inbox so Fable
+      // can read the failure details without phone screenshots. Dev-only pipe.
+      try {
+        const diag = JSON.parse(JSON.stringify(out, (k, v) => (k === 'transcript' || k === 'aiConversation') ? '[stripped]' : v));
+        const s = JSON.stringify(diag);
+        const runId = 'brt-' + Date.now().toString(36);
+        const CH = 3500;
+        const total = Math.min(8, Math.ceil(s.length / CH));
+        const url = (window.MEMENTO_SUPABASE_URL || 'https://lipuxymlsowdrbummqxw.supabase.co') + '/functions/v1/submit-feedback';
+        for (let i = 0; i < total; i++) {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': window.MEMENTO_SUPABASE_ANON || '',
+              'Authorization': 'Bearer ' + (window.MEMENTO_SUPABASE_ANON || ''),
+              'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
+            },
+            body: JSON.stringify({
+              kind: 'dev-brain-test',
+              text: runId + ' [' + (i + 1) + '/' + total + (s.length > CH * 8 ? ' TRUNC' : '') + '] ' + s.slice(i * CH, (i + 1) * CH),
+              appVersion: String(window.MEMENTO_VERSION || '')
+            })
+          }).catch(() => {});
+        }
+        this._devToast('Results sent to the inbox (' + runId + ')');
+      } catch (e) {}
       const old = document.getElementById('devBrainSheet');
       if (old) old.remove();
       const sheet = document.createElement('div');
