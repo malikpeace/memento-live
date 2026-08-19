@@ -514,6 +514,7 @@ const ClarityExperience = {
             // Open a simple inline edit dialog instead of dragging the user
             // back through the whole wizard. Lets them refine their Neutron
             // Star wording + the supporting why directly, save, and return.
+            _cpStampRefine();
             openNeutronStarRefineDialog(restoreSummary);
           });
 
@@ -586,8 +587,21 @@ const ClarityExperience = {
       const redoBtn = document.getElementById('summaryRedo');
       if (redoBtn) {
         redoBtn.addEventListener('click', () => {
+          // ONE free Clarity run, ever (FIRST-WIN-PLAN #1). A redo is a
+          // brand-new AI discovery, so a free user meets the paywall instead
+          // of getting a silent second run. open()'s own gate cannot catch
+          // this path: it tests state.clarity.completed, which this handler
+          // wipes first. (The live hole named in the checklist's amendments.)
+          try {
+            if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+              this.close();
+              ClarityPaywall.show();
+              return;
+            }
+          } catch (e) {}
           this.close();
           setTimeout(() => {
+            try { const gp = state.goalProgress; if (gp) gp.refineFrom = ''; } catch (e) {}
             state.clarity.completed = false;
             state.clarity.tutorialSeen = false;
             delete state.clarity.draft;
@@ -2129,6 +2143,17 @@ const ClarityExperience = {
       const redoBtn2 = container.querySelector('#summaryRedo');
       if (redoBtn2) {
         redoBtn2.addEventListener('click', () => {
+          // Same gate, same reason as the summary's redo: a second discovery
+          // run is the paid thing, and wiping `completed` first would walk
+          // straight past open()'s check.
+          try {
+            if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+              this.close();
+              ClarityPaywall.show();
+              return;
+            }
+          } catch (e) {}
+          try { const gp = state.goalProgress; if (gp) gp.refineFrom = ''; } catch (e) {}
           state.clarity.completed = false;
           state.clarity.tutorialSeen = false;
           delete state.clarity.draft;
@@ -10043,14 +10068,20 @@ function _bindStarPlacard(root) {
   // Primary handoff: the star leads straight into the first move.
   const actionBtn = root.querySelector('#nsv2Action');
   if (actionBtn) actionBtn.addEventListener('click', () => {
-    _ig2Act = 'reveal'; _ig2 = {};
-    // "Add to your Memento" (Malik): FADE the ceremony back to the home, then play
-    // the card unlock cinema. _addToMementoThenAction fades the overlay out first;
-    // the nsv2 root is removed inside finalize (after the fade), not before it.
-    _addToMementoThenAction(() => {
-      try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
-      try { completeWizard(); } catch (e) {}
-      try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
+    // THE MESSAGE BEAT (phase 4). The star animation is done and Continue is
+    // the seam, so the invite intercepts HERE, before the handoff, and both
+    // of its answers fall straight back into the handoff below. Optional,
+    // never a gate, and removable by flipping CP_MESSAGE_BEAT to false.
+    _cpMessageBeat(() => {
+      _ig2Act = 'reveal'; _ig2 = {};
+      // "Add to your Memento" (Malik): FADE the ceremony back to the home, then play
+      // the card unlock cinema. _addToMementoThenAction fades the overlay out first;
+      // the nsv2 root is removed inside finalize (after the fade), not before it.
+      _addToMementoThenAction(() => {
+        try { const r = document.getElementById('nsv2Root'); if (r) r.remove(); } catch (e) {}
+        try { completeWizard(); } catch (e) {}
+        try { if (ClarityExperience && ClarityExperience.isOpen) ClarityExperience.close(); } catch (e) {}
+      });
     });
   });
   const doneBtn = root.querySelector('#nsv2Done');
@@ -10306,10 +10337,6 @@ const CP_ICON_EDIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2
 const CP_ICON_PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const CP_ICON_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
-function _cpStub(what) {
-  try { console.info('[clarity-pager] ' + what + ': the flow lands in a later phase, nothing wired yet.'); } catch (e) {}
-}
-
 function _cpNum(n) {
   const v = Number(n);
   if (!isFinite(v)) return '';
@@ -10380,7 +10407,7 @@ function _cpStanding(f, why) {
     const hasCur = gp.current !== null && gp.current !== undefined && isFinite(cur);
     let html = '<div class="cp-lab">Where you stand</div>';
     if (hasCur) {
-      html += '<div class="cp-num">' + _cpNum(cur) +
+      html += '<div class="cp-num"><span class="cp-num__v">' + _cpNum(cur) + '</span>' +
         (unit ? '<span class="cp-num__unit">' + esc(unit) + '</span>' : '') + '</div>';
       const asOf = _cpAsOf(gp.updatedAt);
       if (asOf) html += '<div class="cp-asof">' + esc(asOf) + '</div>';
@@ -10398,7 +10425,8 @@ function _cpStanding(f, why) {
           '<div class="cp-pts"><span>' + _cpNum(base) + '</span><span>' + _cpNum(tgt) + '</span></div></div>';
         const down = tgt < base;
         const left = Math.max(0, down ? (cur - tgt) : (tgt - cur));
-        html += '<div class="cp-rem">' + (left === 0 ? '0' : (down ? '-' : '+') + _cpNum(left)) +
+        html += '<div class="cp-rem" data-cp-down="' + (down ? '1' : '0') + '">' +
+          '<span class="cp-rem__v">' + (left === 0 ? '0' : (down ? '-' : '+') + _cpNum(left)) + '</span>' +
           '<s>to go</s></div>';
       }
     } else {
@@ -10533,11 +10561,8 @@ function _bindClarityPager(pager) {
   } catch (e) {}
   requestAnimationFrame(sync);
 
-  // Phase 4 stubs. They render and they are tappable; the flows land later.
-  const upd = pager.querySelector('#cpUpdate');
-  if (upd) upd.addEventListener('click', function () { _cpStub('Update progress'); });
-  const twk = pager.querySelector('#cpTweak');
-  if (twk) twk.addEventListener('click', function () { _cpStub('Tweak your Neutron Star'); });
+  // Page 2's two doors (phase 4). Rebound after every repaint of the page.
+  _cpBindSummaryPage(pager);
 
   // Page 3 is live from phase 2/3 on: Add opens the writer, a long press on a
   // note opens the delete confirm. Both rebound after every repaint.
@@ -11137,3 +11162,627 @@ const ClarityNoteWriter = {
     });
   }
 };
+
+/* ============================================================
+   CLARITY PHASE 4 (CLARITY-MERGE-CHECKLIST.md + its 2026-08-19 audit
+   amendments). Mock: mockups/clarity-home/clarity-pages.html, ported.
+
+   Four things live here:
+   1. THE UPDATE SCREEN. Full screen, content dead-centered, the big
+      prefilled number. Saving animates the rail old -> new and re-counts
+      the remaining delta: the payoff IS the update.
+   2. THE COMPLETION DOOR, both halves. The automatic half is a CONSUMER of
+      the one detector (goalProgressMoment() in js/03, fed by the rewards
+      foundation hook); nothing here re-derives a crossing. The manual half
+      is the "Neutron Star Fulfilled" chip, on the update screen only.
+   3. THE TWEAK FLOWS. Refine (same foundation, keeps the climb) and
+      Completely change (three gates: the choice, a 3s hold, the last
+      check), landing on the paywall-gated create path. The word is
+      CREATE, never "forge", anywhere.
+   4. THE MESSAGE BEAT, at the post-ignition seam (#nsv2Action).
+
+   Ceremonies are NOT this module's: the rewards phases own every one of
+   them (THE MERGE resolution B). Clarity's job ends at the declaration and
+   hands over through clarityArrival().
+   ============================================================ */
+
+const CP_HOLD_MS = 3000;
+const CP_RING_LEN = 245.04;         // 2 * PI * 39, the mock's ring exactly
+const CP_MESSAGE_BEAT = true;       // the one flag: false removes the beat
+
+/* ---- the shell every full-screen phase-4 surface shares ---------------- */
+function _cpFsOpen(o) {
+  o = o || {};
+  const el = document.createElement('div');
+  el.className = 'cp-fs' + (o.cls ? ' ' + o.cls : '');
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  if (o.label) el.setAttribute('aria-label', o.label);
+  el.innerHTML = _cpNebula() +
+    '<div class="cp-fsstage">' +
+      '<div class="cp-fsspace"></div>' +
+      '<div class="cp-fscontent">' + (o.content || '') + '</div>' +
+      '<div class="cp-fsspace"></div>' +
+      '<div class="cp-fsfoot">' + (o.foot || '') + '</div>' +
+    '</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function () { el.classList.add('is-on'); });
+  // A hardware keyboard needs the same escape the quiet line gives a thumb.
+  if (typeof o.onEsc === 'function') {
+    el._cpEsc = function (e) {
+      if (e.key !== 'Escape') return;
+      e.preventDefault(); e.stopPropagation();
+      o.onEsc();
+    };
+    document.addEventListener('keydown', el._cpEsc, true);
+  }
+  return el;
+}
+
+function _cpFsClose(el, after) {
+  if (!el) { if (typeof after === 'function') after(); return; }
+  try { if (el._cpEsc) { document.removeEventListener('keydown', el._cpEsc, true); el._cpEsc = null; } } catch (e) {}
+  el.classList.remove('is-on');
+  setTimeout(function () {
+    try { el.remove(); } catch (e) {}
+    if (typeof after === 'function') after();
+  }, 220);
+}
+
+/* ---- the "?" explainer, collapsed until they ask ---------------------- */
+function _cpWhyHtml(body) {
+  return '<button type="button" class="cp-whybtn" aria-label="Why this matters">?</button>' +
+    '<div class="cp-whybody"><div class="cp-fswarn">' + esc(body) + '</div></div>';
+}
+
+function _cpBindWhy(scope) {
+  const btn = scope.querySelector('.cp-whybtn');
+  const body = scope.querySelector('.cp-whybody');
+  if (!btn || !body) return;
+  btn.addEventListener('click', function () {
+    const open = body.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+}
+
+/* ---- hold to confirm, both destructive doors --------------------------
+   A hairline ring closes clockwise around the dot over 3 seconds; releasing
+   early unwinds it. iOS wants to raise its own callout on the same gesture,
+   so the callout is off in CSS and contextmenu is cancelled here. */
+function _cpHoldHtml() {
+  return '<button type="button" class="cp-hold" aria-label="Press and hold for 3 seconds to confirm">' +
+      '<svg viewBox="0 0 86 86" aria-hidden="true">' +
+        '<circle class="cp-hold__track" cx="43" cy="43" r="39"></circle>' +
+        '<circle class="cp-hold__draw" cx="43" cy="43" r="39"></circle>' +
+      '</svg><span class="cp-hold__dot"></span></button>' +
+    '<div class="cp-holdhint">Press and hold for 3 seconds</div>';
+}
+
+function _cpBindHold(scope, onDone) {
+  const el = scope.querySelector('.cp-hold');
+  if (!el) return;
+  const draw = el.querySelector('.cp-hold__draw');
+  let timer = 0, t0 = 0, running = false, done = false;
+
+  /* The mock's 30ms interval, kept on purpose: this ring measures TIME, not
+     motion, and a rAF loop stalls wherever frames stop (a backgrounded tab,
+     a throttled webview). The clock has to keep the promise the copy makes. */
+  const tick = function () {
+    if (!running) return;
+    const p = Math.min((Date.now() - t0) / CP_HOLD_MS, 1);
+    if (draw) draw.style.strokeDashoffset = (CP_RING_LEN * (1 - p)).toFixed(2);
+    if (p >= 1) {
+      clearInterval(timer); timer = 0;
+      running = false; done = true;
+      el.classList.remove('is-holding');
+      el.classList.add('is-done');
+      try { feel('tap'); } catch (e) {}
+      try { onDone(); } catch (e) {}
+    }
+  };
+  const start = function (e) {
+    if (done || running) return;
+    if (e && e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e && e.preventDefault) e.preventDefault();
+    running = true; t0 = Date.now();
+    el.classList.add('is-holding');
+    if (timer) clearInterval(timer);
+    timer = setInterval(tick, 30);
+  };
+  const end = function () {
+    if (!running) return;
+    running = false;
+    if (timer) { clearInterval(timer); timer = 0; }
+    el.classList.remove('is-holding');
+    if (draw) {
+      draw.style.transition = 'stroke-dashoffset 0.3s ease-out';
+      draw.style.strokeDashoffset = CP_RING_LEN;
+      setTimeout(function () { try { draw.style.transition = ''; } catch (e) {} }, 320);
+    }
+  };
+  el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  el.addEventListener('pointerdown', start);
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+    el.addEventListener(ev, end);
+  });
+}
+
+/* ---- the number field's own formatting -------------------------------- */
+function _cpMaskNumber(raw) {
+  let s = String(raw == null ? '' : raw).replace(/[^0-9.]/g, '');
+  const dot = s.indexOf('.');
+  if (dot !== -1) s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, '');
+  const parts = s.split('.');
+  let int = parts[0].replace(/^0+(?=\d)/, '');
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.length > 1 ? grouped + '.' + parts[1] : grouped;
+}
+
+/* Group as they type without the caret jumping to the end: count the value
+   characters before the caret, then land after the same count. */
+function _cpBindNumberField(input, sizer) {
+  const resize = function () {
+    if (!sizer) return;
+    sizer.textContent = input.value || '0';
+    input.style.width = (sizer.offsetWidth + 3) + 'px';
+  };
+  input.addEventListener('input', function () {
+    const before = input.value;
+    let pos = input.selectionStart;
+    if (pos === null || pos === undefined) pos = before.length;
+    const kept = before.slice(0, pos).replace(/[^0-9.]/g, '').length;
+    const out = _cpMaskNumber(before);
+    input.value = out;
+    let i = 0, seen = 0;
+    while (i < out.length && seen < kept) {
+      if (out.charCodeAt(i) !== 44) seen++;   // 44 = comma
+      i++;
+    }
+    try { input.setSelectionRange(i, i); } catch (e) {}
+    resize();
+  });
+  resize();
+  return resize;
+}
+
+/* ---- page 2's two doors ------------------------------------------------ */
+function _cpBindSummaryPage(pager) {
+  if (!pager) return;
+  const upd = pager.querySelector('#cpUpdate');
+  if (upd) upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
+  const twk = pager.querySelector('#cpTweak');
+  if (twk) twk.addEventListener('click', function () { clarityOpenTweak(); });
+}
+
+/* Repaint page 2 in place after a save, and walk the rail from where it was
+   to where it is now. A repaint alone would snap; the whole point of the
+   screen is watching the thing move. */
+function _cpRepaintSummaryPage(o) {
+  o = o || {};
+  try {
+    const pager = document.getElementById('clarityPager');
+    if (!pager) return;
+    const page = pager.querySelector('.clarity-pager__page--sum');
+    if (!page) return;
+
+    const oldFill = page.querySelector('.cp-track__fill');
+    const fromW = oldFill ? oldFill.style.width : '';
+    const oldNum = page.querySelector('.cp-num__v');
+    const fromNum = oldNum ? oldNum.textContent : '';
+    const oldRem = page.querySelector('.cp-rem__v');
+    const fromRem = oldRem ? oldRem.textContent : '';
+
+    page.innerHTML = _clarityPageSummary();
+    _cpBindSummaryPage(pager);
+
+    const still = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if (!o.animate || still) return;
+
+    const fill = page.querySelector('.cp-track__fill');
+    if (fill && fromW) {
+      const toW = fill.style.width;
+      fill.classList.remove('is-grow');
+      fill.style.width = fromW;
+      void fill.offsetWidth;
+      fill.classList.add('is-moving');
+      requestAnimationFrame(function () { fill.style.width = toW; });
+      setTimeout(function () { try { fill.classList.remove('is-moving'); } catch (e) {} }, 950);
+    }
+    _cpCountTo(page.querySelector('.cp-num__v'), fromNum);
+    _cpCountTo(page.querySelector('.cp-rem__v'), fromRem);
+  } catch (e) {}
+}
+
+/* Count one number element from an old rendered string to the one it is
+   already showing. Sign and grouping come from the two strings themselves,
+   so nothing here has to know the goal's direction. */
+function _cpCountTo(el, fromText) {
+  if (!el || !fromText) return;
+  const toText = el.textContent;
+  const parse = function (s) { return Number(String(s).replace(/[^0-9.\-]/g, '')); };
+  const from = parse(fromText), to = parse(toText);
+  if (!isFinite(from) || !isFinite(to) || from === to) return;
+  const sign = /^[+-]/.test(toText) ? toText[0] : '';
+  // t0 comes from the FIRST FRAME's own clock, never performance.now(): the
+  // two are not guaranteed to share an origin, and a negative delta sends an
+  // eased curve past both ends (a count that ran to millions in the probe).
+  const dur = 850;
+  let t0 = 0;
+  const step = function (now) {
+    const t = (typeof now === 'number' && isFinite(now)) ? now : performance.now();
+    if (!t0) t0 = t;
+    const p = Math.max(0, Math.min((t - t0) / dur, 1));
+    const eased = 1 - Math.pow(1 - p, 3);
+    const v = from + (to - from) * eased;
+    el.textContent = p >= 1 ? toText : sign + _cpNum(Math.abs(Math.round(v)));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  el.textContent = sign + _cpNum(Math.abs(Math.round(from)));
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   1. THE UPDATE SCREEN
+   Number goals only: a dated wall moves itself and a why-led page has no
+   number to move. Reachable from page 2 and, per the RESUME CARVE-OUT,
+   directly from an intentional deep link (the weekly progress ask, the
+   once-per-staleness in-app ask). A relaunch still lands page 1.
+   ============================================================ */
+function clarityOpenUpdate(opts) {
+  opts = opts || {};
+  if (document.querySelector('.cp-fs--upd')) return null;
+  const f = _cpFace();
+  if (f.face !== 'number') return null;
+  const gp = f.gp;
+  const unit = String(gp.unit || f.shape.unit || '').trim();
+  const hasCur = gp.current !== null && gp.current !== undefined && isFinite(Number(gp.current));
+  const cur = hasCur ? Number(gp.current) : null;
+  const start = hasCur ? cur : ((gp.baseline !== null && isFinite(Number(gp.baseline))) ? Number(gp.baseline) : 0);
+  const asOf = hasCur ? _cpAsOf(gp.updatedAt) : '';
+  const fulfilled = !!gp.fulfilledAt;
+
+  const content =
+    '<div class="cp-lab">Update progress</div>' +
+    '<h2 class="cp-fsq">Where are you now?</h2>' +
+    '<div class="cp-fsnum">' +
+      '<input class="cp-fsnum__in" type="text" inputmode="decimal" autocomplete="off" ' +
+        'autocorrect="off" spellcheck="false" aria-label="Where you are now" ' +
+        'value="' + esc(_cpMaskNumber(String(start))) + '">' +
+      '<span class="cp-fsnum__sizer" aria-hidden="true"></span>' +
+      (unit ? '<span class="cp-fsnum__unit">' + esc(unit) + '</span>' : '') +
+    '</div>' +
+    (hasCur ? '<div class="cp-fswas">was ' + esc(_cpNum(cur)) + (asOf ? ', ' + esc(asOf) : '') + '</div>' : '') +
+    '<div class="cp-payoff">This also updates your progress.</div>' +
+    // THE MANUAL COMPLETION DOOR. On this screen only, and once it has been
+    // used it stays as the record of it rather than offering itself again.
+    '<button type="button" class="cp-lock cp-lock--fs" id="cpFulfil"' + (fulfilled ? ' disabled' : '') + '>' +
+      CP_ICON_LOCK + 'Neutron Star Fulfilled</button>';
+
+  const foot =
+    '<button type="button" class="cn-cta" id="cpUpdSave">Save</button>' +
+    '<button type="button" class="cn-skip" id="cpUpdCancel">Cancel</button>';
+
+  let el = null;
+  // the settle recipe's host contract: it transforms host.el and never
+  // touches a pageWrap this overlay does not have.
+  const kbHost = { el: null, pageWrap: null };
+  const shut = function (after) {
+    try { if (kbHost._kbSettleCleanup) { kbHost._kbSettleCleanup(); kbHost._kbSettleCleanup = null; } } catch (e) {}
+    _cpFsClose(el, after);
+  };
+  el = _cpFsOpen({
+    cls: 'cp-fs--upd', label: 'Update progress',
+    content: content, foot: foot,
+    onEsc: function () { shut(); }
+  });
+  kbHost.el = el;
+
+  const input = el.querySelector('.cp-fsnum__in');
+  const sizer = el.querySelector('.cp-fsnum__sizer');
+  _cpBindNumberField(input, sizer);
+
+  // Typing re-anchors the screen to the top so the field, Save and Cancel
+  // all stay clear of the keyboard by geometry (the writer's own law: never
+  // measure the keyboard). The field is not focused on open, so the screen
+  // they land on is the composed one the mock shows.
+  input.addEventListener('focus', function () {
+    el.classList.add('is-typing');
+    try { input.setSelectionRange(0, input.value.length); } catch (e) {}
+  });
+  input.addEventListener('blur', function () { el.classList.remove('is-typing'); });
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); save(); } });
+  try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(kbHost, input); } catch (e) {}
+
+  const save = function () {
+    const raw = String(input.value || '').replace(/[^0-9.]/g, '');
+    if (raw === '') { shut(); return; }
+    const n = Number(raw);
+    if (!isFinite(n) || n < 0) { input.value = ''; return; }
+    const ok = (typeof goalProgressUpdate === 'function') ? goalProgressUpdate(n) : false;
+    // THE DETECTOR, consumed. js/03's hook already decided whether this
+    // crossed the line, direction and throttle included; this only reacts.
+    const moment = (ok && typeof goalProgressMoment === 'function') ? goalProgressMoment() : null;
+    shut(function () {
+      _cpRepaintSummaryPage({ animate: true });
+      if (moment && moment.ask) {
+        try {
+          const g = state.goalProgress;
+          if (g) { g.askedDay = moment.day; persistNow(); }
+        } catch (e) {}
+        _cpOpenFulfilConfirm({ auto: true });
+      }
+    });
+  };
+
+  /* Blur re-centers the screen, so a button that let the field blur first
+     would slide out from under the thumb between touch and tap. Holding
+     focus through the press keeps every target exactly where it was aimed. */
+  const hold = function (node) {
+    if (node) node.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+  };
+  const saveBtn = el.querySelector('#cpUpdSave');
+  const cancelBtn = el.querySelector('#cpUpdCancel');
+  const lock = el.querySelector('#cpFulfil');
+  hold(saveBtn); hold(cancelBtn); if (!fulfilled) hold(lock);
+  saveBtn.addEventListener('click', save);
+  cancelBtn.addEventListener('click', function () { shut(); });
+  if (lock && !fulfilled) lock.addEventListener('click', function () {
+    shut(function () { _cpOpenFulfilConfirm({}); });
+  });
+  return el;
+}
+
+/* ============================================================
+   2. THE COMPLETION DOORS
+   ============================================================ */
+
+/* The confirm behind both doors: the chip, and the automatic crossing. Two
+   gates deep by the time it shows, and the third is the 3 second hold. */
+function _cpOpenFulfilConfirm(o) {
+  o = o || {};
+  if (document.querySelector('.cp-fs--fulfil')) return null;
+  let el = null;
+  el = _cpFsOpen({
+    cls: 'cp-fs--fulfil', label: 'Neutron Star Fulfilled',
+    content:
+      '<div class="cp-lab">Neutron Star Fulfilled</div>' +
+      '<h2 class="cp-fsq">You did it??</h2>' +
+      _cpWhyHtml('Fulfilling your Neutron Star means your big goal is completed and we can close this chapter. ' +
+        'The star, actions and progress are sealed into your history. After, Memento will walk you toward your next ' +
+        'star to continue building. This cannot be tapped by accident, and it should never be tapped lightly.'),
+    foot: _cpHoldHtml() + '<button type="button" class="cn-skip" id="cpFulfilNo">Not yet</button>',
+    onEsc: function () { _cpFsClose(el); }
+  });
+  _cpBindWhy(el);
+  _cpBindHold(el, function () {
+    /* The declaration is theirs and it persists HERE, before anything
+       renders (v1149 law). It writes NO finale receipt: state.goalDone is
+       the referee's to write at ceremony time (R10), and burning it now
+       would kill that ceremony forever for this goal (R3). gp.userSaysDone
+       is exactly the input the referee waits on. */
+    try {
+      const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : state.goalProgress;
+      if (gp) {
+        gp.userSaysDone = true;
+        gp.fulfilledAt = Date.now();
+        persistNow();
+      }
+    } catch (e) {}
+    setTimeout(function () {
+      _cpFsClose(el, function () { clarityArrival('fulfilled'); });
+    }, 620);
+  });
+  el.querySelector('#cpFulfilNo').addEventListener('click', function () { _cpFsClose(el); });
+  return el;
+}
+
+/* THE ARRIVAL SEAM. Every ceremony belongs to the rewards phases (THE MERGE
+   resolution B); Clarity's job ends the moment the person has declared it.
+   When the arrival ceremony lands it registers window.rewardArrival and
+   this hands straight over, one line, nothing else changes. Until then the
+   interim below closes the beat honestly, because reaching your own finish
+   line inside a form must never be met with silence. */
+function clarityArrival(source) {
+  try {
+    if (typeof window.rewardArrival === 'function') { window.rewardArrival({ source: source }); return; }
+  } catch (e) {}
+  _cpArrivalInterim();
+}
+
+function _cpArrivalInterim() {
+  let el = null;
+  el = _cpFsOpen({
+    cls: 'cp-fs--arrive', label: 'Neutron Star Fulfilled',
+    content:
+      '<div class="cp-lab">Neutron Star Fulfilled</div>' +
+      '<h2 class="cp-fsq">You did it.</h2>' +
+      '<div class="cp-fswarn">Marked complete. Your star, your notes and everything you logged stay in your history.</div>',
+    foot: '<button type="button" class="cn-cta" id="cpArriveDone">Done</button>',
+    onEsc: function () { _cpFsClose(el); }
+  });
+  el.querySelector('#cpArriveDone').addEventListener('click', function () {
+    _cpFsClose(el, function () { _cpRepaintSummaryPage({}); });
+  });
+  return el;
+}
+
+/* ============================================================
+   3. THE TWEAK FLOWS
+   ============================================================ */
+
+/* Refine keeps the climb: the words change, the number and the unit
+   re-parse, and everything they logged survives (the checklist amendment).
+   The stamp is read once by ensureGoalTarget in js/03. */
+function _cpStampRefine() {
+  try {
+    const gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : state.goalProgress;
+    if (gp) { gp.refineFrom = gp.starHash || ''; persistNow(); }
+  } catch (e) {}
+}
+
+function clarityOpenTweak() {
+  if (document.querySelector('.cp-fs--tweak')) return null;
+  let el = null;
+  el = _cpFsOpen({
+    cls: 'cp-fs--tweak', label: 'Tweak your Neutron Star',
+    content:
+      '<div class="cp-lab">Tweak your Neutron Star</div>' +
+      '<h2 class="cp-fsq">What do you want to do with it?</h2>' +
+      '<div class="cp-fsopts">' +
+        '<button type="button" class="cp-fsopt" id="cpTwkRefine">Refine your Neutron Star</button>' +
+        '<button type="button" class="cp-fsopt cp-fsopt--danger" id="cpTwkChange">Completely change it</button>' +
+      '</div>' +
+      '<div class="cp-fswarn">Completely changing your Neutron Star changes your entire Memento. It is the ' +
+        'foundation everything else is built on: your plan, your pages, and your card all rebuild around the new ' +
+        'goal. Your notes and history stay.</div>',
+    foot: '<button type="button" class="cn-skip" id="cpTwkCancel">Cancel</button>',
+    onEsc: function () { _cpFsClose(el); }
+  });
+
+  el.querySelector('#cpTwkRefine').addEventListener('click', function () {
+    _cpStampRefine();
+    _cpFsClose(el, function () {
+      try {
+        openNeutronStarRefineDialog(function () { _cpRepaintSummaryPage({}); });
+      } catch (e) {}
+    });
+  });
+  el.querySelector('#cpTwkChange').addEventListener('click', function () {
+    _cpFsClose(el, function () { _cpOpenChangeConfirm(); });
+  });
+  el.querySelector('#cpTwkCancel').addEventListener('click', function () { _cpFsClose(el); });
+  return el;
+}
+
+/* Gate two of three. The escape hatch points back at Refine for anyone who
+   only meant to adjust the wording, the date or the number. */
+function _cpOpenChangeConfirm() {
+  if (document.querySelector('.cp-fs--change')) return null;
+  let el = null;
+  el = _cpFsOpen({
+    cls: 'cp-fs--change', label: 'Completely change it',
+    content:
+      '<div class="cp-lab">Completely change it</div>' +
+      '<h2 class="cp-fsq">Create a new Neutron Star?</h2>' +
+      _cpWhyHtml("This means you haven't completed your current star and it's either not what you want, or " +
+        'completely wrong. Your current star, plan, and pages will be rebuilt around a new goal from scratch. ' +
+        'Your notes and history stay, but everything else starts over. If you only want to reword the goal, move ' +
+        'the date, or adjust the number, go back and choose Refine instead. This can\'t be undone.'),
+    foot: _cpHoldHtml() + '<button type="button" class="cn-skip" id="cpChangeBack">Go back</button>',
+    onEsc: function () { _cpFsClose(el); }
+  });
+  _cpBindWhy(el);
+  _cpBindHold(el, function () {
+    setTimeout(function () { _cpOpenLastCheck(el); }, 620);
+  });
+  el.querySelector('#cpChangeBack').addEventListener('click', function () { _cpFsClose(el); });
+  return el;
+}
+
+/* Gate three of three: the mock's dlgWrap/dlg, on the SHIPPED .cn-dlg
+   primitives. Nothing this big happens by momentum. */
+function _cpOpenLastCheck(host) {
+  const wrap = document.createElement('div');
+  wrap.className = 'cn-dlgwrap';
+  wrap.setAttribute('role', 'dialog');
+  wrap.setAttribute('aria-modal', 'true');
+  wrap.innerHTML =
+    '<div class="cn-dlg">' +
+      '<h4>Last check.</h4>' +
+      '<p>Your Memento rebuilds around a new goal. There is no undo.</p>' +
+      '<button type="button" class="cn-dlgbtn cn-dlgbtn--danger" data-cp-yes>Create a new star</button>' +
+      '<button type="button" class="cn-dlgbtn cn-dlgbtn--quiet" data-cp-no>Cancel</button>' +
+    '</div>';
+  if (host) host.classList.add('is-dimmed');
+  const shut = function () {
+    try { wrap.remove(); } catch (e) {}
+    if (host) host.classList.remove('is-dimmed');
+  };
+  wrap.addEventListener('click', function (e) { if (e.target === wrap) shut(); });
+  wrap.querySelector('[data-cp-no]').addEventListener('click', shut);
+  wrap.querySelector('[data-cp-yes]').addEventListener('click', function () {
+    shut();
+    _cpFsClose(host, function () { _cpCreateNewStar(); });
+  });
+  document.body.appendChild(wrap);
+  requestAnimationFrame(function () { wrap.classList.add('is-on'); });
+}
+
+/* The create path, gated exactly like nsConfirmRestart: a brand-new AI run
+   is the paid thing, so a free user meets the paywall instead of a silent
+   second run. Notes survive on purpose, they belong to the person and not
+   to the star. */
+function _cpCreateNewStar() {
+  try {
+    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) {
+      try { ClarityExperience.close(); } catch (e) {}
+      ClarityPaywall.show();
+      return;
+    }
+  } catch (e) {}
+  try {
+    // a new climb, so the refine stamp must not survive into it
+    const gp = state.goalProgress;
+    if (gp) gp.refineFrom = '';
+    state.clarity.completed = false;
+    state.clarity.tutorialSeen = false;
+    delete state.clarity.draft;
+    state.clarity.answers = {};
+    persistNow();
+  } catch (e) {}
+  try { ClarityExperience.close(); } catch (e) {}
+  setTimeout(function () { try { ClarityExperience.open(); } catch (e) {} }, 500);
+}
+
+/* ============================================================
+   4. THE MESSAGE BEAT
+   The star animation has finished and Continue is the seam. Optional,
+   never a gate: both answers land in the same handoff. Removable by
+   flipping CP_MESSAGE_BEAT to false, nothing else to unpick.
+   ============================================================ */
+function _cpMessageBeat(next) {
+  const go = function () { try { next(); } catch (e) {} };
+  try {
+    if (!CP_MESSAGE_BEAT) { go(); return; }
+    if (!state.meta || typeof state.meta !== 'object') state.meta = {};
+    if (state.meta.clarityMsgBeatSeen) { go(); return; }
+    // a re-run by someone who already has notes gets no invite
+    if (clarityNotesLive().length) { state.meta.clarityMsgBeatSeen = true; persistNow(); go(); return; }
+    state.meta.clarityMsgBeatSeen = true;
+    persistNow();
+  } catch (e) { go(); return; }
+
+  let el = null;
+  el = _cpFsOpen({
+    cls: 'cp-fs--invite', label: 'A message for future you',
+    content:
+      '<div class="cp-invite__star" aria-hidden="true"></div>' +
+      '<h2 class="cp-fsq">Before we continue.</h2>' +
+      '<p class="cp-invite__p">Leave a message for future you. As you start and keep making progress toward your ' +
+        'goals, it\'s very easy to forget why you started. But you started for a reason. I highly recommend writing ' +
+        'a personal note to remind yourself that you have a dream, so when your future self inevitably hits a lower ' +
+        'point, they can stay in the fight.</p>',
+    foot:
+      '<button type="button" class="cn-cta" id="cpInviteWrite">Write a message</button>' +
+      '<button type="button" class="cn-skip" id="cpInviteSkip">Maybe later</button>'
+  });
+
+  el.querySelector('#cpInviteWrite').addEventListener('click', function () {
+    // The writer sits above the invite. Cancelling it returns here rather
+    // than skipping the beat for them.
+    ClarityNoteWriter.open({
+      founding: true,
+      onDone: function (saved) {
+        if (!saved) return;
+        _cpFsClose(el, go);
+      }
+    });
+  });
+  el.querySelector('#cpInviteSkip').addEventListener('click', function () {
+    // Seeded from their own why instead, so the stack is never empty. If
+    // Clarity has not been stamped completed yet, page 3's own seed does it
+    // the first time they open the stack.
+    try { clarityNotesSeedIfEmpty(); } catch (e) {}
+    _cpFsClose(el, go);
+  });
+}

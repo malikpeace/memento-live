@@ -1571,17 +1571,43 @@ function ensureGoalTarget() {
     const hash = (h >>> 0).toString(16);
     if (gp.starHash === hash) return gp;
     const found = star ? extractGoalTarget(star) : null;
+    /* A REFINE is the same climb in new words (CLARITY-MERGE-CHECKLIST audit
+       amendment): the number and the unit re-parse, everything they logged
+       survives. Clarity stamps gp.refineFrom with the hash it is refining
+       FROM, immediately before the star text changes; this consumes that
+       stamp exactly once. Every other route to a new star (create-new, the
+       wizard redo) clears it, so a stale stamp can never preserve a climb
+       that ended. */
+    const refining = !!gp.refineFrom && gp.refineFrom === gp.starHash;
+    gp.refineFrom = '';
     gp.starHash = hash;
     gp.target = found ? found.target : null;
     gp.unit = found ? found.unit : '';
-    gp.baseline = null; gp.current = null; gp.updatedAt = ''; gp.askedDay = '';
-    gp.history = [];
-    // THE MERGE foundation: shape + custom marks are star-scoped too.
-    gp.shape = ''; gp.customMarks = [];
+    // the shape is re-derived either way: a refine may move a date or a number
+    gp.shape = '';
+    if (!refining) {
+      gp.baseline = null; gp.current = null; gp.updatedAt = ''; gp.askedDay = '';
+      gp.history = [];
+      // THE MERGE foundation: custom marks are star-scoped too.
+      gp.customMarks = [];
+      // a new star is a new finish line, never the old one's
+      gp.fulfilledAt = 0; gp.userSaysDone = false;
+    }
     try { persistNow(); } catch (e) {}
     return gp;
   } catch (e) { return state.goalProgress || null; }
 }
+
+/* THE COMPLETION DETECTOR (CLARITY-MERGE-CHECKLIST phase 4 + its audit
+   amendment), ONE owner: the rewards-foundation hook inside
+   goalProgressUpdate below. The crossing itself is decided by the
+   foundation's referee, which already owns direction (R8: a down-goal
+   fires at <=), the once-a-day throttle (R5, via gp.askedDay) and the
+   dead-after-the-finale guard (R3). This seam only carries that answer out
+   of the pulse so consumers can react to it. NOTHING else in the app
+   re-derives "did they reach it": no second detector, ever. */
+let _goalMoment = null;
+function goalProgressMoment() { return _goalMoment; }
 
 // One pulse: "where are you now". Appends to history and moves current.
 function goalProgressUpdate(value) {
@@ -1601,6 +1627,18 @@ function goalProgressUpdate(value) {
     if (gp.history.length > 400) gp.history.splice(0, gp.history.length - 400);
     // THE MERGE phase 0: shadow-mode referee observation (pulse-crossed marks).
     try { if (typeof rewardShadow === 'function') rewardShadow('js03-pulse', { prevValue: _prevPulse }); } catch (_) {}
+    // ...and the same hook answers the completion question, once, for everyone.
+    _goalMoment = null;
+    try {
+      if (typeof buildRewardCtx === 'function' && typeof RewardReferee !== 'undefined') {
+        const ctx = buildRewardCtx({ prevValue: _prevPulse });
+        _goalMoment = {
+          crossed: !!RewardReferee.reachedNow(ctx).reached,
+          ask: !!RewardReferee.shouldAsk(ctx),
+          day: day
+        };
+      }
+    } catch (_) {}
     try { persistNow(); } catch (e) {}
     return true;
   } catch (e) { return false; }

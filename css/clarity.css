@@ -4739,6 +4739,10 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
 /* grow-in: once per page-show, replayed by a class swap in js/02. No fill mode,
    the resting state already equals the end state, so no GPU layer is held. */
 .cp-track__fill.is-grow { animation: cpRailGrow 0.85s cubic-bezier(0.22, 0.61, 0.36, 1); }
+/* phase 4: an update walks the rail from where it was to where it is now,
+   same curve and duration as the grow-in. The class is removed once it lands,
+   so nothing transitions in the background. */
+.cp-track__fill.is-moving { transition: width 0.85s cubic-bezier(0.22, 0.61, 0.36, 1); }
 .clarity-pager__page.is-active .cp-track__fill::after {
   content: ""; position: absolute; top: 0; bottom: 0; width: 42%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
@@ -5109,3 +5113,179 @@ html.theme-light .cn-dlg { background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 
 html.theme-light .cn-dlg h4 { color: rgba(24, 26, 33, 0.96); }
 html.theme-light .cn-dlg p { color: rgba(24, 26, 33, 0.55); }
 html.theme-light .cn-dlgbtn--quiet { color: rgba(24, 26, 33, 0.5); }
+
+/* ============================================================
+   CLARITY PHASE 4 (CLARITY-MERGE-CHECKLIST.md): the full-screen update
+   screen, the Fulfilled + Create-new confirms, the Tweak choice and the
+   post-ignition message beat.
+
+   Ported from mockups/clarity-home/clarity-pages.html: fsq / fsNum /
+   pillCta / quiet / payoffLine / fsOpts / fsWarn / reached / holdCircle /
+   whyBtn / dlgWrap, plus notes-flow.html's invite. Same 1:1 scale as the
+   pager and the writer that shipped from these same two mocks, so the new
+   surfaces sit in one type system with their siblings.
+   The mock's dead bottom-sheet block (sheet, grab, slab, bignum, was,
+   sheetCta, payoff, dim, optRow, opt, warn) is NOT ported, by the plan.
+
+   The pill, the quiet line and the confirm dialog are the SHIPPED .cn-cta /
+   .cn-skip / .cn-dlg* primitives by reference, never copies: one button
+   recipe across every Clarity surface.
+
+   Theme: these are everyday surfaces, so they FOLLOW the theme. Light mode
+   is additive html.theme-light overrides off the mock's .lt recipe, and
+   there is no :has() theme opt-out anywhere in here. Colours are literal
+   for the same reason the pager's are (the shipped
+   html.theme-light .clarity-exp:has(.ns-star-scene) rule pins --ink white
+   across the overlay, so the token lies on these surfaces).
+   ============================================================ */
+.cp-fs {
+  position: fixed; inset: 0; z-index: 100050;
+  overflow-y: auto; overflow-x: hidden;
+  background: #04050a; color: rgba(255, 255, 255, 0.96);
+  --cp-acc: #8be9fa;
+  --cp-acc-soft: rgba(139, 233, 250, 0.14);
+  --cp-acc-ring: rgba(139, 233, 250, 0.35);
+  opacity: 0; transition: opacity 0.2s ease;
+}
+.cp-fs.is-on { opacity: 1; }
+/* min-height (not height) so a long explainer scrolls instead of clipping,
+   and so a tall desktop window still centers rather than overflowing. */
+.cp-fsstage {
+  position: relative; min-height: 100%;
+  width: 100%; max-width: 520px; margin: 0 auto;
+  padding: calc(var(--safe-t, 0px) + 24px) 24px calc(var(--safe-b, 0px) + 30px);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+.cp-fsspace { flex: 1; min-height: 0; }
+/* the mock's 22px between the eyebrow and the question, not 11 + 22 */
+.cp-fscontent > .cp-lab { margin-bottom: 0; }
+.cp-fscontent, .cp-fsfoot { width: 100%; display: flex; flex-direction: column; align-items: center; }
+/* The last check blurs what is behind it. Only the text stage takes the
+   filter: the nebula is a sibling, so nothing blurred is ever clipped into
+   a rectangle (the edge-safe law). */
+.cp-fs.is-dimmed .cp-fsstage { filter: blur(2px); opacity: 0.45; pointer-events: none; }
+
+.cp-fsq {
+  font-size: clamp(21px, 6vw, 25px); font-weight: 800; line-height: 1.28;
+  margin: 22px 0 0; text-wrap: balance; max-width: 280px; color: #fff;
+}
+.cp-fswas { margin-top: 12px; color: rgba(255, 255, 255, 0.45); font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cp-payoff { margin-top: 16px; color: var(--cp-acc); font-size: 13.5px; font-weight: 650; }
+
+/* the number they nudge. The field is sized to its own text by a hidden
+   twin, so the unit keeps hugging the number the way the mock has it. */
+.cp-fsnum {
+  display: flex; align-items: baseline; justify-content: center; gap: 8px;
+  margin-top: 30px; max-width: 100%;
+  padding: 20px 26px; border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.cp-fsnum__in, .cp-fsnum__sizer {
+  font-family: inherit; font-size: 40px; font-weight: 800; line-height: 1.1;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  color: #fff;
+}
+.cp-fsnum__in {
+  min-width: 1.2ch; max-width: 100%;
+  border: 0; background: none; padding: 0; margin: 0; outline: none;
+  text-align: center; caret-color: var(--cp-acc);
+  -webkit-appearance: none; appearance: none;
+}
+.cp-fsnum__sizer { position: absolute; left: -9999px; top: 0; white-space: pre; visibility: hidden; }
+.cp-fsnum__unit { color: rgba(255, 255, 255, 0.6); font-size: 16px; font-weight: 600; }
+/* Typing re-anchors the screen to the top so the field, the pill and the
+   quiet line all stay above the keyboard by geometry, never by measuring
+   it. Same law and same shape as the writer's own-tag step. */
+.cp-fs.is-typing .cp-fsspace { flex: 0; }
+.cp-fs.is-typing .cp-fsfoot { margin-top: 34px; }
+
+/* the quiet completion door, the mock's .reached. Once the door has been
+   used the chip stays as the record of it, so it keeps its colour and simply
+   stops behaving like a button. */
+.cp-lock--fs { margin-top: 26px; }
+.cp-lock[disabled] { cursor: default; }
+.cp-lock[disabled]:active { transform: none; }
+
+/* the tweak choice */
+.cp-fsopts { display: flex; flex-direction: column; gap: 11px; width: 100%; max-width: 320px; margin: 30px auto 0; }
+.cp-fsopt {
+  padding: 17px 16px; border-radius: 999px; border: 0; width: 100%;
+  background: #fff; color: #0b1112;
+  font-family: inherit; font-size: 15.5px; font-weight: 700; text-align: center; cursor: pointer;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+  -webkit-tap-highlight-color: transparent;
+}
+.cp-fsopt--danger { background: #ff3b30; color: #fff; box-shadow: 0 14px 34px rgba(255, 59, 48, 0.3); }
+.cp-fsopt:active { transform: scale(0.99); }
+.cp-fswarn { margin: 18px auto 0; font-size: 13px; line-height: 1.55; color: rgba(255, 255, 255, 0.45); max-width: 290px; }
+
+/* the "?" explainer, collapsed by default */
+.cp-whybtn {
+  margin: 16px auto 0; width: 26px; height: 26px; border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center; border: 0;
+  background: rgba(255, 255, 255, 0.09); color: rgba(255, 255, 255, 0.62);
+  font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cp-whybody { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.35s ease, opacity 0.25s ease; }
+.cp-whybody.is-open { max-height: 340px; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cp-whybody { transition: none; } }
+
+/* hold to confirm: the hairline ring closes clockwise around the dot over
+   3 seconds. iOS must not raise its own callout on the same gesture. */
+.cp-hold {
+  width: 86px; height: 86px; margin: 0 auto; position: relative; cursor: pointer;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent; background: none; border: 0; padding: 0;
+}
+.cp-hold svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.cp-hold__track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 2; }
+.cp-hold__draw {
+  fill: none; stroke: rgba(255, 255, 255, 0.92); stroke-width: 2; stroke-linecap: round;
+  transition: stroke 0.3s ease; stroke-dasharray: 245.04; stroke-dashoffset: 245.04;
+}
+.cp-hold__dot {
+  position: absolute; left: 50%; top: 50%; width: 15px; height: 15px;
+  margin: -7.5px 0 0 -7.5px; border-radius: 50%; background: rgba(255, 255, 255, 0.5);
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.35s ease;
+}
+.cp-hold.is-holding .cp-hold__dot { transform: scale(0.62); background: rgba(255, 255, 255, 0.85); }
+.cp-hold.is-done .cp-hold__dot { transform: scale(1.75); background: rgba(255, 255, 255, 0.95); }
+.cp-hold.is-done .cp-hold__draw { stroke-dashoffset: 0; stroke: #fff; }
+.cp-holdhint { margin-top: 14px; color: rgba(255, 255, 255, 0.4); font-size: 12.5px; font-weight: 600; }
+
+/* the post-ignition message beat (notes-flow.html, screen 1) */
+.cp-invite__star {
+  width: 88px; height: 88px; margin: 0 auto 26px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 50% 42%, #eafcff, #9feefc 34%, #2aa6bd 62%, transparent 74%);
+  box-shadow: 0 0 46px rgba(139, 233, 250, 0.6), 0 0 120px rgba(139, 233, 250, 0.28);
+}
+.cp-invite__p { color: rgba(255, 255, 255, 0.6); font-size: 14px; line-height: 1.6; margin: 14px auto 0; max-width: 292px; }
+
+/* ---- LIGHT MODE, additive only (the mock's .lt recipe) ---- */
+html.theme-light .cp-fs {
+  background: #eef0f3; color: rgba(24, 26, 33, 0.96);
+  --cp-acc: #0d8ca6;
+  --cp-acc-soft: rgba(13, 140, 166, 0.1);
+  --cp-acc-ring: rgba(13, 140, 166, 0.3);
+}
+html.theme-light .cp-fsq { color: rgba(24, 26, 33, 0.96); }
+html.theme-light .cp-fswas { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cp-payoff { color: #0d8ca6; }
+html.theme-light .cp-fsnum { background: rgba(24, 26, 33, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7); }
+html.theme-light .cp-fsnum__in, html.theme-light .cp-fsnum__sizer { color: rgba(24, 26, 33, 0.96); }
+html.theme-light .cp-fsnum__unit { color: rgba(24, 26, 33, 0.6); }
+html.theme-light .cp-fsopt { background: #181a21; color: #fff; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18); }
+html.theme-light .cp-fsopt--danger { background: #ff3b30; color: #fff; box-shadow: 0 12px 28px rgba(255, 59, 48, 0.24); }
+html.theme-light .cp-fswarn { color: rgba(24, 26, 33, 0.5); }
+html.theme-light .cp-whybtn { background: rgba(24, 26, 33, 0.08); color: rgba(24, 26, 33, 0.6); }
+html.theme-light .cp-hold__track { stroke: rgba(24, 26, 33, 0.13); }
+html.theme-light .cp-hold__draw { stroke: rgba(24, 26, 33, 0.9); }
+html.theme-light .cp-hold.is-done .cp-hold__draw { stroke: rgba(24, 26, 33, 0.95); }
+html.theme-light .cp-hold__dot { background: rgba(24, 26, 33, 0.45); }
+html.theme-light .cp-hold.is-holding .cp-hold__dot { background: rgba(24, 26, 33, 0.8); }
+html.theme-light .cp-hold.is-done .cp-hold__dot { background: rgba(24, 26, 33, 0.92); }
+html.theme-light .cp-holdhint { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cp-invite__p { color: rgba(24, 26, 33, 0.6); }
