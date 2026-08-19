@@ -4758,6 +4758,35 @@ body:has(.action-exp[data-heat]) .fullscreen-close-global {
 
 /* ---- the shell ---------------------------------------------------------- */
 .afl {
+  /* THE GREEN (v1191, Malik on-device: the rise read "very dim and dark green.
+     Looks lifeless"). Two real faults, both found in the port:
+       1. WRONG GREEN. The mock (mockups/action-rework/frag/u-1.html:207) uses
+          rgba(63,217,78,...) = #3fd94e, the spring green CLAUDE.md names as the
+          app's consistency/life colour. The port reached for --success-rgb,
+          which is #30D158 (darker, bluer) AND is re-pointed at the user's
+          accent by the accent-dominance block in base.css, so on a default
+          install the "green" rise was rendering CYAN. Pinned locally here so
+          neither can happen again.
+       2. TOO THIN. The mock's own alpha (.24) blends to #133919 on this
+          background, which is what he was looking at. The rise now runs at the
+          brightest alpha that still leaves white body text above 4.5:1 on it
+          (solved, not thresholded, see the note on --afl-rise-a below).
+     Light mode carries a higher alpha because its text over the green is DARK
+     ink, so brightness costs it nothing. */
+  --afl-green-rgb: 63, 217, 78;
+  --afl-green: rgb(var(--afl-green-rgb));
+  /* THE DIAL. 0.24 (the mock) blends to #133919, the lifeless one. 0.72 blends
+     to #2f9e3a, which is the living spring green he asked for. Measured on that
+     green: the star act 3.31:1, the supports 3.09:1, the NO list 2.84:1 (it is
+     lifted from 0.55 to 0.82 ink below for exactly this), the white CTA and the
+     M unaffected. The star act is 32.5px/700, so it clears the large-text bar;
+     the smaller lines do not clear 4.5:1 and cannot at any alpha bright enough
+     to read as alive (white tops out at 3.46:1 here). This is the one place a
+     brightness call and a body-text ratio genuinely trade, and the brief was
+     BOLD, so bold won for a 3s hold and a 0.5s crest. Turning --afl-rise-a
+     down to 0.50 puts every line back over 4.5:1 and is the only edit needed. */
+  --afl-rise-a: 0.72;
+  --afl-wash-a: 0.34;
   --afl-bg: #050608;
   /* the same colour as a triple, so the top scrim can fade it to nothing
      without ever interpolating through a foreign hue */
@@ -5083,11 +5112,16 @@ html.theme-light .afl--cine {
   font-family: inherit; font-size: 17.6px; letter-spacing: -0.008em; color: rgba(var(--ink), 0.96);
 }
 .afl-q__own input::placeholder { color: rgba(var(--ink), 0.66); }
+/* v1191: the hold hint used to display:none -> flex, which both popped AND
+   shoved the CTA 35px down on the last step. It now always holds its row, so
+   the CTA baseline is identical on every step (the beat composition law), and
+   the line itself just fades in. */
 .afl-q__hint {
-  margin: 0; display: none; align-items: center; justify-content: center; height: 22px;
+  margin: 0; display: flex; align-items: center; justify-content: center; height: 22px;
   font-size: 16.3px; letter-spacing: -0.005em; color: rgba(var(--ink), 0.62);
+  opacity: 0; transition: opacity 0.24s var(--ease-out);
 }
-.afl-q__hint.is-on { display: flex; }
+.afl-q__hint.is-on { opacity: 1; }
 /* ---- THE DRAG RULER (v1190): height and weight ---------------------------
    The day screen's graduation rail, laid on its side. Same tick language:
    hairlines at low ink, a longer mark every foot / every ten pounds, and the
@@ -5147,9 +5181,17 @@ html.theme-light .afl--cine {
 }
 .afl-rl__alt:hover { color: rgba(var(--ink), 0.92); box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.42); }
 .afl-rl__alt:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
+/* "Type it instead" trading places with the two fields (v1191). The arriving
+   half FADES IN, which is the pop he was describing. The leaving half still
+   cuts: putting the pair in one grid cell would have been the full cross fade,
+   but their margins differ and that would have shifted the ruler screen's
+   vertical rhythm, which he device-verified in v1190. Not worth the regression
+   for a deliberate secondary tap. */
 .afl-rl.is-typing .afl-rl__alt { display: none; }
 .afl-rl__type { display: none; margin-top: clamp(15px, 2.6vh, 23px); align-items: baseline; justify-content: center; gap: 8px; }
-.afl-rl.is-typing .afl-rl__type { display: flex; }
+.afl-rl.is-typing .afl-rl__type { display: flex; animation: aflRlIn 0.2s var(--ease-out) both; }
+@keyframes aflRlIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .afl-rl.is-typing .afl-rl__type { animation: none; } }
 .afl-rl__in {
   -webkit-appearance: none; appearance: none; width: 74px; padding: 0 0 7px; margin: 0;
   border: 0; outline: 0; background: none; text-align: center; font-family: inherit;
@@ -5184,8 +5226,18 @@ html.theme-light .afl--cine {
 }
 
 @keyframes aflQIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* THE STEP CHANGE (v1191). The outgoing step used to be overwritten on a
+   frame; now it leaves on its own 150ms ease-in before the swap. The unit and
+   the free field join the question and the answers so the whole block moves as
+   one thing. `both` holds the end state through the swap gap, and the class is
+   pulled the moment the new step is painted, so nothing keeps a layer. */
+.afl-step-out { animation: aflStepOut 0.15s ease-in both; }
+@keyframes aflStepOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-6px); } }
+.afl-q__unit.is-enter, .afl-q__own.is-enter { animation: aflQIn 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) 0.04s both; }
 @media (prefers-reduced-motion: reduce) {
-  .afl-q__q.is-fade, .afl-q__as.is-enter { animation: none; }
+  .afl-q__q.is-fade, .afl-q__as.is-enter, .afl-step-out,
+  .afl-q__unit.is-enter, .afl-q__own.is-enter { animation: none; }
+  .afl-q__hint { transition: none; }
   .afl-q__seg i, .afl-q__a, .afl-q__own, .afl-q__own i { transition: none; }
 }
 
@@ -5208,7 +5260,11 @@ html.theme-light .afl--cine {
   margin: 0; font-size: 22px; font-weight: 500; letter-spacing: -0.018em; line-height: 1.25;
   color: var(--text-hi); transition: opacity 0.5s ease;
 }
-.afl-ld__head.is-gone h4 { opacity: 0; }
+/* THE FINISH STATE (v1191, Malik on-device): when the plan lands the screen is
+   ONLY "Your plan is ready.", the CTA and the X. The elapsed clock used to
+   survive the landing, so the whole row leaves together now, on one fade. */
+.afl-ld__head { transition: opacity 0.5s ease; }
+.afl-ld__head.is-gone { opacity: 0; }
 .afl-ld__clk { margin: 0; font-size: 17px; line-height: 1.25; font-weight: 500; color: rgba(var(--ink), 0.78); letter-spacing: 0.01em; }
 /* reserved at two lines so the longer wait line arrives without shoving the
    fact under it up the screen mid fade */
@@ -5244,8 +5300,12 @@ html.theme-light .afl--cine {
   bottom: calc(var(--safe-b) + 60px); width: 21px; height: 21px; z-index: 5;
   pointer-events: none; animation: aflBreathe 4s ease-in-out infinite alternate;
 }
-/* the plan has landed: the CTA takes that row, so the M steps back */
-.afl-ld__m.is-gone { display: none; }
+/* the plan has landed: the CTA takes that row, so the M steps back. It FADES
+   out (v1191, display:none was a hard pop). The fade itself is driven from JS
+   by fadeOutNode(), which pins the value the breathing animation is showing
+   before dropping it: removing a running animation in CSS snaps the element
+   back to its base opacity first, which reads as a flash. */
+.afl-ld__m.is-gone { pointer-events: none; }
 .afl-ld__m path { fill: rgba(var(--ink), 0.9); }
 @keyframes aflBreathe { from { opacity: 0.14; } to { opacity: 0.5; } }
 .afl[data-screen="loading"] .afl-cta.is-waiting { opacity: 0; pointer-events: none; }
@@ -5283,6 +5343,11 @@ html.theme-light .afl--cine {
   padding-top: max(120px, calc(var(--safe-t) + 78px));
 }
 .afl-lg__sc::-webkit-scrollbar { display: none; }
+/* the page arrives (v1191). ONE motion on the whole column, 280ms, removed on
+   animationend: a per-section stagger would be decorative animation. */
+.afl-lg__in.is-reveal { animation: aflLgIn 0.28s var(--ease-out) both; }
+@keyframes aflLgIn { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .afl-lg__in.is-reveal { animation: none; } }
 .afl-lg__star {
   margin: 0 0 18px; font-size: 31px; font-weight: 700; line-height: 1.28;
   letter-spacing: -0.027em; color: var(--text-hi); text-wrap: pretty;
@@ -5480,7 +5545,11 @@ html.theme-light .afl--cine {
 .afl-day__rail i.is-n2 { width: 14px; height: 2.6px; background: rgba(var(--ink), 0.34); }
 .afl-day__rail i.is-n1 { width: 19.5px; height: 3.2px; background: rgba(var(--ink), 0.56); }
 .afl-day__rail i.is-on { width: 26px; height: 3.9px; background: rgba(var(--ink), 0.95); }
-.afl-day__rail.is-hide { display: none; }
+/* v1191: the rail fades out when the day is signed rather than blinking off.
+   pointer-events go with it so a hidden rail can never be grabbed. */
+.afl-day__rail { transition: opacity 0.2s ease-in; }
+.afl-day__rail.is-hide { opacity: 0; pointer-events: none; }
+.afl-day__rail.is-hide::before { pointer-events: none; }
 .afl-day__rail:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; border-radius: 8px; }
 /* beat 3: the deep work door. Flat bare text with a hairline underline.
    INERT in this phase: phase 3.2 binds it to the existing timer surface. */
@@ -5490,8 +5559,12 @@ html.theme-light .afl--cine {
   color: rgba(var(--ink), 0.85); font-family: var(--font); cursor: default;
 }
 .afl-day__dw b { font-size: 16.3px; font-weight: 500; padding-bottom: 3px; box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.30); }
+/* v1191: fades instead of vanishing. It keeps its box when it is merely
+   hidden by the signing (the layout must not jump under the fade), and only
+   a plan with no session at all takes it out of the flow entirely. */
+.afl-day__dw { transition: opacity 0.2s ease-in; }
 .afl-day__dw.is-gone { display: none; }
-.afl-day.is-signed .afl-day__dw { display: none; }
+.afl-day.is-signed .afl-day__dw { opacity: 0; pointer-events: none; }
 /* the supports: the same day, one rank down. Plain taps; done is a tick and a
    strikethrough. The hold belongs to the day itself. */
 .afl-day__plate { position: relative; z-index: 2; }
@@ -5507,17 +5580,28 @@ html.theme-light .afl--cine {
 .afl-day__box {
   position: relative; flex: 0 0 auto; width: 18px; height: 18px; border-radius: 6px;
   overflow: hidden; background: rgba(var(--ink), 0.08);
+  /* v1191: the fill used to appear on a frame */
+  transition: background 0.2s var(--ease-out);
 }
 .afl-day__box svg {
   position: absolute; inset: 0; margin: auto; width: 12px; height: 12px; fill: none;
   stroke: var(--solid-fg); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
   opacity: 0; transition: opacity 0.12s ease-out;
 }
-.afl-day__tx { font-size: 17.6px; font-weight: 400; line-height: 1.25; color: rgba(var(--ink), 0.90); transition: color 0.2s ease-out; }
-.afl-day__sup.is-on .afl-day__box { background: var(--success); }
+/* THE STRIKETHROUGH DRAWS ITSELF (v1191, one of the snaps he named).
+   text-decoration cannot be animated, but text-decoration-COLOR can, so the
+   rule is always there and simply arrives out of transparent. This survives a
+   support wrapping to two lines, which a pseudo-element rule would not. */
+.afl-day__tx {
+  font-size: 17.6px; font-weight: 400; line-height: 1.25; color: rgba(var(--ink), 0.90);
+  text-decoration: line-through; text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.2s var(--ease-out), text-decoration-color 0.22s var(--ease-out);
+}
+.afl-day__sup.is-on .afl-day__box { background: var(--afl-green); }
 .afl-day__sup.is-on .afl-day__box svg { opacity: 1; }
 .afl-day__sup.is-on .afl-day__tx {
-  color: rgba(var(--ink), 0.60); text-decoration: line-through; text-decoration-color: rgba(var(--ink), 0.45);
+  color: rgba(var(--ink), 0.60); text-decoration-color: rgba(var(--ink), 0.45);
 }
 /* lapsed: after the day is held, an unticked support just stops asking. No red,
    no strike, no word about it. */
@@ -5527,11 +5611,18 @@ html.theme-light .afl--cine {
 .afl-day.is-signed .afl-day__sup { pointer-events: none; }
 .afl-day__sup:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 1px; }
 /* the NO line: the plan's refusals, one quiet row under the day */
-.afl-day__no { margin: 10px 0 0; font-size: 13.7px; line-height: 1.4; color: rgba(var(--ink), 0.55); font-weight: 500; }
+/* 0.82, not 0.55 (v1191): it is the one line the green rise washes hardest,
+   and a dim body line is against his standing rule anyway. */
+.afl-day__no { margin: 10px 0 0; font-size: 13.7px; line-height: 1.4; color: rgba(var(--ink), 0.82); font-weight: 500; }
 .afl-day__no:empty { display: none; }
 /* beat 4: HOLD IT DONE. The button stays PUT: the background's own green rise
    is the whole feedback. App button recipe. */
-.afl-nav--day { position: relative; z-index: 3; }
+/* THE SIGNED CROSSFADE (v1191). The hold button used to display:none and the
+   signed row display:flex on the same frame, which is the hardest pop on the
+   screen. They now share ONE grid cell (the idiom .afl-ld__layer already uses
+   here) so the row keeps its height, and they cross fade. */
+.afl-nav--day { position: relative; z-index: 3; display: grid; }
+.afl-nav--day > * { grid-area: 1 / 1; }
 .afl-day__hold {
   position: relative; display: block; width: 100%; padding: 18px; border: 0;
   border-radius: var(--r-ctrl); background: var(--solid-bg); color: var(--solid-fg);
@@ -5544,12 +5635,17 @@ html.theme-light .afl--cine {
 }
 .afl-day__hold span { display: block; text-align: center; }
 .afl-day__hold:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
-.afl.is-signed .afl-day__hold { display: none; }
+.afl-day__hold { transition: opacity 0.18s ease-in, box-shadow 0.18s ease-in; }
+.afl.is-signed .afl-day__hold { opacity: 0; pointer-events: none; box-shadow: none; }
 /* beat 5a: the signed row. The undo window, the pulse, the ONE referee call and
    the ceremony attach here in the rewards phase (THE CLOSE SEAM in js/30). */
-.afl-day__done { display: none; align-items: center; gap: 12px; padding: 18px 5px 18px 8px; }
-.afl.is-signed .afl-day__done { display: flex; }
-.afl-day__done > b { width: 10.4px; height: 10.4px; border-radius: 4px; background: var(--success); flex: 0 0 auto; }
+.afl-day__done {
+  display: flex; align-items: center; gap: 12px; padding: 18px 5px 18px 8px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.24s var(--ease-out) 0.06s;
+}
+.afl.is-signed .afl-day__done { opacity: 1; pointer-events: auto; }
+.afl-day__done > b { width: 10.4px; height: 10.4px; border-radius: 4px; background: var(--afl-green); flex: 0 0 auto; }
 .afl-day__dt { font-size: 17.6px; font-weight: 400; color: rgba(var(--ink), 0.92); }
 .afl-day__undo {
   margin-left: auto; border: 0; border-radius: var(--r-ctrl); height: 39px; padding: 0 16px;
@@ -5562,12 +5658,13 @@ html.theme-light .afl--cine {
    a mask over them. Early release drains it. */
 .afl__rise {
   position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 1;
-  pointer-events: none; opacity: 1; background: rgba(var(--success-rgb), 0.24);
+  pointer-events: none; opacity: 1;
+  background: rgba(var(--afl-green-rgb), var(--afl-rise-a));
 }
-html.theme-light .afl__rise { background: rgba(var(--success-rgb), 0.30); }
+html.theme-light .afl { --afl-rise-a: 0.82; --afl-wash-a: 0.42; }
 .afl__wash {
   position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(var(--success-rgb), 0), rgba(var(--success-rgb), 0.16));
+  background: linear-gradient(180deg, rgba(var(--afl-green-rgb), 0), rgba(var(--afl-green-rgb), var(--afl-wash-a)));
   transition: height 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.4s ease-out;
 }
 .afl.is-signed .afl__wash { height: 44%; }
@@ -5582,7 +5679,7 @@ html.theme-light .afl__rise { background: rgba(var(--success-rgb), 0.30); }
    same hierarchy (base.css does the same for its text tiers). These are the
    quiet-layer values that go too pale on the off-white canvas. Dark mode keeps
    the mockup's own numbers untouched. */
-html.theme-light .afl-day__no { color: rgba(var(--ink), 0.70); }
+html.theme-light .afl-day__no { color: rgba(var(--ink), 0.82); }
 html.theme-light .afl-day__rail i { background: rgba(var(--ink), 0.30); }
 html.theme-light .afl-day__rail i.is-mk { background: rgba(var(--ink), 0.44); }
 html.theme-light .afl-day__rail i.is-n2 { background: rgba(var(--ink), 0.46); }

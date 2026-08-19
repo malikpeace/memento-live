@@ -580,8 +580,10 @@
     b.appendChild(inv);
     return b;
   }
+  // the label and its inverted twin change together, and they FADE (v1191):
+  // "Continue" becoming "Create action plan" was a hard swap on the last step.
   function ctaLabel(b, text) {
-    b.querySelector('.afl-cta__lab').textContent = text;
+    swapText(b.querySelector('.afl-cta__lab'), text, 1);
     b.querySelector('.afl-cta__inv span').textContent = text;
   }
 
@@ -686,6 +688,27 @@
   // A NUMBER THAT CHANGES MUST NOT HARD SWAP (Malik, on-device). The new value
   // arrives from the direction the change came from, 200ms, once. The class
   // comes back off on animationend so nothing holds a layer.
+  // Fade out a node that may be MID ANIMATION (the breathing M). Pin the value
+  // the animation is showing, drop the animation, then transition from there:
+  // removing a running animation any other way snaps the element back to its
+  // base opacity for a frame, which reads as a flash.
+  function fadeOutNode(node, ms) {
+    ms = ms || 400;
+    var now = '1';
+    try { now = getComputedStyle(node).opacity; } catch (e) {}
+    node.style.animation = 'none';
+    if (reduced()) { node.style.opacity = '0'; return; }
+    node.style.opacity = now;
+    void node.offsetWidth;
+    node.style.transition = 'opacity ' + ms + 'ms ease-in';
+    node.style.opacity = '0';
+  }
+
+  // NO HARD SWAPS ANYWHERE IN THIS MODULE (v1191, his second flag: "I don't
+  // like it when things just snap and pop in. It makes it feel cheap"). Any
+  // text this module rewrites goes through here. The new value arrives from the
+  // direction the change came from, 200ms, once, and the class comes back off
+  // on animationend so nothing holds a layer.
   function swapText(node, text, dir) {
     var t = String(text == null ? '' : text);
     if (node.textContent === t) return;
@@ -770,8 +793,9 @@
       root.setAttribute('data-lit', String(Math.min(3, n)));
       go.classList.toggle('is-live', ready && !done);
       go.setAttribute('aria-disabled', ready ? 'false' : 'true');
-      sub.textContent = done ? 'Change it later in Clarity'
-        : (ready ? 'Press and hold' : 'Tap each line to confirm');
+      // the sub line changes three times on this screen. It fades (v1191).
+      swapText(sub, done ? 'Change it later in Clarity'
+        : (ready ? 'Press and hold' : 'Tap each line to confirm'), 1);
     }
     var stopHold = bindCtaHold(go, 780, function () {
       done = true;
@@ -1179,16 +1203,22 @@
       if ((d.chips || []).length) buildChips();
     }
 
-    function render(anim) {
+    // THE STEP CHANGE (v1191). It used to write the new question straight over
+    // the old one and only animate the arrival, which is the "snap and pop" he
+    // flagged: the outgoing step vanished on a frame. Now the whole block
+    // (question, unit, answers, the free field) fades OUT on 150ms ease-in,
+    // the content is swapped while it is invisible, and it comes back on the
+    // screen's own entrance. Reduced motion writes straight through.
+    var STEP_OUT = 150;
+    var swapT = null;
+    var FADERS = [qEl, unit, body, own];
+    function paintStep() {
       var d = D[i];
-      qEl.classList.remove('is-fade');
-      if (anim && !reduced()) { void qEl.offsetWidth; qEl.classList.add('is-fade'); }
       qEl.textContent = d.q;
       unit.textContent = (d.kind === 'num' || d.kind === 'ruler') ? (d.unit || '') : '';
       numInput = null;
       body.className = 'afl-q__as';
       body.innerHTML = '';
-      if (anim && !reduced()) { void body.offsetWidth; body.classList.add('is-enter'); }
       if (d.kind === 'num') buildNum();
       else if (d.kind === 'ruler') buildRuler();
       else buildChips();
@@ -1200,6 +1230,32 @@
       back.classList.toggle('is-ghost', i === 0);
       syncCta();
     }
+    function enterStep() {
+      if (reduced()) return;
+      qEl.classList.remove('is-fade');
+      body.classList.remove('is-enter');
+      unit.classList.remove('is-enter');
+      own.classList.remove('is-enter');
+      void qEl.offsetWidth;
+      qEl.classList.add('is-fade');
+      body.classList.add('is-enter');
+      unit.classList.add('is-enter');
+      own.classList.add('is-enter');
+    }
+    function render(anim) {
+      if (swapT) { clearTimeout(swapT); swapT = null; }
+      FADERS.forEach(function (n) { n.classList.remove('afl-step-out'); });
+      if (!anim || reduced()) { paintStep(); return; }
+      void qEl.offsetWidth;
+      FADERS.forEach(function (n) { n.classList.add('afl-step-out'); });
+      swapT = setTimeout(function () {
+        swapT = null;
+        FADERS.forEach(function (n) { n.classList.remove('afl-step-out'); });
+        paintStep();
+        enterStep();
+      }, STEP_OUT);
+    }
+    current.teardown = function () { if (swapT) clearTimeout(swapT); };
     var stopHold = bindCtaHold(go, 780, function () {
       go.classList.add('is-done');
       if (typeof opts.onDone === 'function') opts.onDone(collect());
@@ -1222,12 +1278,14 @@
     }
 
     go.addEventListener('click', function () {
-      if (go.disabled || go.classList.contains('afl-cta--hold')) return;
+      // a tap landing inside the 150ms swap would advance a step whose answer
+      // state has not been painted yet
+      if (swapT || go.disabled || go.classList.contains('afl-cta--hold')) return;
       i++;
       render(true);
     });
     back.addEventListener('click', function () {
-      if (i === 0) return;
+      if (swapT || i === 0) return;
       i--;
       render(true);
     });
@@ -1360,13 +1418,17 @@
       timers.forEach(clearTimeout);
       timers = [];
       if (tickT) { clearInterval(tickT); tickT = null; }
-      clk.textContent = fmt(Date.now() - t0);
+      // THE FINISH STATE (v1191, Malik on-device): what is left is "Your plan is
+      // ready.", the CTA and the X. Nothing else. The elapsed clock leaves with
+      // the title (it used to survive the landing), and every one of these
+      // leaves on a fade, never a display flip.
       head.classList.add('is-gone');
       state.classList.remove('is-swap');
       state.classList.add('is-gone');
       tickRow.classList.add('is-gone');
       fact.classList.remove('is-on');
       m.classList.add('is-gone');
+      fadeOutNode(m, 400);
       at(120, function () { arr.classList.add('is-on'); });
       at(280, function () { go.classList.remove('is-waiting'); });
     }
@@ -1519,10 +1581,66 @@
         if (typeof opts.onClose === 'function') opts.onClose(); else destroy();
       });
     } else {
+      // ---- THE SCROLL GATE (v1191, Malik) --------------------------------
+      // You cannot agree to a page you have not read. The hold wakes up once
+      // 80% of the page has passed, and once awake it STAYS awake (scrolling
+      // back up is reading, not undoing).
+      //
+      // It can never be unreachable: progress is measured from the BOTTOM of
+      // the viewport, (scrollTop + clientHeight) / scrollHeight, so a page that
+      // does not scroll at all is already 100% and the hold is live on the
+      // first frame. A tall desktop window, a short plan and a phone all land
+      // on the same rule. Recomputed on scroll, on resize, and once after the
+      // fonts settle, because scrollHeight before webfont layout is a lie.
+      var GATE = 0.8;
+      var eligible = false;
+      go.disabled = true;
+      go.setAttribute('aria-disabled', 'true');
+
+      function gateProgress() {
+        var h = sc.scrollHeight, v = sc.clientHeight;
+        if (!h) return 1;
+        if (h <= v + 2) return 1;                 // nothing to scroll: fully read
+        return Math.min(1, (sc.scrollTop + v) / h);
+      }
+      function gateSync() {
+        if (eligible) return;
+        if (gateProgress() < GATE) return;
+        eligible = true;
+        go.disabled = false;
+        go.removeAttribute('aria-disabled');
+        // the live look arrives on .afl-cta's own 200ms background/colour
+        // transition, so the wake up is a fade, never a snap.
+      }
+      sc.addEventListener('scroll', gateSync, { passive: true });
+      var onResize = function () { eligible ? null : gateSync(); };
+      window.addEventListener('resize', onResize);
+      lgTimers.push(setTimeout(gateSync, 0));
+      lgTimers.push(setTimeout(gateSync, 400));   // after webfonts relayout
+      try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(gateSync); } catch (e) {}
+      gateSync();
+      var prevTeardown = current.teardown;
+      current.teardown = function () {
+        window.removeEventListener('resize', onResize);
+        if (typeof prevTeardown === 'function') prevTeardown();
+      };
+
       bindCtaHold(go, 900, function () {
         go.classList.add('is-done');
         if (typeof opts.onAgree === 'function') opts.onAgree();
-      });
+      }, function () { return eligible; });
+    }
+    // the page itself arrives, it does not appear (v1191). ONE motion on the
+    // whole column, not a stagger cascade.
+    if (!reduced()) {
+      box.classList.add('is-reveal');
+      var offReveal = function (e) {
+        if (e && e.target !== box) return;
+        box.classList.remove('is-reveal');
+        box.removeEventListener('animationend', offReveal);
+      };
+      box.addEventListener('animationend', offReveal);
+      lgTimers.push(setTimeout(offReveal, 600));
     }
     return root;
   }
@@ -1698,21 +1816,33 @@
       if (hv(v) <= hv(named[1])) return 2;
       return 3;
     }
+    var starShape = null;                     // 'off' | 'act', only rebuilt on a change
     function drawStar() {
-      starEl.innerHTML = '';
+      // v1191: this used to blow the sentence away and rebuild it on EVERY
+      // paint, which cancels any animation running on the size token and is a
+      // hard swap by construction. The nodes are now only re-hung when the
+      // shape of the line actually changes (rest day <-> the act).
       if (off) {
-        starEl.classList.add('is-off');
-        var lines = (plan.offDays && plan.offDays.restLine ? plan.offDays.restLine : 'Rest day.\nEnjoy :)').split('\n');
-        lines.forEach(function (ln, k) {
-          if (k) starEl.appendChild(document.createElement('br'));
-          starEl.appendChild(document.createTextNode(ln));
-        });
+        if (starShape !== 'off') {
+          starShape = 'off';
+          starEl.innerHTML = '';
+          starEl.classList.add('is-off');
+          var lines = (plan.offDays && plan.offDays.restLine ? plan.offDays.restLine : 'Rest day.\nEnjoy :)').split('\n');
+          lines.forEach(function (ln, k) {
+            if (k) starEl.appendChild(document.createElement('br'));
+            starEl.appendChild(document.createTextNode(ln));
+          });
+        }
         return;
       }
-      starEl.classList.remove('is-off');
-      starEl.appendChild(pre);
-      starEl.appendChild(tok);
-      starEl.appendChild(post);
+      if (starShape !== 'act') {
+        starShape = 'act';
+        starEl.innerHTML = '';
+        starEl.classList.remove('is-off');
+        starEl.appendChild(pre);
+        starEl.appendChild(tok);
+        starEl.appendChild(post);
+      }
       if (!hasSize) {
         pre.textContent = starAct.text;
         tok.textContent = '';
@@ -1801,9 +1931,10 @@
       drawPlate();
       drawRail();
       dw.classList.toggle('is-gone', !(starAct.session && !off));
-      noLine.textContent = (off || !plan.noList || !plan.noList.length) ? ''
-        : 'NO list: ' + plan.noList.join(' · ');
-      hold.querySelector('span').textContent = off ? 'Hold to close the day' : 'Hold to complete';
+      // both of these change on a rest day and on a size change. They fade.
+      swapText(noLine, (off || !plan.noList || !plan.noList.length) ? ''
+        : 'NO list: ' + plan.noList.join(' · '), 1);
+      swapText(hold.querySelector('span'), off ? 'Hold to close the day' : 'Hold to complete', 1);
     }
     function railSet(y) {
       var L = ladderAsc();
