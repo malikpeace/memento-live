@@ -8266,6 +8266,13 @@ function _mfOpenCustomize() {
   } catch (e) {}
 }
 
+// The evolution cinema owns the card while it runs: no tap-to-open, no hold.
+function _mfCinemaUp() {
+  try {
+    return !!_cardEvolutionRunning || document.body.classList.contains('evo2');
+  } catch (e) { return false; }
+}
+
 function _mfBindCardTap() {
   if (window._mfTapBound) return;
   window._mfTapBound = true;
@@ -8278,7 +8285,7 @@ function _mfBindCardTap() {
     // the HOME hold opens the customise sheet (inside the record the sheet's
     // own binding fires first and this one finds it already open and stops)
     cancelHold();
-    holdT = setTimeout(() => { holdT = null; if (!moved) { held = true; _mfOpenCustomize(); } }, 480);
+    holdT = setTimeout(() => { holdT = null; if (!moved && !_mfCinemaUp()) { held = true; _mfOpenCustomize(); } }, 480);
   }, true);
   document.addEventListener('pointermove', (e) => {
     if (!onCard || moved) return;
@@ -8304,7 +8311,9 @@ function _mfBindCardTap() {
       sheetUp = MementoView.isActive() &&
         !!document.querySelector('#mementoFull:not([hidden]) .mfsk-wrap:not([hidden])');
     } catch (e) {}
-    if (!moved && quick && !sheetUp) { try { MementoView.toggle(); } catch (e) {} }
+    // v1183 (Malik, on-device): while the evolution cinema is playing, a tap
+    // on the card must NOT open the record mid-animation. It does nothing.
+    if (!moved && quick && !sheetUp && !_mfCinemaUp()) { try { MementoView.toggle(); } catch (e) {} }
     moved = true;
   }, true);
   document.addEventListener('pointercancel', () => { cancelHold(); onCard = false; moved = true; held = false; }, true);
