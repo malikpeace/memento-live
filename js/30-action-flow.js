@@ -419,29 +419,113 @@
   }
 
   // ---------------------------------------------------------------------------
-  // THE SHELL. One overlay, one room, one column. Built on open, destroyed on
-  // close, so nothing in here can outlive its view or keep animating offscreen.
+  // THE SHELL. One overlay, one column. Built on open, destroyed on close, so
+  // nothing in here can outlive its view or keep animating offscreen.
+  //
+  // v1187 (Malik, on-device): the room's dot grid is GONE. The background is
+  // the flat near-black the surfaces already carry, both themes.
+  //
+  // THE CROSS FADE. The flow used to hard cut between screens ("instantly cuts
+  // and pops"). Now the outgoing shell fades out under the incoming one: 180ms
+  // ease-in out, 240ms ease-out in, the motion law's numbers. Reduced motion
+  // cuts straight, which is the correct answer there.
   // ---------------------------------------------------------------------------
   var root = null;      // the live overlay element
   var current = null;   // { name, teardown }
   var escBound = null;
+  var closeBound = null;
+  var FADE_OUT = 180, FADE_IN = 240;
+
+  // THE WAY OUT (Malik, on-device: "there is no way out on the phone").
+  // The app's own fullscreen close chip, the same primitive Clarity shows. An
+  // empty source is the existing "just go home" branch of exitToModules: it
+  // closes whatever module is actually open and lands on the home tab. The
+  // chip's own handler does that part; this listener tears the flow down with
+  // it, so one tap on the phone leaves nothing behind.
+  function exitChip() {
+    try { return document.getElementById('fullscreenCloseGlobal'); } catch (e) { return null; }
+  }
+  function showExit() {
+    try {
+      if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('');
+    } catch (e) {}
+    if (closeBound) return;
+    var x = exitChip();
+    if (!x) return;
+    closeBound = function () { destroy(); };
+    x.addEventListener('pointerdown', closeBound);
+    x.addEventListener('click', closeBound);
+    x.addEventListener('touchend', closeBound);
+  }
+  function hideExit() {
+    var x = exitChip();
+    if (x && closeBound) {
+      x.removeEventListener('pointerdown', closeBound);
+      x.removeEventListener('click', closeBound);
+      x.removeEventListener('touchend', closeBound);
+    }
+    closeBound = null;
+    try {
+      if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide();
+    } catch (e) {}
+  }
+
+  function fadeIn(node) {
+    if (reduced()) return;
+    node.classList.add('is-in');
+    var off = function (e) {
+      if (e && e.target !== node) return;          // child animations bubble
+      node.classList.remove('is-in');
+      node.removeEventListener('animationend', off);
+    };
+    node.addEventListener('animationend', off);
+    // iOS drops animationend under load; the class must never outlive the
+    // animation (a held `both` fill keeps a GPU layer alive forever).
+    setTimeout(off, FADE_IN + 160);
+  }
+  function fadeOut(node) {
+    node.setAttribute('aria-hidden', 'true');
+    if (reduced()) { if (node.parentNode) node.parentNode.removeChild(node); return; }
+    node.classList.add('is-exiting');
+    setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, FADE_OUT + 60);
+  }
 
   function shell(name, opts) {
     opts = opts || {};
-    destroy();
+    // The outgoing screen's LOGIC dies now; only its pixels linger for the
+    // fade, on a timer they cannot outlive.
+    var prev = root;
+    if (escBound) { document.removeEventListener('keydown', escBound); escBound = null; }
+    if (current && typeof current.teardown === 'function') {
+      try { current.teardown(); } catch (e) {}
+    }
+    current = null;
+    root = null;
+    if (prev) fadeOut(prev);
+
     root = el('div', 'afl' + (opts.cine ? ' afl--cine' : ''));
     root.setAttribute('data-screen', name);
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-modal', 'true');
     if (opts.label) root.setAttribute('aria-label', opts.label);
-    var room = el('div', 'afl__room');
-    room.setAttribute('aria-hidden', 'true');
-    root.appendChild(room);
     var col = el('div', 'afl__col');
+    // THE TOP FADE: on a surface that scrolls, the text must keep going and
+    // dissolve, never hit a straight cut under the island. The scrim is the
+    // flow's OWN (the app's #topFade stays hidden here, it painted a light band
+    // over the dark room), it is the surface's own background colour in both
+    // themes, and it runs from y=0 through the safe area and is gone by ~90px.
+    // It lives inside the column so the day screen's M can sit above it.
+    if (opts.top) {
+      var tf = el('div', 'afl__top');
+      tf.setAttribute('aria-hidden', 'true');
+      col.appendChild(tf);
+    }
     root.appendChild(col);
     document.body.appendChild(root);
+    fadeIn(root);
     escBound = function (e) { if (e.key === 'Escape') destroy(); };
     document.addEventListener('keydown', escBound);
+    showExit();
     current = { name: name, teardown: null };
     return col;
   }
@@ -452,8 +536,15 @@
       try { current.teardown(); } catch (e) {}
     }
     current = null;
+    hideExit();
     if (root && root.parentNode) root.parentNode.removeChild(root);
     root = null;
+    // anything still fading out goes with it: nothing outlives the view
+    try {
+      [].forEach.call(document.querySelectorAll('.afl.is-exiting'), function (n) {
+        if (n.parentNode) n.parentNode.removeChild(n);
+      });
+    } catch (e) {}
   }
 
   // The app's standing bottom-button recipe (Clarity's nav geometry). Every
@@ -474,42 +565,120 @@
     b.querySelector('.afl-cta__inv span').textContent = text;
   }
 
-  // THE HOLD. The light fills the button, the label inverts exactly where the
-  // light has reached, and letting go early takes the light straight back.
-  // Nothing important in this module is committed by a bare tap.
-  function bindCtaHold(b, ms, go, guard) {
-    var holding = false;
-    var inv = b.querySelector('.afl-cta__inv span');
-    var fill = b.querySelector('.afl-cta__fill');
-    function stop() {
-      if (!holding) return;
-      holding = false;
-      b.classList.remove('is-holding');
+  // ---------------------------------------------------------------------------
+  // THE HOLD (v1187). Rebuilt on the pattern that is PROVEN on Malik's phone:
+  // _cpBindHold in js/02 (the Clarity fulfilled ring) and the card hold in
+  // js/08. The previous version worked in desktop probes and did nothing at all
+  // on a real iPhone. Every line below is one of the reasons why:
+  //
+  //   1. THE CLOCK IS A CLOCK. Completion used to be gated on the CSS width
+  //      transition's `transitionend`. If iOS drops, defers or recomposites
+  //      that transition (which it does under load, and on any surface it
+  //      decides to hand to a gesture), the event never arrives and the hold
+  //      can NEVER finish. The ring measures Date.now() on a 30ms interval,
+  //      exactly as js/02 does, and the CSS fill is only the picture of it.
+  //   2. pointerdown preventDefault()s, always, once the guard has passed.
+  //      Without it WebKit keeps its own claim on the press (selection, the
+  //      callout, a drag), and the way WebKit takes a claim is pointercancel,
+  //      which is bound to the abort. This was missing on the day hold.
+  //   3. contextmenu is cancelled. Same reason, the other half of the callout.
+  //   4. NO setPointerCapture. Capture retargets the pointer mid gesture and
+  //      shifts which element the boundary events fire on. js/02 and js/08 both
+  //      do without it; the day hold was the only place in the app using it.
+  //   5. NO movement threshold. Neither proven hold cancels on drift, so a real
+  //      finger's tremor cannot unwind the ring.
+  //   6. The mouse guard (secondary buttons never start a hold) comes from
+  //      js/02 verbatim.
+  // The CSS half of the same fix (touch-action: none, -webkit-touch-callout:
+  // none, tap highlight) is on .afl-cta and .afl-day__hold in css/action.css.
+  // ---------------------------------------------------------------------------
+  function aflBindHold(node, ms, onDone, opts) {
+    opts = opts || {};
+    var timer = 0, t0 = 0, running = false, done = false;
+    function tick() {
+      if (!running) return;
+      var p = Math.min((Date.now() - t0) / ms, 1);
+      if (opts.onTick) { try { opts.onTick(p); } catch (e) {} }
+      if (p < 1) return;
+      clearInterval(timer); timer = 0;
+      running = false;
+      done = true;
+      try { onDone(); } catch (e) {}
     }
     function start(e) {
-      if (holding || b.disabled) return;
-      if (guard && !guard()) return;
+      if (done || running) return;
+      if (e && e.pointerType === 'mouse' && e.button !== 0) return;
+      if (opts.guard && !opts.guard()) return;
       if (e && e.preventDefault) e.preventDefault();
-      inv.style.width = b.offsetWidth + 'px';
-      holding = true;
-      void fill.offsetWidth;
-      b.classList.add('is-holding');
+      running = true;
+      t0 = Date.now();
+      if (opts.onStart) { try { opts.onStart(); } catch (e2) {} }
+      if (timer) clearInterval(timer);
+      timer = setInterval(tick, 30);
     }
-    fill.addEventListener('transitionend', function (e) {
-      if (e.propertyName !== 'width' || !holding) return;
-      holding = false;
+    function end() {
+      if (!running) return;
+      running = false;
+      if (timer) { clearInterval(timer); timer = 0; }
+      if (opts.onAbort) { try { opts.onAbort(); } catch (e) {} }
+    }
+    node.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    node.addEventListener('pointerdown', start);
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+      node.addEventListener(ev, end);
+    });
+    node.addEventListener('keydown', function (e) {
+      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); start(); }
+    });
+    node.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') end(); });
+    node.addEventListener('blur', end);
+    return {
+      abort: end,
+      reset: function () { end(); done = false; },
+      isRunning: function () { return running; }
+    };
+  }
+
+  // THE CTA HOLD. The light fills the button, the label inverts exactly where
+  // the light has reached, and letting go early takes the light straight back.
+  // Nothing important in this module is committed by a bare tap.
+  function bindCtaHold(b, ms, go, guard) {
+    var inv = b.querySelector('.afl-cta__inv span');
+    var fill = b.querySelector('.afl-cta__fill');
+    var h = aflBindHold(b, ms, function () {
       b.classList.remove('is-holding');
       go();
+    }, {
+      // the guard runs BEFORE preventDefault, so the steps where this button is
+      // an ordinary tap keep their click.
+      guard: function () { return !b.disabled && (!guard || guard()); },
+      onStart: function () {
+        inv.style.width = b.offsetWidth + 'px';
+        void fill.offsetWidth;
+        b.classList.add('is-holding');
+      },
+      onAbort: function () { b.classList.remove('is-holding'); }
     });
-    b.addEventListener('pointerdown', start);
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { b.addEventListener(ev, stop); });
-    b.addEventListener('keydown', function (e) {
-      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) start(e);
-    });
-    b.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') stop(); });
-    b.addEventListener('blur', stop);
     b.style.setProperty('--afl-hold', (ms / 1000) + 's');
-    return stop;
+    return h.abort;
+  }
+
+  // A NUMBER THAT CHANGES MUST NOT HARD SWAP (Malik, on-device). The new value
+  // arrives from the direction the change came from, 200ms, once. The class
+  // comes back off on animationend so nothing holds a layer.
+  function swapText(node, text, dir) {
+    var t = String(text == null ? '' : text);
+    if (node.textContent === t) return;
+    node.textContent = t;
+    if (reduced()) return;
+    node.classList.remove('afl-swap--up', 'afl-swap--dn');
+    void node.offsetWidth;
+    node.classList.add(dir < 0 ? 'afl-swap--dn' : 'afl-swap--up');
+    if (node.dataset.swapBound) return;
+    node.dataset.swapBound = '1';
+    node.addEventListener('animationend', function () {
+      node.classList.remove('afl-swap--up', 'afl-swap--dn');
+    });
   }
 
   // ===========================================================================
@@ -604,6 +773,31 @@
       });
     });
     sync();
+    return root;
+  }
+
+  // ===========================================================================
+  // 2.1b  THE INTERSTITIAL (Malik, on-device 2026-08-19)
+  // One line between confirming the star and being asked five more things, so
+  // the questions do not arrive out of nowhere. His copy, exactly. It fades in
+  // with the shell, holds long enough to read, and leaves on its own: there is
+  // no button, because nothing here is a decision. Reduced motion cuts in and
+  // keeps the same hold.
+  // ===========================================================================
+  var NOTE_LINE = 'A few more questions. I promise.';
+  var NOTE_MS = 2200;
+
+  function openNote(text, opts) {
+    opts = opts || {};
+    var col = shell('note', { label: 'One moment' });
+    var wrap = el('div', 'afl-note');
+    wrap.appendChild(el('p', null, text || NOTE_LINE));
+    col.appendChild(wrap);
+    var t = setTimeout(function () {
+      t = null;
+      if (typeof opts.onDone === 'function') opts.onDone();
+    }, opts.ms || NOTE_MS);
+    current.teardown = function () { if (t) clearTimeout(t); };
     return root;
   }
 
@@ -977,7 +1171,11 @@
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
     var plan = opts.plan || fx.plan;
-    var col = shell('logic', { label: 'Why this plan' });
+    // top: the only scrolling surface in the flow, so the only one that needs
+    // the flow's own top scrim (his "the goal title gets sliced" note).
+    var col = shell('logic', { label: 'Why this plan', top: true });
+    var lgTimers = [];
+    current.teardown = function () { lgTimers.forEach(clearTimeout); lgTimers = []; };
 
     var c = el('div', 'afl-lg');
     var sc = el('div', 'afl-lg__sc');
@@ -1032,6 +1230,7 @@
         d.appendChild(el('s', null, label));
         d.appendChild(el('b', null, String(value)));
         eq.appendChild(d);
+        return d;
       }
       (plan.eq.rows || []).forEach(function (r) { eqRow(r.label, r.value); });
       (plan.eq.compute || []).forEach(function (r) {
@@ -1039,12 +1238,19 @@
         // The client is the last word on arithmetic: if the written value and
         // the expression disagree by more than 2%, the computed number is what
         // the person reads, and the plan is flagged for the judge.
-        var shown = r.shown;
+        var fixed = null;
         if (!chk.ok && chk.value != null) {
           eqOk = false;
-          shown = '≈ ' + Math.round(chk.value).toLocaleString();
+          fixed = '≈ ' + Math.round(chk.value).toLocaleString();
         }
-        eqRow(r.label, shown);
+        var rowEl = eqRow(r.label, r.shown);
+        // THE SUBSTITUTION READS. The written number lands first, then corrects
+        // itself once the page has settled, with the same quiet 200ms the rail
+        // uses. A silent hard swap on paint would just look like a typo.
+        if (fixed) {
+          var vb = rowEl.querySelector('b');
+          lgTimers.push(setTimeout(function () { swapText(vb, fixed, 1); }, 520));
+        }
       });
       if (plan.eq.result) eqRow(plan.eq.result.label, plan.eq.result.value, 'is-result');
       box.appendChild(eq);
@@ -1246,8 +1452,10 @@
     // ---- state --------------------------------------------------------------
     var actCount = 3;                        // star + both supports (arrives full)
     var val = hasSize ? named[named.length - 1] : 0;
+    var lastVal = val;
     var ticks = sups.map(function () { return false; });
     var signed = false;
+    var railTicks = [];
 
     function ladderAsc() {
       var L = hasSize ? ladder.slice() : [0, 1, 2];
@@ -1289,13 +1497,16 @@
       var m = starAct.text.match(/^(.*?)(\d+\s*(?:minutes|minute|mins|min|hours|hour|hrs|hr))(.*)$/i);
       if (m) {
         pre.textContent = m[1];
-        tok.textContent = label;
+        // the number the rail is moving: it arrives from the direction the rail
+        // went, never a hard swap (his on-device note).
+        swapText(tok, label, (val === lastVal) ? 1 : (ascending ? (val > lastVal ? 1 : -1) : (val < lastVal ? 1 : -1)));
         post.textContent = m[3];
       } else {
         pre.textContent = starAct.text;
         tok.textContent = '';
         post.textContent = '';
       }
+      lastVal = val;
     }
     function drawPlate() {
       supEls.forEach(function (b, k) {
@@ -1308,23 +1519,46 @@
       });
       ruleEl.classList.toggle('is-gone', actCount === 1);
     }
-    function drawRail() {
-      rail.classList.toggle('is-hide', signed || off || !hasSize);
-      if (signed || off || !hasSize) return;
-      var L = ladderAsc();
-      var i = L.indexOf(val);
+    // THE RAIL (Malik, on-device: "animate it nicely"). It used to rebuild every
+    // tick node on every change, so a brand new element started at its final
+    // size and NO transition ever ran: that is the whole reason it felt
+    // stepped. The ticks are built once and only ever change class from here,
+    // and the two neighbours either side answer the active one, so the rail
+    // reads as one liquid thing instead of six separate states.
+    function railIndex() {
+      var L = ladderAsc(), i = L.indexOf(val);
       if (i < 0) {
         var best = 0, bd = Infinity;
         L.forEach(function (v, j) { var d = Math.abs(v - val); if (d < bd) { bd = d; best = j; } });
         i = best;
       }
+      return i;
+    }
+    function buildRail() {
+      var L = ladderAsc();
       rail.innerHTML = '';
+      railTicks = [];
       for (var j = L.length - 1; j >= 0; j--) {
         var t = el('i');
-        if (named.indexOf(L[j]) > -1) t.className = 'is-mk';
-        if (j === i) t.className = 'is-on';
         rail.appendChild(t);
+        railTicks.push(t);       // painted top down: largest value first
       }
+    }
+    function drawRail() {
+      rail.classList.toggle('is-hide', signed || off || !hasSize);
+      if (signed || off || !hasSize) return;
+      var L = ladderAsc();
+      if (railTicks.length !== L.length) buildRail();
+      var i = railIndex();
+      railTicks.forEach(function (t, rowIdx) {
+        var j = L.length - 1 - rowIdx;
+        var d = Math.abs(j - i);
+        var cls = (named.indexOf(L[j]) > -1) ? 'is-mk' : '';
+        if (d === 0) cls += ' is-on';
+        else if (d === 1) cls += ' is-n1';
+        else if (d === 2) cls += ' is-n2';
+        t.className = cls.trim();
+      });
       rail.setAttribute('aria-valuemin', '0');
       rail.setAttribute('aria-valuemax', String(L.length - 1));
       rail.setAttribute('aria-valuenow', String(i));
@@ -1389,7 +1623,6 @@
     });
 
     // ---- the hold: 3 seconds, and the background itself goes green ----------
-    var holdT = null;
     function riseStart() {
       if (reduced()) return;
       rise.style.transition = 'height ' + (DAY_HOLD / 1000) + 's linear';
@@ -1415,23 +1648,14 @@
         }, 480);
       }, 520);
     }
-    function startHold(e) {
-      if (signed || holdT) return;
-      if (e && e.pointerId != null) { try { hold.setPointerCapture(e.pointerId); } catch (z) {} }
-      riseStart();
-      holdT = setTimeout(function () { holdT = null; complete(); }, DAY_HOLD);
-    }
-    function stopHold() {
-      if (holdT) { clearTimeout(holdT); holdT = null; }
-      if (!signed) riseAbort();
-    }
-    hold.addEventListener('pointerdown', startHold);
-    ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { hold.addEventListener(ev, stopHold); });
-    hold.addEventListener('keydown', function (e) {
-      if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); startHold(); }
+    // The gesture itself is aflBindHold, the pattern that is proven on his
+    // phone. What used to be here (a bare setTimeout, no preventDefault, and a
+    // setPointerCapture) is exactly what a real iPhone refused to run.
+    var dayHold = aflBindHold(hold, DAY_HOLD, complete, {
+      guard: function () { return !signed; },
+      onStart: riseStart,
+      onAbort: function () { if (!signed) riseAbort(); }
     });
-    hold.addEventListener('keyup', stopHold);
-    hold.addEventListener('blur', stopHold);
 
     function complete() {
       signed = true;
@@ -1453,6 +1677,7 @@
     }
     undo.addEventListener('click', function () {
       signed = false;
+      dayHold.reset();          // the day can be held again
       rise.style.transition = 'none';
       rise.style.height = '0';
       rise.style.opacity = '1';
@@ -1488,14 +1713,15 @@
   // ===========================================================================
   function demo(key, from) {
     key = FIXTURES[key] ? key : 'weight';
-    var order = ['intent', 'refine', 'loading', 'logic', 'day'];
+    var order = ['intent', 'note', 'refine', 'loading', 'logic', 'day'];
     var at = Math.max(0, order.indexOf(from || 'intent'));
     function step(n) {
       var name = order[n];
       if (name === 'intent') return openIntent(key, { onConfirm: function () { setTimeout(function () { step(1); }, 420); } });
-      if (name === 'refine') return openRefine(key, { onDone: function () { step(2); } });
-      if (name === 'loading') return openLoading(key, { onOpen: function () { step(3); } });
-      if (name === 'logic') return openLogic(key, { onAgree: function () { setTimeout(function () { step(4); }, 320); } });
+      if (name === 'note') return openNote(NOTE_LINE, { onDone: function () { step(2); } });
+      if (name === 'refine') return openRefine(key, { onDone: function () { step(3); } });
+      if (name === 'loading') return openLoading(key, { onOpen: function () { step(4); } });
+      if (name === 'logic') return openLogic(key, { onAgree: function () { setTimeout(function () { step(5); }, 320); } });
       return openDay(key, {});
     }
     return step(at);
@@ -1503,6 +1729,7 @@
 
   var ActionFlow = {
     openIntent: openIntent,
+    openNote: openNote,
     openRefine: openRefine,
     openLoading: openLoading,
     openLogic: openLogic,

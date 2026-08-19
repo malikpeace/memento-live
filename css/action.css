@@ -4759,7 +4759,9 @@ body:has(.action-exp[data-heat]) .fullscreen-close-global {
 /* ---- the shell ---------------------------------------------------------- */
 .afl {
   --afl-bg: #050608;
-  --afl-dot: rgba(var(--ink), 0.16);
+  /* the same colour as a triple, so the top scrim can fade it to nothing
+     without ever interpolating through a foreign hue */
+  --afl-bg-rgb: 5, 6, 8;
   --afl-hold: 0.78s;
   position: fixed; inset: 0; z-index: var(--z-modal);
   display: flex; flex-direction: column; overflow: hidden;
@@ -4767,7 +4769,55 @@ body:has(.action-exp[data-heat]) .fullscreen-close-global {
   font-family: var(--font); font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
 }
-html.theme-light .afl { --afl-bg: var(--surface-0); --afl-dot: rgba(var(--ink), 0.13); }
+html.theme-light .afl { --afl-bg: var(--surface-0); --afl-bg-rgb: 238, 240, 243; }
+
+/* THE CROSS FADE between screens (v1187, Malik on-device: it "instantly cuts
+   and pops"). The outgoing shell fades under the incoming one. Motion law
+   numbers: 180 out on ease-in, 240 in on the app's ease-out. The classes are
+   removed the moment the animation ends, so no `both` fill holds a layer. */
+.afl.is-in { animation: aflShellIn 0.24s var(--ease-out) both; }
+.afl.is-exiting { pointer-events: none; animation: aflShellOut 0.18s ease-in both; }
+@keyframes aflShellIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aflShellOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* THE TOP FADE (v1187). On a surface that scrolls, the text keeps going and
+   dissolves instead of hitting a straight cut under the island. It is the
+   surface's OWN background colour in both themes, so it can never be a light
+   band on dark (the reason the app's #topFade is hidden on these screens). It
+   covers y=0 through the safe area and is gone by ~90px. It sits inside the
+   column at z4, under the day screen's M (z5), over everything that scrolls. */
+.afl__top {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none;
+  height: max(90px, calc(var(--safe-t) + 44px));
+  background: linear-gradient(180deg,
+    rgb(var(--afl-bg-rgb)) 0,
+    rgb(var(--afl-bg-rgb)) max(47px, var(--safe-t)),
+    rgba(var(--afl-bg-rgb), 0.86) max(62px, calc(var(--safe-t) + 16px)),
+    rgba(var(--afl-bg-rgb), 0) 100%);
+}
+
+/* A NUMBER THAT CHANGES arrives, it never hard swaps (his on-device note).
+   200ms, from the direction the change came from, once, nothing loops. */
+.afl-swap--up { animation: aflSwapUp 0.2s var(--ease-out) both; }
+.afl-swap--dn { animation: aflSwapDn 0.2s var(--ease-out) both; }
+@keyframes aflSwapUp { from { opacity: 0.22; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes aflSwapDn { from { opacity: 0.22; transform: translateY(-5px); } to { opacity: 1; transform: none; } }
+
+/* THE INTERSTITIAL: one line, alone, centred, no chrome. It is the wall's own
+   type one size down, so it reads as the same voice, not a new screen. */
+.afl-note {
+  flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+  padding: max(34px, calc(var(--safe-t) + 12px)) 31px calc(var(--safe-b) + 34px);
+}
+.afl-note p {
+  margin: 0; max-width: 15ch; text-align: left; text-wrap: pretty;
+  font-size: 31px; font-weight: 500; line-height: 1.26; letter-spacing: -0.026em;
+  color: var(--text-hi);
+}
+@media (prefers-reduced-motion: reduce) {
+  .afl.is-in, .afl.is-exiting,
+  .afl-swap--up, .afl-swap--dn { animation: none; }
+}
 /* These are full-screen experiences: the mobile top fade would paint a band
    across the top of them (and a LIGHT band across the dark onboarding wall).
    Same idiom misc.css already uses for the other full-screen surfaces. */
@@ -4781,39 +4831,9 @@ body:has(.afl) #topFade { display: none; }
      pins the same way). */
   width: 100%; max-width: 430px; margin: 0 auto;
 }
-/* THE ROOM: Points (Malik's pick). Dots where a graph paper's lines would have
-   crossed: the workbench without the cage. Two sparse offset subsets breathe on
-   uneven cycles. Neutral ink only, never a hue. Full bleed behind the column. */
-.afl__room {
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image: linear-gradient(var(--afl-dot) 1.8px, transparent 1.8px);
-  background-size: 34px 34px; background-position: 16px 16px;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.8px, transparent 1.8px);
-  mask-image: linear-gradient(90deg, transparent 0, #000 1.8px, transparent 1.8px);
-  -webkit-mask-size: 34px 34px; mask-size: 34px 34px;
-  -webkit-mask-position: 16px 16px; mask-position: 16px 16px;
-}
-.afl__room::before, .afl__room::after {
-  content: ''; position: absolute; inset: 0;
-  background-image: inherit; background-size: 101px 101px;
-  -webkit-mask-image: inherit; mask-image: inherit;
-  -webkit-mask-size: 101px 101px; mask-size: 101px 101px;
-}
-.afl__room::before {
-  background-position: 49px 83px;
-  -webkit-mask-position: 49px 83px; mask-position: 49px 83px;
-  animation: aflRoomA 9s ease-in-out infinite alternate;
-}
-.afl__room::after {
-  background-position: 83px 16px;
-  -webkit-mask-position: 83px 16px; mask-position: 83px 16px;
-  animation: aflRoomB 13s ease-in-out -5s infinite alternate;
-}
-@keyframes aflRoomA { from { opacity: 0; } to { opacity: 0.9; } }
-@keyframes aflRoomB { from { opacity: 0.85; } to { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .afl__room::before, .afl__room::after { animation: none; opacity: 0.4; }
-}
+/* THE ROOM IS GONE (v1187, Malik on-device: "kill the dots"). The graph-paper
+   dot grid that used to live here is deleted in both themes; the background is
+   the flat near-black these surfaces already carry. Nothing replaced it. */
 
 /* DARK CINEMA: the onboarding wall keeps the dark room in every theme. ONE
    root rule, the same token block base.css gives its other dark scenes. */
@@ -4821,7 +4841,7 @@ html.theme-light .afl--cine {
   color-scheme: dark;
   --ink: 255, 255, 255;
   --afl-bg: #050608;
-  --afl-dot: rgba(var(--ink), 0.16);
+  --afl-bg-rgb: 5, 6, 8;
   --surface-0: #040405;
   --surface-1: rgba(var(--ink), 0.04); --surface-2: rgba(var(--ink), 0.072); --surface-3: rgba(var(--ink), 0.10);
   --hairline: rgba(var(--ink), 0.09); --hairline-strong: rgba(var(--ink), 0.16);
@@ -4843,6 +4863,13 @@ html.theme-light .afl--cine {
   font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   background: var(--kfill-04); color: rgba(var(--ink), 0.58);
   cursor: default; -webkit-user-select: none; user-select: none;
+  /* THE HOLD'S OTHER HALF (v1187). Without touch-action: none iOS keeps the
+     press as a candidate pan and hands it away mid hold, and the way it hands
+     it away is pointercancel, which unwinds the ring. The callout and the tap
+     highlight are the same gesture from the other side. Copied from .cp-hold
+     in css/clarity.css, the hold that is proven on his phone. */
+  touch-action: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   transition: background var(--t-base) ease, color var(--t-base) ease, transform 0.15s ease;
 }
 .afl-cta__lab { position: relative; display: block; text-align: center; }
@@ -4887,10 +4914,6 @@ html.theme-light .afl--cine {
    light and lifts the wall a step, so the screen finishes brighter than it
    started.
    ========================================================================== */
-.afl[data-screen="intent"] .afl__room { opacity: 0.62; transition: opacity 0.6s var(--ease-out); }
-.afl[data-screen="intent"][data-lit="1"] .afl__room { opacity: 0.8; }
-.afl[data-screen="intent"][data-lit="2"] .afl__room { opacity: 1; }
-.afl[data-screen="intent"][data-lit="3"] .afl__room { opacity: 1; }
 .afl-int__type {
   flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center;
   padding: max(31px, calc(var(--safe-t) + 12px)) 31px 0;
@@ -4944,7 +4967,7 @@ html.theme-light .afl--cine {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9), 0 1px 0 rgba(var(--ink), 0.16);
 }
 @media (prefers-reduced-motion: reduce) {
-  .afl-int__z, .afl-int__z > *, .afl[data-screen="intent"] .afl__room { transition: none; }
+  .afl-int__z, .afl-int__z > * { transition: none; }
 }
 
 /* ==========================================================================
@@ -5133,11 +5156,19 @@ html.theme-light .afl--cine {
    Flat: no glass cards. Ruled sections, hairlines above and below, more air.
    Three parts, each of which skims alone.
    ========================================================================== */
+/* v1187: the top inset moved OFF the page and ONTO the scroll box's own
+   padding, so the scroll box now starts at y=0 and the text travels up into
+   the safe area and dissolves under .afl__top instead of being sliced at a
+   straight edge (his screenshot: the goal title cut in half). The content's
+   resting top clears the scrim's ~90px so nothing is dimmed at rest. */
 .afl-lg {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
-  padding: max(65px, calc(var(--safe-t) + 26px)) 26px 0;
+  padding: 0 26px;
 }
-.afl-lg__sc { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.afl-lg__sc {
+  flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding-top: max(96px, calc(var(--safe-t) + 50px));
+}
 .afl-lg__sc::-webkit-scrollbar { display: none; }
 .afl-lg__star {
   margin: 0 0 18px; font-size: 31px; font-weight: 700; line-height: 1.28;
@@ -5179,7 +5210,8 @@ html.theme-light .afl--cine {
 }
 .afl-lg__eq div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .afl-lg__eq s { text-decoration: none; font-size: 15.6px; color: rgba(var(--ink), 0.78); }
-.afl-lg__eq b { font-size: 18.2px; font-weight: 700; color: var(--text-hi); white-space: nowrap; }
+/* inline-block so a re-checked number can arrive with the change animation */
+.afl-lg__eq b { display: inline-block; font-size: 18.2px; font-weight: 700; color: var(--text-hi); white-space: nowrap; }
 .afl-lg__eq .is-result { padding-top: 12px; box-shadow: inset 0 1px 0 rgba(var(--ink), 0.13); }
 .afl-lg__eq .is-result b { font-size: 21.5px; }
 .afl-lg__q { margin: 0 0 7px; font-size: 16.9px; font-weight: 700; letter-spacing: -0.012em; color: var(--text-hi); line-height: 1.35; }
@@ -5303,6 +5335,9 @@ html.theme-light .afl--cine {
   color: var(--text-hi); text-wrap: pretty;
 }
 .afl-day__star.is-off { text-align: left; }
+/* the size token the rail owns. inline-block so the change animation can move
+   it, and so a size never breaks across two lines mid word. */
+.afl-day__tok { display: inline-block; }
 /* beat 2: SIZE IT. the graduation rail, one small tick per size on the right
    edge, named sizes longer, the current size a long bright mark. */
 .afl-day__rail {
@@ -5311,11 +5346,26 @@ html.theme-light .afl--cine {
   border: 0; background: none; padding: 3px 13px 3px 0;
   display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;
 }
+/* THE GRAB AREA (v1187, Malik on-device: it must be catchable from well outside
+   the lines). A padded hit layer, absolutely positioned so it is NOT a flex
+   item and the visible geometry is untouched: ~40px left and ~36px above and
+   below the control box, which is ~50px clear of the widest visible tick. The
+   right edge is the screen edge, so it cannot reach further there. */
+.afl-day__rail::before {
+  content: ''; position: absolute; top: -36px; bottom: -36px; left: -40px; right: 0;
+}
+/* the ticks are built ONCE and only change class (js/30), so these transitions
+   actually run. Rebuilding the nodes is what made the rail feel stepped. */
 .afl-day__rail i {
   width: 10.4px; height: 2.6px; border-radius: 1px; background: rgba(var(--ink), 0.20);
-  pointer-events: none; transition: width 0.14s ease-out, background 0.14s ease-out, height 0.14s ease-out;
+  pointer-events: none;
+  transition: width 0.2s var(--ease-out), height 0.2s var(--ease-out), background 0.2s var(--ease-out);
 }
 .afl-day__rail i.is-mk { width: 17px; background: rgba(var(--ink), 0.32); }
+/* the neighbours answer the active tick, one step each, so the rail moves as
+   one thing instead of a single line jumping between six slots */
+.afl-day__rail i.is-n2 { width: 14px; height: 2.6px; background: rgba(var(--ink), 0.34); }
+.afl-day__rail i.is-n1 { width: 19.5px; height: 3.2px; background: rgba(var(--ink), 0.56); }
 .afl-day__rail i.is-on { width: 26px; height: 3.9px; background: rgba(var(--ink), 0.95); }
 .afl-day__rail.is-hide { display: none; }
 .afl-day__rail:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; border-radius: 8px; }
@@ -5374,6 +5424,9 @@ html.theme-light .afl--cine {
   border-radius: var(--r-ctrl); background: var(--solid-bg); color: var(--solid-fg);
   font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none;
+  /* v1187: the callout was the missing one here. iOS raises it on a long press
+     over text and cancels the pointer stream to do it. */
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.38);
 }
 .afl-day__hold span { display: block; text-align: center; }
@@ -5419,6 +5472,8 @@ html.theme-light .afl__rise { background: rgba(var(--success-rgb), 0.30); }
 html.theme-light .afl-day__no { color: rgba(var(--ink), 0.70); }
 html.theme-light .afl-day__rail i { background: rgba(var(--ink), 0.30); }
 html.theme-light .afl-day__rail i.is-mk { background: rgba(var(--ink), 0.44); }
+html.theme-light .afl-day__rail i.is-n2 { background: rgba(var(--ink), 0.46); }
+html.theme-light .afl-day__rail i.is-n1 { background: rgba(var(--ink), 0.66); }
 html.theme-light .afl-day__m path { fill: rgba(var(--ink), 0.46); }
 html.theme-light .afl-nav__sub { color: rgba(var(--ink), 0.72); }
 html.theme-light .afl-lg__ar b.is-from { color: rgba(var(--ink), 0.70); }
