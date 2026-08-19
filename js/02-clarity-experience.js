@@ -10172,7 +10172,7 @@ function _bindStarPlacard(root) {
     // there is no synthesized star yet. Used ONLY for the cheat-bar preview;
     // never written to state.
     const FILLER_ANSWERS = {
-      neutronStar: 'Build Memento into the tool that gets a million people locked in on the one thing that actually matters',
+      neutronStar: 'Grow Memento to 1,000 paying users who would miss it if it disappeared',
       coreWhy: 'Too many people stay busy for years without ever moving, and most apps feed the distraction instead of cutting it.',
       antiVision: 'Another well-designed app people download, admire for a day, and forget by the weekend.',
       futureVision: 'A product people open every morning because it points them straight at the one move that matters that day.',
@@ -10188,10 +10188,17 @@ function _bindStarPlacard(root) {
         try {
           const ans = state.clarity.answers || {};
           const hasStar = String(ans.neutronStar || '').trim().length > 0;
+          // v1185 (Malik): the dev jump should land on a goal the tracking can
+          // actually demo, so a numberless star gets the numeric filler too.
+          let numeric = false;
+          try {
+            const t = (typeof extractGoalTarget === 'function') ? extractGoalTarget(String(ans.neutronStar || '')) : null;
+            numeric = !!(t && t.target !== null && t.target !== undefined);
+          } catch (e) {}
           // v881 (Malik): cheat jumps must leave REAL-flow state behind. With
           // no real star, the filler becomes the state's star, exactly as if
           // the user had synthesized it, so the home/gates read post-Clarity.
-          if (!hasStar) state.clarity.answers = Object.assign({}, ans, FILLER_ANSWERS);
+          if (!hasStar || !numeric) state.clarity.answers = Object.assign({}, ans, FILLER_ANSWERS);
           devSummary = normalizeClaritySummary(state.clarity.answers);
         } catch (e) {}
       }
@@ -10452,8 +10459,14 @@ function _cpStanding(f, why) {
       _cpWhyBlock(why);
   }
 
-  // why-led: no standing block at all, the why leads the page in large type.
-  return why ? '<div class="cp-why cp-why--hero">' + esc(why) + '</div>' : '';
+  // why-led: the why leads the page in large type. Below it, the honest
+  // state of the measuring: this goal carries no number, so the page says so
+  // and offers the door (the tweak flow) instead of tracking nothing.
+  // v1185 (Malik on-device: "i dont see a spot to put in any numbers").
+  return (why ? '<div class="cp-why cp-why--hero">' + esc(why) + '</div>' : '') +
+    '<div class="cp-div"></div><div class="cp-lab">Where you stand</div>' +
+    '<div class="cp-none">This goal has no number yet, so there is nothing to measure.</div>' +
+    '<button type="button" class="cp-upd" id="cpGiveNumber">' + CP_ICON_EDIT + 'Put a number on it</button>';
 }
 
 function _cpNebula() {
@@ -11352,6 +11365,9 @@ function _cpBindSummaryPage(pager) {
   if (upd) upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
   const twk = pager.querySelector('#cpTweak');
   if (twk) twk.addEventListener('click', function () { clarityOpenTweak(); });
+  // the numberless goal's door: same tweak flow, reached from the nudge
+  const gn = pager.querySelector('#cpGiveNumber');
+  if (gn) gn.addEventListener('click', function () { clarityOpenTweak(); });
 }
 
 /* Repaint page 2 in place after a save, and walk the rail from where it was
