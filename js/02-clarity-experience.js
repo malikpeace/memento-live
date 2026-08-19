@@ -10195,7 +10195,14 @@ function _bindStarPlacard(root) {
       synth: () => { openShell(); showSynth(); },
       reveal: () => { openShell(); showCeremony('reveal'); },
       star: () => { openShell(); showCeremony('star'); },
-      summary: () => { openShell(); try { ClarityExperience.openSummary(); } catch (e) {} }
+      summary: () => {
+        // openShell marks the experience open, which trips openSummary's
+        // already-open guard into a silent no-op. Prime the state via the
+        // shell, then hand the actual open to openSummary itself.
+        openShell();
+        ClarityExperience.isOpen = false;
+        try { ClarityExperience.openSummary(); } catch (e) {}
+      }
     };
 
     // Free back/forth scrubber over the synth beat + five ceremony acts.
