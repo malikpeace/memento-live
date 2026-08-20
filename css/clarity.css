@@ -4756,12 +4756,19 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
 .cp-num__unit { display: inline-block; color: var(--cp-acc); font-size: 0.32em; font-weight: 700; margin-left: 0.34em; letter-spacing: 0; }
 .cp-asof { color: rgba(255, 255, 255, 0.45); font-size: 13px; font-weight: 600; margin-top: 9px; }
 .cp-none { color: rgba(255, 255, 255, 0.94); font-size: 15px; font-weight: 600; margin-top: 10px; }
-.cp-none--tap {
-  background: none; border: 0; font-family: inherit; cursor: pointer;
-  -webkit-tap-highlight-color: transparent; padding: 10px 12px;
+/* v1219 (Malik, on-device): the empty state's door must LOOK like a door. */
+.cp-logfirst {
+  margin-top: 14px; display: inline-flex; align-items: center;
+  padding: 10px 18px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09); color: #fff;
+  font-size: 14px; font-weight: 650;
+  border: 0; font-family: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: transform 0.18s ease;
 }
-.cp-none--tap:active { transform: scale(0.975); }
+.cp-logfirst:active { transform: scale(0.97); }
+.cp-logfirst:focus-visible { outline: 2px solid var(--cp-acc); outline-offset: 2px; }
 .cp-prog { margin: 18px auto 0; width: 100%; max-width: 280px; }
 .cp-track { position: relative; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
 .cp-track__fill {
@@ -4874,6 +4881,7 @@ html.theme-light .cp-num, html.theme-light .cp-why { color: rgba(24, 26, 33, 0.9
 html.theme-light .cp-num__unit { color: #0d8ca6; }
 html.theme-light .cp-asof { color: rgba(24, 26, 33, 0.45); }
 html.theme-light .cp-none { color: rgba(24, 26, 33, 0.94); }
+html.theme-light .cp-logfirst { background: rgba(24, 26, 33, 0.07); color: rgba(24, 26, 33, 0.9); box-shadow: none; }
 html.theme-light .cp-track { background: rgba(24, 26, 33, 0.1); }
 html.theme-light .cp-track__fill { background: linear-gradient(90deg, #3fb6cd, #0d8ca6); }
 html.theme-light .cp-pts { color: rgba(24, 26, 33, 0.45); }

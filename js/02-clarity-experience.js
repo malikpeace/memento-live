@@ -10450,7 +10450,10 @@ function _cpStanding(f, why) {
           '<s>to go</s></div>';
       }
     } else {
-      html += '<button type="button" class="cp-none cp-none--tap" id="cpUpdate">No number logged yet.</button>';
+      /* v1219 (Malik, on-device): plain text failed as a door, he could not
+         find the update screen. The empty state gets a real button. */
+      html += '<div class="cp-none">No number logged yet.</div>' +
+        '<button type="button" class="cp-logfirst" id="cpUpdate">Log your number</button>';
     }
     /* Adjudicated (Fable, 2026-08-19): the "Neutron Star Fulfilled" lock chip
        lives on the UPDATE SCREEN only (checklist Completion section + the
