@@ -170,7 +170,11 @@
       if (LOCAL) { MementoPush._lastSync = { skipped: 'local' }; return Promise.resolve(); }
       var j = sub.toJSON ? sub.toJSON() : sub;
       var keys = j.keys || {};
-      var device = (typeof deviceId === 'function') ? deviceId() : '';
+      // v1217 THE no-device-id BUG: a bare `deviceId` global never existed
+      // (it is private to js/00 and js/22), so this line always produced ''
+      // and every subscription upload silently skipped. Analytics.deviceId
+      // is the app's real accessor, the same one every AI call uses.
+      var device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : '';
       if (!device) { MementoPush._lastSync = { skipped: 'no-device-id' }; return Promise.resolve(); }
       var ctx = buildContext();
       var today = (typeof getTodayISO === 'function') ? getTodayISO() : null;
@@ -210,7 +214,7 @@
     var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
     var token = remoteToken();
     var device = '';
-    try { device = (typeof deviceId === 'function') ? deviceId() : ''; } catch (e) {}
+    try { device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : ''; } catch (e) {}
     var remove = Promise.resolve();
     if (url && anon && token && token !== anon && device) {
       remove = fetch(fnUrl(), {
