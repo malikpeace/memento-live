@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1221';
+window.MEMENTO_JS_BUILD = 'v1222';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -800,7 +800,14 @@ let _accentDriftStart = 0;
 function _accentDriftTick() {
   const b = document.body; if (!b) return;
   const PERIOD = 30000; // one full loop through the M palette
-  const t = ((Date.now() - _accentDriftStart) % PERIOD) / PERIOD * _ACCENT_DRIFT_STOPS.length;
+  // A DEVICE CLOCK CAN GO BACKWARDS: a manual correction, an NTP step, or the
+  // 5-tap date diagnostic. The raw remainder keeps that minus sign, so the
+  // index below went negative, _ACCENT_DRIFT_STOPS[-1] was undefined, and this
+  // threw every 400ms for the rest of the session (found by the Stage C sim,
+  // 2026-08-20, reproducible by setting the clock back an hour). Wrapping the
+  // remainder positive costs nothing and the drift just carries on.
+  const elapsed = (((Date.now() - _accentDriftStart) % PERIOD) + PERIOD) % PERIOD;
+  const t = elapsed / PERIOD * _ACCENT_DRIFT_STOPS.length;
   const i = Math.floor(t) % _ACCENT_DRIFT_STOPS.length;
   const j = (i + 1) % _ACCENT_DRIFT_STOPS.length;
   const f = t - Math.floor(t);

@@ -175,6 +175,25 @@
     } catch (e) { return 'target'; }
   }
 
+  /* The closed days that were MOVES, for the goal on screen. A rest day is a
+     kept day, not a move, so it is not counted; a day belonging to a retired
+     star is not this goal's. Same rule as js/27's goalDays and js/29's
+     goalDayKeys, so no two surfaces can ever count differently. */
+  function goalMoveCount(gp) {
+    try {
+      var hash = (gp && gp.starHash) || '';
+      var recs = (state && state.dayRecords) || {};
+      var n = 0;
+      Object.keys(recs).forEach(function (k) {
+        var r = recs[k];
+        if (!r || r.off) return;
+        if (hash && r.starHash && r.starHash !== hash) return;
+        n++;
+      });
+      return n;
+    } catch (e) { return 0; }
+  }
+
   function buildRewardCtx(opts) {
     opts = opts || {};
     var gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : (state.goalProgress || null);
@@ -190,10 +209,15 @@
       ledger: opts.ledger || (state.rewards && state.rewards.ledger) || {}
     };
     if (shape === 'count') {
-      /* total completed actions is the honest count until the new day
-         records carry per-goal totals (foundation writes those next) */
-      ctx.count = (state.action && Array.isArray(state.action.completionHistory))
-        ? state.action.completionHistory.length : 0;
+      /* THE MOVES LOGGED FOR THIS GOAL, and only this goal (Stage C sim,
+         2026-08-20). The old read was completionHistory.length, which is the
+         whole app's spine: every goal ever, rest days included. In a 90-day
+         frequency run that printed "your 70th time" on the milestone screen
+         while the daily page and the finale, which both read the day records
+         through the filter below, said 35. Three surfaces, one number, so
+         they read it the same way now: js/27 goalDays, js/29 goalDayKeys and
+         this are the same rule. */
+      ctx.count = goalMoveCount(gp);
       ctx.countTarget = opts.countTarget; /* undefined -> Infinity: shadow never false-finales */
     }
     if (shape === 'duration') {
