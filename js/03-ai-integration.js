@@ -88,6 +88,7 @@ HARD BANS (a checker rejects violations; get them right the first time):
 - No em or en dashes, ever. Periods or commas.
 - No negate-then-redefine, in ANY order or wording: "It's not X, it's Y", "X was never the problem, Y was", "it reads like X, but the real Y is Z", a trailing ", not just X", or the trick split across two sentences. State the thing plainly. (An honest concession is fine: "31 isn't old, but you have more experience.")
 - No AI tics: "Morning arrives", "the purpose behind", "genuinely changing", "deeply meaningful", "authentic", "intentional living", "what truly matters", "the work that matters", "fades into noise", "proof that", "quiet proof", "this is bigger than", "wake people up", "stronger than distraction", "essentially", "fundamentally", "at the end of the day", "operator over dreamer", "the right people are actually using".
+- No unslop tells (Malik adopted the unslop list 2026-08-19): no "delve", "testament to", "pivotal", "showcase", "tapestry", "underscores", "fostering", "garner", "vibrant", "intricate", "evolving landscape", "deeply rooted", "setting the stage"; no fancy is ("serves as", "stands as", "boasts"); no "leverage"/"utilize"/"facilitate" (use "use"/"help"); no "studies show"/"experts say" (cite THEIR numbers or say nothing); no sentence tails like ", highlighting..." or ", showcasing..."; no "it is important to note"; no "I hope this helps" or "let me know".
 - No "pull" for attraction or motivation in any form, no "actually landed", "let you breathe", "never go back", "closest to true", "which is honest", "is the line where", "the whole game". For excitement always: "gets you excited" / "what part actually gets you excited".
 - No corny reassurance or object-speak ("Your star held its shape", "Your journey is waiting"). State facts plainly ("Saved. Pick up where you left off.") or say nothing.
 - No riddles the reader must decode. If an insight is worth saying, say it plainly ("That comic is about you.").
@@ -204,7 +205,17 @@ const VOICE_BANNED = [
   // v890 rerun escapes: "isn't X anymore, it's just Y" / "you're not X, you're just Y".
   [/\b(isn'?t|aren'?t|wasn'?t)\b[^.!?]{2,45}?\banymore,\s*(it'?s|they'?re|you'?re|that'?s)\s+(just\s+)?/i, 'anymore-contrast ("isn\'t X anymore, it\'s just Y")'],
   [/\byou'?re\s+not\b[^.!?]{2,45}?,\s*you'?re\s+(just\s+)?/i, 'you-contrast ("you\'re not X, you\'re just Y")'],
-  [/\b(doesn'?t|don'?t)\s+happen\s+in\b[^.!?]{2,45}?[.!?]\s*(it|they)\s+happens?\b/i, 'happen-contrast ("doesn\'t happen in X. It happens Y")']
+  [/\b(doesn'?t|don'?t)\s+happen\s+in\b[^.!?]{2,45}?[.!?]\s*(it|they)\s+happens?\b/i, 'happen-contrast ("doesn\'t happen in X. It happens Y")'],
+  // Unslop harvest (Malik adopted the unslop skill 2026-08-19): the broad AI-tell
+  // vocabulary and structures the original bans did not cover.
+  [/\b(delve|delving|tapestry|testament to|pivotal|showcas(e|es|ing)|underscor(e|es|ing)|foster(ing|s)?\b|garner(s|ed)?|interplay)\b/i, 'unslop vocabulary'],
+  [/\b(evolving|shifting|changing)\s+landscape\b|\bdeeply rooted\b|\bsetting the stage\b|\bindelible\b/i, 'unslop puffery'],
+  [/\b(serves? as|stands? as|boasts?)\b/i, 'fancy "is" (say is/has)'],
+  [/\b(leverage|leveraging|utiliz(e|es|ing)|facilitat(e|es|ing))\b/i, 'unslop jargon (use "use"/"help")'],
+  [/\b(studies show|research (shows|suggests)|experts (say|believe|agree))\b/i, 'vague attribution (cite their numbers or nothing)'],
+  [/,\s*(highlighting|showcasing|underscoring|emphasizing|demonstrating|reflecting)\b/i, 'superficial -ing tail'],
+  [/\bit('?s| is) (important|worth) (to note|noting)\b/i, 'filler ("it is important to note")'],
+  [/\bI hope this helps\b|\blet me know if\b/i, 'chatbot phrase']
 ];
 function voiceLint(text) {
   const hits = [];
