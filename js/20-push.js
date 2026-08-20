@@ -194,7 +194,15 @@
           clarity_done: ctx.clarity,
           enabled: true
         })
-      }).catch(function () {});
+      }).then(function (r) {
+        // Debug visibility (2026-08-20): the founder's accept produced zero
+        // server rows and this catch ate the evidence. Every attempt now
+        // leaves a readable trace for the push-status dev sheet.
+        try { MementoPush._lastSync = { at: Date.now(), status: r.status, ok: r.ok }; } catch (e2) {}
+        if (!r.ok) return r.text().then(function (t) { try { MementoPush._lastSync.body = String(t).slice(0, 200); } catch (e3) {} });
+      }).catch(function (err) {
+        try { MementoPush._lastSync = { at: Date.now(), error: String(err && err.message || err) }; } catch (e2) {}
+      });
     } catch (e) { return Promise.resolve(); }
   }
 
@@ -277,8 +285,8 @@
   // night. This card IS the pre-prompt; the OS prompt only fires on "Turn on".
   function cardCopy() {
     return {
-      title: 'Memento can check in',
-      sub: 'One note a day with <b>today’s move</b>, so you don’t have to remember. Never between 10pm and 6am. Turn it off whenever you want.'
+      title: 'Get the most out of Memento',
+      sub: 'We highly, highly recommend turning on notifications so Memento can keep you on track when things inevitably get tough. We’ll never spam. Only what is useful toward your goal.'
     };
   }
 

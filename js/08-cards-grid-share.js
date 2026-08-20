@@ -1940,6 +1940,8 @@ const CreatorTools = {
         out.swReady = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
         try { const sub = await (await navigator.serviceWorker.ready).pushManager.getSubscription(); out.subscribed = !!sub; } catch (e) { out.subscribed = 'err:' + e.message; }
         out.eligible = (window.MementoPush && MementoPush._eligible) ? MementoPush._eligible() : 'no-probe';
+        out.lastSync = (window.MementoPush && MementoPush._lastSync) || 'never-attempted';
+        try { if (window.MementoPush && MementoPush.sync) { await MementoPush.sync(); out.syncNow = (MementoPush._lastSync) || 'no-trace'; } } catch (e2) { out.syncNow = 'err:' + e2.message; }
       } catch (e) { out.err = e.message; }
       const old = document.getElementById('devBrainSheet');
       if (old) old.remove();
