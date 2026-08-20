@@ -129,8 +129,11 @@ self.addEventListener('fetch', (event) => {
 });
 
 /* Web Push (js/20-push.js subscribes; push-tick sends). Payload is JSON:
-   { title, body, kind }. One tag per kind so a morning reminder never
-   stacks under an evening one. */
+   { title, body, kind, deepLink, notificationId }.
+   deepLink is the engine's vocabulary (supabase/functions/_shared/
+   notif-engine.ts deepLink()): action | reentry | reflection | update |
+   clarity | card | home. One tag per kind so a morning reminder never stacks
+   under an evening one. */
 self.addEventListener('push', (event) => {
   let data = {};
   try { data = event.data ? event.data.json() : {}; } catch (e) {}
@@ -140,16 +143,37 @@ self.addEventListener('push', (event) => {
     icon: './icons/icon-192.png',
     badge: './icons/icon-192.png',
     tag: 'memento-' + (data.kind || 'reminder'),
-    data: { kind: data.kind || '' }
+    data: {
+      kind: data.kind || '',
+      deepLink: data.deepLink || '',
+      notificationId: data.notificationId || ''
+    }
   }));
 });
 
+/* The tap is half the product: it lands on the exact control, never a
+   generic app open. Cold start carries the link in the hash as #push/<link>
+   (js/20-push.js reads and strips it before the router boots); a window that
+   is already open gets focused and told by postMessage. */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const d = event.notification.data || {};
+  const link = String(d.deepLink || '');
+  const msg = {
+    memento: 'push-open',
+    deepLink: link,
+    notificationId: String(d.notificationId || '')
+  };
+  let url = self.registration.scope;
+  if (link && link !== 'home') url += '#push/' + encodeURIComponent(link);
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
-      for (const c of list) { if ('focus' in c) return c.focus(); }
-      return clients.openWindow(self.registration.scope);
+      for (const c of list) {
+        if (!('focus' in c)) continue;
+        try { c.postMessage(msg); } catch (e) {}
+        return c.focus().catch(() => null);
+      }
+      return clients.openWindow(url);
     })
   );
 });

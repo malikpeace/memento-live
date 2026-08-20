@@ -260,7 +260,7 @@ html.theme-light .save-memento__later { color: rgba(30, 45, 48, 0.45); }
 .push-ask__mark { display: inline-flex; margin-bottom: 16px; filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.5)); }
 .push-ask__mark svg { border-radius: 13px; display: block; }
 .push-ask__title { font-size: 1.22rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; margin-bottom: 9px; }
-.push-ask__sub { font-size: 0.9rem; line-height: 1.5; color: rgba(232, 234, 248, 0.64); margin: 0 auto 22px; max-width: 28ch; }
+.push-ask__sub { font-size: 0.9rem; line-height: 1.5; color: rgba(232, 234, 248, 0.92); margin: 0 auto 22px; max-width: 30ch; }
 .push-ask__sub b { font-weight: 700; color: rgba(255, 255, 255, 0.94); }
 .push-ask__btn {
   width: 100%; font: inherit; font-size: 1rem; font-weight: 700; color: #0b0f10;
@@ -277,7 +277,10 @@ html.theme-light .save-memento__later { color: rgba(30, 45, 48, 0.45); }
 html.theme-light .push-ask__scrim { background: rgba(18, 28, 30, 0.34); }
 html.theme-light .push-ask__sheet { background: linear-gradient(180deg, #fafeff, #eff5f6); box-shadow: 0 30px 80px rgba(30, 72, 80, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7); }
 html.theme-light .push-ask__title { color: #172022; }
-html.theme-light .push-ask__sub { color: rgba(30, 45, 48, 0.62); }
+html.theme-light .push-ask__sub { color: rgba(30, 45, 48, 0.92); }
 html.theme-light .push-ask__sub b { color: #172022; }
-html.theme-light .push-ask__btn { color: #131d1f; background: linear-gradient(180deg, #ffffff, #eaf2f4); box-shadow: 0 10px 26px rgba(30, 72, 80, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+/* Light mode: a white button on a white sheet is invisible (Malik's
+   white-on-white miss). The one primary action wears the app's light-mode
+   CTA fill instead, the same ink as the day card's own button. */
+html.theme-light .push-ask__btn { color: #f7fbfc; background: linear-gradient(180deg, #1c2426, #121819); box-shadow: 0 10px 26px rgba(30, 72, 80, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
 html.theme-light .push-ask__skip { color: rgba(30, 45, 48, 0.45); }

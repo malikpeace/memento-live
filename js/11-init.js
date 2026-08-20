@@ -204,7 +204,7 @@ applyPrefs(); // additive: stamp accent/motion/density prefs (no-op if unset)
 checkDayChange();
 applyDemoModeIfRequested(); // if ?demo=..., swap in demo data (DEMO_MODE blocks all writes)
 applyPrefs(); // re-stamp against the now-active state (demo carries default prefs, so its accent never inherits a prior real user's choice)
-try { scheduleReminder(); } catch (e) {} // arm the daily nudge if enabled + permitted
+// the local daily nudge is retired (notifications phase C); the engine owns sends
 try { if (!DEMO_MODE && state.profile && state.profile.onboarded) _injectDemoBar(null); } catch (e) {} // dev: persona bar on the dashboard outside demo mode
 // Derive the current streak from the activity history at boot for real users
 // (demo already recalcs inside applyDemoModeIfRequested). checkDayChange only

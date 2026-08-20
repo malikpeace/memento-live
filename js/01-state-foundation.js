@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1205';
+window.MEMENTO_JS_BUILD = 'v1206';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1191,40 +1191,9 @@ function applyThemeChange(mutate) {
 // Daily reminder: a best-effort browser notification at the chosen time. Honest
 // limitation (stated in Settings): with no service worker, it only fires while a
 // Memento tab is open. Reschedules itself each day; respects quiet hours.
-let _reminderTimer = null;
-function _inQuietHours(r) {
-  try {
-    const toMin = s => { const parts = String(s || '').split(':'); return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0); };
-    const now = new Date();
-    const cur = now.getHours() * 60 + now.getMinutes();
-    const qs = toMin(r.quietStart || '22:00'), qe = toMin(r.quietEnd || '07:00');
-    if (qs === qe) return false;
-    if (qs < qe) return cur >= qs && cur < qe;
-    return cur >= qs || cur < qe;
-  } catch (e) { return false; }
-}
-function scheduleReminder() {
-  try {
-    if (_reminderTimer) { clearTimeout(_reminderTimer); _reminderTimer = null; }
-    const r = (state.prefs && state.prefs.reminder) || {};
-    if (!r.enabled) return;
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    const parts = String(r.time || '09:00').split(':');
-    const hh = parseInt(parts[0], 10), mm = parseInt(parts[1], 10);
-    const now = new Date();
-    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), isNaN(hh) ? 9 : hh, isNaN(mm) ? 0 : mm, 0, 0);
-    if (next.getTime() <= now.getTime()) next.setDate(next.getDate() + 1);
-    _reminderTimer = setTimeout(() => {
-      try {
-        const rr = (state.prefs && state.prefs.reminder) || {};
-        if (rr.enabled && ('Notification' in window) && Notification.permission === 'granted' && !_inQuietHours(rr)) {
-          new Notification('Memento', { body: 'A quiet nudge: show up for today.' });
-        }
-      } catch (e) {}
-      scheduleReminder();
-    }, next.getTime() - now.getTime());
-  } catch (e) {}
-}
+// scheduleReminder DELETED (notifications phase C, 2026-08-20): the local
+// daily nudge is retired; the notification engine owns every send. js/20
+// stubs the global for any stale caller.
 
 function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 // Allowlist-sanitize stored rich-text (reflection notes) before it is ever

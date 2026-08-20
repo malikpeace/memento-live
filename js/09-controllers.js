@@ -5817,56 +5817,14 @@ const TabBar = {
     // v19 Custom Layouts: open the Customize Dashboard sheet from settings.
     const custLayoutBtn = document.getElementById('prefCustomizeLayout');
     if (custLayoutBtn) custLayoutBtn.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('layout'); } catch (e) {} });
-    // Daily reminder controls.
-    if (!state.prefs.reminder) state.prefs.reminder = { enabled: false, time: '09:00', quietStart: '22:00', quietEnd: '07:00' };
-    const remMsg = document.getElementById('prefReminderMsg');
-    const remOn = document.getElementById('prefReminderOn');
-    if (remOn) remOn.addEventListener('click', () => {
-      const on = !remOn.classList.contains('pref-toggle--on');
-      remOn.classList.toggle('pref-toggle--on', on);
-      remOn.setAttribute('aria-checked', on ? 'true' : 'false');
-      state.prefs.reminder.enabled = on;
-      persistNow();
-      if (on && ('Notification' in window) && Notification.permission !== 'granted' && remMsg) {
-        remMsg.textContent = 'Tip: enable browser notifications below so the nudge can show.';
-      }
-      if (typeof scheduleReminder === 'function') scheduleReminder();
-    });
-    const bindReminderTime = (id, key) => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('change', () => { state.prefs.reminder[key] = el.value; persistNow(); if (typeof scheduleReminder === 'function') scheduleReminder(); });
-    };
-    bindReminderTime('prefReminderTime', 'time');
-    bindReminderTime('prefQuietStart', 'quietStart');
-    bindReminderTime('prefQuietEnd', 'quietEnd');
-    const notifyBtn = document.getElementById('prefNotifyEnable');
-    if (notifyBtn) notifyBtn.addEventListener('click', () => {
-      if (!('Notification' in window)) { if (remMsg) remMsg.textContent = 'This browser does not support notifications.'; return; }
-      Notification.requestPermission().then(p => {
-        if (remMsg) remMsg.textContent = p === 'granted' ? 'Notifications enabled.' : p === 'denied' ? 'Notifications are blocked in your browser settings.' : 'Permission dismissed.';
-        if (p === 'granted' && typeof scheduleReminder === 'function') scheduleReminder();
-      }).catch(() => {});
-    });
-    // Send a real test notification right now, so you can see what it looks like.
-    // Uses the service worker's showNotification (the path that works in an installed
-    // iOS PWA; the plain Notification() constructor does not on iOS).
-    const notifyTestBtn = document.getElementById('prefNotifyTest');
-    if (notifyTestBtn) notifyTestBtn.addEventListener('click', async () => {
-      try {
-        if (!('Notification' in window)) { if (remMsg) remMsg.textContent = 'This device does not support notifications.'; return; }
-        let perm = Notification.permission;
-        if (perm !== 'granted') perm = await Notification.requestPermission();
-        if (perm !== 'granted') { if (remMsg) remMsg.textContent = perm === 'denied' ? 'Notifications are blocked. Turn them on for Memento in your phone Settings.' : 'Permission dismissed, tap again to allow.'; return; }
-        const opts = { body: "Today's move is waiting. Open Memento and keep your streak alive.", icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: 'memento-test', renotify: true };
-        if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-          const reg = await navigator.serviceWorker.ready;
-          await reg.showNotification('Memento', opts);
-        } else if ('Notification' in window) {
-          new Notification('Memento', opts);
-        }
-        if (remMsg) remMsg.textContent = 'Sent. Look for the banner (and check Notification Center).';
-      } catch (e) { if (remMsg) remMsg.textContent = 'Could not send: ' + (e && e.message ? e.message : 'error'); }
-    });
+    // (notifications phase C, 2026-08-20) The local "daily reminder" controls
+    // that used to live here are DELETED. They were the rogue third sender:
+    // a browser Notification fired from an open tab, with its own quiet hours
+    // and its own copy, alongside the real engine. The engine (push-tick +
+    // _shared/notif-engine.ts) owns every send now, and js/20-push.js owns the
+    // one permission ask. Their markup was already gone, so these handlers
+    // bound to nothing; js/01's scheduleReminder() definition and its js/11
+    // boot call are queued for deletion in those shared files.
     // Data export / import bindings
     const exportBtn = document.getElementById('exportData');
     const importBtn = document.getElementById('importData');

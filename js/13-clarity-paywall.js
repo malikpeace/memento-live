@@ -305,6 +305,11 @@ const ClarityPaywall = {
       const plan = access && access.plan ? access.plan : '';
       try { if (typeof Analytics !== 'undefined') Analytics.track('paywall_unlock', { plan }); } catch (e) {} // Funnel
       try { window.MementoPush && MementoPush.sync(); } catch (e) {} // reminder context: now paid
+      // notifications phase C: payment ARMS the reminder pre-prompt. It does
+      // not prompt here. js/20 shows Memento's own card at the first open of
+      // the installed app (the only place iOS can deliver), and the OS prompt
+      // fires only if they tap Turn on.
+      try { window.MementoPush && MementoPush.armPostPayment && MementoPush.armPostPayment(); } catch (e) {}
     } catch (e) {}
     this.hide();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
