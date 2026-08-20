@@ -36,7 +36,7 @@ const PRECACHE = [
   './js/14-appearance-picker.js', './js/19-dev-beats.js', './js/20-sound.js',
   './js/21-descent.js', './js/22-prompt-lab.js', './js/23-action-states.js',
   './js/24-unlock-ceremony.js', './css/unlock-ceremony.css', './js/25-reward-chooser.js',
-  './js/26-reward-referee.js', './js/30-action-flow.js', './js/15-router.js',
+  './js/26-reward-referee.js', './js/27-rewards-daily.js', './css/rewards-daily.css', './js/30-action-flow.js', './js/15-router.js',
   './fonts/fonts.css', './fonts/geist-400.otf', './fonts/geist-500.otf', './fonts/geist-700.otf',
   './fonts/dmsans-0.woff2', './fonts/dmsans-1.woff2',
   './fonts/fraunces-2.woff2', './fonts/fraunces-3.woff2', './fonts/fraunces-4.woff2',

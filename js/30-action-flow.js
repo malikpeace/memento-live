@@ -3285,14 +3285,37 @@
       // block, the heat and the sidebar.
       try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
       // ======================= THE CLOSE SEAM ============================
-      // THE ONE REWARD CALL ATTACHES HERE (THE-MERGE resolution B, Rewards
-      // phase). The order from this line on is: the pulse asks its one number
-      // at plan.close.cadence if due -> ONE rewardMoment() with the full
-      // context (shape, star, gp incl. the pulse value, count/countTarget,
+      // THE ONE REWARD CALL (THE-MERGE resolution B, Rewards phase 1).
+      // The undo window is over and the day is written, so this is the moment
+      // the reward is earned. rewardMoment() builds the full context out of
+      // real state (js/26's buildRewardCtx: shape, star, gp, count/countTarget,
       // daysHeld/daysTarget, prevValue, ledger, goalDone, userSaysDone,
-      // askedDay, today) -> exactly ONE ceremony (finale > milestone > daily
-      // green page) -> the rest line. Nothing above calls the referee, so it
-      // still has exactly one caller when it arrives.
+      // askedDay, today) and the referee returns exactly ONE tier.
+      //
+      // THE PULSE IS NOT AT THIS SEAM YET. Resolution B puts it between the
+      // undo window and this call, so the number they just gave rides in the
+      // context. The pulse sheet is not wired into the close, so the referee
+      // is called with the context as it stands; when the pulse lands, it goes
+      // ABOVE this block and nothing here changes.
+      //
+      // RENDER FOLLOWS PERSISTENCE (the v1149 law): the referee writes the
+      // finale receipt and pays the milestone ledger inside decide(), so the
+      // state is flushed BEFORE anything is drawn. The daily page stamps its
+      // own witness before it renders too.
+      //
+      // Only 'daily' has a renderer today. 'milestone' and 'finale' fall
+      // through to nothing (phases 2 and 3 build them), 'none' is the spent
+      // finale day and shows nothing by design.
+      try {
+        var moment = G('rewardMoment');
+        var tier = moment ? moment() : null;
+        try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
+        // A rest day is a kept day, not a move: the count did not rise, so
+        // there is nothing for the green page to say. The rest line owns it.
+        if (tier && tier.tier === 'daily' && !rec.off && window.DailyReward) {
+          DailyReward.show({ day: rec.day, starHash: rec.starHash });
+        }
+      } catch (e) {}
       // ===================================================================
       return res;
     }
