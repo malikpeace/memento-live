@@ -237,15 +237,18 @@
   // No-op unless the user already subscribed.
   function sync() {
     try {
-      if (!supported() || localStorage.getItem(ON_KEY) !== '1') return;
-      if (Notification.permission !== 'granted') return;
-      navigator.serviceWorker.ready.then(function (reg) {
+      if (!supported() || localStorage.getItem(ON_KEY) !== '1') { MementoPush._lastSync = { skipped: 'off-or-unsupported' }; return Promise.resolve(); }
+      if (Notification.permission !== 'granted') { MementoPush._lastSync = { skipped: 'permission' }; return Promise.resolve(); }
+      // Returns the real chain so callers (the dev status sheet) can await it.
+      return navigator.serviceWorker.ready.then(function (reg) {
         return reg.pushManager.getSubscription();
       }).then(function (sub) {
-        if (!sub) { try { localStorage.removeItem(ON_KEY); } catch (e) {} return; }
+        if (!sub) { try { localStorage.removeItem(ON_KEY); } catch (e) {} MementoPush._lastSync = { skipped: 'no-subscription' }; return; }
         return rpcSync(sub);
-      }).catch(function () {});
-    } catch (e) {}
+      }).catch(function (err) {
+        try { MementoPush._lastSync = { error: 'chain: ' + String(err && err.message || err) }; } catch (e2) {}
+      });
+    } catch (e) { return Promise.resolve(); }
   }
 
   // Full subscribe flow. Must run from a user gesture (Safari requires it).
