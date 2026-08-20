@@ -3303,9 +3303,14 @@
       // state is flushed BEFORE anything is drawn. The daily page stamps its
       // own witness before it renders too.
       //
-      // 'daily' and 'milestone' have renderers. 'finale' falls through to
-      // nothing (phase 3 builds it), 'none' is the spent finale day and shows
-      // nothing by design.
+      // 'daily', 'milestone' and (phase 3) 'finale' have renderers; 'none' is
+      // the spent finale day and shows nothing by design.
+      //
+      // userSaysDone is READ FROM STATE here (phase 3). Clarity's fulfilled
+      // hold persists gp.userSaysDone and never writes a receipt, so the
+      // declaration is a standing fact the referee needs at every door, not
+      // just the one it was made at. Without it a target goal declared done
+      // yesterday would close today as an ordinary day.
       //
       // ONE REWARD PER COMPLETION (R1/R2): the tiers are a chain, not a list.
       // A milestone renders OVER the settled day and the daily does NOT also
@@ -3313,10 +3318,28 @@
       // event) the day still earns its green page, which is R9's promise.
       try {
         var moment = G('rewardMoment');
-        var tier = moment ? moment() : null;
+        var said = false;
+        try { var gpNow = S().goalProgress; said = !!(gpNow && gpNow.userSaysDone); } catch (e) {}
+        var tier = moment ? moment({ userSaysDone: said }) : null;
         try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
         var shown = false;
-        if (tier && tier.tier === 'milestone' && tier.event && window.MilestoneReward) {
+        // THE FINALE OUTRANKS EVERYTHING (R2). The receipt is already written
+        // inside decide(), so the ceremony renders after persistence.
+        if (tier && tier.tier === 'finale' && window.GrandFinale) {
+          shown = GrandFinale.show(tier, { source: 'close' });
+        }
+        // ...and while the goal's own line is crossed but not yet confirmed,
+        // that crossing belongs to the finale. The chooser calls the target
+        // itself a 'final' MARK, so without this the same number would be
+        // celebrated twice: the mark here, the finale when they confirm. Only
+        // the final is held back; an ordinary rung on the same day is still
+        // theirs, and a held-back day still earns its green page (R9).
+        var finaleOwns = false;
+        try {
+          finaleOwns = !!(window.GrandFinale && GrandFinale.owns()
+            && tier && tier.event && tier.event.kind === 'final');
+        } catch (e) {}
+        if (!shown && !finaleOwns && tier && tier.tier === 'milestone' && tier.event && window.MilestoneReward) {
           shown = MilestoneReward.show(tier.event);
         }
         // A rest day is a kept day, not a move: the count did not rise, so

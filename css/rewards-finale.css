@@ -1,0 +1,255 @@
+/* ============================================================================
+   THE GRAND FINALE (THE MERGE, rewards phase 3, 2026-08-20)
+
+   ba-0. The top of the pyramid: fires once per goal, the day the goal itself
+   is done, and nothing else shows that day. Three beats, silent, tap to
+   advance, swipe the stats, Keep to close.
+
+   PORT LAW. Every value below is the graded mockup, carried over as written:
+     the screen  -> the <style> block of mockups/celebrate/frag/ba-0.html
+     kit chrome  -> mockups/celebrate/_kit.css (.b / .keepbtn / .mark--foot /
+                    .cel-confetti, plus the two ba- root rules: beats swap by
+                    visibility so the colour never leaves, and b2/b3 carry the
+                    accent flood with the ink flipped dark)
+
+   WHAT CHANGED FROM THE GALLERY, and why:
+   1. THE FRAME. The gallery draws a 390x760 phone (.ph) inside a page. Here
+      the page IS the phone, so .ph becomes .gfw at 100lvh and the iOS safe
+      areas land in the chrome. No composition value moves.
+   2. THE THEME. Beat 1 follows the app's theme through the app's own tokens
+      (--surface-0, --text-hi/lo, --ink, --accent); beats 2 and 3 are the
+      accent flood, which is theme-proof by construction. ONE root rule each,
+      never a per-beat :has() opt-out (MERGE-README, Malik 2026-08-18).
+   3. THE FOOT BAND. The gallery's hint line ("swipe the stats, tap to
+      replay") is a rig affordance: in the app the last tap keeps the moment,
+      it never replays. Keep takes its place under the dots.
+   ============================================================================ */
+
+/* ---------- the surface ---------- */
+.gfw {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  /* 100lvh, never inset:0 / 100dvh: the others are proven short on-device */
+  height: 100lvh;
+  z-index: 11000;
+  background: var(--surface-0);
+  color: var(--text-hi);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.gfw-stage { position: absolute; inset: 0; }
+
+/* ---------- beats (kit) ----------
+   The ba- rule: beats swap by VISIBILITY, not opacity. Cross-fading between
+   two full-colour beats flashes the page ground for half a second (Malik
+   2026-08-15); the content inside each beat still animates on arrival. */
+.gfw .b {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  justify-content: safe center;          /* short windows keep the top */
+  padding: calc(34px + var(--safe-t, 0px)) 30px calc(34px + var(--safe-b, 0px));
+  text-align: center;
+  opacity: 1; visibility: hidden; pointer-events: none;
+}
+.gfw .b.on { visibility: visible; pointer-events: auto; animation: none; }
+
+/* THE FLOOD STAYS (Malik 2026-08-14). Once the colour lands it never leaves:
+   every beat after the impact is full accent with the ink flipped dark, so
+   the wall of stats reads on the colour. */
+.gfw .b2, .gfw .b3 {
+  background: var(--accent);
+  --ink: 11, 14, 18;
+  --text-hi: rgba(11, 14, 18, .96);
+  --text-mid: rgba(11, 14, 18, .74);
+  --text-lo: rgba(11, 14, 18, .56);
+  --hairline: rgba(11, 14, 18, .14);
+}
+
+/* the dismiss control: quiet, never competes with the moment */
+.gfw .keepbtn {
+  position: absolute; left: 0; right: 0; bottom: calc(26px + var(--safe-b, 0px));
+  z-index: 30; text-align: center;
+  font-size: 14px; font-weight: 600; color: var(--text-mid);
+  opacity: 0; transition: opacity .5s ease; pointer-events: none;
+}
+.gfw.is-done .keepbtn { opacity: 1; pointer-events: auto; }
+/* on the flood the quiet grey would vanish; the ink reads on every accent */
+.gfw.is-done .keepbtn { color: rgba(11, 14, 18, .72); }
+
+.gfw .mark--foot { display: none; }      /* every beat already carries the M */
+
+/* The confetti canvas: above the flood, below the show, never eats taps. The
+   explicit 100%/100% is NOT decoration: a canvas is a replaced element, so an
+   absolute inset:0 with width:auto keeps its INTRINSIC size and the burst
+   lands off-screen. */
+.gfw .cel-confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+/* the page owns the whole moment, like the daily page and the milestones */
+body:has(.gfw) .fullscreen-close-global { display: none !important; }
+
+/* ============================================================================
+   ba-0 "The Grand Finale". Malik's own fusion, refined 2026-08-16:
+   - beat 1: the M gains colour SLOWLY as MANY dots stream in from off-screen
+     and spiral into it (Clarity's nsv2FieldSpiral motion, ported).
+   - the M stays PUT in the middle. On the tap the screen turns full colour,
+     a long fireworks show goes off, and the line fades in below the M. The
+     confetti falls BEHIND everything, small.
+   - beat 3: swipe between the M with their moves exploding out of it into a
+     slowly turning 3D sphere, and the numbers.
+   ============================================================================ */
+
+/* ---- BEAT 1: the M colours in as the dots are pulled into it ---- */
+[data-c="ba-0"] .ba0-m0{position:absolute;left:50%;top:50%;width:98px;height:98px;margin-left:-49px;
+  transform:translateY(-50%);fill:var(--accent);opacity:0;z-index:2}
+[data-c="ba-0"] .b1.on .ba0-m0{animation:ba0MColour 3.6s cubic-bezier(.5,0,.5,1) .3s both}
+@keyframes ba0MColour{from{opacity:0}to{opacity:1}}
+/* the accretion field: dots spawn far OFF the card and spiral into the M's
+   centre (Clarity's nsv2FieldSpiral curve, ported verbatim) */
+[data-c="ba-0"] .ba0-field{position:absolute;left:50%;top:50%;width:0;height:0}
+[data-c="ba-0"] .ba0-field i{position:absolute;left:0;top:0;width:var(--s,2.5px);height:var(--s,2.5px);
+  border-radius:50%;background:radial-gradient(circle at 42% 40%,rgba(var(--ink),.98),rgba(var(--ink),.85) 55%,rgba(var(--accent-rgb),.75));
+  box-shadow:0 0 calc(var(--s,2.5px)*2.4) rgba(var(--accent-rgb),.55);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-field i{animation:ba0Spiral var(--d,3.6s) cubic-bezier(.45,0,.75,.4) var(--del,0s) both}
+@keyframes ba0Spiral{
+  0%{transform:rotate(var(--a)) translateX(var(--r,300px)) scale(1);opacity:0;animation-timing-function:cubic-bezier(.4,0,.7,.5)}
+  10%{opacity:.95}
+  50%{transform:rotate(calc(var(--a) + 140deg)) translateX(calc(var(--r,300px) * .42)) scale(.8);opacity:.9;animation-timing-function:cubic-bezier(.3,.5,.75,.5)}
+  92%{opacity:.8}
+  100%{transform:rotate(calc(var(--a) + 300deg)) translateX(3px) scale(.2);opacity:0}}
+[data-c="ba-0"] .ba0-guess{position:absolute;left:0;right:0;top:64%;text-align:center;
+  font-size:24px;font-weight:650;letter-spacing:-.02em;color:var(--text-hi);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-guess{animation:ba0Soft .8s ease-out 3.7s both}
+[data-c="ba-0"] .ba0-tap{position:absolute;left:0;right:0;top:69%;text-align:center;
+  font-size:11.5px;letter-spacing:.03em;color:var(--text-lo);opacity:0}
+[data-c="ba-0"] .b1.on .ba0-tap{animation:ba0Soft .6s ease-out 4.3s both}
+@keyframes ba0Soft{from{opacity:0}to{opacity:1}}
+
+/* ---- BEAT 2: the tap floods the screen, M stays put, line fades in below ---- */
+[data-c="ba-0"] .ba0-flood{position:absolute;inset:0;background:var(--accent);z-index:0}
+[data-c="ba-0"] .b2.on .ba0-flood{animation:ba0Flood .22s cubic-bezier(.2,.8,.3,1) both}
+@keyframes ba0Flood{from{opacity:0}to{opacity:1}}
+/* the confetti falls BEHIND the fireworks and the text (z between flood and show) */
+[data-c="ba-0"] .b2 .cel-confetti{z-index:1}
+[data-c="ba-0"] .ba0-sh{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;
+  border-radius:50%;border:2.5px solid rgba(11,14,18,.4);opacity:0;z-index:2}
+[data-c="ba-0"] .b2.on .ba0-s1{animation:ba0Ring 1s cubic-bezier(.2,.7,.3,1) .06s both}
+[data-c="ba-0"] .b2.on .ba0-s2{animation:ba0Ring 1.1s cubic-bezier(.2,.7,.3,1) .28s both}
+@keyframes ba0Ring{0%{opacity:.6;transform:scale(.2)}100%{opacity:0;transform:scale(8)}}
+/* the fireworks show */
+[data-c="ba-0"] .ba0-fwrap{position:absolute;inset:0;z-index:2;pointer-events:none}
+[data-c="ba-0"] .ba0-fw{position:absolute;width:0;height:0}
+[data-c="ba-0"] .ba0-fw .tr{position:absolute;left:-1.5px;top:0;width:3px;height:var(--h,120px);border-radius:2px;
+  transform-origin:50% 100%;background:linear-gradient(to top,rgba(11,14,18,0),rgba(11,14,18,.7));opacity:0}
+[data-c="ba-0"] .b2.on .ba0-fw .tr{animation:ba0Launch .5s cubic-bezier(.25,.7,.4,1) var(--t,0s) both}
+@keyframes ba0Launch{0%{opacity:0;transform:translateY(var(--lh,190px)) scaleY(.4)}25%{opacity:1}70%{opacity:1}
+  100%{opacity:0;transform:translateY(0) scaleY(1)}}
+[data-c="ba-0"] .ba0-fw .fl{position:absolute;left:calc(var(--fs,90px)/-2);top:calc(var(--fs,90px)/-2);
+  width:var(--fs,90px);height:var(--fs,90px);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.92),rgba(255,255,255,0) 64%);opacity:0}
+[data-c="ba-0"] .b2.on .ba0-fw .fl{animation:ba0Flash .55s ease-out calc(var(--t,0s) + .44s) both}
+@keyframes ba0Flash{0%{opacity:0;transform:scale(.1)}20%{opacity:1}100%{opacity:0;transform:scale(1.6)}}
+[data-c="ba-0"] .ba0-fw .sp{position:absolute;width:4.5px;height:4.5px;margin:-2.25px 0 0 -2.25px;border-radius:50%;
+  background:rgba(11,14,18,.85);opacity:0}
+[data-c="ba-0"] .ba0-fw .sp:nth-child(3n){background:#fff}
+[data-c="ba-0"] .ba0-fw .sp:nth-child(5n){width:3px;height:3px}
+[data-c="ba-0"] .b2.on .ba0-fw .sp{animation:ba0Spark 1.6s cubic-bezier(.1,.62,.28,1) calc(var(--t,0s) + .44s) both}
+@keyframes ba0Spark{0%{opacity:0;transform:translate(0,0) scale(.5)}
+  6%{opacity:1;transform:translate(calc(var(--dx)*.22),calc(var(--dy)*.22)) scale(1.15)}
+  55%{opacity:1;transform:translate(calc(var(--dx)*.86),calc(var(--dy)*.86 + 14px)) scale(.9)}
+  100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) + 90px)) scale(.4)}}
+[data-c="ba-0"] .ba0-m2{position:absolute;left:50%;top:50%;width:98px;height:98px;margin-left:-49px;
+  transform:translateY(-50%);fill:#0b0e12;opacity:0;z-index:3}
+[data-c="ba-0"] .b2.on .ba0-m2{animation:ba0Soft .35s ease-out .04s both}
+[data-c="ba-0"] .ba0-line{position:absolute;left:0;right:0;top:57%;text-align:center;padding:0 26px;
+  font-size:40px;font-weight:750;letter-spacing:-.04em;line-height:1.06;color:#0b0e12;opacity:0;z-index:4}
+[data-c="ba-0"] .b2.on .ba0-line{animation:ba0LineIn .6s cubic-bezier(.2,.8,.3,1) .5s both}
+@keyframes ba0LineIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ---- BEAT 3: the M with their moves exploding out of it into a 3D sphere ---- */
+[data-c="ba-0"] .b3{padding:0}
+[data-c="ba-0"] .ba0-stats{position:absolute;inset:0;display:flex;flex-direction:column;
+  padding-top:var(--safe-t,0px)}
+[data-c="ba-0"] .ba0-pager{flex:1 1 auto;position:relative;overflow:hidden;touch-action:pan-y}
+[data-c="ba-0"] .ba0-track{display:flex;width:300%;height:100%;transition:transform .38s cubic-bezier(.3,.7,.3,1)}
+[data-c="ba-0"] .ba0-slide{width:33.3333%;height:100%;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:6px 22px 8px;
+  /* the frame changed (the page IS the phone), so a short window keeps the
+     top of the slide instead of clipping both ends of it */
+  justify-content:safe center;overflow-y:auto}
+/* slide A: the M at the core, the sphere of moves exploding out of and around it */
+[data-c="ba-0"] .ba0-orbit{position:relative;width:280px;height:300px;max-width:100%}
+[data-c="ba-0"] .ba0-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+[data-c="ba-0"] .ba0-coreM{position:absolute;left:50%;top:50%;width:50px;height:50px;
+  transform:translate(-50%,-50%);fill:#0b0e12;z-index:2}
+[data-c="ba-0"] .b3.on .ba0-coreM{animation:ba0Soft .5s ease-out .05s both}
+[data-c="ba-0"] .ba0-acount{margin-top:6px;text-align:center}
+[data-c="ba-0"] .ba0-acount b{font-size:40px;font-weight:750;letter-spacing:-.04em;color:#0b0e12;
+  font-variant-numeric:tabular-nums}
+[data-c="ba-0"] .ba0-acount span{display:block;margin-top:5px;font-size:12px;color:rgba(11,14,18,.7)}
+/* slide B: the numbers, a small M crowning them */
+[data-c="ba-0"] .ba0-mcB{width:44px;height:44px;fill:#0b0e12;margin-bottom:14px}
+[data-c="ba-0"] .ba0-wall{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+/* frosted-glass panels for real contrast against the flood (was near-invisible) */
+[data-c="ba-0"] .ba0-cell{padding:14px 14px;border-radius:13px;background:rgba(255,255,255,.17);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 10px rgba(11,14,18,.07);text-align:left}
+[data-c="ba-0"] .ba0-cell b{display:block;font-size:33px;font-weight:750;letter-spacing:-.04em;line-height:1;
+  color:#0b0e12;font-variant-numeric:tabular-nums}
+[data-c="ba-0"] .ba0-cell span{display:block;margin-top:6px;font-size:11px;color:rgba(11,14,18,.66)}
+/* the hero flips DARK: their number in their colour, the strongest contrast */
+[data-c="ba-0"] .ba0-cell--hero{grid-column:1/-1;background:#0b0e12;
+  box-shadow:0 10px 26px rgba(11,14,18,.28)}
+[data-c="ba-0"] .ba0-cell--hero b{font-size:52px;color:var(--accent)}
+[data-c="ba-0"] .ba0-cell--hero span{color:rgba(255,255,255,.62)}
+[data-c="ba-0"] .ba0-cell--hero b.ba0-xform{font-size:34px;white-space:nowrap}
+/* slide C: the note, a quiet word to remember the moment by */
+[data-c="ba-0"] .ba0-note{justify-content:center;text-align:center;padding:6px 28px 8px}
+[data-c="ba-0"] .ba0-noteM{width:40px;height:40px;fill:#0b0e12;opacity:.85;margin-bottom:22px}
+[data-c="ba-0"] .ba0-note1{font-size:23px;font-weight:750;letter-spacing:-.02em;line-height:1.2;
+  color:#0b0e12;margin-bottom:16px;text-wrap:balance}
+[data-c="ba-0"] .ba0-note2{font-size:15px;line-height:1.55;color:rgba(11,14,18,.82);margin-bottom:14px;max-width:30ch}
+[data-c="ba-0"] .ba0-note3{font-size:15px;line-height:1.55;font-weight:600;color:#0b0e12;max-width:28ch}
+/* the foot band: the dots, then Keep under them (the app's dismiss takes the
+   place of the gallery's replay hint) */
+[data-c="ba-0"] .ba0-dots{flex:0 0 auto;display:flex;gap:8px;justify-content:center;
+  padding:8px 0 calc(58px + var(--safe-b,0px))}
+[data-c="ba-0"] .ba0-dot{width:7px;height:7px;border-radius:50%;background:rgba(11,14,18,.28);transition:background .2s,width .2s}
+[data-c="ba-0"] .ba0-dot.on{width:20px;border-radius:4px;background:rgba(11,14,18,.7)}
+
+@media (min-width:768px){ [data-c="ba-0"] .ba0-wall{max-width:420px;margin:0 auto} }
+@media (prefers-reduced-motion:reduce){
+  [data-c="ba-0"] .ba0-field,[data-c="ba-0"] .ba0-sh,[data-c="ba-0"] .ba0-fw{display:none}
+  [data-c="ba-0"] .ba0-m0,[data-c="ba-0"] .ba0-guess,[data-c="ba-0"] .ba0-tap,[data-c="ba-0"] .ba0-m2,
+  [data-c="ba-0"] .ba0-line,[data-c="ba-0"] .ba0-coreM{opacity:1;animation:none}
+  [data-c="ba-0"] .ba0-line{transform:none}
+}
+
+/* ============================================================================
+   THE HAND-OFF (MERGE-3 section 4). Finishing a goal starts the next one, so
+   the biggest moment in the product does not end in an app with nothing to
+   say. Not a ceremony: the app's own surface, its own tokens, ONE primary
+   action, one quiet way out.
+   ============================================================================ */
+.gfw-next {
+  position: absolute; inset: 0; z-index: 40;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  justify-content: safe center;
+  padding: calc(34px + var(--safe-t, 0px)) 26px calc(34px + var(--safe-b, 0px));
+  text-align: center;
+  background: var(--surface-0);
+  animation: gfwNextIn .4s cubic-bezier(.2,.8,.3,1) both;
+}
+@keyframes gfwNextIn { from { opacity: 0; } to { opacity: 1; } }
+.gfw-next__m { width: 34px; height: 34px; fill: var(--accent); margin-bottom: 26px; }
+.gfw-next__h {
+  font-size: 27px; font-weight: 750; letter-spacing: -.03em; line-height: 1.15;
+  color: var(--text-hi); margin: 0 0 12px; max-width: 16ch;
+}
+.gfw-next__p {
+  font-size: 15px; line-height: 1.55; color: var(--text-mid);
+  margin: 0 0 34px; max-width: 28ch;
+}
+.gfw-next .cn-cta { max-width: 320px; }
+@media (prefers-reduced-motion: reduce) { .gfw-next { animation: none; } }

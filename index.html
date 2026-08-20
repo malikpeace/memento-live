@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <script>
 /* Single source of truth for the app version. Surfaced in Settings > About. */
-window.MEMENTO_VERSION = 'v1204';
+window.MEMENTO_VERSION = 'v1205';
 /* v1139 BOOT WATCHDOG. A boot that dies on a real phone looks like a stuck
    M splash and tells nobody anything (2026-08-05, Malik's phone). This runs
    before every other script, captures every JS error and failed file load,
@@ -151,8 +151,9 @@ window.MEMENTO_VERSION = 'v1204';
 <link rel="stylesheet" href="css/onboarding.css?v=v1202">
 <link rel="stylesheet" href="css/clarity.css?v=v1202">
 <link rel="stylesheet" href="css/action.css?v=v1202">
-<link rel="stylesheet" href="css/rewards-daily.css?v=v1204">
-<link rel="stylesheet" href="css/rewards-milestones.css?v=v1204">
+<link rel="stylesheet" href="css/rewards-daily.css?v=v1205">
+<link rel="stylesheet" href="css/rewards-milestones.css?v=v1205">
+<link rel="stylesheet" href="css/rewards-finale.css?v=v1205">
 <link rel="stylesheet" href="css/unlock-ceremony.css?v=v1149">
 <link rel="stylesheet" href="css/daycard-living.css?v=v1177">
 <link rel="stylesheet" href="css/clarity-paywall.css?v=v1020">
@@ -845,15 +846,19 @@ window.MEMENTO_VERSION = 'v1204';
 <script src="js/24-unlock-ceremony.js?v=v1149"></script>
 <!-- THE MERGE foundation: reward logic (chooser feeds the referee), pure
      logic ports, shadow mode only until Rewards phase 1. -->
-<script src="js/25-reward-chooser.js?v=v1204"></script>
+<script src="js/25-reward-chooser.js?v=v1205"></script>
 <script src="js/26-reward-referee.js?v=v1178"></script>
 <!-- THE MERGE rewards phase 1: the daily green page (window.DailyReward).
      Inert until the close seam in js/30 calls it. -->
-<script src="js/27-rewards-daily.js?v=v1204"></script>
+<script src="js/27-rewards-daily.js?v=v1205"></script>
 <!-- THE MERGE rewards phase 2: the along-the-way ceremonies
      (window.MilestoneReward). Inert until the referee returns the milestone
      tier at the close seam in js/30, or a pulse crosses a mark in js/03. -->
-<script src="js/28-rewards-milestones.js?v=v1204"></script>
+<script src="js/28-rewards-milestones.js?v=v1205"></script>
+<!-- THE MERGE rewards phase 3: the Grand Finale (window.GrandFinale +
+     window.rewardArrival). Inert until the referee returns the finale tier:
+     Clarity's fulfilled hold, the close seam in js/30, or a pulse in js/03. -->
+<script src="js/29-rewards-finale.js?v=v1205"></script>
 <!-- THE MERGE phase 2: the five Action surfaces (window.ActionFlow). Inert
      until something calls it; entry wiring lands in phase 3.1. -->
 <script src="js/30-action-flow.js?v=v1202"></script>

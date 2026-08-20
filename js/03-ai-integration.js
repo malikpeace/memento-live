@@ -1658,6 +1658,19 @@ function goalProgressUpdate(value) {
        _goalMoment says the finish line itself is crossed, which belongs to
        the finale. Rendering follows persistence: the ledger is written
        inside decide() before anything is drawn. */
+    /* THE MERGE rewards phase 3. The finale outranks the mark (R2), so it is
+       asked FIRST, and the pulse that crosses the goal's own line belongs to
+       it either way: it fires here when the declaration already stands, and
+       otherwise the confirm question above owns the moment. Both cases mean
+       the milestone stands down, because the chooser calls that same crossing
+       a 'final' mark and would otherwise celebrate it twice.
+       owns()/armed() are pure READS of the same referee (reachedNow + the
+       goalDone receipt). Asking decide() instead would stamp the chooser's
+       once-only ledger on every ordinary pulse and eat the mark. */
+    try {
+      const gf = window.GrandFinale;
+      if (gf && gf.owns()) { gf.pulse(_prevPulse); return true; }
+    } catch (_) {}
     try { if (window.MilestoneReward) MilestoneReward.pulse(_prevPulse); } catch (_) {}
     return true;
   } catch (e) { return false; }
