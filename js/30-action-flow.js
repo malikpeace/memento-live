@@ -894,19 +894,23 @@
   // actually exists (never on the first-visit logic page, which has no second
   // page to go to).
   //
-  // `foot` is the band the dots share with the day's M. One place, so the two
-  // screens cannot drift apart on the spacing above their CTA.
+  // ROUND 9: they live at the VERY BOTTOM, under the standing button, and they
+  // TRACK THE DRAG. The active one is a short pill, the other a dot, and the
+  // two trade shape continuously with --afl-pg (0 on this page, 1 at the other
+  // one), which the page snap writes every frame. `data-active` says which of
+  // the two is home, so one rule set serves both pages.
+  //
+  // THEY COST NO LAYOUT. Absolutely positioned inside the nav's own bottom
+  // padding, so the button does not move a pixel for them and a page that
+  // mounts with them is the same height as a page that does not. That is half
+  // of the settle-shift fix (round 9, item 1).
   function pageDots(active) {
     var d = el('div', 'afl-dots');
     d.setAttribute('aria-hidden', 'true');
-    for (var i = 0; i < 2; i++) d.appendChild(el('i', i === active ? 'is-on' : null));
+    d.dataset.active = String(active);
+    d.appendChild(el('i'));
+    d.appendChild(el('i'));
     return d;
-  }
-  function footBand(active, mark) {
-    var f = el('div', 'afl-foot');
-    if (mark) f.appendChild(mark);
-    f.appendChild(pageDots(active));
-    return f;
   }
   function cta(label) {
     var b = btn('afl-cta');
@@ -1055,11 +1059,23 @@
     node.classList.remove('afl-swap--up', 'afl-swap--dn');
     void node.offsetWidth;
     node.classList.add(dir < 0 ? 'afl-swap--dn' : 'afl-swap--up');
+    // ROUND 9: THE CLASS MUST NEVER OUTLIVE THE ANIMATION. This is the module's
+    // own law (enterFade and fadeIn both carry the timer) and this was the one
+    // helper missing it. The keyframe carries `both`, so there are two ways to
+    // be left holding it: animationend is DROPPED under load on iOS, which
+    // pins a GPU layer alive forever, or the animation never gets a frame to
+    // start in, which pins the label at the from-state's 0.22 opacity. The
+    // second one is visible: a washed out "Completed" on the green button,
+    // which is exactly what the screenshot caught. A timer cannot be dropped.
+    var off = function () {
+      if (node.__aflSwapT) { clearTimeout(node.__aflSwapT); node.__aflSwapT = 0; }
+      node.classList.remove('afl-swap--up', 'afl-swap--dn');
+    };
+    if (node.__aflSwapT) clearTimeout(node.__aflSwapT);
+    node.__aflSwapT = setTimeout(off, 360);
     if (node.dataset.swapBound) return;
     node.dataset.swapBound = '1';
-    node.addEventListener('animationend', function () {
-      node.classList.remove('afl-swap--up', 'afl-swap--dn');
-    });
+    node.addEventListener('animationend', off);
   }
 
   // ===========================================================================
@@ -1089,6 +1105,21 @@
   // scrolling exactly as it did. touch-action: pan-y says the same thing to
   // the compositor, which is what makes the scroll smooth rather than arbitrated.
   // ===========================================================================
+  // ROUND 9, THE SETTLE SHIFT (Malik's screen recording: things "settle" into
+  // position after a swipe). ROOT CAUSE, measured: the page you drag is the
+  // preview, which sits at its SETTLED geometry, and the real page that takes
+  // over at the end of the snap plays the module's entrance, which starts it
+  // 7px low and glides it up over 240ms. Captured side by side, every element
+  // on the incoming page (title, no list, CTA, dots) was exactly 7px below the
+  // preview's. So the handover skips the entrance: the page was already there,
+  // in place, under the finger. A page that ARRIVES (a tap, a resume, the
+  // loading screen handing over) still fades in, because nothing preceded it.
+  // The flag is only ever true for the synchronous duration of the handover.
+  var pagerHandover = false;
+  function handover(go) {
+    pagerHandover = true;
+    try { go(); } finally { pagerHandover = false; }
+  }
   var SNAP_AT = 0.4;        // of the width: the point of no return
   var FLICK_V = 0.65;       // px per ms, a throw rather than a drag
   var FLICK_MIN = 28;       // ...that still has to have travelled
@@ -1111,19 +1142,30 @@
       host.appendChild(pager);
       try { cfg.build(pager); } catch (e) { pager.innerHTML = ''; }
     }
+    // --afl-drag moves the pages; --afl-pg is the same travel as a 0..1 number,
+    // and the page dots read it every frame (round 9: they track the finger the
+    // way a native pager's do, the active pill trading shape with the other
+    // dot as you go). One variable, no second animation to keep in step.
     function drag(px) {
       if (!host || reduced()) return;
+      var W = host.clientWidth || window.innerWidth;
       host.style.setProperty('--afl-drag', px.toFixed(1) + 'px');
+      host.style.setProperty('--afl-pg', Math.min(1, Math.abs(px) / (W || 1)).toFixed(3));
     }
     function clear() {
       if (!host) return;
       host.classList.remove('is-drag', 'is-snap');
       host.style.removeProperty('--afl-drag');
+      host.style.removeProperty('--afl-pg');
     }
     function settle(across) {
       start = null; live = false;
       if (timer) { clearTimeout(timer); timer = null; }
-      if (reduced() || !host) { clear(); if (across) cfg.go(); return; }
+      if (reduced() || !host) {
+        clear();
+        if (across) handover(cfg.go);
+        return;
+      }
       settling = true;
       var W = host.clientWidth || window.innerWidth;
       host.classList.add('is-snap');
@@ -1131,7 +1173,7 @@
       timer = setTimeout(function () {
         timer = null; settling = false;
         // the handover replaces this room, so nothing here needs unwinding
-        if (across) { cfg.go(); return; }
+        if (across) { handover(cfg.go); return; }
         clear();
       }, SNAP_MS + 20);
     }
@@ -2461,12 +2503,12 @@
     // under a Close button would be explaining a door they just walked back
     // through. First visit only.
     if (!refOnly) nav.appendChild(el('p', 'afl-nav__sub', 'You can always return to this page.'));
-    // THE PAGE DOTS (round 8). This page is the FIRST of the two, so the first
-    // dot is lit. They exist only where a pager does: the reference view (from
-    // the M, from the swipe, from a resume) and the preview build that is
-    // literally being dragged. The first-visit page has no second page and
-    // gets no dots.
-    if (refOnly) col.appendChild(footBand(0, null));
+    // THE PAGE DOTS (round 8; round 9 put them under the button). This page is
+    // the FIRST of the two, so the first dot is home. They exist only where a
+    // pager does: the reference view (from the M, from the swipe, from a
+    // resume) and the preview build that is literally being dragged. The
+    // first-visit page has no second page and gets no dots.
+    if (refOnly) nav.appendChild(pageDots(0));
     col.appendChild(nav);
 
     if (refOnly) {
@@ -2585,8 +2627,9 @@
     }
     // the page arrives in two beats: the title, then everything under it. The
     // preview build is already on the screen the moment it is dragged into
-    // view, so it does not arrive at all.
-    if (!opts.into) {
+    // view, and a page handed over by the snap was that preview a frame ago,
+    // so neither of them arrives at all.
+    if (!opts.into && !pagerHandover) {
       enterFade(starEl, 0);
       enterFade(rest, 1);
       enterFade(nav, 1);
@@ -2827,12 +2870,16 @@
     rise.setAttribute('aria-hidden', 'true');
     home.insertBefore(rise, col);
 
-    // THE M (round 8, Malik: the swipe is the main door now, so the mark stops
-    // owning the top of the screen). It moves to the bottom band, above the
-    // page dots: small, quiet, and still a tap to the logic page.
+    // THE M (round 8 took it off the top centre; ROUND 9 puts it in the TOP
+    // LEFT CORNER as branding, mirroring the close chip's corner: same vertical
+    // centre, the same 16px inset from its own edge, a real 44px hit area, and
+    // a 12px mark inside it. Absolutely positioned, so it costs the page no
+    // layout at all and a page that has it is exactly as tall as one that does
+    // not (the settle-shift law, round 9 item 1). Still the secondary door.
     var mBtn = btn('afl-day__m');
     mBtn.setAttribute('aria-label', 'Why this plan');
     mBtn.appendChild(markM());
+    day.appendChild(mBtn);
 
     var rail = btn('afl-day__rail');
     rail.setAttribute('role', 'slider');
@@ -2917,10 +2964,6 @@
     }
     day.appendChild(plate);
 
-    // the bottom band: the mark, then the page dots, then the CTA. The day is
-    // the SECOND page now (logic sits to its left), so the second dot is lit.
-    col.appendChild(footBand(1, opts.into ? null : mBtn));
-
     var nav = navRow();
     nav.classList.add('afl-nav--day');
     var hold = btn('afl-day__hold');
@@ -2940,6 +2983,10 @@
     doneWrap.appendChild(doneIn);
     nav.appendChild(doneWrap);
     nav.appendChild(hold);
+    // the dots sit UNDER the button, in the nav's own bottom padding, so the
+    // standing button geometry is untouched. The day is the SECOND page (logic
+    // is to its left), so the second dot is home.
+    nav.appendChild(pageDots(1));
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------
@@ -2952,6 +2999,7 @@
     var lastVal = val;
     var ticks = sups.map(function () { return false; });
     var signed = false;
+    var restored = false;              // this day was closed before we opened it
     var railTicks = [];
 
     function ladderAsc() {
@@ -3385,14 +3433,28 @@
       // is the room; the green that is left is the button, and the button is
       // simply already green when the screen paints. Nothing to animate in,
       // nothing to suppress, which is what the wash needed three lines for.
+      //
+      // ROUND 9: and the settled weight is already ON at the first paint. The
+      // day did not just finish, it finished earlier; replaying the calm-down
+      // would be the app pretending it just happened.
+      //
+      // THE ENTRANCE GOES WITH IT. Measured: the entrance animates opacity to
+      // 1, and the settled base is 0.62, so a restored day faded in to FULL
+      // strength and then dropped to settled the moment the class came off. A
+      // pop, on the one screen that is meant to be already at rest. A day that
+      // was closed before this screen opened does not arrive at all.
+      day.classList.add('is-restored');
+      restored = true;
     }
     var closedRec = closedToday();
     if (closedRec) restoreClosed(closedRec);
 
     paint();
     // the preview build is already on the screen the moment it is dragged
-    // into view, so it does not arrive at all.
-    if (!opts.into) {
+    // into view, a page handed over by the snap was that preview a frame ago,
+    // and a day that was already closed is at rest by definition: none of the
+    // three arrives.
+    if (!opts.into && !pagerHandover && !restored) {
       enterFade(day);
       enterFade(nav);
     }

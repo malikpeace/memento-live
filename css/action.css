@@ -4946,25 +4946,36 @@ html.theme-light .afl--cine {
   font-size: 0.8125rem; line-height: 1.4; color: rgba(var(--ink), 0.62);
 }
 
-/* ---- THE BOTTOM BAND: the mark, then the page dots (round 8) ------------
-   Clarity's pager dot language, scaled down and stripped of its accent and
-   its glow: these screens carry no accent, and the dots are furniture, not a
-   control. The band sits directly above the standing CTA on both pages, so
-   the two can never drift apart on the spacing. */
-.afl-foot {
-  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
-  gap: 9px; padding: 6px 20px 0;
+/* ---- THE PAGE DOTS (round 8; ROUND 9 moved and rebuilt them) ------------
+   At the VERY BOTTOM, under the standing button, inside the nav's own bottom
+   padding: absolutely positioned, so the button's standing geometry is
+   untouched and a page carrying dots is exactly as tall as one that is not
+   (the settle-shift law).
+
+   THEY TRACK THE FINGER. The page you are on wears a short pill, the other a
+   dot, and the two trade shape continuously with --afl-pg (0 here, 1 at the
+   other page), which the page snap writes every frame. No second animation to
+   keep in step with the pages, and no accent colour: ink only. */
+.afl-dots {
+  position: absolute; left: 0; right: 0; bottom: calc(var(--safe-b, 0px) + 9px);
+  display: flex; gap: 6px; align-items: center; justify-content: center;
+  pointer-events: none; z-index: 2;
 }
-.afl-dots { display: flex; gap: 7px; align-items: center; pointer-events: none; }
 .afl-dots i {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: rgba(var(--ink), 0.20);
-  transition: background 0.25s ease;
+  --w: 0;
+  width: calc(5px + 9px * var(--w)); height: 5px; border-radius: 999px;
+  background: rgba(var(--ink), calc(0.18 + 0.52 * var(--w)));
 }
-.afl-dots i.is-on { background: rgba(var(--ink), 0.70); }
-html.theme-light .afl-dots i { background: rgba(var(--ink), 0.24); }
-html.theme-light .afl-dots i.is-on { background: rgba(var(--ink), 0.78); }
-@media (prefers-reduced-motion: reduce) { .afl-dots i { transition: none; } }
+/* which of the two is home, and therefore which way the shape travels */
+.afl-dots[data-active="0"] i:first-child,
+.afl-dots[data-active="1"] i:last-child { --w: calc(1 - var(--afl-pg, 0)); }
+.afl-dots[data-active="0"] i:last-child,
+.afl-dots[data-active="1"] i:first-child { --w: var(--afl-pg, 0); }
+/* the drag is 1:1 (no transition, or it would lag the finger); the snap is
+   where they glide, on the pages' own curve and duration. */
+.afl.is-snap .afl-dots i { transition: width 0.28s var(--ease-out), background 0.28s var(--ease-out); }
+html.theme-light .afl-dots i { background: rgba(var(--ink), calc(0.22 + 0.56 * var(--w))); }
+@media (prefers-reduced-motion: reduce) { .afl.is-snap .afl-dots i { transition: none; } }
 @media (prefers-reduced-motion: reduce) {
   .afl-cta, .afl-cta__fill, .afl-cta__inv { transition: none; }
   .afl-cta.is-holding .afl-cta__fill,
@@ -5743,13 +5754,19 @@ html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
 .afl-day__sp { min-height: 10px; }
 .afl-day__sp.is-a { flex: 0.55; }
 .afl-day__sp.is-b { flex: 0.9; }
-/* THE M (round 8, Malik: the swipe is the main door now). It left the top of
-   the screen and joined the bottom band, directly above the page dots: ~60%
-   of its old size, quiet ink, and still a real 44px-tall tap target. It no
-   longer shares the top strip with the close chip at all. */
+/* THE M (round 8 took it off the top centre; ROUND 9 parks it in the TOP LEFT
+   CORNER as branding, Malik's call). It mirrors the close chip exactly: the
+   chip is 44x44 at top safe-t + 16 with a 16px inset from the right edge, so
+   the mark is 44x44 at the same top with a 16px inset from the left. Same
+   vertical centre, same inset, a full 44px hit area, a 12px mark inside it.
+   It is absolute, so it costs the page no layout and cannot shift anything.
+   (On a phone the column IS the window, so the two insets are identical; on a
+   wide desktop window the mark stays with the content column while the chip
+   stays at the window edge, which is the right call for both.) */
 .afl-day__m {
-  position: relative; z-index: 5; width: 44px; height: 30px;
-  display: grid; place-items: center;
+  position: absolute; z-index: 5;
+  top: calc(var(--safe-t, 0px) + 16px); left: 16px;
+  width: 44px; height: 44px; display: grid; place-items: center;
   border: 0; background: none; padding: 0; cursor: pointer;
 }
 .afl-day__m svg { width: 12px; height: 12px; }
@@ -5893,6 +5910,27 @@ html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
   background: var(--afl-green); color: #0b1112; cursor: default;
   box-shadow: 0 8px 30px rgba(var(--afl-green-rgb), 0.20);
 }
+/* ---- THE COMPLETION SETTLE (round 9, Malik) -----------------------------
+   When the day lands, EVERYTHING settles: the act, the supports, the rail,
+   the mark, the whole day column calms to a quieter weight and the green
+   button is the only thing left at full strength. It is one opacity on the
+   column, deliberately: every child keeps its own hierarchy (the ticked
+   strikethroughs, the lapsed supports) exactly as it was, just quieter, and
+   there is no second set of colours to keep in sync. The receipt row lives in
+   the nav, not the column, so it stays readable.
+   The fade starts as the green crest begins to leave, so the room and the
+   content calm down together. */
+.afl-day { transition: opacity 0.4s ease-out 0.45s; }
+.afl.is-signed .afl-day { opacity: 0.62; }
+/* The M is a door, not day content. It sits inside the settled column, and a
+   child cannot exceed its parent's opacity, so its own ink rises instead:
+   0.48 x 0.62 = the ~0.30 it always reads at (round 9's embarrassment list). */
+.afl.is-signed .afl-day__m path { fill: rgba(var(--ink), 0.48); }
+/* a day that was ALREADY closed when the screen opened is settled from its
+   first paint: it finished earlier, and replaying the calm-down would be the
+   app pretending it just happened. */
+.afl-day.is-restored { transition: none; }
+@media (prefers-reduced-motion: reduce) { .afl-day { transition: none; } }
 /* beat 5a: the signed row. The undo window, the pulse, the ONE referee call and
    the ceremony attach here in the rewards phase (THE CLOSE SEAM in js/30). */
 .afl-day__donew {
