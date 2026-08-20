@@ -4786,7 +4786,6 @@ body:has(.action-exp[data-heat]) .fullscreen-close-global {
      BOLD, so bold won for a 3s hold and a 0.5s crest. Turning --afl-rise-a
      down to 0.50 puts every line back over 4.5:1 and is the only edit needed. */
   --afl-rise-a: 0.72;
-  --afl-wash-a: 0.34;
   --afl-bg: #050608;
   /* the same colour as a triple, so the top scrim can fade it to nothing
      without ever interpolating through a foreign hue */
@@ -4946,6 +4945,26 @@ html.theme-light .afl--cine {
   margin: 14px 0 0; text-align: center;
   font-size: 0.8125rem; line-height: 1.4; color: rgba(var(--ink), 0.62);
 }
+
+/* ---- THE BOTTOM BAND: the mark, then the page dots (round 8) ------------
+   Clarity's pager dot language, scaled down and stripped of its accent and
+   its glow: these screens carry no accent, and the dots are furniture, not a
+   control. The band sits directly above the standing CTA on both pages, so
+   the two can never drift apart on the spacing. */
+.afl-foot {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center;
+  gap: 9px; padding: 6px 20px 0;
+}
+.afl-dots { display: flex; gap: 7px; align-items: center; pointer-events: none; }
+.afl-dots i {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(var(--ink), 0.20);
+  transition: background 0.25s ease;
+}
+.afl-dots i.is-on { background: rgba(var(--ink), 0.70); }
+html.theme-light .afl-dots i { background: rgba(var(--ink), 0.24); }
+html.theme-light .afl-dots i.is-on { background: rgba(var(--ink), 0.78); }
+@media (prefers-reduced-motion: reduce) { .afl-dots i { transition: none; } }
 @media (prefers-reduced-motion: reduce) {
   .afl-cta, .afl-cta__fill, .afl-cta__inv { transition: none; }
   .afl-cta.is-holding .afl-cta__fill,
@@ -5441,9 +5460,16 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   margin: 0 0 8px; font-size: 18.2px; font-weight: 700;
   letter-spacing: -0.014em; color: var(--text-hi);
 }
+/* ROUND 8: bullets. A plain ink dot, hanging, so a refusal that wraps keeps
+   its text on one left edge instead of sliding under its own bullet. */
 .afl-lg__no-i {
-  margin: 0; padding: 5px 0; font-size: 18.2px; font-weight: 600; line-height: 1.35;
+  position: relative; margin: 0; padding: 5px 0 5px 20px;
+  font-size: 18.2px; font-weight: 600; line-height: 1.35;
   letter-spacing: -0.012em; color: var(--text-hi); text-wrap: pretty;
+}
+.afl-lg__no-i::before {
+  content: ''; position: absolute; left: 3px; top: 15px;
+  width: 5px; height: 5px; border-radius: 50%; background: rgba(var(--ink), 0.55);
 }
 .afl-lg__h {
   margin: 26px 0 18px; padding-top: 22px; font-size: 22px; font-weight: 700;
@@ -5636,8 +5662,7 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
    one, so a descendant selector here would drag the preview's own column
    along with the room it is painted in. */
 .afl.is-drag > .afl__col, .afl.is-snap > .afl__col,
-.afl.is-drag > .afl__rise, .afl.is-snap > .afl__rise,
-.afl.is-drag > .afl__wash, .afl.is-snap > .afl__wash {
+.afl.is-drag > .afl__rise, .afl.is-snap > .afl__rise {
   transform: translateX(var(--afl-drag, 0px));
 }
 .afl.is-drag > .afl-pg--r, .afl.is-snap > .afl-pg--r {
@@ -5647,13 +5672,13 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   transform: translateX(calc(-100% + var(--afl-drag, 0px)));
 }
 .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
-.afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg {
+.afl.is-snap > .afl-pg {
   transition: transform 0.28s var(--ease-out);
 }
 @media (prefers-reduced-motion: reduce) {
   /* reduced motion never drags the pages: past the threshold it swaps */
   .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
-  .afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg { transition: none; }
+  .afl.is-snap > .afl-pg { transition: none; }
 }
 
 /* ---- THE NON-NEGOTIABLES ROW (round 7, Malik on-device) -----------------
@@ -5708,28 +5733,27 @@ html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
   .afl-day__nnb { transition: none; }
 }
 
-/* ---- THE CLOSE CHIP SITS WITH THE M (round 7, Malik on-device) ----------
-   ON THE FLOW'S SCREENS ONLY, the same body:has idiom misc.css uses to hide
-   #topFade here. The M door's box is 39px tall at top max(44px, safe-t+10),
-   so its centre is that + 19.5px; the chip is 44px tall, so its top is that
-   centre minus 22px. Nothing global moves: Clarity's chip is untouched.
-   At safe-t 0 the chip lands at 41.5px, at 47px it lands at 54.5px, both
-   clear of the inset and both inside the scrim .afl__top already paints. */
-body:has(.afl) #fullscreenCloseGlobal {
-  top: calc(max(44px, var(--safe-t, 0px) + 10px) - 2.5px);
-}
+/* ---- THE CLOSE CHIP (round 7, then ROUND 8) -----------------------------
+   Round 7 pulled the chip down onto the M's centre line, because the M owned
+   the top of the day screen and the two sat side by side. Round 8 moved the M
+   to the bottom band, so that rule had nothing left to align to: an offset
+   with no referent is worse than none. The chip is back at the app's standard
+   position (safe-t + 16), which is where Clarity's is, and the top strip of
+   the flow now holds nothing but the X. */
 .afl-day__sp { min-height: 10px; }
 .afl-day__sp.is-a { flex: 0.55; }
 .afl-day__sp.is-b { flex: 0.9; }
-/* the M: the standing door back to the logic page. The bare notched mark, and
-   it sits BELOW the island on a real phone. */
+/* THE M (round 8, Malik: the swipe is the main door now). It left the top of
+   the screen and joined the bottom band, directly above the page dots: ~60%
+   of its old size, quiet ink, and still a real 44px-tall tap target. It no
+   longer shares the top strip with the close chip at all. */
 .afl-day__m {
-  position: absolute; top: max(44px, calc(var(--safe-t) + 10px)); left: 50%; transform: translateX(-50%);
-  z-index: 5; width: 57px; height: 39px; display: grid; place-items: center;
+  position: relative; z-index: 5; width: 44px; height: 30px;
+  display: grid; place-items: center;
   border: 0; background: none; padding: 0; cursor: pointer;
 }
-.afl-day__m svg { width: 19.5px; height: 19.5px; }
-.afl-day__m path { fill: rgba(var(--ink), 0.38); transition: fill 0.16s ease-out; }
+.afl-day__m svg { width: 12px; height: 12px; }
+.afl-day__m path { fill: rgba(var(--ink), 0.30); transition: fill 0.16s ease-out; }
 .afl-day__m:hover path, .afl-day__m:active path { fill: rgba(var(--ink), 0.72); }
 .afl-day__m:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; border-radius: 8px; }
 /* beat 1: SEE IT */
@@ -5842,14 +5866,13 @@ body:has(.afl) #fullscreenCloseGlobal {
 /* ROUND 7: the quiet one-line version of this is gone. The row that replaced
    it (an expandable header with a solid X marker) is defined at the top of
    this section, next to the pager it shares the day's bottom half with. */
-/* beat 4: HOLD IT DONE. The button stays PUT: the background's own green rise
-   is the whole feedback. App button recipe. */
-/* THE SIGNED CROSSFADE (v1191). The hold button used to display:none and the
-   signed row display:flex on the same frame, which is the hardest pop on the
-   screen. They now share ONE grid cell (the idiom .afl-ld__layer already uses
-   here) so the row keeps its height, and they cross fade. */
-.afl-nav--day { position: relative; z-index: 3; display: grid; }
-.afl-nav--day > * { grid-area: 1 / 1; }
+/* beat 4: HOLD IT DONE, and ROUND 8: THE GREEN SETTLES INTO THE BUTTON.
+   The rise is still the whole feedback DURING the hold; when it lands, the
+   room goes back to being a room and the button keeps the green. So the
+   button and the signed row can no longer share one cell (both are on the
+   screen now): the row opens above the button, on its own real height, and
+   the button does not move a pixel while it does. */
+.afl-nav--day { position: relative; z-index: 3; display: flex; flex-direction: column; }
 .afl-day__hold {
   position: relative; display: block; width: 100%; padding: 18px; border: 0;
   border-radius: var(--r-ctrl); background: var(--solid-bg); color: var(--solid-fg);
@@ -5862,16 +5885,27 @@ body:has(.afl) #fullscreenCloseGlobal {
 }
 .afl-day__hold span { display: block; text-align: center; }
 .afl-day__hold:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 3px; }
-.afl-day__hold { transition: opacity 0.18s ease-in, box-shadow 0.18s ease-in; }
-.afl.is-signed .afl-day__hold { opacity: 0; pointer-events: none; box-shadow: none; }
+.afl-day__hold { transition: background 0.4s ease-out, color 0.4s ease-out, box-shadow 0.4s ease-out; }
+/* THE COMPLETED BUTTON. Spring green in BOTH themes, so its ink is pinned
+   rather than tokenised: --solid-fg flips to white in light mode, and white on
+   #3fd94e is 2.3:1. The dark ink is 10.9:1 on it and reads in both. */
+.afl.is-signed .afl-day__hold {
+  background: var(--afl-green); color: #0b1112; cursor: default;
+  box-shadow: 0 8px 30px rgba(var(--afl-green-rgb), 0.20);
+}
 /* beat 5a: the signed row. The undo window, the pulse, the ONE referee call and
    the ceremony attach here in the rewards phase (THE CLOSE SEAM in js/30). */
-.afl-day__done {
-  display: flex; align-items: center; gap: 12px; padding: 18px 5px 18px 8px;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.24s var(--ease-out) 0.06s;
+.afl-day__donew {
+  display: grid; grid-template-rows: 0fr; opacity: 0;
+  transition: grid-template-rows 0.26s var(--ease-out), opacity 0.2s ease-in;
 }
-.afl.is-signed .afl-day__done { opacity: 1; pointer-events: auto; }
+.afl-day__donein { overflow: hidden; min-height: 0; }
+.afl.is-signed .afl-day__donew { grid-template-rows: 1fr; opacity: 1; }
+.afl-day__done {
+  display: flex; align-items: center; gap: 12px; padding: 6px 5px 14px 8px;
+  pointer-events: none;
+}
+.afl.is-signed .afl-day__done { pointer-events: auto; }
 .afl-day__done > b { width: 10.4px; height: 10.4px; border-radius: 4px; background: var(--afl-green); flex: 0 0 auto; }
 .afl-day__dt { font-size: 17.6px; font-weight: 400; color: rgba(var(--ink), 0.92); }
 .afl-day__undo {
@@ -5888,13 +5922,11 @@ body:has(.afl) #fullscreenCloseGlobal {
   pointer-events: none; opacity: 1;
   background: rgba(var(--afl-green-rgb), var(--afl-rise-a));
 }
-html.theme-light .afl { --afl-rise-a: 0.82; --afl-wash-a: 0.42; }
-.afl__wash {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(var(--afl-green-rgb), 0), rgba(var(--afl-green-rgb), var(--afl-wash-a)));
-  transition: height 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.4s ease-out;
-}
-.afl.is-signed .afl__wash { height: 44%; }
+html.theme-light .afl { --afl-rise-a: 0.82; }
+/* ROUND 8: .afl__wash is GONE. The settled day used to keep a green gradient
+   band across the bottom of the room, which is what turned a swipe to the
+   logic page into a hard green cutoff on his phone. The green that survives a
+   completion is the button, and only the button. */
 @media (prefers-reduced-motion: reduce) {
   .afl__rise { display: none; }
   .afl-day__sup, .afl-day__rail i, .afl-day__rule, .afl-day__box svg, .afl-day__tx { transition: none; }

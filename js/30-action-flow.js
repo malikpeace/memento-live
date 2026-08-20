@@ -814,7 +814,19 @@
     }
     current = null;
     root = null;
-    if (prev) fadeOut(prev);
+    // ROUND 8: SCREEN TO SCREEN IS NOT A CROSS FADE (Malik on-device: the logic
+    // page "glitches loading in", "not smooth or native"). Measured: for ~140ms
+    // the outgoing room sat at 0.94 opacity under an incoming room at 0.64, so
+    // the old screen's text was visibly showing THROUGH the new one's. Every
+    // room is opaque and full bleed, and every screen already fades its own
+    // CONTENT in (enterFade, the one stagger), so the room itself simply
+    // arrives and the one leaving goes at once, behind it, where nothing can
+    // see it. Entering the flow from the app still fades, below: there the
+    // room really is arriving over something else.
+    if (prev) {
+      prev.setAttribute('aria-hidden', 'true');
+      if (prev.parentNode) prev.parentNode.removeChild(prev);
+    }
 
     root = el('div', 'afl' + (opts.cine ? ' afl--cine' : ''));
     root.setAttribute('data-screen', name);
@@ -835,7 +847,7 @@
     }
     root.appendChild(col);
     document.body.appendChild(root);
-    fadeIn(root);
+    if (!prev) fadeIn(root);          // only the FIRST room fades into the app
     escBound = function (e) { if (e.key === 'Escape') destroy(); };
     document.addEventListener('keydown', escBound);
     showExit();
@@ -873,6 +885,29 @@
   // The app's standing bottom-button recipe (Clarity's nav geometry). Every
   // screen's primary control comes from here so Action never drifts again.
   function navRow() { return el('div', 'afl-nav'); }
+
+  // THE PAGE DOTS (round 8, Malik: people have to know there are pages and
+  // which one they are on). Two dots, the pager's order: logic, then the day.
+  // Clarity's pager dot language, scaled down and stripped of its accent and
+  // glow, because these screens carry no accent. Furniture, never a control:
+  // aria-hidden, no pointer events, and it is only ever built where a pager
+  // actually exists (never on the first-visit logic page, which has no second
+  // page to go to).
+  //
+  // `foot` is the band the dots share with the day's M. One place, so the two
+  // screens cannot drift apart on the spacing above their CTA.
+  function pageDots(active) {
+    var d = el('div', 'afl-dots');
+    d.setAttribute('aria-hidden', 'true');
+    for (var i = 0; i < 2; i++) d.appendChild(el('i', i === active ? 'is-on' : null));
+    return d;
+  }
+  function footBand(active, mark) {
+    var f = el('div', 'afl-foot');
+    if (mark) f.appendChild(mark);
+    f.appendChild(pageDots(active));
+    return f;
+  }
   function cta(label) {
     var b = btn('afl-cta');
     b.appendChild(el('span', 'afl-cta__fill'));
@@ -1029,11 +1064,14 @@
 
   // ===========================================================================
   // THE PAGE SNAP (round 7, Malik on-device: the vertical door "fought the
-  // logic page's own scrolling"). The two surfaces are now a PAGER, side by
-  // side: the day is the left page, the logic page is the right one. A pull
-  // moves both 1:1 with the finger, and letting go SNAPS, all the way across
-  // past 40% of the width or on a flick, all the way back otherwise. It can
-  // never rest between the two (the finger-follow + snap-to-nearest law).
+  // logic page's own scrolling"). The two surfaces are a PAGER, side by side.
+  // ROUND 8 flipped which side is which (his call: "put the logic page when
+  // they swipe right instead"), so the order is now LOGIC then DAY: a pull to
+  // the right brings the logic page in from the left, and a pull to the left
+  // on the logic page brings the day back. A pull moves both 1:1 with the
+  // finger, and letting go SNAPS, all the way across past 40% of the width or
+  // on a flick, all the way back otherwise. It can never rest between the two
+  // (the finger-follow + snap-to-nearest law).
   //
   // WHY ONE BINDER: the door and the way back are the same gesture mirrored,
   // and two copies would drift. cfg:
@@ -2284,17 +2322,13 @@
           eqOk = false;
           fixed = '≈ ' + Math.round(chk.value).toLocaleString();
         }
-        var rowEl = eqRow(r.label, r.shown);
-        // THE SUBSTITUTION READS. The written number lands first, then corrects
-        // itself once the page has settled, with the same quiet 200ms the rail
-        // uses. A silent hard swap on paint would just look like a typo.
-        // the preview build owns no timers (nothing tears it down but the view
-        // it lives in), so it simply shows the written number; the real page
-        // it hands over to runs the substitution.
-        if (fixed && !opts.into) {
-          var vb = rowEl.querySelector('b');
-          lgTimers.push(setTimeout(function () { swapText(vb, fixed, 1); }, 520));
-        }
+        // ROUND 8: THE CORRECTION LANDS BEFORE THE FIRST PAINT. This used to
+        // print the AI's number and swap it 520ms later, which is a visible
+        // jump on a page that is still arriving (part of his "glitches loading
+        // in"). The client is the last word on arithmetic either way, so it is
+        // simply the only number ever shown. Nothing on this page changes
+        // after it is painted.
+        eqRow(r.label, fixed || r.shown);
       });
       if (plan.eq.result) eqRow(plan.eq.result.label, plan.eq.result.value, 'is-result');
       box.appendChild(eq);
@@ -2427,6 +2461,12 @@
     // under a Close button would be explaining a door they just walked back
     // through. First visit only.
     if (!refOnly) nav.appendChild(el('p', 'afl-nav__sub', 'You can always return to this page.'));
+    // THE PAGE DOTS (round 8). This page is the FIRST of the two, so the first
+    // dot is lit. They exist only where a pager does: the reference view (from
+    // the M, from the swipe, from a resume) and the preview build that is
+    // literally being dragged. The first-visit page has no second page and
+    // gets no dots.
+    if (refOnly) col.appendChild(footBand(0, null));
     col.appendChild(nav);
 
     if (refOnly) {
@@ -2510,10 +2550,10 @@
       }, function () { return gatesPass(); });
     }
 
-    // ---- THE WAY BACK (round 7: the other half of the pager) ----------------
-    // The day is the page to the LEFT, so a pull to the right brings it back,
-    // the same gesture mirrored. Horizontal dominance is what keeps this off
-    // the page's own vertical scrolling; nothing here prevents a scroll.
+    // ---- THE WAY BACK (round 7; ROUND 8: mirrored) --------------------------
+    // The day is the page to the RIGHT now, so a pull to the LEFT brings it
+    // back, the same gesture mirrored. Horizontal dominance is what keeps this
+    // off the page's own vertical scrolling; nothing here prevents a scroll.
     //
     // ONLY WHEN THERE IS A DAY TO GO BACK TO. On the first visit the day does
     // not exist yet (it is what agreeing opens), so there is no left page and
@@ -2529,7 +2569,7 @@
       var lgSnap = bindPageSnap({
         host: root,
         surface: c,
-        dir: 1,
+        dir: -1,
         blocked: function (t) {
           if (!t || !t.closest) return true;
           return !!t.closest('.afl-cta, .afl-nav, .afl-nn__a, .afl-ref__t');
@@ -2779,18 +2819,20 @@
 
     // THE GREEN RISE lives on the SHELL, not inside the day column: the whole
     // background goes green, under every element, full bleed on desktop too.
+    // ROUND 8: the rise is the HOLD's gesture and nothing else. It crests, it
+    // fades, and the green then lives in the button (the settled day carries no
+    // background wash at all, which is what made swiping to the logic page read
+    // as a hard green cutoff on his phone).
     var rise = el('div', 'afl__rise');
     rise.setAttribute('aria-hidden', 'true');
-    var wash = el('div', 'afl__wash');
-    wash.setAttribute('aria-hidden', 'true');
-    home.insertBefore(wash, col);
     home.insertBefore(rise, col);
 
-    // the M: the standing door back to the logic page, below the island.
+    // THE M (round 8, Malik: the swipe is the main door now, so the mark stops
+    // owning the top of the screen). It moves to the bottom band, above the
+    // page dots: small, quiet, and still a tap to the logic page.
     var mBtn = btn('afl-day__m');
     mBtn.setAttribute('aria-label', 'Why this plan');
     mBtn.appendChild(markM());
-    day.appendChild(mBtn);
 
     var rail = btn('afl-day__rail');
     rail.setAttribute('role', 'slider');
@@ -2875,17 +2917,29 @@
     }
     day.appendChild(plate);
 
+    // the bottom band: the mark, then the page dots, then the CTA. The day is
+    // the SECOND page now (logic sits to its left), so the second dot is lit.
+    col.appendChild(footBand(1, opts.into ? null : mBtn));
+
     var nav = navRow();
     nav.classList.add('afl-nav--day');
     var hold = btn('afl-day__hold');
     hold.appendChild(el('span', null, 'Hold to complete'));
+    // ROUND 8: the signed row and the button no longer share one cell. The
+    // green ends up IN the button ("Completed"), so the receipt line has to
+    // live somewhere of its own: it opens above the button on its own real
+    // height, and the button never moves while it does.
+    var doneWrap = el('div', 'afl-day__donew');
+    var doneIn = el('div', 'afl-day__donein');
     var doneRow = el('div', 'afl-day__done');
     doneRow.appendChild(el('b'));
     doneRow.appendChild(el('span', 'afl-day__dt'));
     var undo = btn('afl-day__undo', 'Undo');
     doneRow.appendChild(undo);
+    doneIn.appendChild(doneRow);
+    doneWrap.appendChild(doneIn);
+    nav.appendChild(doneWrap);
     nav.appendChild(hold);
-    nav.appendChild(doneRow);
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------
@@ -3031,7 +3085,10 @@
       // say in is the rest day, where the old line was hidden too.
       if (nnWrap) nnWrap.classList.toggle('is-gone', off);
       // this changes on a rest day. It fades.
-      swapText(hold.querySelector('span'), off ? 'Hold to close the day' : 'Hold to complete', 1);
+      // ROUND 8: the button IS the completion once the day is held. It goes
+      // spring green and says so, and it keeps saying so on a re-open.
+      swapText(hold.querySelector('span'),
+        signed ? 'Completed' : (off ? 'Hold to close the day' : 'Hold to complete'), 1);
     }
     function railSet(y) {
       var L = ladderAsc();
@@ -3090,19 +3147,25 @@
       rise.style.transition = 'height .2s ease-out';
       rise.style.height = '0';
     }
+    // ROUND 8: THE CREST, THEN THE GREEN GOES HOME. The rise still fills the
+    // room (that is the ceremony, and it is untouched), holds a beat, then
+    // fades out over 600ms and leaves. What is left of it is the button, which
+    // is green from the moment the hold lands. A settled day therefore has a
+    // plain room, which is what stops the swipe to the logic page reading as a
+    // hard green cutoff.
     function riseCrest() {
       if (reduced()) return;
       rise.style.transition = 'none';
       rise.style.height = '100%';
       setTimeout(function () {
-        rise.style.transition = 'opacity .45s ease-out';
+        rise.style.transition = 'opacity .6s ease-out';
         rise.style.opacity = '0';
         setTimeout(function () {
           if (!rise.isConnected) return;
           rise.style.transition = 'none';
           rise.style.height = '0';
           rise.style.opacity = '1';
-        }, 480);
+        }, 640);
       }, 520);
     }
     // The gesture itself is aflBindHold, the pattern that is proven on his
@@ -3258,11 +3321,11 @@
     }
     mBtn.addEventListener('click', toLogic);
 
-    // ---- THE DOOR TO THE LOGIC PAGE (round 7: a HORIZONTAL page snap) -------
-    // The day is the left page, the logic page is the right one. A pull to the
-    // LEFT brings it in from the right edge, 1:1 with the finger, and letting
-    // go snaps one way or the other, never between. The M is untouched: it is
-    // still one tap to the same page.
+    // ---- THE DOOR TO THE LOGIC PAGE (round 7; ROUND 8: the other way) -------
+    // The logic page is the LEFT page now, so a pull to the RIGHT brings it in
+    // from the left edge, 1:1 with the finger, and letting go snaps one way or
+    // the other, never between. The M is still a tap to the same page, from
+    // its new home at the bottom.
     //
     // It only starts on OPEN BACKGROUND: a press on the rail, a support, the
     // CTA, the M, the deep work door, the signed row or the non-negotiables
@@ -3275,7 +3338,7 @@
       daySnap = bindPageSnap({
         host: home,
         surface: day,
-        dir: -1,
+        dir: 1,
         blocked: swipeBlocked,
         build: function (pg) { openLogic(key, { plan: plan, standing: true, into: pg }); },
         go: toLogic
@@ -3318,15 +3381,10 @@
       // the write is final, so the control that says it can be taken back is not
       // on the screen (commitDay's own two lines).
       try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
-      // the settled green wash belongs to the signed state, so it is THERE, but
-      // it must not animate itself in on a re-entry: it is already how the day
-      // ended. Killed for the first paint, handed back after it.
-      try {
-        wash.style.transition = 'none';
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { if (wash.isConnected) wash.style.transition = ''; });
-        });
-      } catch (e) {}
+      // ROUND 8: a re-entered closed day carries NO background wash. The room
+      // is the room; the green that is left is the button, and the button is
+      // simply already green when the screen paints. Nothing to animate in,
+      // nothing to suppress, which is what the wash needed three lines for.
     }
     var closedRec = closedToday();
     if (closedRec) restoreClosed(closedRec);
