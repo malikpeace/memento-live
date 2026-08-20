@@ -399,6 +399,87 @@
     ]
   };
 
+  // ===========================================================================
+  // THE CHECK-IN FREQUENCY QUESTION (v3.1, Malik 2026-08-20: "it's important to
+  // know WHEN to ask for progress as that's going to be different based on
+  // different goals and priorities").
+  //
+  // It is asked SECOND TO LAST, right before the baseline number, and only in
+  // the buckets that have a number pulse at all. A bucket whose pulse is 'none'
+  // (the logs ARE the record: gym, quitting, deep work, the blocker list) or
+  // whose cadence is 'on-results' (asked when results exist, "never between")
+  // is not asked, because there would be nothing behind the answer.
+  // ACTION-BUCKETS.md is the source of both the cadence and the default.
+  //
+  // The default arrives PRESELECTED, so the fast answer is one tap on Continue
+  // and the question is a correction, not a chore.
+  // ===========================================================================
+  var BUCKET_PULSE = {
+    weight:      { cadence: 'daily',         pref: 'daily' },   // the weigh-in
+    screen:      { cadence: 'nightly',       pref: 'daily' },   // the nightly report
+    money:       { cadence: 'weekly:sunday', pref: 'weekly' },  // "never daily"
+    'money-job': { cadence: 'weekly:sunday', pref: 'weekly' },  // weekly interviews landed
+    business:    { cadence: 'weekly:sunday', pref: 'weekly' },  // the Sunday confirm
+    fitness:     { cadence: 'none',          pref: null },      // the logs are the record
+    school:      { cadence: 'on-results',    pref: null },      // grades exist or they do not
+    projects:    { cadence: 'none',          pref: null },      // the blocker list is the pulse
+    focus:       { cadence: 'none',          pref: null }       // the sessions are the pulse
+  };
+  var CADENCE_CHIPS = [
+    { key: 'daily',       label: 'Every day' },
+    { key: 'every-other', label: 'Every other day' },
+    { key: 'twice-week',  label: 'Twice a week' },
+    { key: 'weekly',      label: 'Once a week' },
+    { key: 'custom',      label: 'Pick my days' }
+  ];
+  var DAY_LETTER = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  var DAY_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var CADENCE_Q = {
+    id: 'cadence-pref',
+    kind: 'cadence',
+    free: false,                       // structured input, so no free field
+    q: 'How often do you want to log your progress?',
+    unit: 'The more, the better.'
+  };
+  function bucketPulse(bucket) {
+    return BUCKET_PULSE[bucket] || BUCKET_PULSE[(bucket || '').split('-')[0]] || null;
+  }
+  function cadenceAskable(bucket) {
+    var b = bucketPulse(bucket);
+    return !!(b && b.pref);
+  }
+  function defaultCadencePref(bucket) {
+    var b = bucketPulse(bucket);
+    return { kind: (b && b.pref) || 'daily', days: [] };
+  }
+  // second to last: immediately before the baseline, which is the LAST number
+  // step in the set (baselineFrom's own rule, so the two can never disagree).
+  // A bucket with no number at all takes it at the end.
+  function withCadenceQ(list, bucket) {
+    if (!cadenceAskable(bucket)) return list;
+    var out = list.slice(), at = out.length;
+    for (var k = out.length - 1; k >= 0; k--) {
+      var d = out[k];
+      if (d.kind === 'num' || (d.kind === 'ruler' && d.ruler === 'weight')) { at = k; break; }
+    }
+    out.splice(at, 0, CADENCE_Q);
+    return out;
+  }
+  // the readable form of a pref, in their own words, for the answer row
+  function cadenceLabel(pref) {
+    if (!pref || !pref.kind) return '';
+    if (pref.kind === 'custom') {
+      var days = (pref.days || []).slice().sort(function (a, b) { return a - b; });
+      if (!days.length) return '';
+      return days.map(function (d) { return DAY_SHORT[d]; }).join(', ');
+    }
+    for (var i = 0; i < CADENCE_CHIPS.length; i++) {
+      if (CADENCE_CHIPS[i].key === pref.kind) return CADENCE_CHIPS[i].label;
+    }
+    return '';
+  }
+
   // ---------------------------------------------------------------------------
   // THE DRAG RULER (v1190). Height and a body weight are hard-format answers, so
   // the input IS the control: a flat tick strip in the day rail's own language,
@@ -1378,7 +1459,10 @@
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
     var bucket = opts.bucket || fx.intake.bucket;
-    var D = (QUESTIONS[bucket] || QUESTIONS.weight).slice(0, 5);
+    // the content questions stay capped at 5 (REFINE-QUESTIONS.md); the check-in
+    // question sits OUTSIDE that cap, because it is not a fact the plan math
+    // needs, it is how they want to be asked (v3.1).
+    var D = withCadenceQ((QUESTIONS[bucket] || QUESTIONS.weight).slice(0, 5), bucket);
     var clarityTime = getClarityTimeAnswer(opts.intake || fx.intake);
     var col = shell('refine', { label: 'A few questions' });
 
@@ -1441,13 +1525,26 @@
     // is painted: after that the person owns the answer, and deselecting must
     // not be undone by walking back and forth.
     var presetDone = D.map(function () { return false; });
+    // the check-in pref, seeded with the bucket's own default (v3.1)
+    var cadPick = D.map(function (d) {
+      return d.kind === 'cadence' ? defaultCadencePref(bucket) : null;
+    });
     var mirror = el('span', 'afl-q__mirror');
     wrap.appendChild(mirror);
     var numInput = null;
 
     function isNum(k) { return D[k].kind === 'num'; }
     function isRuler(k) { return D[k].kind === 'ruler'; }
+    function isCadence(k) { return D[k].kind === 'cadence'; }
     function answeredAt(k) {
+      // THE CHECK-IN QUESTION arrives already answered (the bucket's default is
+      // preselected), so Continue is live from the first frame. The one way to
+      // un-answer it is picking their own days and naming none.
+      if (isCadence(k)) {
+        var p = cadPick[k];
+        if (!p || !p.kind) return false;
+        return p.kind !== 'custom' || (p.days || []).length > 0;
+      }
       // REQUIRED (v1190). Height and weight cannot be skipped, and words in the
       // free field do not stand in for the number: the math needs the number.
       // Where the same question also asks for sex, both halves must be there.
@@ -1568,6 +1665,70 @@
       body.appendChild(f);
       fitNum();
     }
+    // THE CHECK-IN STEP (v3.1). The bucket's rhythms as flat ruled rows, the
+    // same control every other chip question uses, and one of them opens a
+    // week: seven day toggles in the multi-select language, on a real animated
+    // height (a grid row from 0fr to 1fr, the non-negotiables row's own recipe,
+    // never a max-height guess that opens in one frame).
+    function buildCadence() {
+      var k = i;
+      var pref = cadPick[k] || defaultCadencePref(bucket);
+      cadPick[k] = pref;
+      body.classList.add('afl-q__as--cad');
+
+      var rows = CADENCE_CHIPS.map(function (c) {
+        var b = btn('afl-q__a', c.label);
+        b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', function () {
+          pref.kind = c.key;
+          if (c.key !== 'custom') pref.days = [];
+          paintCad();
+          syncCta();
+        });
+        body.appendChild(b);
+        return b;
+      });
+
+      var wrapD = el('div', 'afl-cd');
+      var bodyD = el('div', 'afl-cd__b');
+      var rowD = el('div', 'afl-cd__r');
+      var dayBtns = DAY_LETTER.map(function (lab, idx) {
+        var b = btn('afl-cd__d', lab);
+        b.setAttribute('aria-label', DAY_NAME[idx]);
+        b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', function () {
+          var at = pref.days.indexOf(idx);
+          if (at > -1) pref.days.splice(at, 1); else pref.days.push(idx);
+          pref.days.sort(function (x, y) { return x - y; });
+          paintCad();
+          syncCta();
+        });
+        rowD.appendChild(b);
+        return b;
+      });
+      bodyD.appendChild(rowD);
+      wrapD.appendChild(bodyD);
+      body.appendChild(wrapD);
+
+      function paintCad() {
+        rows.forEach(function (b, j) {
+          var on = CADENCE_CHIPS[j].key === pref.kind;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var open = pref.kind === 'custom';
+        wrapD.classList.toggle('is-open', open);
+        wrapD.setAttribute('aria-hidden', open ? 'false' : 'true');
+        dayBtns.forEach(function (b, idx) {
+          var on = pref.days.indexOf(idx) > -1;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          b.tabIndex = open ? 0 : -1;
+        });
+      }
+      paintCad();
+    }
+
     // THE RULER STEP. A big readout, the tick strip under it, and a quiet "type
     // it instead" door for keyboards and screen readers. The strip is two
     // repeating hairline layers whose origin is one CSS length, so dragging is a
@@ -1763,13 +1924,14 @@
       // reserved on every step (css min-height), so using it costs no layout.
       // "You said", never "You typed": they said it to Clarity, in a conversation.
       var said = (d.clarityTime && clarityTime) ? ('You said ' + clarityTime + ' in Clarity.') : '';
-      unit.textContent = said || ((d.kind === 'num' || d.kind === 'ruler') ? (d.unit || '') : '');
+      unit.textContent = said || ((d.kind === 'num' || d.kind === 'ruler' || d.kind === 'cadence') ? (d.unit || '') : '');
       unit.classList.toggle('is-said', !!said);
       numInput = null;
       body.className = 'afl-q__as';
       body.innerHTML = '';
       if (d.kind === 'num') buildNum();
       else if (d.kind === 'ruler') buildRuler();
+      else if (d.kind === 'cadence') buildCadence();
       else buildChips();
       // THE FREE FIELD DIET (v3): the field is only on the questions where their
       // own words add something. See wantsFree() for the standing rule.
@@ -1816,6 +1978,19 @@
 
     function collect() {
       return D.map(function (d, k) {
+        // THE CHECK-IN ANSWER (v3.1). It is a preference, not a fact about
+        // their goal, so it travels as its own field AND as a readable chip,
+        // which is what the brain and the receipt both need.
+        if (d.kind === 'cadence') {
+          var p = cadPick[k] || defaultCadencePref(bucket);
+          var lab = cadenceLabel(p);
+          return {
+            id: d.id, kind: 'cadence', ruler: null, q: d.q, multi: false,
+            chip: lab || null, chipList: lab ? [lab] : [],
+            num: null, numText: null, free: null,
+            cadence: { kind: p.kind, days: (p.days || []).slice() }
+          };
+        }
         // MULTI (v3): every lit chip is part of the answer, comma joined in the
         // order they were tapped, because that order is their own ranking.
         // chipList keeps them separated for the brain; chip is the readable one.
@@ -1923,8 +2098,76 @@
         return out;
       })
     };
+    // THE CHECK-IN PREF (v3.1) rides at the TOP of the store, not buried in an
+    // answer row: it is read on every close, and a consumer should never have
+    // to walk the answers to find how often this person wants to be asked.
+    // The answer row stays too, so the brain still sees the question they were
+    // asked and the words they chose.
+    (answers || []).forEach(function (a) {
+      if (a && a.cadence && a.cadence.kind) {
+        store.cadencePref = { kind: a.cadence.kind, days: (a.cadence.days || []).slice() };
+      }
+    });
     st.actionRefine = store;
     return store;
+  }
+
+  // ===========================================================================
+  // THE CADENCE OVERRIDE (v3.1). plan.close.cadence is what the brain thought
+  // the rhythm should be; cadencePref is what the PERSON said. The person wins.
+  // The AI's own line is never destroyed: the pref lands beside it as
+  // plan.close.userCadence, so the plan still reads as it was written and the
+  // gate has one field to check first.
+  //
+  // Called at plan land, and by ActionFlow.setCadencePref (the seam a settings
+  // surface calls later, documented in ACTION-PLAN-SCHEMA.md).
+  // ===========================================================================
+  function normalizeCadencePref(pref) {
+    if (!pref || !pref.kind) return null;
+    var kinds = CADENCE_CHIPS.map(function (c) { return c.key; });
+    if (kinds.indexOf(pref.kind) < 0) return null;
+    var days = [];
+    (pref.days || []).forEach(function (d) {
+      var n = Number(d);
+      if (isFinite(n) && n >= 0 && n <= 6 && days.indexOf(n) < 0) days.push(n);
+    });
+    days.sort(function (a, b) { return a - b; });
+    // "my days" with no days is not a rhythm, it is a blank. Nothing is stored.
+    if (pref.kind === 'custom' && !days.length) return null;
+    return { kind: pref.kind, days: days };
+  }
+  function applyCadencePref(pref) {
+    var st = S();
+    if (!st) return null;
+    var pick = normalizeCadencePref(pref || (st.actionRefine && st.actionRefine.cadencePref));
+    if (!pick) return null;
+    if (pref) {
+      // an explicit set keeps the refine store and the plan in step, so the
+      // two can never answer this question differently.
+      if (!st.actionRefine || typeof st.actionRefine !== 'object') st.actionRefine = { answers: [] };
+      st.actionRefine.cadencePref = { kind: pick.kind, days: pick.days.slice() };
+    }
+    var p = st.actionPlan;
+    if (p && p.close && typeof p.close === 'object') {
+      p.close.userCadence = { kind: pick.kind, days: pick.days.slice(), at: Date.now() };
+    }
+    try { var pn = G('persistNow'); if (pn) pn(); } catch (e) {}
+    return pick;
+  }
+  // What the app should honour right now: the plan's stamped pref, else the
+  // refine answer (a plan that landed before this shipped, or a server-written
+  // plan that never passed through the stamp).
+  function livePref() {
+    var st = S();
+    if (!st) return null;
+    try {
+      var p = st.actionPlan;
+      if (p && p.close && p.close.userCadence) {
+        var a = normalizeCadencePref(p.close.userCadence);
+        if (a) return a;
+      }
+    } catch (e) {}
+    return normalizeCadencePref(st.actionRefine && st.actionRefine.cadencePref);
   }
 
   // THE BASELINE. REFINE-QUESTIONS.md: "Q-final is always the pulse baseline
@@ -2205,6 +2448,10 @@
           return endState('The plan came back but could not be saved.',
             'Try again. Nothing you answered is lost.', 'Try again', retry);
         }
+        // THE PERSON'S RHYTHM OVERRIDES THE PLAN'S (v3.1). Stamped right after
+        // the land, so it survives actionPlanNormalize (which owns the shape of
+        // everything the model wrote and would drop a field it does not know).
+        try { applyCadencePref(); } catch (e) {}
         ActionFlow._lastReport = report;
         if (typeof opts.onLanded === 'function') { try { opts.onLanded((res && res.plan) || report.plan, report); } catch (e) {} }
         at(0, land);
@@ -3394,15 +3641,77 @@
       var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(k || ''));
       return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
     }
+    // THE WEEKLY DAY the plan names ('weekly:sunday'), Sunday when it names
+    // none. A person's "Once a week" answer inherits it, so their week lands on
+    // the day their own bucket was built around.
+    function weeklyDow() {
+      var cad = String((plan.close && plan.close.cadence) || '');
+      var want = (cad.indexOf('weekly') === 0) ? (cad.split(':')[1] || 'sunday') : 'sunday';
+      var idx = WEEK.indexOf(String(want).slice(0, 3));
+      return idx < 0 ? 0 : idx;
+    }
+    // EVERY OTHER DAY is arithmetic, never a memory: days since the plan landed,
+    // even asks, odd stays quiet. Deterministic, so a missed day cannot shift
+    // the rhythm and a reinstall cannot restart it.
+    // The anchor, in the order of how solid it is: the day this plan landed,
+    // then the day the LIVE plan landed (a fixture or a preview build has no
+    // landing of its own), then the first day they ever closed for this goal.
+    // All three are facts already in the store, so the rhythm is the same on
+    // every device and cannot drift with a reinstall.
+    function everyOtherAnchor() {
+      var a = null;
+      try { if (plan.landedAt) a = dayKey(new Date(plan.landedAt)); } catch (e) {}
+      if (!a) {
+        try {
+          var lp = (S() || {}).actionPlan;
+          if (lp && lp.landedAt) a = dayKey(new Date(lp.landedAt));
+        } catch (e) {}
+      }
+      if (!a) {
+        try {
+          var recs = (S() || {}).dayRecords || {}, mine = plan.starHash || liveStarHash(), keys = [];
+          Object.keys(recs).forEach(function (k) {
+            var r = recs[k];
+            if (r && (!mine || !r.starHash || r.starHash === mine)) keys.push(k);
+          });
+          keys.sort();
+          if (keys.length) a = keys[0];
+        } catch (e) {}
+      }
+      return a;
+    }
+    function everyOtherDue(d) {
+      var anchor = everyOtherAnchor();
+      if (!anchor) return true;                 // nothing to count from: ask
+      var diff = Math.round((d - dayDateOf(anchor)) / 86400000);
+      return Math.abs(diff) % 2 === 0;
+    }
+    function prefDue(pref, rec) {
+      var d = dayDateOf(rec.day), dow = d.getDay();
+      if (pref.kind === 'daily') return true;
+      if (pref.kind === 'every-other') return everyOtherDue(d);
+      if (pref.kind === 'twice-week') return dow === 1 || dow === 4;   // Mon + Thu
+      if (pref.kind === 'weekly') return dow === weeklyDow();
+      if (pref.kind === 'custom') return (pref.days || []).indexOf(dow) > -1;
+      return true;
+    }
     function closeAskDue(rec) {
       var c = plan.close;
       if (!c || !c.prompt) return null;
       var cad = String(c.cadence || 'none');
+      // 'none' and 'on-results' are not rhythms, so a preference cannot turn
+      // them into one: there is nothing to ask for, and the check-in question
+      // is not even asked in those buckets.
+      if (cad === 'none' || cad === 'on-results') return null;
       var due = false;
-      if (cad === 'daily' || cad === 'nightly') due = true;
+      // THE PERSON'S ANSWER FIRST (v3.1), the plan's own line second.
+      var pref = null;
+      try { pref = livePref(); } catch (e) { pref = null; }
+      if (pref) {
+        due = prefDue(pref, rec);
+      } else if (cad === 'daily' || cad === 'nightly') due = true;
       else if (cad.indexOf('weekly') === 0) {
-        var want = (cad.split(':')[1] || 'sunday').slice(0, 3);
-        due = WEEK[dayDateOf(rec.day).getDay()] === want;
+        due = dayDateOf(rec.day).getDay() === weeklyDow();
       } else if (cad === 'per-session') due = !rec.off;
       if (!due) return null;
       // ONCE A DAY. gp.askedDay is the app's own throttle for asking a person
@@ -4095,6 +4404,15 @@
     // writers without going through a screen
     resolveBucket: resolveBucket,
     writeRefineStore: writeRefineStore,
+    // THE CHECK-IN RHYTHM SEAM (v3.1). setCadencePref({kind, days}) is what a
+    // settings surface calls to change how often Memento asks; it writes the
+    // refine store and the live plan together and persists. cadencePref() reads
+    // what is honoured right now. Kinds: daily | every-other | twice-week |
+    // weekly | custom (custom needs days, 0=Sunday). Documented in
+    // ACTION-PLAN-SCHEMA.md.
+    setCadencePref: function (pref) { return applyCadencePref(pref); },
+    cadencePref: livePref,
+    CADENCE_CHIPS: CADENCE_CHIPS,
     baselineFrom: baselineFrom,
     pulseBaseline: pulseBaseline,
     writeDayClose: writeDayClose,

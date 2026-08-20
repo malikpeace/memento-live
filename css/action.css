@@ -6064,6 +6064,43 @@ html.theme-light .afl-day__undo { color: rgba(var(--ink), 0.62); }
   .afl-ask.is-in, .afl-ask.is-out { animation: none; }
 }
 
+/* ==========================================================================
+   v1208: THE CHECK-IN FREQUENCY QUESTION (refine v3.1)
+   The rhythms are the refine screen's own ruled rows (.afl-q__a), so nothing
+   new is invented for them. Only the week they open needs anything here.
+   ========================================================================== */
+.afl-q__as--cad { justify-content: center; }
+/* the week opens on a REAL height (grid row 0fr -> 1fr, the non-negotiables
+   row's recipe), never a max-height guess that lands in one frame. */
+.afl-cd {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows 0.26s var(--ease-out);
+}
+.afl-cd.is-open { grid-template-rows: 1fr; }
+.afl-cd__b { overflow: hidden; min-height: 0; }
+.afl-cd__r {
+  display: flex; gap: 6px; padding: 16px 0 2px;
+}
+.afl-cd__d {
+  flex: 1 1 0; min-width: 0; height: 46px; padding: 0;
+  border: 0; border-radius: 10px;
+  background: var(--kfill-04); box-shadow: var(--glass-highlight);
+  font: 600 15.6px/1 var(--font); color: rgba(var(--ink), 0.62);
+  font-variant-numeric: normal; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+/* the lit day inverts against the ROOM, not against a token that flips with
+   it: the fill is the ink, so the letter has to be the room's own background
+   in both themes (white letter on black in light, black letter on white in
+   dark). Reading it off --solid-fg gave dark on dark in light mode. */
+.afl-cd__d.is-on { background: rgba(var(--ink), 0.92); color: var(--afl-bg); }
+.afl-cd__d:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; }
+html.theme-light .afl-cd__d:not(.is-on) { color: rgba(var(--ink), 0.70); }
+@media (prefers-reduced-motion: reduce) {
+  .afl-cd { transition: none; }
+}
+
 /* END: THE ACTION FLOW appended section */
 
 /* ---- LIGHT MODE CONTRAST PASS -------------------------------------------
