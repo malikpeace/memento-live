@@ -4711,6 +4711,16 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
 .cp-stage--top { padding-top: calc(var(--safe-t, 0px) + 72px); }
 .cp-stage--center { text-align: center; align-items: center; }
 .cp-spacer { flex: 1; }
+/* DESKTOP (law: content centered, never pinned to the top over dead space).
+   On a phone the column fills the screen already, so this only kicks in on a
+   wide window: two shrinkable spacers, one above the content and one below
+   Tweak, center the whole block. They collapse to 0 when the content is
+   taller than the window, so a tall window scrolls instead of clipping. */
+@media (min-width: 700px) {
+  .cp-stage--center::before,
+  .cp-stage--center::after { content: ""; flex: 1 1 0; min-height: 0; }
+  .cp-stage--center .cp-spacer { flex: 0 0 30px; }
+}
 .cp-div { width: 44px; height: 1px; background: rgba(255, 255, 255, 0.22); margin: 20px auto; }
 
 /* the uppercase tracked label. Malik-approved, INSIDE Clarity only. */
@@ -4720,15 +4730,38 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
   margin-bottom: 11px;
 }
 
-/* ---- page 2, the summary ---- */
-.cp-num {
-  white-space: nowrap; margin-top: 12px;
-  font-size: clamp(30px, 9vw, 38px); line-height: 1.1; font-weight: 800;
-  color: #fff; font-variant-numeric: tabular-nums;
+/* ---- page 2, the summary ----
+   v1191 (Malik): the standing number is the hero of this section and it is
+   also the door to the update screen. The old "Update progress" chip is gone;
+   .cp-numtap is the generous hit area around number + unit + stamp, and the
+   press-scale every other Clarity control uses is the whole affordance. */
+.cp-numtap {
+  display: block; width: 100%; margin-top: 4px;
+  padding: 10px 12px 12px; border-radius: 16px;
+  background: none; border: 0; font-family: inherit; color: inherit;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease;
 }
-.cp-num__unit { color: var(--cp-acc); font-size: 0.46em; font-weight: 700; margin-left: 0.3em; }
-.cp-asof { color: rgba(255, 255, 255, 0.45); font-size: 13px; font-weight: 600; margin-top: 8px; }
+.cp-numtap:active { transform: scale(0.975); }
+.cp-numtap:focus-visible { outline: 2px solid var(--cp-acc); outline-offset: 2px; }
+/* Not nowrap any more: at hero size a long unit ("paying customers") would
+   run off a 390 phone. The number never breaks, the unit drops to its own
+   line when it has to. */
+.cp-num {
+  margin-top: 0;
+  font-size: clamp(48px, 15.5vw, 66px); line-height: 1.04; font-weight: 800;
+  color: #fff; font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+}
+.cp-num__v { white-space: nowrap; }
+.cp-num__unit { display: inline-block; color: var(--cp-acc); font-size: 0.32em; font-weight: 700; margin-left: 0.34em; letter-spacing: 0; }
+.cp-asof { color: rgba(255, 255, 255, 0.45); font-size: 13px; font-weight: 600; margin-top: 9px; }
 .cp-none { color: rgba(255, 255, 255, 0.94); font-size: 15px; font-weight: 600; margin-top: 10px; }
+.cp-none--tap {
+  background: none; border: 0; font-family: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; padding: 10px 12px;
+  transition: transform 0.18s ease;
+}
+.cp-none--tap:active { transform: scale(0.975); }
 .cp-prog { margin: 18px auto 0; width: 100%; max-width: 280px; }
 .cp-track { position: relative; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
 .cp-track__fill {
@@ -4755,22 +4788,13 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
   .clarity-pager__page.is-active .cp-track__fill::after { display: none; }
 }
 .cp-pts {
-  display: flex; justify-content: space-between; margin-top: 9px;
+  display: flex; justify-content: space-between; margin-top: 8px;
   color: rgba(255, 255, 255, 0.42); font-size: 12px; font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.cp-rem { margin-top: 11px; color: var(--cp-acc); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* v1191 (Malik): the remaining line sits closer to the rail, "just a bit". */
+.cp-rem { margin-top: 4px; color: var(--cp-acc); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .cp-rem s { text-decoration: none; color: rgba(255, 255, 255, 0.42); font-size: 12.5px; font-weight: 600; margin-left: 5px; }
-.cp-upd {
-  margin-top: 14px; display: inline-flex; align-items: center; gap: 6px;
-  padding: 10px 15px; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.09); color: #fff;
-  font-size: 14px; font-weight: 650;
-  border: 0; font-family: inherit; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.cp-upd svg { width: 12px; height: 12px; stroke: var(--cp-acc); fill: none; stroke-width: 2; stroke-linecap: round; }
-.cp-upd:active { transform: scale(0.97); }
 .cp-lock {
   margin-top: 12px; display: inline-flex; align-items: center; gap: 7px;
   padding: 10px 16px; border-radius: 999px;
@@ -4855,8 +4879,6 @@ html.theme-light .cp-track__fill { background: linear-gradient(90deg, #3fb6cd, #
 html.theme-light .cp-pts { color: rgba(24, 26, 33, 0.45); }
 html.theme-light .cp-rem { color: #0d8ca6; }
 html.theme-light .cp-rem s { color: rgba(24, 26, 33, 0.45); }
-html.theme-light .cp-upd { background: rgba(24, 26, 33, 0.07); color: rgba(24, 26, 33, 0.9); }
-html.theme-light .cp-upd svg { stroke: #0d8ca6; }
 html.theme-light .cp-lock { color: #0d8ca6; background: rgba(13, 140, 166, 0.09); }
 html.theme-light .cp-anti { color: rgba(24, 26, 33, 0.94); }
 html.theme-light .cp-tweak {
@@ -5165,23 +5187,75 @@ html.theme-light .cn-dlgbtn--quiet { color: rgba(24, 26, 33, 0.5); }
    filter: the nebula is a sibling, so nothing blurred is ever clipped into
    a rectangle (the edge-safe law). */
 .cp-fs.is-dimmed .cp-fsstage { filter: blur(2px); opacity: 0.45; pointer-events: none; }
+/* DESKTOP (law: content centered, never stranded above a floor-hugging CTA).
+   On a phone the foot belongs at the bottom under the thumb. On a wide or tall
+   window that leaves a void in the middle, so the content and its buttons
+   become ONE centered block: the gap between them is fixed and the slack moves
+   to the outside. The trailing space is a pseudo-element, so the shell's
+   markup is untouched, and it collapses to 0 when the content is taller than
+   the window (a tall surface still scrolls instead of clipping). */
+@media (min-width: 700px) {
+  .cp-fsstage::after { content: ""; flex: 1 1 0; min-height: 0; }
+  .cp-fscontent + .cp-fsspace { flex: 0 0 52px; }
+  .cp-fs.is-typing .cp-fsstage::after { flex: 0 0 0; }
+  .cp-fs.is-typing .cp-fscontent + .cp-fsspace { flex: 0 0 34px; }
+}
 
 .cp-fsq {
   font-size: clamp(21px, 6vw, 25px); font-weight: 800; line-height: 1.28;
   margin: 22px 0 0; text-wrap: balance; max-width: 280px; color: #fff;
 }
-.cp-fswas { margin-top: 12px; color: rgba(255, 255, 255, 0.45); font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.cp-payoff { margin-top: 16px; color: var(--cp-acc); font-size: 13.5px; font-weight: 650; }
+.cp-fswas { margin-top: 10px; color: rgba(255, 255, 255, 0.45); font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-/* the number they nudge. The field is sized to its own text by a hidden
-   twin, so the unit keeps hugging the number the way the mock has it. */
+/* the number they nudge. The field is sized to its own text by a hidden twin.
+   v1191 (Malik): the box holds ONLY the number, the unit is its own line
+   underneath. Less bloat, and the figure reads as the single thing being
+   changed. */
 .cp-fsnum {
-  display: flex; align-items: baseline; justify-content: center; gap: 8px;
+  display: flex; align-items: baseline; justify-content: center;
   margin-top: 30px; max-width: 100%;
   padding: 20px 26px; border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+.cp-fsunit { margin-top: 11px; color: rgba(255, 255, 255, 0.6); font-size: 15px; font-weight: 600; }
+
+/* HOLD TO SAVE (v1191, Malik). A progress write is deliberate: a stray tap
+   can log a wrong number and burn a milestone's once-ever ceremony, so Save
+   is a 2 second hold. The pill keeps the shipped .cn-cta geometry exactly;
+   the hold's light travels it and the label inverts precisely where the light
+   has reached, the Action CTA's language read the other way round (this pill
+   is already the bright one, so what travels is the ink).
+   touch-action / callout / tap-highlight are the gesture's other half: without
+   them iOS keeps the press as a candidate pan and cancels it mid hold. */
+.cp-save {
+  position: relative; overflow: hidden;
+  touch-action: none; -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
+}
+.cp-save:active { transform: none; }
+.cp-save__lab, .cp-save__inv { position: relative; }
+.cp-save__fill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: #0b1112; transition: width 0.22s ease-out;
+}
+.cp-save__inv {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0; overflow: hidden;
+  pointer-events: none; transition: width 0.22s ease-out;
+}
+.cp-save__inv span {
+  position: absolute; left: 0; top: 0; bottom: 0; display: flex;
+  align-items: center; justify-content: center;
+  color: #fff; font-size: 16px; font-weight: 700;
+}
+/* the light's width is written every 30ms by the hold's own clock, so while
+   it travels nothing may smooth it; the resting transition is the unwind. */
+.cp-save.is-holding .cp-save__fill,
+.cp-save.is-holding .cp-save__inv,
+.cp-save.is-done .cp-save__fill,
+.cp-save.is-done .cp-save__inv { transition: none; }
+.cp-savehint { margin-top: 12px; color: rgba(255, 255, 255, 0.4); font-size: 12.5px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .cp-save__fill, .cp-save__inv { transition: none; } }
 .cp-fsnum__in, .cp-fsnum__sizer {
   font-family: inherit; font-size: 40px; font-weight: 800; line-height: 1.1;
   font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
@@ -5194,7 +5268,6 @@ html.theme-light .cn-dlgbtn--quiet { color: rgba(24, 26, 33, 0.5); }
   -webkit-appearance: none; appearance: none;
 }
 .cp-fsnum__sizer { position: absolute; left: -9999px; top: 0; white-space: pre; visibility: hidden; }
-.cp-fsnum__unit { color: rgba(255, 255, 255, 0.6); font-size: 16px; font-weight: 600; }
 /* Typing re-anchors the screen to the top so the field, the pill and the
    quiet line all stay above the keyboard by geometry, never by measuring
    it. Same law and same shape as the writer's own-tag step. */
@@ -5203,8 +5276,15 @@ html.theme-light .cn-dlgbtn--quiet { color: rgba(24, 26, 33, 0.5); }
 
 /* the quiet completion door, the mock's .reached. Once the door has been
    used the chip stays as the record of it, so it keeps its colour and simply
-   stops behaving like a button. */
-.cp-lock--fs { margin-top: 26px; }
+   stops behaving like a button.
+   v1191 (Malik): it now lives BELOW the Save/Cancel cluster, held off by a
+   hairline so it reads as a separate, quieter option and never crowds the
+   number being typed. */
+.cp-lock--fs { margin-top: 30px; position: relative; }
+.cp-lock--fs::before {
+  content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  width: 44px; height: 1px; background: rgba(255, 255, 255, 0.16);
+}
 .cp-lock[disabled] { cursor: default; }
 .cp-lock[disabled]:active { transform: none; }
 
@@ -5273,10 +5353,14 @@ html.theme-light .cp-fs {
 }
 html.theme-light .cp-fsq { color: rgba(24, 26, 33, 0.96); }
 html.theme-light .cp-fswas { color: rgba(24, 26, 33, 0.45); }
-html.theme-light .cp-payoff { color: #0d8ca6; }
 html.theme-light .cp-fsnum { background: rgba(24, 26, 33, 0.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7); }
 html.theme-light .cp-fsnum__in, html.theme-light .cp-fsnum__sizer { color: rgba(24, 26, 33, 0.96); }
-html.theme-light .cp-fsnum__unit { color: rgba(24, 26, 33, 0.6); }
+html.theme-light .cp-fsunit { color: rgba(24, 26, 33, 0.6); }
+/* the pill is dark in light mode, so the travelling light is light */
+html.theme-light .cp-save__fill { background: #fff; }
+html.theme-light .cp-save__inv span { color: #181a21; }
+html.theme-light .cp-savehint { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cp-lock--fs::before { background: rgba(24, 26, 33, 0.16); }
 html.theme-light .cp-fsopt { background: #181a21; color: #fff; box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18); }
 html.theme-light .cp-fsopt--danger { background: #ff3b30; color: #fff; box-shadow: 0 12px 28px rgba(255, 59, 48, 0.24); }
 html.theme-light .cp-fswarn { color: rgba(24, 26, 33, 0.92); }

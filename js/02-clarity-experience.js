@@ -10347,7 +10347,6 @@ function _bindStarPlacard(root) {
    handler here is a logging no-op.
    ============================================================ */
 
-const CP_ICON_EDIT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 const CP_ICON_PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 const CP_ICON_LOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
 
@@ -10421,10 +10420,17 @@ function _cpStanding(f, why) {
     const hasCur = gp.current !== null && gp.current !== undefined && isFinite(cur);
     let html = '<div class="cp-lab">Where you stand</div>';
     if (hasCur) {
-      html += '<div class="cp-num"><span class="cp-num__v">' + _cpNum(cur) + '</span>' +
-        (unit ? '<span class="cp-num__unit">' + esc(unit) + '</span>' : '') + '</div>';
+      /* v1191 (Malik): the number IS the button. The "Update progress" chip is
+         gone, so the whole standing block (number, unit, stamp) is one generous
+         tap target that opens the update screen. No new chrome: the press-scale
+         idiom every other Clarity control uses is the whole affordance. */
       const asOf = _cpAsOf(gp.updatedAt);
-      if (asOf) html += '<div class="cp-asof">' + esc(asOf) + '</div>';
+      html += '<div class="cp-numtap" id="cpUpdate" role="button" tabindex="0" ' +
+          'aria-label="Update progress">' +
+        '<div class="cp-num"><span class="cp-num__v">' + _cpNum(cur) + '</span>' +
+        (unit ? '<span class="cp-num__unit">' + esc(unit) + '</span>' : '') + '</div>' +
+        (asOf ? '<div class="cp-asof">' + esc(asOf) + '</div>' : '') +
+      '</div>';
       const base = (gp.baseline !== null && gp.baseline !== undefined && isFinite(Number(gp.baseline))) ? Number(gp.baseline) : null;
       const tgt = Number(gp.target);
       if (base !== null && isFinite(tgt)) {
@@ -10444,9 +10450,8 @@ function _cpStanding(f, why) {
           '<s>to go</s></div>';
       }
     } else {
-      html += '<div class="cp-none">No number logged yet.</div>';
+      html += '<button type="button" class="cp-none cp-none--tap" id="cpUpdate">No number logged yet.</button>';
     }
-    html += '<button type="button" class="cp-upd" id="cpUpdate">' + CP_ICON_EDIT + 'Update progress</button>';
     /* Adjudicated (Fable, 2026-08-19): the "Neutron Star Fulfilled" lock chip
        lives on the UPDATE SCREEN only (checklist Completion section + the
        canonical mock's page 2, which shows no chip). Renders in Phase 4. */
@@ -11325,6 +11330,98 @@ function _cpBindHold(scope, onDone) {
   });
 }
 
+/* ---- hold to save, the pill half of the same gesture -------------------
+   v1191 (Malik): a progress write is deliberate. A stray tap can log a wrong
+   number and burn a milestone's once-ever ceremony, so Save is a 2 second
+   hold. Same clock and same event handling as _cpBindHold above (30ms
+   interval, contextmenu killed, no pointer capture); the visual language is
+   the Action CTA's, the light travels the pill and the label inverts exactly
+   where the light has reached. Releasing early takes the light straight back.
+   Enter on a hardware keyboard still saves instantly: that path is already
+   deliberate, and a key-repeat hold is not an affordance. */
+const CP_SAVE_HOLD_MS = 2000;
+
+function _cpSaveHtml(label) {
+  return '<button type="button" class="cn-cta cp-save" id="cpUpdSave" ' +
+      'aria-label="' + esc(label) + ', press and hold for 2 seconds">' +
+      // paint order matters: the resting label, then the light over it, then
+      // the inverted label the light carries.
+      '<span class="cp-save__lab">' + esc(label) + '</span>' +
+      '<span class="cp-save__fill" aria-hidden="true"></span>' +
+      '<span class="cp-save__inv" aria-hidden="true"><span>' + esc(label) + '</span></span>' +
+    '</button>' +
+    '<div class="cp-savehint">Hold to save.</div>';
+}
+
+function _cpBindSaveHold(btn, onDone) {
+  if (!btn) return function () {};
+  const fill = btn.querySelector('.cp-save__fill');
+  const inv = btn.querySelector('.cp-save__inv');
+  let timer = 0, t0 = 0, running = false, done = false;
+
+  /* The light is driven by the SAME 30ms clock as the ring, not by a CSS
+     transition: this measures TIME, and the clock has to keep the promise the
+     hint makes wherever frames stop. Only the unwind is a transition. */
+  const paint = function (p) {
+    if (fill) fill.style.width = (p * 100).toFixed(2) + '%';
+    if (inv) inv.style.width = (p * 100).toFixed(2) + '%';
+  };
+  const stop = function () {
+    running = false;
+    if (timer) { clearInterval(timer); timer = 0; }
+    btn.classList.remove('is-holding');
+  };
+  const tick = function () {
+    if (!running) return;
+    const p = Math.min((Date.now() - t0) / CP_SAVE_HOLD_MS, 1);
+    paint(p);
+    if (p < 1) return;
+    stop();
+    done = true;
+    btn.classList.add('is-done');
+    paint(1);
+    try { feel('tap'); } catch (e) {}
+    try { onDone(); } catch (e) {}
+  };
+  const start = function (e) {
+    if (done || running || btn.disabled) return;
+    if (e && e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e && e.preventDefault) e.preventDefault();
+    running = true; t0 = Date.now();
+    // the inverted label is laid out at the button's full width, then revealed
+    // by the light: the two labels sit in exactly the same place.
+    const span = inv && inv.firstElementChild;
+    if (span) span.style.width = btn.offsetWidth + 'px';
+    btn.classList.add('is-holding');
+    paint(0);
+    if (timer) clearInterval(timer);
+    timer = setInterval(tick, 30);
+  };
+  // letting go early takes the light straight back, on the transition the
+  // resting state carries.
+  const end = function () { if (!running) return; stop(); paint(0); };
+
+  btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  btn.addEventListener('pointerdown', start);
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+    btn.addEventListener(ev, end);
+  });
+  btn.addEventListener('blur', end);
+  /* The keyboard path saves on Enter, the same instant path the field itself
+     has. Reaching this button by tab and pressing Enter is already a
+     deliberate act, and a key-repeat "hold" is not an affordance. A pointer
+     tap never produces this event, so the gesture stays a hold on a phone. */
+  btn.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || done || btn.disabled) return;
+    e.preventDefault();
+    stop(); done = true;
+    btn.classList.add('is-done');
+    paint(1);
+    try { onDone(); } catch (e2) {}
+  });
+  return end;
+}
+
 /* ---- the number field's own formatting -------------------------------- */
 function _cpMaskNumber(raw) {
   let s = String(raw == null ? '' : raw).replace(/[^0-9.]/g, '');
@@ -11367,7 +11464,16 @@ function _cpBindNumberField(input, sizer) {
 function _cpBindSummaryPage(pager) {
   if (!pager) return;
   const upd = pager.querySelector('#cpUpdate');
-  if (upd) upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
+  if (upd) {
+    upd.addEventListener('click', function () { clarityOpenUpdate({ source: 'page2' }); });
+    // The standing block is a div wearing role="button", so it has to answer
+    // the keyboard itself the way a real button would.
+    upd.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      e.preventDefault();
+      clarityOpenUpdate({ source: 'page2' });
+    });
+  }
   const twk = pager.querySelector('#cpTweak');
   if (twk) twk.addEventListener('click', function () { clarityOpenTweak(); });
 }
@@ -11462,23 +11568,26 @@ function clarityOpenUpdate(opts) {
   const content =
     '<div class="cp-lab">Update progress</div>' +
     '<h2 class="cp-fsq">Where are you now?</h2>' +
+    // v1191 (Malik): the box holds ONLY the number. The unit sits under it as
+    // its own quiet line, so the entry reads as one figure, not a packed slab.
     '<div class="cp-fsnum">' +
       '<input class="cp-fsnum__in" type="text" inputmode="decimal" autocomplete="off" ' +
         'autocorrect="off" spellcheck="false" aria-label="Where you are now" ' +
         'value="' + esc(_cpMaskNumber(String(start))) + '">' +
       '<span class="cp-fsnum__sizer" aria-hidden="true"></span>' +
-      (unit ? '<span class="cp-fsnum__unit">' + esc(unit) + '</span>' : '') +
     '</div>' +
-    (hasCur ? '<div class="cp-fswas">was ' + esc(_cpNum(cur)) + (asOf ? ', ' + esc(asOf) : '') + '</div>' : '') +
-    '<div class="cp-payoff">This also updates your progress.</div>' +
-    // THE MANUAL COMPLETION DOOR. On this screen only, and once it has been
-    // used it stays as the record of it rather than offering itself again.
-    '<button type="button" class="cp-lock cp-lock--fs" id="cpFulfil"' + (fulfilled ? ' disabled' : '') + '>' +
-      CP_ICON_LOCK + 'Neutron Star Fulfilled</button>';
+    (unit ? '<div class="cp-fsunit">' + esc(unit) + '</div>' : '') +
+    (hasCur ? '<div class="cp-fswas">was ' + esc(_cpNum(cur)) + (asOf ? ', ' + esc(asOf) : '') + '</div>' : '');
 
+  /* THE MANUAL COMPLETION DOOR. On this screen only, and once it has been
+     used it stays as the record of it rather than offering itself again.
+     v1191 (Malik): it moved out from under the number entry to below the
+     Save/Cancel cluster, separated, so it never crowds the thing being typed. */
   const foot =
-    '<button type="button" class="cn-cta" id="cpUpdSave">Save</button>' +
-    '<button type="button" class="cn-skip" id="cpUpdCancel">Cancel</button>';
+    _cpSaveHtml('Save') +
+    '<button type="button" class="cn-skip" id="cpUpdCancel">Cancel</button>' +
+    '<button type="button" class="cp-lock cp-lock--fs" id="cpFulfil"' + (fulfilled ? ' disabled' : '') + '>' +
+      CP_ICON_LOCK + 'Neutron Star Fulfilled?</button>';
 
   let el = null;
   // the settle recipe's host contract: it transforms host.el and never
@@ -11541,8 +11650,10 @@ function clarityOpenUpdate(opts) {
   const saveBtn = el.querySelector('#cpUpdSave');
   const cancelBtn = el.querySelector('#cpUpdCancel');
   const lock = el.querySelector('#cpFulfil');
-  hold(saveBtn); hold(cancelBtn); if (!fulfilled) hold(lock);
-  saveBtn.addEventListener('click', save);
+  hold(cancelBtn); if (!fulfilled) hold(lock);
+  // Save is the 2 second hold, so it never fires on a bare tap. Its own
+  // pointerdown handler already holds focus for it.
+  _cpBindSaveHold(saveBtn, save);
   cancelBtn.addEventListener('click', function () { shut(); });
   if (lock && !fulfilled) lock.addEventListener('click', function () {
     shut(function () { _cpOpenFulfilConfirm({}); });
