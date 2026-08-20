@@ -5482,9 +5482,23 @@ HARD RULES (the judge rejects violations):
     from the transcript. You never reword it, even when your plan
     honestly renegotiates the number or the date; the honest numbers go
     in targets and the renegotiation lives in the reasoning.
+16. ONE SET OF NUMBERS. arrow, targets, eq and reasoning must agree.
+    When the plan renegotiates, the honest number is THE number: arrow.to
+    shows it, targets carry it, reasoning explains it. Never leave the
+    stated-but-rejected number standing in any field.
+17. HONEST ROUNDING. "shown" is the true value rounded, never nudged:
+    6.07 shows as 6, never 7; 0.44 shows as 0.4, never 0.5. If a rounded
+    number would flatter the plan, keep the extra digit instead.
+18. NOTHING ORPHANED. Every number in prose traces to eq or their words;
+    every ladder value gets used by an act or target. Never emit a
+    placeholder ladder. Estimates are named estimates in eq.rows before
+    prose uses them; a rate nobody stated (a conversion, a percentage)
+    is an estimate, never a bare fact.
 
 VOICE: witness with a clock. Plain, direct, second person. No coaching
-pep, no shame, no "It's not X, it's Y" constructions, no aphorisms.
+pep, no shame, no "It's not X, it's Y" constructions, no aphorisms, and
+no trailing-contrast tails ("real material, not just prep"); say the
+positive half and stop.
 
 OUTPUT: exactly one JSON object matching the provided schema. No prose
 outside JSON, no markdown fences, the raw object only.`;
@@ -5551,6 +5565,22 @@ CALIBRATION, read first:
 - A failure is a VIOLATION of a rule below. If you find yourself writing
   "this is reasonable, but" or suggesting a tighter phrasing, it is a
   pass; do not list it. Suggestions are not failures.
+- THE TEST FOR LISTING: would the person reading this plan call it wrong,
+  dishonest, or confusing? If not, do not list it. A note whose own text
+  concedes correctness ("this is correct", "consistent", "no violation",
+  "the math holds") must never appear in failures; finish the check and
+  move on. Every failure you list blocks the plan, so listing an
+  observation is the same as calling the plan broken.
+- Eyebrow labels are LABEL-SHAPED text: short uppercase or kicker-style
+  headers ("NEXT STEP", "THE PATH"). A normal prose sentence ("Here is
+  the honest math.") is not an eyebrow label; do not fail prose for this.
+- doneWhen passes when an honest person can answer it yes or no tonight.
+  Do not fail one for phrasing style, tense, or for naming two motions of
+  one act (looked at the report and typed the number is one act).
+- Metadata rows that are strings by design ("First check-in: two weeks")
+  are not math failures; only computed numbers are.
+- nonNegotiables.chosen as an empty array is CORRECT by design (the
+  person picks in the app); never fail it.
 - The star field is the person's goal in THEIR OWN WORDS, verbatim. Never
   fail it and never ask for it to change, even when the plan honestly
   renegotiates the number or the date; the honest numbers live in targets,
