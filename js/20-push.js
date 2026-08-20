@@ -166,12 +166,12 @@
   function rpcSync(sub) {
     try {
       var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
-      if (!url || !anon || !sub || isDemo()) return Promise.resolve();
-      if (LOCAL) return Promise.resolve(); // dev preview: never write real rows
+      if (!url || !anon || !sub || isDemo()) { MementoPush._lastSync = { skipped: !url ? 'no-url' : !anon ? 'no-anon' : !sub ? 'no-sub' : 'demo' }; return Promise.resolve(); }
+      if (LOCAL) { MementoPush._lastSync = { skipped: 'local' }; return Promise.resolve(); }
       var j = sub.toJSON ? sub.toJSON() : sub;
       var keys = j.keys || {};
       var device = (typeof deviceId === 'function') ? deviceId() : '';
-      if (!device) return Promise.resolve();
+      if (!device) { MementoPush._lastSync = { skipped: 'no-device-id' }; return Promise.resolve(); }
       var ctx = buildContext();
       var today = (typeof getTodayISO === 'function') ? getTodayISO() : null;
       return fetch(fnUrl(), {
