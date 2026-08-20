@@ -5402,7 +5402,9 @@ HARD RULES (the judge rejects violations):
    Mechanism, not hype.
 7. NO LIST: 2 or 3 refusals. Each traces to their own words or the
    bucket's standard enemies. Refusals are things they might actually do
-   instead of the plan (plan-shopping, new programs, busywork). Each item
+   instead of the plan (plan-shopping, new programs, busywork). Each is a
+   short phrase, 2 to 5 words, never a full sentence, and starts with the
+   thing itself, no leading a/an/the ("new diet every week"). Each item
    is a SHORT PHRASE, 2 to 5 words, never a sentence: "sugar drinks",
    "tool shopping", "a new diet every week". No verbs of instruction, no
    punctuation, no explanation inside the item. The reasoning paragraphs

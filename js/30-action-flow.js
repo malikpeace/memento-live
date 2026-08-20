@@ -620,6 +620,23 @@
     }
     return String(v);
   }
+  // ONE REFUSAL, ONE LINE (round 7). The AI writes clipped phrases ("sugar
+  // drinks"), and the page says them the way a person would: "NO sugar
+  // drinks." The item's own words and casing are untouched, the prefix is
+  // never doubled on an item that already refuses in its own voice ("No new
+  // niches this quarter"), and the period is never doubled either.
+  function noLine(t) {
+    var s = String(t == null ? '' : t).trim().replace(/\.+$/, '');
+    if (!s) return '';
+    if (!/^no\b/i.test(s)) {
+      // "NO a new diet every week" is not a sentence anyone writes. The prefix
+      // takes the determiner's place, so a leading article steps aside for it.
+      // Nothing else about their wording is touched. (The prompt's own rule 7
+      // example is article-led, so this WILL come up in real plans.)
+      s = 'NO ' + s.replace(/^(a|an|the)\s+/i, '');
+    }
+    return s + '.';
+  }
   function daysUntil(iso) {
     try {
       var d = new Date(iso + 'T00:00:00');
@@ -1008,6 +1025,139 @@
     node.addEventListener('animationend', function () {
       node.classList.remove('afl-swap--up', 'afl-swap--dn');
     });
+  }
+
+  // ===========================================================================
+  // THE PAGE SNAP (round 7, Malik on-device: the vertical door "fought the
+  // logic page's own scrolling"). The two surfaces are now a PAGER, side by
+  // side: the day is the left page, the logic page is the right one. A pull
+  // moves both 1:1 with the finger, and letting go SNAPS, all the way across
+  // past 40% of the width or on a flick, all the way back otherwise. It can
+  // never rest between the two (the finger-follow + snap-to-nearest law).
+  //
+  // WHY ONE BINDER: the door and the way back are the same gesture mirrored,
+  // and two copies would drift. cfg:
+  //   host     the .afl room that moves (captured, never re-read)
+  //   surface  the element a pull may START on
+  //   dir      -1 the second page comes from the RIGHT (a pull to the left)
+  //            +1 the second page comes from the LEFT  (a pull to the right)
+  //   blocked  fn(target) true when that press belongs to a control
+  //   build    fn(pagerEl) renders the second page (the REAL screen, into it)
+  //   go       fn() the handover, once the snap has landed across
+  //
+  // VERTICAL BELONGS TO THE PAGE. The axis is decided once, and a pull is only
+  // taken when it is clearly sideways (1.6x the vertical component). Anything
+  // else is abandoned outright, nothing is prevented, and the logic page keeps
+  // scrolling exactly as it did. touch-action: pan-y says the same thing to
+  // the compositor, which is what makes the scroll smooth rather than arbitrated.
+  // ===========================================================================
+  var SNAP_AT = 0.4;        // of the width: the point of no return
+  var FLICK_V = 0.65;       // px per ms, a throw rather than a drag
+  var FLICK_MIN = 28;       // ...that still has to have travelled
+  var AXIS_LOCK = 10;       // px before the direction is decided
+  var AXIS_DOM = 1.6;       // how sideways a pull has to be to be a pull
+  var SNAP_MS = 280;
+
+  function bindPageSnap(cfg) {
+    var host = cfg.host, dir = (cfg.dir < 0) ? -1 : 1;
+    var pager = null, start = null, live = false, settling = false;
+    var dx = 0, vx = 0, lastX = 0, lastT = 0, timer = null;
+
+    // THE SECOND PAGE is the real screen, rendered by the real function into a
+    // host element (shell's preview branch), never a lookalike. Built once, on
+    // the first pull, and it dies with the room it hangs in.
+    function buildPager() {
+      if (pager || reduced() || !host || typeof cfg.build !== 'function') return;
+      pager = el('div', 'afl-pg afl-pg--' + (dir < 0 ? 'r' : 'l'));
+      pager.setAttribute('aria-hidden', 'true');
+      host.appendChild(pager);
+      try { cfg.build(pager); } catch (e) { pager.innerHTML = ''; }
+    }
+    function drag(px) {
+      if (!host || reduced()) return;
+      host.style.setProperty('--afl-drag', px.toFixed(1) + 'px');
+    }
+    function clear() {
+      if (!host) return;
+      host.classList.remove('is-drag', 'is-snap');
+      host.style.removeProperty('--afl-drag');
+    }
+    function settle(across) {
+      start = null; live = false;
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (reduced() || !host) { clear(); if (across) cfg.go(); return; }
+      settling = true;
+      var W = host.clientWidth || window.innerWidth;
+      host.classList.add('is-snap');
+      drag(across ? dir * W : 0);
+      timer = setTimeout(function () {
+        timer = null; settling = false;
+        // the handover replaces this room, so nothing here needs unwinding
+        if (across) { cfg.go(); return; }
+        clear();
+      }, SNAP_MS + 20);
+    }
+    var onDown = function (e) {
+      if (settling) return;                              // the snap owns it now
+      if (start || live) { settle(false); return; }      // second finger
+      if (cfg.blocked && cfg.blocked(e.target)) return;
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0 };
+      dx = 0; vx = 0; lastX = e.clientX; lastT = Date.now();
+      buildPager();
+    };
+    // THE REST OF THE GESTURE IS NOT THE SURFACE'S. Once the pull is under way
+    // the finger travels over the nav row, the second page, whatever, and those
+    // are siblings, not children. Move is heard on the ROOM, release on the
+    // window, so a pull can never be left half way for want of an event.
+    var onMove = function (e) {
+      if (!start || e.pointerId !== start.id || settling) return;
+      var mx = e.clientX - start.x, my = Math.abs(e.clientY - start.y);
+      if (!start.axis) {
+        if (Math.max(Math.abs(mx), my) < AXIS_LOCK) return;
+        // not sideways enough, or sideways the wrong way: this is the page's
+        // gesture, not ours, and we let go of it completely.
+        if (Math.abs(mx) < my * AXIS_DOM || mx * dir <= 0) { start = null; clear(); return; }
+        start.x = e.clientX;              // travel is measured from the lock
+        start.axis = 1;
+        live = true;
+        if (!reduced()) host.classList.add('is-drag');
+        return;
+      }
+      var now = Date.now(), dt = now - lastT;
+      if (dt > 0) vx = (e.clientX - lastX) / dt;
+      lastX = e.clientX; lastT = now;
+      dx = (dir < 0) ? Math.min(0, mx) : Math.max(0, mx);   // 1:1, one way only
+      drag(dx);
+    };
+    var onUp = function (e) {
+      if (settling || !start || e.pointerId !== start.id) return;
+      if (!live) { start = null; return; }               // a tap, not a pull
+      var W = (host && host.clientWidth) || window.innerWidth;
+      // a flick is a throw AT THE MOMENT OF LETTING GO. A finger that moved
+      // fast, stopped, held still and then lifted has thrown nothing, so a
+      // stale reading is dropped rather than counted.
+      if (Date.now() - lastT > 90) vx = 0;
+      var travel = Math.abs(dx);
+      settle(travel >= W * SNAP_AT || (vx * dir >= FLICK_V && travel >= FLICK_MIN));
+    };
+    var onCancel = function (e) {
+      if (settling || !start || (e && e.pointerId !== start.id)) return;
+      if (live) settle(false);
+      else { start = null; clear(); }
+    };
+    cfg.surface.addEventListener('pointerdown', onDown);
+    host.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onCancel);
+    return {
+      destroy: function () {
+        if (timer) { clearTimeout(timer); timer = null; }
+        try {
+          window.removeEventListener('pointerup', onUp);
+          window.removeEventListener('pointercancel', onCancel);
+        } catch (e) {}
+      }
+    };
   }
 
   // ===========================================================================
@@ -2094,10 +2244,16 @@
       st.appendChild(document.createTextNode(' ' + starterAct.starter));
       box.appendChild(st);
     }
+    // ROUND 7 (Malik, on-device): the refusals are a LIST, not a sentence. The
+    // header stays, and every item is its own line that starts with the word
+    // that matters. Same type as the acts above it, no bullets, flat lines.
     if (plan.noList && plan.noList.length) {
-      var no = el('p', 'afl-lg__no');
-      no.appendChild(el('b', null, 'NO LIST:'));
-      no.appendChild(document.createTextNode(' ' + plan.noList.join(', ') + '.'));
+      var no = el('div', 'afl-lg__no');
+      no.appendChild(el('p', 'afl-lg__no-h', 'NO LIST:'));
+      plan.noList.forEach(function (t) {
+        var line = noLine(t);
+        if (line) no.appendChild(el('p', 'afl-lg__no-i', line));
+      });
       box.appendChild(no);
     }
 
@@ -2353,6 +2509,40 @@
         if (typeof opts.onAgree === 'function') opts.onAgree();
       }, function () { return gatesPass(); });
     }
+
+    // ---- THE WAY BACK (round 7: the other half of the pager) ----------------
+    // The day is the page to the LEFT, so a pull to the right brings it back,
+    // the same gesture mirrored. Horizontal dominance is what keeps this off
+    // the page's own vertical scrolling; nothing here prevents a scroll.
+    //
+    // ONLY WHEN THERE IS A DAY TO GO BACK TO. On the first visit the day does
+    // not exist yet (it is what agreeing opens), so there is no left page and
+    // the gesture is not bound at all: a page that cannot move is better than
+    // one that moves to nowhere, and it can never become a way around the
+    // agreement.
+    var backToDay = null;
+    if (!opts.into) {
+      if (typeof opts.onClose === 'function') backToDay = opts.onClose;
+      else if (agreed) backToDay = function () { openDay(key, { plan: plan }); };
+    }
+    if (backToDay) {
+      var lgSnap = bindPageSnap({
+        host: root,
+        surface: c,
+        dir: 1,
+        blocked: function (t) {
+          if (!t || !t.closest) return true;
+          return !!t.closest('.afl-cta, .afl-nav, .afl-nn__a, .afl-ref__t');
+        },
+        build: function (pg) { openDay(key, { plan: plan, into: pg }); },
+        go: backToDay
+      });
+      var beforeSnap = current.teardown;
+      current.teardown = function () {
+        lgSnap.destroy();
+        if (typeof beforeSnap === 'function') beforeSnap();
+      };
+    }
     // the page arrives in two beats: the title, then everything under it. The
     // preview build is already on the screen the moment it is dragged into
     // view, so it does not arrive at all.
@@ -2558,7 +2748,13 @@
     var fx = FIXTURES[key] || FIXTURES.weight;
     // the same rule the logic page follows: their plan, unless a demo hands one
     var plan = opts.plan || livePlan() || fx.plan;
-    var col = shell('day', { label: 'Today' });
+    // opts.into = THE PREVIEW BUILD (the logic page's second page, round 7).
+    // Same screen, rendered into a host element instead of taking the room, so
+    // it owns no teardown, no doors, no entrance and no window listeners.
+    var col = shell('day', { label: 'Today', into: opts.into || null });
+    // the .afl this day is painted in: the live room, or the preview's own.
+    var home = opts.into ? col.parentNode : root;
+    var daySnap = null;
 
     var acts = plan.acts || [];
     var starAct = acts[0] || { text: '' };
@@ -2587,8 +2783,8 @@
     rise.setAttribute('aria-hidden', 'true');
     var wash = el('div', 'afl__wash');
     wash.setAttribute('aria-hidden', 'true');
-    root.insertBefore(wash, col);
-    root.insertBefore(rise, col);
+    home.insertBefore(wash, col);
+    home.insertBefore(rise, col);
 
     // the M: the standing door back to the logic page, below the island.
     var mBtn = btn('afl-day__m');
@@ -2644,8 +2840,39 @@
     // quiet line, never loud and never tappable: it is a standard they are
     // holding, not another thing to do. A plan with nothing chosen (or one
     // written before schema v1.1) renders no line at all.
-    var nnLine = el('p', 'afl-day__nn');
-    plate.appendChild(nnLine);
+    //
+    // ROUND 7 (Malik, on-device): the line becomes an EXPANDABLE ROW under the
+    // supports. Its marker is a SOLID filled X, deliberately not the supports'
+    // open box: these are already committed, they are not today's work. It
+    // never counts as an act, never gates the hold, and it is collapsed until
+    // asked. A plan with nothing chosen renders no row at all.
+    var nnPick = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.chosen))
+      ? plan.nonNegotiables.chosen.filter(function (t) { return t && String(t).trim(); }) : [];
+    var nnWrap = null, nnHead = null;
+    if (nnPick.length) {
+      nnWrap = el('div', 'afl-day__nn');
+      nnHead = btn('afl-day__nnt');
+      nnHead.setAttribute('aria-expanded', 'false');
+      var nnMk = el('span', 'afl-day__nnx');
+      nnMk.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.7 3.7l4.6 4.6M8.3 3.7l-4.6 4.6"/></svg>';
+      nnHead.appendChild(nnMk);
+      nnHead.appendChild(el('span', 'afl-day__nnl', 'Non-negotiables'));
+      // two boxes on purpose: the outer one animates its own height (a grid
+      // row from 0fr to 1fr, the only way to move a REAL height rather than a
+      // max-height guess that opens in one frame), the inner one clips.
+      var nnBody = el('div', 'afl-day__nnb');
+      var nnIn = el('div', 'afl-day__nnin');
+      nnPick.forEach(function (t) { nnIn.appendChild(el('p', 'afl-day__nni', t)); });
+      nnBody.appendChild(nnIn);
+      nnHead.addEventListener('click', function () {
+        var open = !nnWrap.classList.contains('is-open');
+        nnWrap.classList.toggle('is-open', open);
+        nnHead.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      nnWrap.appendChild(nnHead);
+      nnWrap.appendChild(nnBody);
+      plate.appendChild(nnWrap);
+    }
     day.appendChild(plate);
 
     var nav = navRow();
@@ -2795,16 +3022,14 @@
     function paint() {
       day.classList.toggle('is-signed', signed);
       day.classList.toggle('is-off', off);
-      if (root) root.classList.toggle('is-signed', signed);
+      if (home) home.classList.toggle('is-signed', signed);
       drawStar();
       drawPlate();
       drawRail();
       dw.classList.toggle('is-gone', !(starAct.session && !off));
-      // the non-negotiables they picked. Singular or a dot-joined pair.
-      var nnPick = (plan.nonNegotiables && Array.isArray(plan.nonNegotiables.chosen))
-        ? plan.nonNegotiables.chosen.filter(function (t) { return t && String(t).trim(); }) : [];
-      swapText(nnLine, (off || !nnPick.length) ? ''
-        : 'Non-negotiable: ' + nnPick.join(' \u00b7 '), 1);
+      // the row is the same standard every day, so the only thing paint has a
+      // say in is the rest day, where the old line was hidden too.
+      if (nnWrap) nnWrap.classList.toggle('is-gone', off);
       // this changes on a rest day. It fades.
       swapText(hold.querySelector('span'), off ? 'Hold to close the day' : 'Hold to complete', 1);
     }
@@ -3012,149 +3237,50 @@
 
     // THE VIEW DIES CLEANLY. A pending undo window flushes (the hold happened),
     // the sheet watcher stops, and nothing here outlives the screen.
-    current.teardown = function () {
+    if (!opts.into) current.teardown = function () {
       if (sheetWatch) { clearInterval(sheetWatch); sheetWatch = null; }
       if (undoT) { clearTimeout(undoT); undoT = null; commitDay(); }
-      if (swT) { clearTimeout(swT); swT = null; }
-      // the swipe listens on the window, so it has to stop listening with the
+      // the page snap listens on the window, so it stops listening with the
       // view: nothing in this module outlives its screen.
-      try {
-        window.removeEventListener('pointerup', swUp);
-        window.removeEventListener('pointercancel', swCancel);
-      } catch (e) {}
+      if (daySnap) { daySnap.destroy(); daySnap = null; }
     };
 
     function toLogic() {
-      openLogic(key, { plan: plan, standing: true, onClose: function () { openDay(key, opts); } });
+      openLogic(key, {
+        plan: plan, standing: true,
+        // coming back is always a LIVE day, never another preview build
+        onClose: function () {
+          var o = {};
+          for (var k in opts) { if (k !== 'into' && Object.prototype.hasOwnProperty.call(opts, k)) o[k] = opts[k]; }
+          openDay(key, o);
+        }
+      });
     }
     mBtn.addEventListener('click', toLogic);
 
-    // ---- THE SWIPE DOWN DOOR (v1197; ROUND 6: A PAGE SNAP) ------------------
-    // The logic page is the SECOND PAGE, sitting directly above this one. The
-    // day follows the finger 1:1 and the logic page comes down with it, and on
-    // release the pair SNAPS: all the way to logic past 40% of the viewport or
-    // on a strong flick, all the way back otherwise. It can NEVER rest between
-    // the two (the app's finger-follow + snap-to-nearest law). The M is
-    // untouched: it is still one tap to the same page.
+    // ---- THE DOOR TO THE LOGIC PAGE (round 7: a HORIZONTAL page snap) -------
+    // The day is the left page, the logic page is the right one. A pull to the
+    // LEFT brings it in from the right edge, 1:1 with the finger, and letting
+    // go snaps one way or the other, never between. The M is untouched: it is
+    // still one tap to the same page.
     //
-    // DELIBERATE IS STILL THE POINT:
-    //   - it only starts on OPEN BACKGROUND. A pointerdown on the rail, a
-    //     support, the CTA, the M, the deep work door or the signed row is
-    //     that control's gesture and this never sees it.
-    //   - THE AXIS IS DECIDED ONCE, after 10px: a first move that is more
-    //     sideways than down, or upward, is not a pull and nothing moves.
-    //     Travel is measured from the lock, so the page never jumps to catch
-    //     up with the finger.
-    //   - one finger only; a second pointer springs it back, and so does
-    //     pointercancel (iOS fires it when it claims a gesture).
-    // Reduced motion moves nothing: past the threshold it simply swaps.
-    var SNAP_AT = 0.4;        // of the viewport: the point of no return
-    var FLICK_V = 0.65;       // px per ms, a throw rather than a drag
-    var FLICK_MIN = 28;       // ...that still has to have travelled
-    var AXIS_LOCK = 10;       // px before the direction is decided
-    var SNAP_MS = 280;
-    var pager = null;                       // the second page, built on the first pull
-    var swStart = null, swLive = false, swSettling = false;
-    var swDy = 0, swV = 0, swLastY = 0, swLastT = 0, swT = null;
-
-    // THE SECOND PAGE. Built once, on the first pull, and it is the real logic
-    // page rendered by the real function into a host element (shell's preview
-    // branch), never a lookalike. It dies with this view, like everything else
-    // in the module.
-    function pagerBuild() {
-      if (pager || reduced() || !root) return;
-      pager = el('div', 'afl-pg');
-      pager.setAttribute('aria-hidden', 'true');
-      root.appendChild(pager);
-      try { openLogic(key, { plan: plan, standing: true, into: pager }); } catch (e) { pager.innerHTML = ''; }
-    }
-    function swDrag(dy) {
-      if (!root || reduced()) return;
-      root.style.setProperty('--afl-drag', (dy || 0).toFixed(1) + 'px');
-    }
-    function swClear() {
-      if (!root) return;
-      root.classList.remove('is-drag', 'is-snap');
-      root.style.removeProperty('--afl-drag');
-    }
-    function swSettle(toLogicPage) {
-      swStart = null; swLive = false;
-      if (swT) { clearTimeout(swT); swT = null; }
-      if (reduced() || !root) {
-        swClear();
-        if (toLogicPage) toLogic();
-        return;
-      }
-      swSettling = true;
-      var H = root.clientHeight || window.innerHeight;
-      root.classList.add('is-snap');
-      swDrag(toLogicPage ? H : 0);
-      swT = setTimeout(function () {
-        swT = null;
-        swSettling = false;
-        // the snap TO logic hands the screen over: openLogic's shell replaces
-        // this root, so nothing here needs unwinding.
-        if (toLogicPage) { toLogic(); return; }
-        swClear();
-      }, SNAP_MS + 20);
-    }
+    // It only starts on OPEN BACKGROUND: a press on the rail, a support, the
+    // CTA, the M, the deep work door, the signed row or the non-negotiables
+    // row is that control's gesture and this never sees it.
     function swipeBlocked(t) {
       if (!t || !t.closest) return true;
-      return !!t.closest('.afl-day__rail, .afl-day__sup, .afl-day__hold, .afl-day__m, .afl-day__dw, .afl-day__done, .afl-nav');
+      return !!t.closest('.afl-day__rail, .afl-day__sup, .afl-day__hold, .afl-day__m, .afl-day__dw, .afl-day__done, .afl-day__nnt, .afl-nav');
     }
-    day.addEventListener('pointerdown', function (e) {
-      if (swSettling) return;                               // the snap owns it now
-      if (swStart || swLive) { swSettle(false); return; }   // second finger
-      if (swipeBlocked(e.target)) return;
-      swStart = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0 };
-      swDy = 0; swV = 0; swLastY = e.clientY; swLastT = Date.now();
-      pagerBuild();
-    });
-    // THE REST OF THE GESTURE IS NOT THE DAY'S. Once the pull is under way the
-    // finger travels over the nav row, the pager, whatever: those are siblings
-    // of the day, not children, so a listener on the day would simply stop
-    // hearing it and the pages would be left mid travel. Pointer capture would
-    // normally retarget them, but it is allowed to fail (and it does, on a
-    // synthetic pointer), and "never lands between" cannot depend on that.
-    // Move is heard on the ROOM, release on the window, so nothing is missed.
-    var swMove = function (e) {
-      if (!swStart || e.pointerId !== swStart.id || swSettling) return;
-      var dy = e.clientY - swStart.y, dx = Math.abs(e.clientX - swStart.x);
-      if (!swStart.axis) {
-        if (Math.max(dx, Math.abs(dy)) < AXIS_LOCK) return;
-        if (dy <= 0 || dx > Math.abs(dy)) { swStart = null; swClear(); return; }
-        swStart.axis = 1;
-        swStart.y = e.clientY;             // travel is measured from the lock
-        swLive = true;
-        if (!reduced()) root.classList.add('is-drag');
-        try { day.setPointerCapture(e.pointerId); } catch (z) {}
-        return;
-      }
-      var now = Date.now(), dt = now - swLastT;
-      if (dt > 0) swV = (e.clientY - swLastY) / dt;
-      swLastY = e.clientY; swLastT = now;
-      swDy = Math.max(0, dy);              // 1:1, and never above its own top
-      swDrag(swDy);
-    };
-    var swUp = function (e) {
-      if (swSettling || !swStart || e.pointerId !== swStart.id) return;
-      if (!swLive) { swStart = null; return; }              // a tap, not a pull
-      var H = (root && root.clientHeight) || window.innerHeight;
-      // a flick is a throw AT THE MOMENT OF LETTING GO. A finger that dragged
-      // fast, stopped, held still and then lifted has thrown nothing, so a
-      // stale reading is dropped rather than counted.
-      if (Date.now() - swLastT > 90) swV = 0;
-      var go = swDy >= H * SNAP_AT || (swV >= FLICK_V && swDy >= FLICK_MIN);
-      swSettle(go);
-    };
-    var swCancel = function (e) {
-      if (swSettling || !swStart || (e && e.pointerId !== swStart.id)) return;
-      if (swLive) swSettle(false);
-      else { swStart = null; swClear(); }
-    };
-    root.addEventListener('pointermove', swMove);
-    window.addEventListener('pointerup', swUp);
-    window.addEventListener('pointercancel', swCancel);
+    if (!opts.into) {
+      daySnap = bindPageSnap({
+        host: home,
+        surface: day,
+        dir: -1,
+        blocked: swipeBlocked,
+        build: function (pg) { openLogic(key, { plan: plan, standing: true, into: pg }); },
+        go: toLogic
+      });
+    }
 
     // ---- THE CLOSED DAY (merge 3.1, the re-open) ----------------------------
     // Today's record already exists, so this day was held and written. It has
@@ -3206,8 +3332,12 @@
     if (closedRec) restoreClosed(closedRec);
 
     paint();
-    enterFade(day);
-    enterFade(nav);
+    // the preview build is already on the screen the moment it is dragged
+    // into view, so it does not arrive at all.
+    if (!opts.into) {
+      enterFade(day);
+      enterFade(nav);
+    }
     return root;
   }
 

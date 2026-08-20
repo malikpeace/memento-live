@@ -5374,6 +5374,10 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
      Mid scroll the text still travels up, and .afl__top (matched to the same
      depth) dissolves it before it reaches the chip. */
   padding-top: max(120px, calc(var(--safe-t) + 78px));
+  /* ROUND 7: vertical is this box's, horizontal belongs to the pager (the way
+     back to the day). Saying it to the compositor is what keeps the scroll
+     smooth instead of arbitrated. */
+  touch-action: pan-y;
 }
 .afl-lg__sc::-webkit-scrollbar { display: none; }
 /* the page arrives (v1191). ONE motion on the whole column, 280ms, removed on
@@ -5424,11 +5428,23 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 .afl-lg__row span { display: block; margin-top: 3px; font-size: 15.6px; line-height: 1.45; color: rgba(var(--ink), 0.78); }
 .afl-lg__st { margin: 6px 0 16px; font-size: 17.6px; line-height: 1.55; color: rgba(var(--ink), 0.92); }
 .afl-lg__st b { font-weight: 600; color: var(--text-hi); }
+/* ROUND 7: a real list. The header keeps its line, then one refusal per line
+   in the acts list's own type, flat, no bullets. */
+/* ONE rule, on top. The block used to close itself with a second hairline,
+   which sat 26px above The Math's own top hairline and read as an empty band
+   once the list grew from one line to four. */
 .afl-lg__no {
-  margin: 0 0 6px; padding: 16px 0; font-size: 17.6px; line-height: 1.55; color: rgba(var(--ink), 0.92);
-  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16), inset 0 -1px 0 rgba(var(--ink), 0.16);
+  margin: 0 0 6px; padding: 16px 0;
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16);
 }
-.afl-lg__no b { font-weight: 700; color: var(--text-hi); }
+.afl-lg__no-h {
+  margin: 0 0 8px; font-size: 18.2px; font-weight: 700;
+  letter-spacing: -0.014em; color: var(--text-hi);
+}
+.afl-lg__no-i {
+  margin: 0; padding: 5px 0; font-size: 18.2px; font-weight: 600; line-height: 1.35;
+  letter-spacing: -0.012em; color: var(--text-hi); text-wrap: pretty;
+}
 .afl-lg__h {
   margin: 26px 0 18px; padding-top: 22px; font-size: 22px; font-weight: 700;
   letter-spacing: -0.02em; color: var(--text-hi); box-shadow: inset 0 1px 0 rgba(var(--ink), 0.16);
@@ -5596,21 +5612,25 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column;
   padding: max(52px, calc(var(--safe-t) + 10px)) 23px 0;
   -webkit-user-select: none; user-select: none;
-  /* the swipe door follows the finger, so iOS must not keep the press as a
-     candidate pan and hand it away mid pull (the same reason the holds carry
-     it). Nothing on this screen scrolls. */
-  touch-action: none;
+  /* ROUND 7: vertical is the page's (there is nothing to scroll here, so it is
+     simply free), HORIZONTAL IS OURS. Without this iOS keeps a sideways press
+     as a candidate pan and hands it away mid pull, and the way it hands it
+     away is pointercancel. */
+  touch-action: pan-y;
 }
 
-/* ---- THE SWIPE DOWN DOOR, the second page (round 6) ---------------------
-   The logic page sits directly ABOVE the day. Both move together by exactly
-   what the finger did (--afl-drag), and on release they SNAP: fully to logic
-   or fully back, never between. The var is the only thing JS touches, so
-   there is no inline transform anywhere and nothing to unwind. */
+/* ---- THE PAGER: day <-> logic, side by side (round 7) -------------------
+   The day is the LEFT page and the logic page is the RIGHT one. Both move
+   together by exactly what the finger did (--afl-drag, signed), and on release
+   they SNAP: fully across or fully back, never between. The var is the only
+   thing JS touches, so there is no inline transform anywhere and nothing to
+   unwind. --r is a second page waiting off the right edge (the logic page seen
+   from the day), --l one waiting off the left (the day seen from logic). */
 .afl-pg {
   position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  transform: translateY(-100%);
 }
+.afl-pg--r { transform: translateX(100%); }
+.afl-pg--l { transform: translateX(-100%); }
 .afl-pg .afl { position: absolute; z-index: 0; }
 /* DIRECT CHILDREN ONLY. The second page is a whole .afl living inside this
    one, so a descendant selector here would drag the preview's own column
@@ -5618,10 +5638,13 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 .afl.is-drag > .afl__col, .afl.is-snap > .afl__col,
 .afl.is-drag > .afl__rise, .afl.is-snap > .afl__rise,
 .afl.is-drag > .afl__wash, .afl.is-snap > .afl__wash {
-  transform: translateY(var(--afl-drag, 0px));
+  transform: translateX(var(--afl-drag, 0px));
 }
-.afl.is-drag > .afl-pg, .afl.is-snap > .afl-pg {
-  transform: translateY(calc(-100% + var(--afl-drag, 0px)));
+.afl.is-drag > .afl-pg--r, .afl.is-snap > .afl-pg--r {
+  transform: translateX(calc(100% + var(--afl-drag, 0px)));
+}
+.afl.is-drag > .afl-pg--l, .afl.is-snap > .afl-pg--l {
+  transform: translateX(calc(-100% + var(--afl-drag, 0px)));
 }
 .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
 .afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg {
@@ -5631,6 +5654,69 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   /* reduced motion never drags the pages: past the threshold it swaps */
   .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
   .afl.is-snap > .afl__wash, .afl.is-snap > .afl-pg { transition: none; }
+}
+
+/* ---- THE NON-NEGOTIABLES ROW (round 7, Malik on-device) -----------------
+   Under the supports, and deliberately NOT one of them: the marker is a solid
+   filled X, not an open box, because these are already committed. It is never
+   a task, it never gates the hold, and it opens only when asked. */
+.afl-day__nn { margin: 10px 0 0; }
+.afl-day__nn.is-gone { display: none; }
+.afl-day__nnt {
+  display: flex; align-items: center; gap: 14px; width: 100%; height: 44px;
+  padding: 0 8px; border: 0; border-radius: var(--r-ctrl); background: none;
+  font-family: var(--font); text-align: left; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.afl-day__nnt:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 1px; }
+/* the SOLID marker. The supports' box is an empty 8% well waiting to be
+   filled; this one is already filled, and it carries an X instead of a check
+   so the two can never be read as the same state. */
+.afl-day__nnx {
+  position: relative; flex: 0 0 auto; width: 18px; height: 18px; border-radius: 6px;
+  /* solid, but not louder than the acts it sits under: a full white chip drew
+     the eye away from the star and the CTA on his own screen. 0.68 still reads
+     as filled next to the supports' 0.08 well, which is the whole contrast. */
+  background: rgba(var(--ink), 0.68);
+}
+.afl-day__nnx svg {
+  position: absolute; inset: 0; margin: auto; width: 12px; height: 12px; fill: none;
+  stroke: var(--solid-fg); stroke-width: 2.2; stroke-linecap: round;
+}
+.afl-day__nnl {
+  font-size: 15.6px; font-weight: 500; line-height: 1.25; color: rgba(var(--ink), 0.78);
+}
+/* the body opens on its REAL height and on opacity, no snap. A max-height
+   guess reaches the content's own height in the first frames and reads as a
+   jump; a grid row from 0fr to 1fr moves the actual measurement. An engine
+   that will not interpolate it simply opens with the fade, which is where
+   this started. Closed by default, and it holds no layer while it is shut. */
+.afl-day__nnb {
+  display: grid; grid-template-rows: 0fr; opacity: 0;
+  transition: grid-template-rows 0.24s var(--ease-out), opacity 0.18s ease-in;
+}
+.afl-day__nnin { overflow: hidden; min-height: 0; }
+.afl-day__nn.is-open .afl-day__nnb { grid-template-rows: 1fr; opacity: 1; }
+.afl-day__nni {
+  margin: 0; padding: 5px 8px 5px 40px;
+  font-size: 14.3px; line-height: 1.4; font-weight: 500; color: rgba(var(--ink), 0.62);
+}
+.afl-day__nni:last-child { padding-bottom: 9px; }
+html.theme-light .afl-day__nni { color: rgba(var(--ink), 0.70); }
+html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
+@media (prefers-reduced-motion: reduce) {
+  .afl-day__nnb { transition: none; }
+}
+
+/* ---- THE CLOSE CHIP SITS WITH THE M (round 7, Malik on-device) ----------
+   ON THE FLOW'S SCREENS ONLY, the same body:has idiom misc.css uses to hide
+   #topFade here. The M door's box is 39px tall at top max(44px, safe-t+10),
+   so its centre is that + 19.5px; the chip is 44px tall, so its top is that
+   centre minus 22px. Nothing global moves: Clarity's chip is untouched.
+   At safe-t 0 the chip lands at 41.5px, at 47px it lands at 54.5px, both
+   clear of the inset and both inside the scrim .afl__top already paints. */
+body:has(.afl) #fullscreenCloseGlobal {
+  top: calc(max(44px, var(--safe-t, 0px) + 10px) - 2.5px);
 }
 .afl-day__sp { min-height: 10px; }
 .afl-day__sp.is-a { flex: 0.55; }
@@ -5753,12 +5839,9 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
 /* v1197: the NO line is GONE from the day screen ("takes way too much space
    in the main card", Malik on-device). The full list lives on the logic page.
    The row it freed is where the non-negotiable line now sits. */
-.afl-day__nn {
-  margin: 12px 0 0; font-size: 14.3px; line-height: 1.4;
-  color: rgba(var(--ink), 0.62); font-weight: 500;
-}
-.afl-day__nn:empty { display: none; }
-html.theme-light .afl-day__nn { color: rgba(var(--ink), 0.70); }
+/* ROUND 7: the quiet one-line version of this is gone. The row that replaced
+   it (an expandable header with a solid X marker) is defined at the top of
+   this section, next to the pager it shares the day's bottom half with. */
 /* beat 4: HOLD IT DONE. The button stays PUT: the background's own green rise
    is the whole feedback. App button recipe. */
 /* THE SIGNED CROSSFADE (v1191). The hold button used to display:none and the
