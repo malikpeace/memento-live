@@ -441,8 +441,11 @@
   APPLY['qu-1'] = function (r, v) {
     var start = Math.max(0, +v.start), goal = +v.goal;
     if (goal <= start) goal = start + 1;
-    var cur = Math.min(Math.max(+v.cur, start), goal);
-    var span = goal - start, frac = (cur - start) / span;
+    /* THE ROAD CLAMPS, THE NUMBERS DO NOT (see qd-1): they can pass the goal,
+       and the real number is what every printed figure uses. */
+    var cur = +v.cur;
+    var pos = Math.min(Math.max(cur, start), goal);
+    var span = goal - start, frac = (pos - start) / span;
     var money = isMoney(v.unit);
     var mf = function (n) { return (money ? '$' : '') + fmt(n); };
     var marks = v.marks || [];
@@ -465,7 +468,8 @@
     var wm = Q(r, '.gp__was');
     if (wm) { wm.style.left = (wasF * 100).toFixed(1) + '%'; wm.style.display = wasV === start ? 'none' : ''; }
     var nm = Q(r, '.gp__now'); if (nm) nm.style.left = (frac * 100).toFixed(1) + '%';
-    put(r, '.gp__row', '<span><b>' + mf(cur - start) + '</b> closed</span><span><b>' + mf(goal - cur) + '</b> to go</span>');
+    // past the line is 0 to go, never a negative remainder
+    put(r, '.gp__row', '<span><b>' + mf(cur - start) + '</b> closed</span><span><b>' + mf(Math.max(0, goal - cur)) + '</b> to go</span>');
     // PROVENANCE: the rig divides the overall pace to guess the last leg. The
     // real leg is the days between the mark they last passed (its stamped fire
     // date) and today.
@@ -489,9 +493,15 @@
   APPLY['qd-1'] = function (r, v) {
     var start = +v.start, goal = +v.goal;
     if (start === goal) return;
-    var cur = Math.max(Math.min(+v.cur, Math.max(start, goal)), Math.min(start, goal));
+    /* THE ROAD CLAMPS, THE NUMBERS DO NOT. The rig's slider could never leave
+       the start..goal range, so it clamped and printed the clamped value. Real
+       life overshoots: the goal is 200 and the scale says 199. `cur` is what
+       they actually weigh and is what every printed number uses; `pos` is the
+       same value pinned to the rail, so a full road never draws past its end. */
+    var cur = +v.cur;
+    var pos = Math.max(Math.min(cur, Math.max(start, goal)), Math.min(start, goal));
     var marks = v.marks || [];
-    var span = Math.abs(goal - start), frac = Math.abs(cur - start) / span;
+    var span = Math.abs(goal - start), frac = Math.abs(pos - start) / span;
     var money = isMoney(v.unit);
     var mf = function (n) { return (money ? '$' : '') + fmt(n); };
     if (money) { put(r, '.qd1-hero', mf(cur)); put(r, '.qd1-hero2', mf(cur)); }
@@ -511,7 +521,9 @@
     var nm = Q(r, '.gp__now'); if (nm) nm.style.left = (frac * 100).toFixed(1) + '%';
     var weighty = /lb|kg|pound|kilo/i.test(v.unit || '');
     var downWord = money ? 'paid off' : 'down';
-    put(r, '.gp__row', '<span><b>' + mf(Math.abs(cur - start)) + '</b> ' + downWord + '</span><span><b>' + mf(Math.abs(cur - goal)) + '</b> to go</span>');
+    // past the line is 0 to go, never "1 to go" measured backwards
+    var leftToGo = Math.max(0, cur - goal);
+    put(r, '.gp__row', '<span><b>' + mf(Math.abs(cur - start)) + '</b> ' + downWord + '</span><span><b>' + mf(leftToGo) + '</b> to go</span>');
     // PROVENANCE: real leg, from the last mark's stamped fire date. See qu-1.
     var leg = Math.abs(cur - wasV);
     var cost = Q(r, '.gp__cost');
@@ -774,17 +786,39 @@
 
   DATA['qu-1'] = DATA['qd-1'] = function (c, ev) {
     var gp = c.gp;
-    if (gp.target === null || gp.current === null || gp.baseline === null) return null;
+    if (gp.target === null || gp.current === null) return null;
     var C = window.MilestoneChooser;
     var dir = C.direction(gp, liveStar());
     var marks = C.milestones(gp, dir);
+    if (!marks.length) return null;
+    /* NO BASELINE IS NOT NO SCREEN (the v1204 defect). The chooser fires on a
+       goal whose baseline is GONE, and says so: L6's hasBaseline:false, which
+       happens after a refine or a cloud merge. This builder used to demand a
+       baseline and returned null, so the referee promised a ceremony that
+       never arrived and the seam fell back to the daily page.
+       The road still has to start somewhere real, so the start falls back
+       exactly the way the chooser's own milestones() does: 0 for a rising
+       goal, and for a falling one the number they actually stood at before
+       this pulse (ev.prev, a logged reading). Nothing is invented: if there
+       is still no honest start, decline and let the floor below speak. */
+    var start = gp.baseline;
+    if (start === null || start === undefined) {
+      if (dir !== 'down') start = 0;                  // what milestones() used
+      else {
+        // the furthest reading they actually logged is where the record starts
+        var high = (ev && ev.prev != null) ? ev.prev : null;
+        c.hist.forEach(function (p) { if (high === null || p.value > high) high = p.value; });
+        start = (high !== null && high > gp.target) ? high : null;
+      }
+    }
+    if (start === null) return null;
     var cur = gp.current;
     var below = dir === 'down'
       ? marks.filter(function (m) { return m > cur; })
       : marks.filter(function (m) { return m < cur; });
-    var wasV = below.length ? below[below.length - 1] : gp.baseline;
+    var wasV = below.length ? below[below.length - 1] : start;
     return {
-      start: gp.baseline, goal: gp.target, cur: cur, unit: c.unit,
+      start: start, goal: gp.target, cur: cur, unit: c.unit,
       marks: marks, legDays: legDaysFor(c, wasV),
       markName: customName(gp, ev && ev.milestone)
     };
@@ -1013,19 +1047,42 @@
     st.rewards.msScreens[seenKey(hash, screen)] = todayKey();
   }
 
+  /* THE FAMILY'S GENERAL SCREEN. The referee's promise has to land on
+     something, so the family always has one screen that is not conditional on
+     a specific shape of data. The rows above are preferences; this is the
+     floor, and it is consulted even when the row did not name it. */
+  var GENERAL = { qu: 'qu-1', qd: 'qd-1', mt: 'mt-1', fr: 'fr-3' };
+
   function pickScreen(c, ev) {
-    var list = candidates(ev), fallback = null;
+    var list = candidates(ev).slice();
+    /* the family's general screen is always the last resort, whatever the row
+       said (fam qu / kind step was a single-entry row, so one null builder
+       used to mean no ceremony at all) */
+    var floor = GENERAL[ev.family];
+    if (floor && list.indexOf(floor) < 0) list.push(floor);
+    var spent = null;
     for (var i = 0; i < list.length; i++) {
       var key = list[i];
       if (!HTML[key] || !DATA[key]) continue;
       var v = null;
       try { v = DATA[key](c, ev); } catch (e) { v = null; }
       if (!v) continue;                                  // cannot be drawn honestly
+      /* The ambiguity rule is a PREFERENCE, never a veto: a screen that has
+         had its turn steps aside for the general one, but if nothing behind
+         it can draw, it is still the screen. */
       var specific = i < list.length - 1;
-      if (specific && screenSeen(c.hash, key)) { if (!fallback) fallback = { key: key, v: v }; continue; }
+      if (specific && screenSeen(c.hash, key)) { if (!spent) spent = { key: key, v: v }; continue; }
       return { key: key, v: v };
     }
-    return fallback;
+    if (spent) return spent;
+    /* Every screen in the family declined. The referee already promised a
+       ceremony and the chooser already spent the mark, so this can never pass
+       quietly: it is a data hole worth seeing in the console. */
+    try {
+      console.warn('[rewards] no milestone screen could render',
+        (ev && ev.family) || '?', (ev && ev.kind) || '?', (ev && ev.key) || '?', list.join(','));
+    } catch (e) {}
+    return null;
   }
 
   // ---------------------------------------------------------------------------

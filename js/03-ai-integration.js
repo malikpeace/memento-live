@@ -1654,10 +1654,10 @@ function goalProgressUpdate(value) {
     /* THE MERGE rewards phase 2, THE PULSE ENTRY. A number they type can
        cross a mark with no action logged, so the pulse earns the milestone
        tier too. This is a CONSUMER of the seam above, not a second detector:
-       js/28 runs the same referee (rewardMoment) and stands down when
-       _goalMoment says the finish line itself is crossed, which belongs to
-       the finale. Rendering follows persistence: the ledger is written
-       inside decide() before anything is drawn. */
+       js/28 runs the same referee (rewardMoment). Rendering follows
+       persistence: the ledger is written inside decide() before anything is
+       drawn. The finale's own guard sits below and returns first when it owns
+       the moment, so the milestone never has to test for that itself. */
     /* THE MERGE rewards phase 3. The finale outranks the mark (R2), so it is
        asked FIRST, and the pulse that crosses the goal's own line belongs to
        it either way: it fires here when the declaration already stands, and
