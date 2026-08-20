@@ -1925,6 +1925,47 @@ const CreatorTools = {
     // The real generation pipeline against the live proxy (needs a signed-in
     // paid session). Renders the raw result into a scrollable dev sheet so
     // Malik can run it from the phone with no console.
+    // Push diagnostics: show every eligibility gate + force the ask card.
+    bind('creatorPushStatus', async () => {
+      const out = {};
+      try {
+        out.permission = ('Notification' in window) ? Notification.permission : 'unsupported';
+        out.standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+        out.askedV2 = localStorage.getItem('memento_push_asked_v2');
+        out.pushOn = localStorage.getItem('memento_push_on');
+        out.armed = localStorage.getItem('memento_push_armed');
+        out.paid = (typeof ClarityPaywall !== 'undefined') ? ClarityPaywall.isPaid() : 'n/a';
+        out.signedIn = !!(window.CloudSync && CloudSync.accessToken && CloudSync.accessToken());
+        out.clarityDone = !!(state.clarity && state.clarity.completed);
+        out.swReady = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+        try { const sub = await (await navigator.serviceWorker.ready).pushManager.getSubscription(); out.subscribed = !!sub; } catch (e) { out.subscribed = 'err:' + e.message; }
+        out.eligible = (window.MementoPush && MementoPush._eligible) ? MementoPush._eligible() : 'no-probe';
+      } catch (e) { out.err = e.message; }
+      const old = document.getElementById('devBrainSheet');
+      if (old) old.remove();
+      const sheet = document.createElement('div');
+      sheet.id = 'devBrainSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(5,6,8,.97);color:#e8eaef;overflow:auto;padding:calc(20px + env(safe-area-inset-top)) 16px calc(30px + env(safe-area-inset-bottom));font:13px/1.6 ui-monospace,Menlo,monospace;white-space:pre-wrap;';
+      const x = document.createElement('button');
+      x.textContent = 'Close';
+      x.style.cssText = 'position:sticky;top:0;float:right;background:#fff;color:#000;font:600 13px Geist,sans-serif;border:0;border-radius:999px;padding:8px 16px;';
+      x.addEventListener('click', () => sheet.remove());
+      const force = document.createElement('button');
+      force.textContent = 'Force the ask card';
+      force.style.cssText = 'display:block;margin:14px 0;background:#3fd94e;color:#0b1112;font:600 13px Geist,sans-serif;border:0;border-radius:999px;padding:10px 18px;';
+      force.addEventListener('click', () => {
+        try { localStorage.removeItem('memento_push_asked_v2'); } catch (e) {}
+        try { if (window.MementoPush && MementoPush._offerAsk) MementoPush._offerAsk(true); else if (window.MementoPush && MementoPush.armPostPayment) { localStorage.setItem('memento_push_armed', '1'); MementoPush.armPostPayment(); } } catch (e) {}
+        sheet.remove();
+        this._devToast('Ask re-armed. Watch for the card.');
+      });
+      sheet.appendChild(x);
+      sheet.appendChild(force);
+      const pre = document.createElement('div');
+      pre.textContent = JSON.stringify(out, null, 2);
+      sheet.appendChild(pre);
+      document.body.appendChild(sheet);
+    });
     bind('creatorActionBrainTest', async () => {
       if (typeof actionBrainLiveRun !== 'function') { this._devToast('brain not loaded'); return; }
       this._devToast('Running 2 real plans, ~1-3 min...');
