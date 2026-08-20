@@ -6000,11 +6000,69 @@ html.theme-light .afl { --afl-rise-a: 0.82; }
   .afl-ld__end { transition: opacity 0.2s linear; transform: none; }
 }
 
-/* THE UNDO LEAVES WITH ITS WINDOW (merge phase 3.4). Once the ~1.5s undo
-   window closes the day is written, so the control that says it can be taken
-   back has to go: the row keeps its mark and its time and nothing else. */
-.afl-day__done.is-locked { pointer-events: none; }
-.afl-day__done.is-locked .afl-day__undo { display: none; }
+/* ==========================================================================
+   v1207: THE STANDING UNDO + THE CLOSE PULSE ASK
+   The 1.5s undo window is gone (it was the delay in front of the reward), so
+   the two things it used to cover both live here now.
+   ========================================================================== */
+
+/* THE STANDING UNDO. It is on the receipt row all day, so it cannot look like
+   a second button next to Completed: it is a small text control, quiet, at the
+   far end of the row it belongs to. The hit box is deliberately modest (no
+   invisible 44px slab): this row also has to let a swipe to the logic page
+   through, and a control that can undo a day should not be easy to brush. */
+.afl-day__undo {
+  margin-left: auto; border: 0; border-radius: 8px;
+  height: 32px; padding: 0 6px; background: none; box-shadow: none;
+  color: rgba(var(--ink), 0.55); font: 500 15px/1 var(--font);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color 0.18s ease;
+}
+.afl-day__undo:active { color: rgba(var(--ink), 0.92); }
+html.theme-light .afl-day__undo { color: rgba(var(--ink), 0.62); }
+
+/* THE ASK. A full screen beat inside the day's own room, built from the refine
+   screen's parts so the two number moments in Action are one control: same
+   question type, same big readout, same bottom button. Theme faithful, opaque
+   (a handover never layers two rooms, v1201), and it fades. */
+.afl-ask {
+  position: absolute; inset: 0; z-index: 40;
+  background: var(--afl-bg);
+  opacity: 1;
+}
+/* the same phone column every screen in this flow stands in, so the ask is
+   centred on a desktop window exactly like the refine question it is built
+   from (430px, hardcoded, .afl__col's own note explains why). */
+.afl-ask__col {
+  position: relative; height: 100%;
+  display: flex; flex-direction: column;
+  width: 100%; max-width: 430px; margin: 0 auto;
+}
+.afl-ask.is-in { animation: aflAskIn 0.24s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.afl-ask.is-out { animation: aflAskOut 0.18s ease-in both; }
+@keyframes aflAskIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aflAskOut { from { opacity: 1; } to { opacity: 0; } }
+/* the reserved top row: no bar and no chevron here, only the height they
+   occupy, so the question sits on the refine question's baseline and nothing
+   enters the close chip's corner. */
+.afl-q--ask .afl-q__top { min-height: 34px; }
+.afl-nav--ask { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+/* the unit after the number, the twin of .afl-q__pre before it */
+.afl-q__suf {
+  font-size: 28.6px; font-weight: 500; line-height: 1;
+  letter-spacing: -0.01em; color: rgba(var(--ink), 0.82);
+}
+/* "Not now" is a real answer, so it is a real control, and it is quiet. */
+.afl-ask__skip {
+  align-self: center; border: 0; background: none; box-shadow: none;
+  padding: 12px 16px; color: rgba(var(--ink), 0.58);
+  font: 500 16.3px/1 var(--font); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; transition: color 0.18s ease;
+}
+.afl-ask__skip:active { color: rgba(var(--ink), 0.90); }
+@media (prefers-reduced-motion: reduce) {
+  .afl-ask.is-in, .afl-ask.is-out { animation: none; }
+}
 
 /* END: THE ACTION FLOW appended section */
 
@@ -6043,3 +6101,10 @@ html.theme-light .afl-rl__alt { color: rgba(var(--ink), 0.74); box-shadow: inset
 html.theme-light .afl-rl__lb { color: rgba(var(--ink), 0.76); }
 html.theme-light .afl-rl__in { box-shadow: inset 0 -1px 0 rgba(var(--ink), 0.34); }
 html.theme-light .afl-rl__in::placeholder { color: rgba(var(--ink), 0.34); }
+
+/* THE GREY BAND (light mode, found in the close-ask round): the parked
+   sidebar (z 1000) floats its 40px drop shadow OVER the flow (z 800),
+   which reads as a grey stripe down the left edge on light. While the flow
+   is open the sidebar has no business painting at all. Same :has() idiom
+   misc.css uses for #topFade. */
+body:has(.afl) #appSidebar { box-shadow: none; }

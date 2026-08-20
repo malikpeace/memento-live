@@ -26,7 +26,14 @@
   touch-action: pan-y;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* v1207: it ARRIVES. The page now opens the instant the hold crests, while
+     the day's own green rise is still filling the room, so the two greens
+     cross over each other and the deep green settles in. A hard cut here
+     would be the "snap and pop" Malik has flagged before. */
+  animation: drwIn 0.22s ease-out both;
 }
+@keyframes drwIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .drw { animation: none; } }
 .drw__track {
   display: flex;
   width: 100%; height: 100%;

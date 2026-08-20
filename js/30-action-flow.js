@@ -3226,16 +3226,16 @@
     });
 
     // ---- THE CLOSE (merge phase 3.4, the data half) -------------------------
-    // THE UNDO WINDOW IS A DELAY, NOT A ROLLBACK. Resolution B says nothing
-    // persists while the signed row is up, so the write is simply deferred:
-    // undo inside the window cancels a timer and there is nothing to reverse.
-    // That is the simpler of the two correct answers, and it is the only one
-    // where a crash mid-window cannot leave a half-written day behind.
-    // If the view is torn down while the window is still open, the day FLUSHES
-    // (they did the hold and did not undo, so the record is theirs). Leaving on
-    // the X is not an undo.
-    var UNDO_MS = 1500;
-    var undoT = null;
+    // THE WAIT IS GONE (v1207, Malik on-device: the green page "arrives a bit
+    // delayed and looks weird"). The 1.5s undo window WAS that delay. The day
+    // is now written the instant the hold crests, and the moment that follows
+    // opens on top while the crest is still green, so the two read as one move
+    // instead of a cut and a wait.
+    //
+    // Taking it back did not disappear, it MOVED: the receipt row carries a
+    // standing Undo for as long as today is today, re-opens included (see
+    // undoDay). A mis-hold is fixable for hours now instead of for a second
+    // and a half, which is the stronger promise of the two.
     var written = false;
 
     function complete() {
@@ -3243,8 +3243,7 @@
       riseCrest();
       doneRow.querySelector('.afl-day__dt').textContent = 'Done at ' + stamp() + '.';
       paint();
-      if (undoT) clearTimeout(undoT);
-      undoT = setTimeout(function () { undoT = null; commitDay(); }, UNDO_MS);
+      commitDay();
     }
 
     function dayRecordNow() {
@@ -3271,11 +3270,12 @@
       written = true;
       var rec = dayRecordNow();
       ActionFlow._lastDayRecord = rec;
+      // the number the standing store held BEFORE this close. The ask below can
+      // move it, and the chooser needs the old value to know what was crossed.
+      var prevGp = null;
+      try { var g0 = S().goalProgress; prevGp = g0 ? g0.current : null; } catch (e) {}
       var res = writeDayClose(rec, plan);
       ActionFlow._lastClose = res;
-      // the row can no longer be taken back, so the control that says it can
-      // has to leave with the window.
-      try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
       // THE HOME HAS TO KNOW (v1197, Malik on-device: he closed the flow after
       // completing and the homepage, sync box included, showed nothing). The
       // old path did this in completeTodayActionFromHome (js/08:3653): credit,
@@ -3283,20 +3283,42 @@
       // Same call, no new machinery: renderAll re-renders the command centre,
       // which is where the sync box lives, plus the day card, the consistency
       // block, the heat and the sidebar.
-      try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
+      //
+      // IT WAITS ONE TICK (v1207). The home is behind a full screen overlay at
+      // this moment and the ceremony is not: repainting the whole command
+      // centre first put a heavy synchronous job between the crest and the
+      // page, which is the delay Malik felt. Persistence already happened
+      // above; this is only paint, so it goes after.
+      setTimeout(function () { try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {} }, 0);
+      closeMoment(rec, prevGp);
+      return res;
+    }
+
+    // THE CLOSE MOMENT (resolution B, in its order): the pulse asks its one
+    // number when the plan says today is an ask day, and only then does the
+    // referee decide. A number that crosses a mark therefore reaches the
+    // referee in the same breath, so the crossing outranks the daily page
+    // instead of arriving after it.
+    function closeMoment(rec, prevGp) {
+      var ask = null;
+      try { ask = closeAskDue(rec); } catch (e) { ask = null; }
+      if (!ask) { closeReward(rec, prevGp); return; }
+      openCloseAsk(ask, rec, function () { closeReward(rec, prevGp); });
+    }
+
+    function closeReward(rec, prevGp) {
       // ======================= THE CLOSE SEAM ============================
       // THE ONE REWARD CALL (THE-MERGE resolution B, Rewards phase 1).
-      // The undo window is over and the day is written, so this is the moment
-      // the reward is earned. rewardMoment() builds the full context out of
-      // real state (js/26's buildRewardCtx: shape, star, gp, count/countTarget,
-      // daysHeld/daysTarget, prevValue, ledger, goalDone, userSaysDone,
-      // askedDay, today) and the referee returns exactly ONE tier.
+      // The day is written and the pulse has had its ask, so this is the
+      // moment the reward is earned. rewardMoment() builds the full context
+      // out of real state (js/26's buildRewardCtx: shape, star, gp,
+      // count/countTarget, daysHeld/daysTarget, prevValue, ledger, goalDone,
+      // userSaysDone, askedDay, today) and the referee returns ONE tier.
       //
-      // THE PULSE IS NOT AT THIS SEAM YET. Resolution B puts it between the
-      // undo window and this call, so the number they just gave rides in the
-      // context. The pulse sheet is not wired into the close, so the referee
-      // is called with the context as it stands; when the pulse lands, it goes
-      // ABOVE this block and nothing here changes.
+      // prevValue is the standing number from BEFORE the close (v1207). The
+      // ask can have moved it a moment ago, and the chooser reads the pair to
+      // know which marks this pulse crossed; passing today's value as its own
+      // previous value would hide every crossing the ask just produced.
       //
       // RENDER FOLLOWS PERSISTENCE (the v1149 law): the referee writes the
       // finale receipt and pays the milestone ledger inside decide(), so the
@@ -3320,7 +3342,7 @@
         var moment = G('rewardMoment');
         var said = false;
         try { var gpNow = S().goalProgress; said = !!(gpNow && gpNow.userSaysDone); } catch (e) {}
-        var tier = moment ? moment({ userSaysDone: said }) : null;
+        var tier = moment ? moment({ userSaysDone: said, prevValue: prevGp }) : null;
         try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
         var shown = false;
         // THE FINALE OUTRANKS EVERYTHING (R2). The receipt is already written
@@ -3349,18 +3371,296 @@
         }
       } catch (e) {}
       // ===================================================================
-      return res;
     }
 
-    undo.addEventListener('click', function () {
-      if (written) return;                 // the window is over; the row stands
-      if (undoT) { clearTimeout(undoT); undoT = null; }
+    // =========================================================================
+    // THE CLOSE PULSE ASK (v1207, Malik: "when is Memento going to ask how
+    // close or far I am?"). The plan already carries the answer in plan.close,
+    // and resolution B already says where it goes: after the day is written,
+    // before the referee. This is the consumer, nothing more. It never invents
+    // a cadence and it never asks twice in one day.
+    //
+    // THE CADENCE TABLE (ACTION-BUCKETS.md, one line each):
+    //   daily / nightly   every close asks (the weigh-in, the screen report)
+    //   weekly:<day>      only on that weekday's close (money, audience)
+    //   per-session       every close that was not a rest day
+    //   on-results        NEVER here. It is event cadence: "asked when grades
+    //                     or results exist, never between." A schedule would
+    //                     be Memento inventing an occasion.
+    //   none              never, for anyone
+    // =========================================================================
+    var askLive = null;
+    function dayDateOf(k) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(k || ''));
+      return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
+    }
+    function closeAskDue(rec) {
+      var c = plan.close;
+      if (!c || !c.prompt) return null;
+      var cad = String(c.cadence || 'none');
+      var due = false;
+      if (cad === 'daily' || cad === 'nightly') due = true;
+      else if (cad.indexOf('weekly') === 0) {
+        var want = (cad.split(':')[1] || 'sunday').slice(0, 3);
+        due = WEEK[dayDateOf(rec.day).getDay()] === want;
+      } else if (cad === 'per-session') due = !rec.off;
+      if (!due) return null;
+      // ONCE A DAY. gp.askedDay is the app's own throttle for asking a person
+      // where they are; the same stamp keeps Clarity's ask off the same day.
+      try {
+        var gp = S().goalProgress;
+        if (gp && gp.askedDay === rec.day) return null;
+      } catch (e) {}
+      return c;
+    }
+
+    // The number rules are the refine screen's, to the character (clean +
+    // shownNum + fitNum there): same typing behaviour, same big centred
+    // readout, so the two number moments in Action are one control.
+    function askClean(raw, dec) {
+      var t = String(raw).replace(dec ? /[^0-9.]/g : /[^0-9]/g, '');
+      if (!dec) return t.replace(/^0+(?=\d)/, '');
+      var s = t.split('.');
+      return s.length > 1 ? s[0] + '.' + s.slice(1).join('').slice(0, 1) : t;
+    }
+    function askShown(v, dec) {
+      if (dec) return v;
+      return v ? v.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+    }
+
+    function openCloseAsk(c, rec, done) {
+      if (askLive) return;
+      var kind = (c.kind === 'choice' && (c.choices || []).length) ? 'choice' : 'num';
+      var raw = '', pick = null;
+
+      var lay = el('div', 'afl-ask');
+      lay.setAttribute('role', 'dialog');
+      lay.setAttribute('aria-modal', 'true');
+      lay.setAttribute('aria-label', c.prompt);
+      var wrap = el('div', 'afl-q afl-q--ask');
+      // the same reserved top row the refine questions have, so this question
+      // lands on their baseline and clears the close chip's corner (law 3a2).
+      var top = el('div', 'afl-q__top');
+      top.setAttribute('aria-hidden', 'true');
+      top.appendChild(el('span', 'afl-q__sp'));
+      wrap.appendChild(top);
+      wrap.appendChild(el('div', 'afl-q__q', c.prompt));
+      // their plan's own line about why this is asked. No source, no line: the
+      // slot is reserved either way, so the question never moves.
+      wrap.appendChild(el('p', 'afl-q__unit', c.source || ''));
+      var body = el('div', 'afl-q__as');
+      wrap.appendChild(body);
+
+      var nav = navRow();
+      nav.classList.add('afl-nav--ask');
+      var skip = btn('afl-ask__skip', 'Not now');
+      var go = cta('Save');
+      go.disabled = true;
+      nav.appendChild(skip);
+      nav.appendChild(go);
+      wrap.appendChild(nav);
+      var askCol = el('div', 'afl-ask__col');
+      askCol.appendChild(wrap);
+      lay.appendChild(askCol);
+
+      function live(on) {
+        go.disabled = !on;
+        go.classList.toggle('is-live', !!on);
+      }
+
+      if (kind === 'num') {
+        body.classList.add('afl-q__as--num');
+        var f = el('div', 'afl-q__field');
+        var set = el('div', 'afl-q__set');
+        if (c.prefix) set.appendChild(el('span', 'afl-q__pre', c.prefix));
+        var inp = document.createElement('input');
+        inp.className = 'afl-q__num';
+        inp.type = 'text';
+        inp.setAttribute('inputmode', c.decimals ? 'decimal' : 'numeric');
+        inp.autocomplete = 'off';
+        inp.placeholder = '0';
+        inp.setAttribute('aria-label', c.prompt);
+        set.appendChild(inp);
+        if (c.unit) set.appendChild(el('span', 'afl-q__suf', c.unit));
+        f.appendChild(set);
+        f.appendChild(el('div', 'afl-q__rule'));
+        body.appendChild(f);
+        var mirror = el('span', 'afl-q__mirror');
+        f.appendChild(mirror);
+        var fit = function () {
+          var t = inp.value || inp.placeholder, L = t.length;
+          var px = L <= 3 ? 130 : L === 4 ? 114 : L === 5 ? 99 : L === 6 ? 83 : 70;
+          inp.style.fontSize = px + 'px';
+          mirror.style.fontSize = px + 'px';
+          mirror.textContent = t;
+          inp.style.width = Math.max(83, Math.ceil(mirror.getBoundingClientRect().width) + 13) + 'px';
+        };
+        inp.addEventListener('input', function () {
+          raw = askClean(inp.value, c.decimals);
+          inp.value = askShown(raw, c.decimals);
+          fit();
+          live(parseFloat(raw) > 0);
+        });
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+        });
+        fit();
+      } else {
+        (c.choices || []).forEach(function (t, k) {
+          var b = btn('afl-q__a', t);
+          b.addEventListener('click', function () {
+            pick = (pick === k) ? null : k;
+            [].forEach.call(body.querySelectorAll('.afl-q__a'), function (x, j) {
+              x.classList.toggle('is-on', pick === j);
+              x.setAttribute('aria-pressed', pick === j ? 'true' : 'false');
+            });
+            live(pick !== null);
+          });
+          body.appendChild(b);
+        });
+      }
+
+      function shut() {
+        if (!askLive) return;
+        askLive = null;
+        if (reduced()) { if (lay.parentNode) lay.parentNode.removeChild(lay); return; }
+        lay.classList.add('is-out');
+        setTimeout(function () { if (lay.parentNode) lay.parentNode.removeChild(lay); }, 200);
+      }
+
+      function answer() {
+        var val = (kind === 'num') ? parseFloat(raw) : (c.choices[pick] || '');
+        if (kind === 'num' && !isFinite(val)) return;
+        if (kind === 'choice' && !val) return;
+        // 1. THE RECORD HOLDS WHAT THEY SAID. The day row is the receipt, so
+        //    the answer lives with the day it belongs to (the v1002 law), even
+        //    for a choice, which the standing store has no shape for yet.
+        try {
+          var r0 = (S().dayRecords || {})[rec.day];
+          if (r0) {
+            r0.close = {
+              kind: kind, value: val, prompt: c.prompt,
+              unit: c.unit || '', prefix: c.prefix || '', at: Date.now()
+            };
+          }
+        } catch (e) {}
+        // 2. THE STANDING STORE, through the app's one writer. js/03's pulse
+        //    path carries its OWN ceremony renderers, for a number typed
+        //    anywhere else in the app. Here the close owns the moment
+        //    (resolution B: exactly one referee call, right below), so the two
+        //    renderers stand down for this one synchronous write and the
+        //    decision is made once, by closeReward.
+        if (kind === 'num') {
+          var mR = window.MilestoneReward, gF = window.GrandFinale;
+          try {
+            window.MilestoneReward = null;
+            window.GrandFinale = null;
+            var upd = G('goalProgressUpdate');
+            if (upd) upd(val);
+          } catch (e) {
+          } finally {
+            window.MilestoneReward = mR;
+            window.GrandFinale = gF;
+          }
+        }
+        // 3. asked today, so nothing asks again today.
+        try { var gp = S().goalProgress; if (gp) gp.askedDay = rec.day; } catch (e) {}
+        try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+        shut();
+        try { done(); } catch (e) {}
+      }
+
+      go.addEventListener('click', function () { if (!go.disabled) answer(); });
+      // "Not now" is a real answer to a question about a number they may not
+      // have. It costs nothing and it is never asked about again today.
+      skip.addEventListener('click', function () { shut(); try { done(); } catch (e) {} });
+
+      askLive = { close: shut };
+      home.appendChild(lay);
+      if (!reduced()) { void lay.offsetWidth; lay.classList.add('is-in'); }
+    }
+
+    // =========================================================================
+    // THE STANDING UNDO (v1207, Malik). The old 1.5 second window was the only
+    // way back, and it was also the delay in front of the reward. So the way
+    // back became a standing one: a quiet text control on the receipt row,
+    // there for as long as today is today, re-opens included.
+    //
+    // WHAT IT REVERSES: today, and only today. The day record, the completion
+    // in the spine, the receipt, the daily page's witness stamp (so a real
+    // re-completion earns its page again), and the per-goal count, which
+    // yields to an explicit correction. The count law protects the number from
+    // data quirks, never from its owner.
+    //
+    // WHAT IT NEVER TOUCHES: anything already witnessed. A milestone mark that
+    // fired stays paid and a finale receipt stays written (fired = witnessed),
+    // and a number they typed into the pulse stays: that is a fact about their
+    // body or their business, not a fact about this day being closed.
+    // =========================================================================
+    function undoDay() {
+      var st = S();
+      if (!st) return;
+      var dk = dayKey();
+      var hash = plan.starHash || liveStarHash();
+      var key = hash || 'nostar';
+      try {
+        if (st.dayRecords) delete st.dayRecords[dk];
+        var hist = (st.action && Array.isArray(st.action.completionHistory)) ? st.action.completionHistory : null;
+        if (hist) {
+          var mid = 'plan_' + key;
+          for (var i = hist.length - 1; i >= 0; i--) {
+            var h = hist[i];
+            if (!h || h.missionId !== mid) continue;
+            var hd = '';
+            try {
+              hd = (typeof actionDayKey === 'function')
+                ? actionDayKey(new Date(h.date))
+                : String(h.date || '').slice(0, 10);
+            } catch (e) {}
+            if (hd === dk) { hist.splice(i, 1); break; }
+          }
+        }
+        var dedupe = closeDedupeKey({ starHash: hash, day: dk });
+        if (Array.isArray(st.proofEvents)) {
+          st.proofEvents = st.proofEvents.filter(function (e) {
+            return !(e && e.metadata && e.metadata.dedupeKey === dedupe);
+          });
+        }
+        if (st.rewards) {
+          if (st.rewards.dailySeen) delete st.rewards.dailySeen[key + '|' + dk];
+          if (!st.rewards.counts || typeof st.rewards.counts !== 'object') st.rewards.counts = {};
+          var n = 0, recs = st.dayRecords || {};
+          Object.keys(recs).forEach(function (k) {
+            var r = recs[k];
+            if (!r || r.off) return;
+            if (hash && r.starHash && r.starHash !== hash) return;
+            n++;
+          });
+          st.rewards.counts[key] = n;
+        }
+        try { var rs = G('recalculateStreak'); if (rs) rs(); } catch (e) {}
+        try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+        try { if (window.MementoPush && MementoPush.sync) MementoPush.sync(); } catch (e) {}
+        try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
+      } catch (e) {}
+      // ...and the screen is a live day again: the hold is armed, the content
+      // is back at full strength, the green is gone.
+      written = false;
       signed = false;
-      dayHold.reset();          // the day can be held again
+      restored = false;
+      day.classList.remove('is-restored');
+      try { dayHold.reset(); } catch (e) {}
       rise.style.transition = 'none';
       rise.style.height = '0';
       rise.style.opacity = '1';
+      var dt = doneRow.querySelector('.afl-day__dt');
+      if (dt) dt.textContent = '';
       paint();
+    }
+
+    undo.addEventListener('click', function () {
+      if (!signed) return;
+      undoDay();
     });
 
     // ---- 3.2  THE DEEP WORK DOOR --------------------------------------------
@@ -3401,11 +3701,17 @@
     }
     dw.addEventListener('click', openDeepWork);
 
-    // THE VIEW DIES CLEANLY. A pending undo window flushes (the hold happened),
-    // the sheet watcher stops, and nothing here outlives the screen.
+    // THE VIEW DIES CLEANLY. The day is already written by the time anything
+    // here can be torn down (there is no pending window any more), the sheet
+    // watcher stops, and nothing here outlives the screen.
+    //
+    // LEAVING DURING THE ASK is leaving: the ask closes with the view and the
+    // ceremony does not chase them onto the home screen. The day stands, the
+    // number simply was not given, and gp.askedDay was never stamped, so the
+    // app may still ask somewhere else today.
     if (!opts.into) current.teardown = function () {
       if (sheetWatch) { clearInterval(sheetWatch); sheetWatch = null; }
-      if (undoT) { clearTimeout(undoT); undoT = null; commitDay(); }
+      if (askLive) { try { askLive.close(); } catch (e) {} askLive = null; }
       // the page snap listens on the window, so it stops listening with the
       // view: nothing in this module outlives its screen.
       if (daySnap) { daySnap.destroy(); daySnap = null; }
@@ -3481,9 +3787,10 @@
       if (hasSize && !off && r.size != null) { val = r.size; lastVal = r.size; }
       var dt = doneRow.querySelector('.afl-day__dt');
       if (dt) dt.textContent = 'Done at ' + stamp(r.at) + '.';
-      // the write is final, so the control that says it can be taken back is not
-      // on the screen (commitDay's own two lines).
-      try { undo.hidden = true; doneRow.classList.add('is-locked'); } catch (e) {}
+      // v1207: THE UNDO STANDS. A day they closed this morning is still today,
+      // so the way back is still on the screen when they come back to it.
+      // Tomorrow this branch does not run at all, and yesterday can never be
+      // reopened here, which is what keeps "today only" true by construction.
       // ROUND 8: a re-entered closed day carries NO background wash. The room
       // is the room; the green that is left is the button, and the button is
       // simply already green when the screen paints. Nothing to animate in,
