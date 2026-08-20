@@ -464,13 +464,37 @@ const CloudSync = (function () {
         goalDone: unionEarliest(lr.shadow && lr.shadow.goalDone, cr.shadow && cr.shadow.goalDone)
       };
     } catch (e) {}
+    // v1210: THE UNDO TOMBSTONES (state.action.completionTombstones, js/01).
+    // Every store below merges by UNION, so a day the person undid on this
+    // phone would merge straight back from the other copy. The tombstones are
+    // themselves unioned first (an undo on either device is an undo), and then
+    // the three unions drop what they name. Same rule as clarityNotes: a
+    // tombstoned key never re-enters on any device.
+    let _tombs = {};
+    try {
+      const lt = (local.action && local.action.completionTombstones) || {};
+      const ct = (cloud.action && cloud.action.completionTombstones) || {};
+      Object.keys(lt).forEach((k) => { _tombs[k] = Math.max(lt[k] || 0, _tombs[k] || 0); });
+      Object.keys(ct).forEach((k) => { _tombs[k] = Math.max(ct[k] || 0, _tombs[k] || 0); });
+      if (merged.action) merged.action.completionTombstones = _tombs;
+      if (Array.isArray(merged.proofEvents)) {
+        merged.proofEvents = merged.proofEvents.filter((ev) => {
+          if (!ev) return false;
+          const dk = ev.metadata && ev.metadata.dedupeKey;
+          return !(dk && _tombs[dk]) && !(ev.id && _tombs[ev.id]);
+        });
+      }
+    } catch (e) {}
     // Day records: union by day key; a day both devices wrote keeps the copy
-    // from the side whose action module edited more recently.
+    // from the side whose action module edited more recently. An undone day
+    // ('day:<key>' tombstoned) is dropped from the union entirely.
     try {
       const lNewer = (lm.action || lGlobal) >= (cm.action || cGlobal);
       const base = lNewer ? (local.dayRecords || {}) : (cloud.dayRecords || {});
       const other = lNewer ? (cloud.dayRecords || {}) : (local.dayRecords || {});
-      merged.dayRecords = Object.assign({}, other, base);
+      const dr = Object.assign({}, other, base);
+      Object.keys(dr).forEach((k) => { if (_tombs['day:' + k]) delete dr[k]; });
+      merged.dayRecords = dr;
     } catch (e) {}
     // completionHistory is the app's activity spine (12 external readers):
     // newest-module-wins on state.action must never drop the other device's
@@ -484,7 +508,8 @@ const CloudSync = (function () {
           lNewer ? la : ca, lNewer ? ca : la,
           (h) => h && (h.id || h.missionId ? String(h.id || '') + '|' + String(h.missionId || '') + '|' + String(h.completedAt || h.date || '') : null),
           1200
-        );
+        // v1210: ...minus anything an undo removed on either device.
+        ).filter((h) => !(h && h.id && _tombs[h.id]));
       }
     } catch (e) {}
     return merged;

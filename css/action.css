@@ -6101,6 +6101,54 @@ html.theme-light .afl-cd__d:not(.is-on) { color: rgba(var(--ink), 0.70); }
   .afl-cd { transition: none; }
 }
 
+/* ==========================================================================
+   v1210: THE UNDO CONFIRM + THE RHYTHM ROW
+   Both reuse what the app already has: Clarity's cn-dlg for the dialog, the
+   refine rows and the day week for the picker. Only the theme-faithful skin
+   and the one new row are here.
+   ========================================================================== */
+/* the dialog lives inside the flow's room, so it sits above the room and
+   below nothing else; the ceremonies (z 11000+) still outrank it. */
+.afl-dlg { position: absolute; inset: 0; z-index: 60; }
+/* THEME FAITHFUL. Clarity's dialog is dark-only by design (it belongs to a
+   dark room). This one stands on a screen that follows the theme, so its
+   surface and its ink come from tokens. And it is NOT red: taking today back
+   is a correction, not a disaster. */
+.cn-dlg--afl {
+  background: var(--surface-1-solid, var(--afl-bg));
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(var(--ink),0.10);
+}
+.cn-dlg--afl h4 { color: rgba(var(--ink), 0.96); }
+.cn-dlg--afl p { color: rgba(var(--ink), 0.80); }
+.cn-dlg--wide { max-width: 330px; text-align: left; }
+.cn-dlg--wide h4 { text-align: left; font-size: 16px; font-weight: 700; line-height: 1.3; margin-bottom: 14px; }
+.cn-dlgbtn--afl { background: var(--solid-bg); color: var(--solid-fg); }
+.cn-dlgbtn--afl:disabled { opacity: 0.45; cursor: default; }
+.cn-dlg--afl .cn-dlgbtn--quiet { color: rgba(var(--ink), 0.55); }
+
+/* the five rhythms inside the sheet: the refine rows, one step tighter */
+.afl-rhy__rows .afl-q__a { min-height: 48px; padding: 13px 2px; font-size: 16.3px; }
+.afl-rhy__rows .afl-q__a::after { right: 2px; }
+.cn-dlg--wide .afl-cd__r { padding: 12px 0 4px; }
+.cn-dlg--wide .afl-cd__d { height: 40px; font-size: 14px; }
+.cn-dlg--wide .cn-dlgbtn { margin-top: 14px; }
+.cn-dlg--wide .cn-dlgbtn--quiet { margin-top: 4px; }
+
+/* THE RHYTHM ROW on the logic page's reference view. It is reference, not a
+   control shouting to be used: the same quiet line weight as the rest of the
+   page, the value in full ink so the answer reads first. */
+.afl-rhy {
+  display: flex; align-items: baseline; gap: 10px; width: 100%;
+  margin: 22px 0 0; padding: 14px 2px; border: 0; background: none;
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12);
+  font-family: inherit; text-align: left; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.afl-rhy__l { font-size: 16.3px; font-weight: 500; color: rgba(var(--ink), 0.62); }
+.afl-rhy__v { font-size: 16.3px; font-weight: 650; color: rgba(var(--ink), 0.96); }
+.afl-rhy:active .afl-rhy__v { color: rgba(var(--ink), 0.72); }
+.afl-rhy:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; }
+
 /* END: THE ACTION FLOW appended section */
 
 /* ---- LIGHT MODE CONTRAST PASS -------------------------------------------

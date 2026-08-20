@@ -414,17 +414,42 @@
   // The default arrives PRESELECTED, so the fast answer is one tap on Continue
   // and the question is a correction, not a chore.
   // ===========================================================================
+  // v3.2 (Malik 2026-08-20): "why not log how many runs... how many hours
+  // someone has stayed focused". FITNESS and FOCUS are asked too now.
+  //   fitness  the day close IS the log ("did the session happen"), so the
+  //            answer only chooses WHICH DAYS it asks. Default: their own
+  //            training days, read from the plan or their refine answer, and
+  //            Mon/Wed/Fri when neither says.
+  //   focus    the hours are a real number nothing else records, so the pref
+  //            MANUFACTURES the ask for this bucket even when the plan's close
+  //            block says none (see MANUFACTURED_ASK).
+  // School and projects stay out (results cadence, and the blocker list).
   var BUCKET_PULSE = {
     weight:      { cadence: 'daily',         pref: 'daily' },   // the weigh-in
     screen:      { cadence: 'nightly',       pref: 'daily' },   // the nightly report
     money:       { cadence: 'weekly:sunday', pref: 'weekly' },  // "never daily"
     'money-job': { cadence: 'weekly:sunday', pref: 'weekly' },  // weekly interviews landed
     business:    { cadence: 'weekly:sunday', pref: 'weekly' },  // the Sunday confirm
-    fitness:     { cadence: 'none',          pref: null },      // the logs are the record
+    fitness:     { cadence: 'none',          pref: 'custom' },  // their training days
+    focus:       { cadence: 'none',          pref: 'daily' },   // hours, every day
     school:      { cadence: 'on-results',    pref: null },      // grades exist or they do not
-    projects:    { cadence: 'none',          pref: null },      // the blocker list is the pulse
-    focus:       { cadence: 'none',          pref: null }       // the sessions are the pulse
+    projects:    { cadence: 'none',          pref: null }       // the blocker list is the pulse
   };
+  // The ask a bucket carries when its PLAN has no close question of its own.
+  // Only where a real number exists that nothing else in the app records.
+  // Fitness is deliberately absent: its sessions are already counted from the
+  // closes, and asking them to count what Memento counts is how a tracker
+  // starts lying.
+  var MANUFACTURED_ASK = {
+    focus: {
+      cadence: 'daily', kind: 'num',
+      prompt: 'How many hours of deep work today?',
+      unit: 'hours', prefix: '', decimals: true,
+      source: 'Asked at the end of the day.',
+      choices: null
+    }
+  };
+  var WEEK_DEFAULT_TRAINING = [1, 3, 5];        // Mon, Wed, Fri
   var CADENCE_CHIPS = [
     { key: 'daily',       label: 'Every day' },
     { key: 'every-other', label: 'Every other day' },
@@ -449,9 +474,43 @@
     var b = bucketPulse(bucket);
     return !!(b && b.pref);
   }
+  // THEIR OWN TRAINING DAYS, never a guess dressed as one: the landed plan's
+  // trainingDays first, then a refine answer that named days ("Mon/Wed/Fri",
+  // "Tue/Thu/Sat"), then the plain 3x week. Only used to PRESELECT, and every
+  // toggle stays theirs to change.
+  function trainingDaysPref() {
+    var days = [];
+    try {
+      var p = livePlan();
+      var td = p && p.offDays && p.offDays.trainingDays;
+      if (Array.isArray(td)) {
+        td.forEach(function (d) {
+          var i = WEEK.indexOf(String(d).slice(0, 3).toLowerCase());
+          if (i > -1 && days.indexOf(i) < 0) days.push(i);
+        });
+      }
+    } catch (e) {}
+    if (!days.length) {
+      try {
+        var ans = ((S() || {}).actionRefine || {}).answers || [];
+        ans.forEach(function (a) {
+          if (days.length) return;
+          var txt = ((a && a.chips) || []).join(' ') + ' ' + ((a && a.text) || '');
+          if (!/mon|tue|wed|thu|fri|sat|sun/i.test(txt)) return;
+          WEEK.forEach(function (w, i) {
+            if (new RegExp(w, 'i').test(txt) && days.indexOf(i) < 0) days.push(i);
+          });
+        });
+      } catch (e) {}
+    }
+    if (!days.length) days = WEEK_DEFAULT_TRAINING.slice();
+    days.sort(function (a, b) { return a - b; });
+    return days;
+  }
   function defaultCadencePref(bucket) {
     var b = bucketPulse(bucket);
-    return { kind: (b && b.pref) || 'daily', days: [] };
+    var kind = (b && b.pref) || 'daily';
+    return { kind: kind, days: kind === 'custom' ? trainingDaysPref() : [] };
   }
   // second to last: immediately before the baseline, which is the LAST number
   // step in the set (baselineFrom's own rule, so the two can never disagree).
@@ -2688,6 +2747,11 @@
         nnRef.appendChild(nnRl);
         box.appendChild(nnRef);
       }
+      // v1210: THE RHYTHM, AND THE WAY TO CHANGE IT. One quiet reference line
+      // among the others: how often Memento asks where they are, and a tap to
+      // change it. Only on a plan that asks at all; the sheet writes through
+      // ActionFlow.setCadencePref, the one door for this.
+      try { var rr = rhythmRow(); if (rr) box.appendChild(rr); } catch (e) {}
     } else if (nnCands.length) {
       var nnWrap = el('div', 'afl-nn');
       nnWrap.appendChild(el('p', 'afl-nn__lead', 'Pick 1 or 2 non-negotiables.'));
@@ -2736,6 +2800,121 @@
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       gateSync();
+    }
+
+    // ---- THE RHYTHM ROW + ITS SHEET (v1210) ---------------------------------
+    // What it says has to be true of THIS goal: the pref they chose, else the
+    // cadence the plan itself carries, in plain words. A bucket that never
+    // asks (school, projects) renders no row, because there is no rhythm to
+    // name and a row saying "never" would be noise.
+    function rhythmWords() {
+      var pref = null;
+      try { pref = livePref(); } catch (e) {}
+      if (pref) {
+        if (pref.kind === 'custom') return cadenceLabel(pref);
+        return (cadenceLabel(pref) || '').toLowerCase();
+      }
+      var cad = String((plan.close && plan.close.cadence) || 'none');
+      if (cad === 'daily' || cad === 'nightly') return 'every day';
+      if (cad.indexOf('weekly') === 0) {
+        var d = (cad.split(':')[1] || 'sunday');
+        return d.charAt(0).toUpperCase() + d.slice(1) + 's';
+      }
+      if (cad === 'per-session') return 'every session';
+      return '';
+    }
+    function rhythmRow() {
+      var words = rhythmWords();
+      var askable = cadenceAskable(plan.bucket || '');
+      if (!words && !askable) return null;
+      if (!words) words = (cadenceLabel(defaultCadencePref(plan.bucket || '')) || '').toLowerCase();
+      if (!words) return null;
+      var row = btn('afl-rhy');
+      var lab = el('span', 'afl-rhy__l', 'Logging');
+      var val = el('span', 'afl-rhy__v', words);
+      row.appendChild(lab);
+      row.appendChild(val);
+      row.setAttribute('aria-label', 'Logging ' + words + '. Change it.');
+      row.addEventListener('click', function () {
+        openRhythmSheet(function () { val.textContent = rhythmWords(); });
+      });
+      return row;
+    }
+    function openRhythmSheet(onSaved) {
+      var start = null;
+      try { start = livePref(); } catch (e) {}
+      var pref = start
+        ? { kind: start.kind, days: (start.days || []).slice() }
+        : defaultCadencePref(plan.bucket || '');
+      var wrap = el('div', 'cn-dlgwrap afl-dlg');
+      wrap.setAttribute('role', 'dialog');
+      wrap.setAttribute('aria-modal', 'true');
+      var boxD = el('div', 'cn-dlg cn-dlg--afl cn-dlg--wide');
+      boxD.appendChild(el('h4', null, 'How often do you want to log your progress?'));
+      var rows = el('div', 'afl-rhy__rows');
+      var btns = CADENCE_CHIPS.map(function (c2) {
+        var b = btn('afl-q__a', c2.label);
+        b.addEventListener('click', function () {
+          pref.kind = c2.key;
+          if (c2.key !== 'custom') pref.days = [];
+          else if (!pref.days.length) pref.days = trainingDaysPref();
+          paintR();
+        });
+        rows.appendChild(b);
+        return b;
+      });
+      boxD.appendChild(rows);
+      var wrapD = el('div', 'afl-cd');
+      var bodyD = el('div', 'afl-cd__b');
+      var rowD = el('div', 'afl-cd__r');
+      var dayBtns = DAY_LETTER.map(function (lab2, idx) {
+        var b = btn('afl-cd__d', lab2);
+        b.setAttribute('aria-label', DAY_NAME[idx]);
+        b.addEventListener('click', function () {
+          var at = pref.days.indexOf(idx);
+          if (at > -1) pref.days.splice(at, 1); else pref.days.push(idx);
+          pref.days.sort(function (x, y) { return x - y; });
+          paintR();
+        });
+        rowD.appendChild(b);
+        return b;
+      });
+      bodyD.appendChild(rowD);
+      wrapD.appendChild(bodyD);
+      boxD.appendChild(wrapD);
+      var save = btn('cn-dlgbtn cn-dlgbtn--afl', 'Save');
+      var cancel = btn('cn-dlgbtn cn-dlgbtn--quiet', 'Cancel');
+      boxD.appendChild(save);
+      boxD.appendChild(cancel);
+      wrap.appendChild(boxD);
+      function paintR() {
+        btns.forEach(function (b, j) {
+          var on = CADENCE_CHIPS[j].key === pref.kind;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var open = pref.kind === 'custom';
+        wrapD.classList.toggle('is-open', open);
+        dayBtns.forEach(function (b, idx) {
+          var on = pref.days.indexOf(idx) > -1;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          b.tabIndex = open ? 0 : -1;
+        });
+        save.disabled = open && !pref.days.length;
+      }
+      function shut() { try { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); } catch (e) {} }
+      cancel.addEventListener('click', shut);
+      wrap.addEventListener('click', function (e) { if (e.target === wrap) shut(); });
+      save.addEventListener('click', function () {
+        if (save.disabled) return;
+        try { ActionFlow.setCadencePref(pref); } catch (e) {}
+        shut();
+        try { if (typeof onSaved === 'function') onSaved(); } catch (e) {}
+      });
+      paintR();
+      (col.closest ? (col.closest('.afl') || document.body) : document.body).appendChild(wrap);
+      requestAnimationFrame(function () { wrap.classList.add('is-on'); });
     }
 
     if (!refOnly) box.appendChild(el('p', 'afl-lg__fair', 'Ready to Start?'));
@@ -2979,6 +3158,15 @@
     if (!st || !rec) return out;
     try {
       var dkey = closeDedupeKey(rec);
+      // v1210: A REAL CLOSE LIFTS ITS OWN TOMBSTONES. An undo marks this day
+      // and this dedupeKey as deleted so no sync can resurrect them; closing
+      // the day again is the person saying it happened after all, so the
+      // marks come off before the write. The old completion record's id stays
+      // tombstoned forever: that row is gone, and this close writes a new one.
+      try {
+        var tomb0 = (st.action && st.action.completionTombstones) || null;
+        if (tomb0) { delete tomb0['day:' + rec.day]; delete tomb0[dkey]; }
+      } catch (e) {}
       var already = Array.isArray(st.proofEvents) && st.proofEvents.some(function (e) {
         return e && e.metadata && e.metadata.dedupeKey === dkey;
       });
@@ -3697,16 +3885,25 @@
     }
     function closeAskDue(rec) {
       var c = plan.close;
-      if (!c || !c.prompt) return null;
-      var cad = String(c.cadence || 'none');
-      // 'none' and 'on-results' are not rhythms, so a preference cannot turn
-      // them into one: there is nothing to ask for, and the check-in question
-      // is not even asked in those buckets.
-      if (cad === 'none' || cad === 'on-results') return null;
-      var due = false;
-      // THE PERSON'S ANSWER FIRST (v3.1), the plan's own line second.
       var pref = null;
       try { pref = livePref(); } catch (e) { pref = null; }
+      // v3.2: THE MANUFACTURED ASK. Deep work hours are a real number nothing
+      // else in the app records, and the plan's close block for that bucket
+      // often says none. Where the person has chosen a rhythm and the bucket
+      // has an ask of its own, the rhythm brings the ask with it.
+      if ((!c || !c.prompt) && pref) {
+        var made = MANUFACTURED_ASK[(livePlan() && livePlan().bucket) || plan.bucket || ''];
+        if (made) c = made;
+      }
+      if (!c || !c.prompt) return null;
+      var cad = String(c.cadence || 'none');
+      // 'none' and 'on-results' on a plan that HAS a question of its own are
+      // not rhythms, and a preference cannot turn them into one. A
+      // manufactured ask arrives with its own cadence, so it is unaffected.
+      if (c !== plan.close) cad = String(c.cadence || 'daily');
+      else if (cad === 'none' || cad === 'on-results') return null;
+      var due = false;
+      // THE PERSON'S ANSWER FIRST (v3.1), the plan's own line second.
       if (pref) {
         due = prefDue(pref, rec);
       } else if (cad === 'daily' || cad === 'nightly') due = true;
@@ -3912,8 +4109,22 @@
       var dk = dayKey();
       var hash = plan.starHash || liveStarHash();
       var key = hash || 'nostar';
+      // v1210: THE TOMBSTONES. Deleting a row locally is not enough: every one
+      // of these three stores merges by UNION in js/12, so the cloud copy
+      // would hand the day straight back on the next sync. Each deletion below
+      // writes the key it removed, and js/12 drops tombstoned keys from all
+      // three unions (js/01 owns the store and its cap).
+      var tomb = null;
+      try {
+        if (!st.action || typeof st.action !== 'object') st.action = {};
+        if (!st.action.completionTombstones || typeof st.action.completionTombstones !== 'object') st.action.completionTombstones = {};
+        tomb = st.action.completionTombstones;
+      } catch (e) { tomb = null; }
+      var now = Date.now();
+      function mark(k) { if (tomb && k) tomb[k] = now; }
       try {
         if (st.dayRecords) delete st.dayRecords[dk];
+        mark('day:' + dk);
         var hist = (st.action && Array.isArray(st.action.completionHistory)) ? st.action.completionHistory : null;
         if (hist) {
           var mid = 'plan_' + key;
@@ -3926,13 +4137,15 @@
                 ? actionDayKey(new Date(h.date))
                 : String(h.date || '').slice(0, 10);
             } catch (e) {}
-            if (hd === dk) { hist.splice(i, 1); break; }
+            if (hd === dk) { mark(h.id); hist.splice(i, 1); break; }
           }
         }
         var dedupe = closeDedupeKey({ starHash: hash, day: dk });
+        mark(dedupe);
         if (Array.isArray(st.proofEvents)) {
           st.proofEvents = st.proofEvents.filter(function (e) {
-            return !(e && e.metadata && e.metadata.dedupeKey === dedupe);
+            if (e && e.metadata && e.metadata.dedupeKey === dedupe) { mark(e.id); return false; }
+            return true;
           });
         }
         if (st.rewards) {
@@ -3967,9 +4180,35 @@
       paint();
     }
 
+    // THE CONFIRM (v1210, Malik). Undo now costs a second tap. It is the app's
+    // own dialog (Clarity's cn-dlg, the same one that guards deleting a note),
+    // theme faithful here and without the red: taking today back is a
+    // correction, not a disaster. Cancelling changes nothing at all.
+    function confirmUndo(onYes) {
+      var wrap = el('div', 'cn-dlgwrap afl-dlg');
+      wrap.setAttribute('role', 'dialog');
+      wrap.setAttribute('aria-modal', 'true');
+      var box = el('div', 'cn-dlg cn-dlg--afl');
+      box.appendChild(el('h4', null, 'Undo today?'));
+      box.appendChild(el('p', null, 'This removes the day from your record.'));
+      var yes = btn('cn-dlgbtn cn-dlgbtn--afl', 'Undo it');
+      var no = btn('cn-dlgbtn cn-dlgbtn--quiet', 'Keep it');
+      box.appendChild(yes);
+      box.appendChild(no);
+      wrap.appendChild(box);
+      function shut() { try { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); } catch (e) {} }
+      wrap.addEventListener('click', function (e) { if (e.target === wrap) shut(); });
+      no.addEventListener('click', shut);
+      yes.addEventListener('click', function () { shut(); try { onYes(); } catch (e) {} });
+      // it lives in the flow's own room, so it dies with the view
+      home.appendChild(wrap);
+      requestAnimationFrame(function () { wrap.classList.add('is-on'); });
+      return wrap;
+    }
+
     undo.addEventListener('click', function () {
       if (!signed) return;
-      undoDay();
+      confirmUndo(undoDay);
     });
 
     // ---- 3.2  THE DEEP WORK DOOR --------------------------------------------

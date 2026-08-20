@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1211';
+window.MEMENTO_JS_BUILD = 'v1212';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -79,6 +79,16 @@ const DEFAULT_STATE = {
     planSourceNeutronStar: '',
     lastGeneratedAt: null,
     completionHistory: [],
+    // v1210: TOMBSTONES FOR AN UNDONE DAY. completionHistory, proofEvents and
+    // dayRecords all merge by UNION in js/12, so a record deleted on this
+    // phone comes straight back from the cloud on the next sync. Undo writes
+    // the deleted keys here and js/12 drops them from every union, the way
+    // clarityNotes.tombstones already works. Keys are id -> timestamp, in
+    // three shapes: the completion record id, the proof event's dedupeKey,
+    // and 'day:<YYYY-MM-DD>' for the day record. Re-closing the same day
+    // LIFTS its day and dedupeKey tombstones (js/30 writeDayClose), so a
+    // real re-completion is never blocked by an old undo.
+    completionTombstones: {},
     // v1006: retired Neutron Stars with a summary of everything done under
     // each. Written by archiveNeutronStar (js/03) when the star changes.
     starHistory: [],
@@ -1975,6 +1985,16 @@ function migrateState() {
   // Completion history. Every "Mark complete" tap appends here so the AI
   // can generate the NEXT logical step when the user asks for a refresh.
   if (!Array.isArray(state.action.completionHistory)) state.action.completionHistory = [];
+  // v1210: the undo tombstones (see the default above). Capped at 80 keys,
+  // oldest out first, so a long-lived account cannot grow this without end.
+  if (!state.action.completionTombstones || typeof state.action.completionTombstones !== 'object') state.action.completionTombstones = {};
+  {
+    const _tk = Object.keys(state.action.completionTombstones);
+    if (_tk.length > 80) {
+      _tk.sort((a, b) => (state.action.completionTombstones[a] || 0) - (state.action.completionTombstones[b] || 0));
+      _tk.slice(0, _tk.length - 80).forEach((k) => { delete state.action.completionTombstones[k]; });
+    }
+  }
   if (!state.action.refine || typeof state.action.refine !== 'object') state.action.refine = { messages: [], refinedText: '', refinedForTier: '' };
   // ONE-TIME MIGRATION: run the current sanitizer over any existing plan
   // text on load so users with pre-fix cached plans don't keep staring at
