@@ -102,12 +102,40 @@
      60, 75, 80, 90, 95, 100. Marks stay whole units and never stack, so
      small spans (write 3 books) still celebrate per unit. */
   var ROAD_PCTS = [1, 5, 10, 20, 25, 30, 40, 50, 60, 75, 80, 90, 95];
+  /* L12 CUSTOM SUB-GOALS (Malik 2026-08-16, MERGE-2). When they name their own
+     middles ("run a 5K, then 10, then 20, then the marathon"), those marks
+     REPLACE the percent ladder: gp.customMarks holds whole numbers (or
+     { value, name } objects) strictly between the baseline and the target.
+     Sorted into crossing order, deduped, capped at 12 (denser is noise), and
+     the target is still appended last, so every once-only law above applies
+     to them unchanged: same 'mark-<value>' ledger keys, same coalescing, same
+     swallow by the finale. */
+  var CUSTOM_CAP = 12;
+  function customLadder(gp, base, dir) {
+    var raw = gp.customMarks;
+    if (!Array.isArray(raw) || !raw.length) return null;
+    var sign = dir === 'down' ? -1 : 1, out = [];
+    for (var i = 0; i < raw.length; i++) {
+      var m = raw[i];
+      var v = Math.round(+((m && typeof m === 'object') ? m.value : m));
+      if (!isFinite(v)) continue;
+      if (sign > 0 ? (v <= base || v >= gp.target) : (v >= base || v <= gp.target)) continue;
+      if (out.indexOf(v) < 0) out.push(v);
+    }
+    if (!out.length) return null;
+    out.sort(function (a, b) { return sign > 0 ? a - b : b - a; });
+    if (out.length > CUSTOM_CAP) out = out.slice(0, CUSTOM_CAP);
+    out.push(gp.target);
+    return out;
+  }
   function milestones(gp, dir) {
     if (!gp || gp.target === null) return [];
     var base = gp.baseline !== null ? gp.baseline : (dir === 'down' ? null : 0);
     if (base === null) return [gp.target];             // down with no baseline: only the end is knowable
     var span = Math.abs(gp.target - base);
     if (span <= 0) return [gp.target];
+    var custom = customLadder(gp, base, dir);          /* L12 */
+    if (custom) return custom;
     var out = [], sign = dir === 'down' ? -1 : 1;
     ROAD_PCTS.forEach(function (p) {
       var v = Math.round(base + sign * span * p / 100);

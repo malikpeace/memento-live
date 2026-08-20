@@ -1651,6 +1651,14 @@ function goalProgressUpdate(value) {
       }
     } catch (_) {}
     try { persistNow(); } catch (e) {}
+    /* THE MERGE rewards phase 2, THE PULSE ENTRY. A number they type can
+       cross a mark with no action logged, so the pulse earns the milestone
+       tier too. This is a CONSUMER of the seam above, not a second detector:
+       js/28 runs the same referee (rewardMoment) and stands down when
+       _goalMoment says the finish line itself is crossed, which belongs to
+       the finale. Rendering follows persistence: the ledger is written
+       inside decide() before anything is drawn. */
+    try { if (window.MilestoneReward) MilestoneReward.pulse(_prevPulse); } catch (_) {}
     return true;
   } catch (e) { return false; }
 }

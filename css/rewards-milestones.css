@@ -1,0 +1,485 @@
+/* ============================================================================
+   THE MILESTONE CEREMONIES (THE MERGE, rewards phase 2, 2026-08-20)
+
+   The along-the-way moments: a mark on the road crossed, a record taken, a
+   week of days banked. Three beats, tap to advance, tap to keep. Silent.
+
+   PORT LAW. Every value below is the graded mockup, carried over as written:
+     kit chrome  -> mockups/celebrate/_kit.css (.b / .n / .sub / .cap /
+                    .deposit / .keepbtn / .mark--foot / .cel-confetti /
+                    .b--flood)
+     per screen  -> the <style> block at the top of each
+                    mockups/celebrate/frag/<key>.html, selectors unchanged so
+                    [data-c="qu-1"] still addresses its own screen.
+
+   WHAT CHANGED FROM THE GALLERY, and why:
+   1. THE FRAME. The gallery draws a 390x760 phone (.ph) inside a page. Here
+      the page IS the phone, so .ph becomes .msw at 100lvh and the iOS safe
+      areas land in the beat padding. Nothing about the composition moves.
+   2. THE TOKENS. The gallery ships its own light/dark token block. The app
+      already has one: --ink, --text-hi/mid/lo, --hairline and --accent all
+      flip under html.theme-light, and every fragment rule is written in
+      those tokens. So the ceremonies are theme-faithful (Malik 2026-08-18)
+      through the app's ONE root rule, with no per-screen theme opt-out.
+      Only the page ground had to be named: var(--surface-0).
+   3. OVERFLOW-SAFE CENTERING (the tall-window law). The kit centres beats
+      with justify-content:center, which clips the top when content outgrows
+      a short window. Here it is `safe center` over a scrollable beat.
+   ============================================================================ */
+
+/* ---------- the surface ---------- */
+.msw {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  /* 100lvh, never inset:0 / 100dvh: the others are proven short on-device */
+  height: 100lvh;
+  z-index: 11000;
+  background: var(--surface-0);
+  color: var(--text-hi);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.msw-stage { position: absolute; inset: 0; }
+
+/* ---------- beats (kit) ---------- */
+.msw .b {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  justify-content: safe center;          /* short windows keep the top */
+  overflow-y: auto;
+  padding: calc(34px + var(--safe-t, 0px)) 30px calc(34px + var(--safe-b, 0px));
+  text-align: center;
+  opacity: 0; pointer-events: none;
+}
+.msw .b.on { opacity: 1; pointer-events: auto; animation: mswBeatIn .5s cubic-bezier(.2,.8,.3,1); }
+@keyframes mswBeatIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* the dismiss control: quiet, never competes with the accent moment */
+.msw .keepbtn {
+  position: absolute; left: 0; right: 0; bottom: calc(30px + var(--safe-b, 0px));
+  z-index: 30; text-align: center;
+  font-size: 14px; font-weight: 600; color: var(--text-mid);
+  opacity: 0; transition: opacity .5s ease; pointer-events: none;
+}
+.msw.is-done .keepbtn { opacity: 1; }
+
+/* ---------- shared type (kit) ---------- */
+.msw .n { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: -.045em; line-height: .9; color: var(--text-hi); }
+.msw .n--hero { font-size: 104px; }
+.msw .n--big { font-size: 68px; }
+.msw .sub { font-size: 15px; color: var(--text-mid); font-weight: 500; margin-top: 14px; letter-spacing: -.01em; }
+.msw .sub b { color: var(--text-hi); font-weight: 650; }
+.msw .cap { font-size: 12.5px; color: var(--text-lo); margin-top: 9px; }
+.msw .mark--foot {
+  position: absolute; bottom: calc(64px + var(--safe-b, 0px)); left: 50%; transform: translateX(-50%);
+  width: 18px; height: 18px; fill: rgba(var(--ink), .14); pointer-events: none;
+}
+.msw .deposit { font-size: 15px; color: var(--text-mid); line-height: 1.5; max-width: 22ch; }
+.msw .deposit b { color: var(--text-hi); font-weight: 650; }
+
+/* The confetti canvas: sits above the beats, never eats taps. The explicit
+   100%/100% is NOT decoration: a canvas is a replaced element, so an absolute
+   inset:0 with width:auto keeps its INTRINSIC size (the 2x backing store) and
+   the burst lands off-screen. */
+.msw .cel-confetti { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 24; pointer-events: none; }
+
+/* the page owns the whole moment: the flow's close chip steps aside while it
+   is up, exactly as the daily page does (a tap anywhere dismisses) */
+body:has(.msw) .fullscreen-close-global { display: none !important; }
+
+/* ---------- the flood (kit) ----------
+   The land beat of a bold milestone fills the screen with THEIR colour and
+   the M. Ink flips to near-black so it reads on all six accents (every one
+   is a light colour by construction). Receipts return to the page ground. */
+.msw .b--flood { background: var(--accent); }
+.msw .b--flood .n, .msw .b--flood .sub, .msw .b--flood .cap, .msw .b--flood .deposit { color: #0b0e12; }
+.msw .b--flood .sub b, .msw .b--flood .cap b, .msw .b--flood .deposit b { color: #0b0e12; }
+.msw .b--flood .sub, .msw .b--flood .cap { opacity: .82; }
+.msw .flood-m { width: 74px; height: 74px; fill: #0b0e12; margin-bottom: 26px; }
+.msw .b--flood.on { animation: mswFloodIn .45s cubic-bezier(.2,.8,.3,1); }
+@keyframes mswFloodIn { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .msw .b.on, .msw .b--flood.on { animation: none; }
+}
+
+/* ============================================================================
+   THE SCREENS. Each block below is the fragment's own <style>, verbatim.
+   ============================================================================ */
+
+/* ---------- qu-1 : the marker posts, in The Gap's clothes ----------
+   Malik 2026-08-16 ("much more minimal and simple"): a 2px dotted road, the
+   closed ground as THE one coloured thing, a thin ghost tick at the last
+   mark, the white tick standing where they are. */
+[data-c="qu-1"] .qu1-hero{font-size:104px}
+[data-c="qu-1"] .qu1-hero2{font-size:72px}
+[data-c="qu-1"] .qu1-sub2{margin-bottom:34px}
+
+[data-c="qu-1"] .gp{width:100%;max-width:302px;display:flex;flex-direction:column;align-items:center}
+[data-c="qu-1"] .gp__scale{display:flex;justify-content:space-between;width:100%;
+  margin:0 0 10px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .gp__rail{position:relative;width:100%;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    rgba(var(--ink),.20) 0 3px, rgba(var(--ink),0) 3px 8px)}
+[data-c="qu-1"] .gp__fill{position:absolute;left:0;top:-1px;bottom:-1px;width:60%;
+  border-radius:2px;background:var(--accent);
+  transform-origin:left center;transform:scaleX(var(--gpFrom,.6667))}
+[data-c="qu-1"] .b2.on .gp__fill{animation:qu1GapFill 950ms cubic-bezier(.2,.85,.25,1) .3s forwards}
+@keyframes qu1GapFill{from{transform:scaleX(var(--gpFrom,.6667))}to{transform:scaleX(1)}}
+[data-c="qu-1"] .gp__was{position:absolute;left:40%;top:-5px;width:1px;height:12px;
+  background:rgba(var(--ink),.45)}
+[data-c="qu-1"] .gp__now{position:absolute;left:60%;top:-8px;width:2px;height:18px;
+  margin-left:-1px;border-radius:1px;background:var(--text-hi);
+  opacity:0;transform:scaleY(.25);transform-origin:center}
+[data-c="qu-1"] .b2.on .gp__now{animation:qu1GapTick 420ms cubic-bezier(.2,.85,.25,1) 1.15s forwards}
+@keyframes qu1GapTick{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:scaleY(1)}}
+[data-c="qu-1"] .gp__row{display:flex;justify-content:space-between;width:100%;
+  margin-top:19px;font-size:14.5px;color:var(--text-mid);letter-spacing:-.01em;opacity:0}
+[data-c="qu-1"] .gp__row b{color:var(--text-hi);font-weight:700;font-variant-numeric:tabular-nums}
+[data-c="qu-1"] .b2.on .gp__row{animation:qu1GapUp 460ms ease-out 1.28s forwards}
+[data-c="qu-1"] .gp__cost{margin-top:30px;opacity:0}
+[data-c="qu-1"] .b2.on .gp__cost{animation:qu1GapUp 460ms ease-out 1.5s forwards}
+@keyframes qu1GapUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+[data-c="qu-1"] .b3{padding-bottom:calc(96px + var(--safe-b, 0px))}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qu-1"] .gp__fill{transform:scaleX(1);animation:none}
+  [data-c="qu-1"] .gp__now{opacity:1;transform:scaleY(1);animation:none}
+  [data-c="qu-1"] .gp__row,[data-c="qu-1"] .gp__cost{opacity:1;transform:none;animation:none}
+}
+
+/* ---------- qu-2 : four figures ----------
+   No target on the goal, so the win is the digit the number just grew. */
+[data-c="qu-2"] .qu2-hero{font-size:78px}
+[data-c="qu-2"] .qu2-ledger{width:212px;margin:0 auto 22px;text-align:left}
+[data-c="qu-2"] .qu2-row{display:flex;align-items:baseline;justify-content:space-between;
+  padding:5px 0}
+[data-c="qu-2"] .qu2-m{font-size:12.5px;color:var(--text-lo);letter-spacing:-.01em}
+[data-c="qu-2"] .qu2-v{font-size:16px;font-weight:600;color:rgba(var(--ink),.60);
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+[data-c="qu-2"] .qu2-row.is-new .qu2-m{color:var(--text-mid)}
+[data-c="qu-2"] .qu2-row.is-new .qu2-v{color:var(--text-hi);font-size:21px;font-weight:700}
+[data-c="qu-2"] .qu2-line{position:relative;height:2px;border-radius:1px;margin:9px 0 11px;
+  background:var(--accent)}
+[data-c="qu-2"] .qu2-sub{max-width:27ch}
+[data-c="qu-2"] .qu2-cap{max-width:34ch}
+[data-c="qu-2"] .b3{padding-bottom:calc(96px + var(--safe-b, 0px))}
+
+[data-c="qu-2"] .b.on .qu2-row{animation:qu2In .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-2"] .b.on .qu2-row.is-new{animation-delay:.02s}
+[data-c="qu-2"] .b.on .qu2-line{animation:qu2Wipe .46s cubic-bezier(.2,.8,.3,1) both;
+  animation-delay:.16s;transform-origin:left center}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(3){animation-delay:.24s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(4){animation-delay:.32s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(5){animation-delay:.40s}
+[data-c="qu-2"] .b.on .qu2-row:nth-of-type(6){animation-delay:.48s}
+@keyframes qu2In{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes qu2Wipe{from{opacity:0;transform:scaleX(.2)}to{opacity:1;transform:none}}
+
+/* ---------- qu-5 : the record board ----------
+   No target, so the only thing to beat is the last time you were best. */
+[data-c="qu-5"] .qu5-hero{font-size:88px}
+[data-c="qu-5"] .qu5-board{width:224px;margin:2px auto 22px;text-align:left}
+[data-c="qu-5"] .qu5-row{position:relative;display:flex;align-items:baseline;
+  justify-content:space-between;padding:7px 0 7px 15px}
+[data-c="qu-5"] .qu5-row + .qu5-row{border-top:1px solid var(--hairline)}
+[data-c="qu-5"] .qu5-when{font-size:12.5px;color:var(--text-lo);letter-spacing:-.01em}
+[data-c="qu-5"] .qu5-v{font-size:17px;font-weight:600;color:rgba(var(--ink),.58);
+  font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+[data-c="qu-5"] .qu5-row.is-new .qu5-when{color:var(--text-mid)}
+[data-c="qu-5"] .qu5-row.is-new .qu5-v{color:var(--text-hi);font-size:23px;font-weight:700}
+[data-c="qu-5"] .qu5-row.is-new::before{content:'';position:absolute;left:0;top:6px;bottom:6px;
+  width:2px;border-radius:1px;background:var(--accent)}
+[data-c="qu-5"] .qu5-sub{max-width:22ch}
+[data-c="qu-5"] .qu5-cap{max-width:34ch}
+[data-c="qu-5"] .b3{padding-bottom:calc(96px + var(--safe-b, 0px))}
+
+[data-c="qu-5"] .b.on .qu5-row{animation:qu5Seat .46s cubic-bezier(.2,.8,.3,1) both}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(1){animation-delay:.04s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(2){animation-delay:.20s}
+[data-c="qu-5"] .b.on .qu5-row:nth-child(3){animation-delay:.28s}
+@keyframes qu5Seat{from{opacity:0;transform:translateY(-9px)}to{opacity:1;transform:none}}
+
+/* ---------- qd-1 : The Gap, reversed ----------
+   The road runs from the START number down to the GOAL. */
+[data-c="qd-1"] .qd1-hero{font-size:104px}
+[data-c="qd-1"] .qd1-hero2{font-size:72px}
+[data-c="qd-1"] .qd1-sub2{margin-bottom:34px}
+
+[data-c="qd-1"] .gp{width:100%;max-width:302px;display:flex;flex-direction:column;align-items:center}
+[data-c="qd-1"] .gp__scale{display:flex;justify-content:space-between;width:100%;
+  margin:0 0 10px;font-size:11px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .gp__rail{position:relative;width:100%;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    rgba(var(--ink),.20) 0 3px, rgba(var(--ink),0) 3px 8px)}
+[data-c="qd-1"] .gp__fill{position:absolute;left:0;top:-1px;bottom:-1px;width:60%;
+  border-radius:2px;background:var(--accent);
+  transform-origin:left center;transform:scaleX(var(--gpFrom,.6667))}
+[data-c="qd-1"] .b2.on .gp__fill{animation:qd1GapFill 950ms cubic-bezier(.2,.85,.25,1) .3s forwards}
+@keyframes qd1GapFill{from{transform:scaleX(var(--gpFrom,.6667))}to{transform:scaleX(1)}}
+[data-c="qd-1"] .gp__was{position:absolute;left:40%;top:-5px;width:1px;height:12px;
+  background:rgba(var(--ink),.45)}
+[data-c="qd-1"] .gp__now{position:absolute;left:60%;top:-8px;width:2px;height:18px;
+  margin-left:-1px;border-radius:1px;background:var(--text-hi);
+  opacity:0;transform:scaleY(.25);transform-origin:center}
+[data-c="qd-1"] .b2.on .gp__now{animation:qd1GapTick 420ms cubic-bezier(.2,.85,.25,1) 1.15s forwards}
+@keyframes qd1GapTick{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:scaleY(1)}}
+[data-c="qd-1"] .gp__row{display:flex;justify-content:space-between;width:100%;
+  margin-top:19px;font-size:14.5px;color:var(--text-mid);letter-spacing:-.01em;opacity:0}
+[data-c="qd-1"] .gp__row b{color:var(--text-hi);font-weight:700;font-variant-numeric:tabular-nums}
+[data-c="qd-1"] .b2.on .gp__row{animation:qd1GapUp 460ms ease-out 1.28s forwards}
+[data-c="qd-1"] .gp__cost{margin-top:30px;opacity:0}
+[data-c="qd-1"] .b2.on .gp__cost{animation:qd1GapUp 460ms ease-out 1.5s forwards}
+@keyframes qd1GapUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+[data-c="qd-1"] .b3{padding-bottom:calc(96px + var(--safe-b, 0px))}
+[data-c="qd-1"] .deposit{text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-1"] .gp__fill{transform:scaleX(1);animation:none}
+  [data-c="qd-1"] .gp__now{opacity:1;transform:scaleY(1);animation:none}
+  [data-c="qd-1"] .gp__row,[data-c="qd-1"] .gp__cost{opacity:1;transform:none;animation:none}
+}
+
+/* ---------- qd-2 : the record book ----------
+   No hard target, the week's average logged; the only thing to beat is
+   their own lowest week. */
+[data-c="qd-2"] .lead{display:flex;align-items:baseline;gap:10px}
+[data-c="qd-2"] .n--hero{font-size:64px}
+[data-c="qd-2"] .lead .u{font-size:26px;font-weight:650;letter-spacing:-.02em;color:var(--text-mid)}
+
+[data-c="qd-2"] .log{width:216px;margin-bottom:10px}
+[data-c="qd-2"] .lgr{display:flex;align-items:baseline;justify-content:space-between;
+  padding:9px 0;opacity:0;transform:translateY(5px)}
+[data-c="qd-2"] .lgr .d{font-size:12.5px;letter-spacing:-.01em;color:var(--text-lo)}
+[data-c="qd-2"] .lgr .v{font-size:17px;font-weight:700;letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;color:rgba(var(--ink),.56)}
+[data-c="qd-2"] .lgr--now{padding-top:13px}
+[data-c="qd-2"] .lgr--now .d{color:var(--text-mid)}
+[data-c="qd-2"] .lgr--now .v{font-size:23px;color:var(--accent)}
+
+[data-c="qd-2"] .b.on .lgr{animation:qd2row .5s cubic-bezier(.2,.8,.3,1) forwards}
+[data-c="qd-2"] .b.on .lgr:nth-child(1){animation-delay:.05s}
+[data-c="qd-2"] .b.on .lgr:nth-child(2){animation-delay:.12s}
+[data-c="qd-2"] .b.on .lgr:nth-child(3){animation-delay:.19s}
+[data-c="qd-2"] .b.on .lgr:nth-child(4){animation-delay:.26s}
+[data-c="qd-2"] .b.on .lgr:nth-child(5){animation-delay:.36s}
+@keyframes qd2row{to{opacity:1;transform:translateY(0)}}
+
+[data-c="qd-2"] .sub{text-wrap:balance}
+[data-c="qd-2"] .sub + .sub{margin-top:7px}
+[data-c="qd-2"] .deposit{max-width:23ch;text-wrap:balance}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="qd-2"] .lgr{opacity:1;transform:none}
+}
+
+/* ---------- qd-3 : the number you carry ---------- */
+[data-c="qd-3"] .b1 .sub{position:relative;z-index:1}
+[data-c="qd-3"] .lead{position:relative;display:flex;align-items:baseline;justify-content:center}
+[data-c="qd-3"] .sub{text-wrap:balance}
+[data-c="qd-3"] .sub + .sub{margin-top:7px}
+[data-c="qd-3"] .deposit{max-width:24ch;text-wrap:balance}
+
+/* ---------- fr-3 : the fiftieth ---------- */
+[data-c="fr-3"] .fr3-sub{max-width:24ch}
+[data-c="fr-3"] .deposit{max-width:17ch}
+[data-c="fr-3"] .deposit b{white-space:nowrap}
+[data-c="fr-3"] .mark--foot{bottom:calc(94px + var(--safe-b, 0px))}
+
+[data-c="fr-3"] .fr3-row{display:flex;gap:13px}
+[data-c="fr-3"] .fr3-d{width:8px;height:8px;border-radius:50%;background:rgba(var(--ink),.30)}
+[data-c="fr-3"] .fr3-d.last{background:var(--accent)}
+
+[data-c="fr-3"] .b2.on .fr3-row{animation:fr3In .44s cubic-bezier(.2,.8,.3,1) backwards}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(2){animation-delay:.07s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(3){animation-delay:.14s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(4){animation-delay:.21s}
+[data-c="fr-3"] .b2.on .fr3-row:nth-child(5){animation-delay:.28s}
+@keyframes fr3In{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+[data-c="fr-3"] .b2.on .fr3-d.last{animation:fr3Land .5s cubic-bezier(.2,.8,.3,1) .42s backwards}
+@keyframes fr3Land{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+
+[data-c="fr-3"] .b3.on .deposit{animation:fr3Settle .5s cubic-bezier(.2,.8,.3,1) .1s backwards}
+@keyframes fr3Settle{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+[data-c="fr-3"] .fr3-box{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:10px;
+  background:rgba(var(--ink),.04);box-shadow:inset 0 1px 0 rgba(var(--ink),.05)}
+[data-c="fr-3"] .fr3-field{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:32px}
+[data-c="fr-3"] .fr3-mult{font-size:30px;font-weight:750;letter-spacing:-.03em;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+[data-c="fr-3"] .fr3-off{opacity:.16}
+
+/* ---------- mt-1 : the ledger of days ---------- */
+[data-c="mt-1"] .b1.on .n--hero{animation:mt1land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt1land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-1"] .b1.on .sub{animation:mt1sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt1sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-1"] .mt1-field{display:flex;flex-direction:column;gap:10px;align-items:center}
+[data-c="mt-1"] .mt1-row{width:225px;height:18px;
+  background:repeating-linear-gradient(90deg,rgba(var(--accent-rgb),.78) 0 3px,transparent 3px 9px)}
+[data-c="mt-1"] .b2.on .mt1-row{animation:mt1row .5s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(2){animation-delay:.09s}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(3){animation-delay:.18s}
+[data-c="mt-1"] .b2.on .mt1-row:nth-child(4){animation-delay:.27s}
+@keyframes mt1row{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+[data-c="mt-1"] .mt1-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+
+/* ---------- mt-2 : held to the date ---------- */
+[data-c="mt-2"] .b1.on .n--hero{animation:mt2land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt2land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-2"] .b1.on .sub{animation:mt2sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt2sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-2"] .mt2-rail{position:relative;width:268px;height:12px}
+[data-c="mt-2"] .mt2-track{position:absolute;left:0;right:0;top:5px;height:2px;background:rgba(var(--ink),.13)}
+[data-c="mt-2"] .mt2-fill{position:absolute;left:0;right:0;top:5px;height:2px;
+  background:var(--accent);transform-origin:0 50%}
+[data-c="mt-2"] .b2.on .mt2-fill{animation:mt2fill 1s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt2fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+[data-c="mt-2"] .mt2-start{position:absolute;left:0;top:2px;width:2px;height:8px;background:rgba(var(--ink),.40)}
+[data-c="mt-2"] .mt2-end{position:absolute;right:0;top:0;width:2px;height:12px;
+  background:rgba(var(--ink),.62);transform-origin:50% 50%}
+[data-c="mt-2"] .b2.on .mt2-end{animation:mt2end .38s cubic-bezier(.2,.8,.3,1) .86s both}
+@keyframes mt2end{from{opacity:0;transform:scaleY(.25)}to{opacity:1;transform:none}}
+
+[data-c="mt-2"] .mt2-dates{display:flex;justify-content:space-between;width:268px;margin-top:11px;
+  font-size:11.5px;color:var(--text-lo);font-variant-numeric:tabular-nums}
+
+[data-c="mt-2"] .mt2-line2{font-size:13px;line-height:1.5;color:var(--text-mid);
+  max-width:29ch;margin-top:9px;letter-spacing:-.005em}
+[data-c="mt-2"] .mt2-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:26ch;margin-top:18px;letter-spacing:-.005em}
+
+/* ---------- mt-3 : the hard ones ---------- */
+[data-c="mt-3"] .b1.on .n--hero{animation:mt3land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt3land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-3"] .b1.on .sub{animation:mt3sub .5s cubic-bezier(.2,.8,.3,1) .26s both}
+@keyframes mt3sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-3"] .mt3-days{display:flex;flex-direction:column;gap:7px;align-items:center}
+[data-c="mt-3"] .mt3-hd{font-size:14.5px;font-weight:600;letter-spacing:-.01em;color:rgba(var(--accent-rgb),.92);
+  font-variant-numeric:tabular-nums}
+[data-c="mt-3"] .mt3-hd--more{color:var(--text-lo);font-weight:500}
+[data-c="mt-3"] .mt3-bar{width:4px;height:16px;background:rgba(var(--ink),.28)}
+[data-c="mt-3"] .mt3-h{height:34px;background:rgba(var(--accent-rgb),.92);transform-origin:50% 100%}
+[data-c="mt-3"] .b2.on .mt3-h{animation:mt3rise .58s cubic-bezier(.2,.8,.3,1) .36s both}
+@keyframes mt3rise{from{transform:scaleY(.47)}to{transform:scaleY(1)}}
+
+[data-c="mt-3"] .mt3-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:27ch;margin-top:18px;letter-spacing:-.005em}
+
+/* ---------- mt-4 : the first seven ---------- */
+[data-c="mt-4"] .mt4-hero{position:relative;display:flex;align-items:center;justify-content:center}
+[data-c="mt-4"] .b1.on .mt4-glow{animation:mt4glow .9s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt4glow{from{opacity:0;transform:translate(-50%,-50%) scale(.86)}
+  to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+[data-c="mt-4"] .mt4-hero .n--hero{position:relative}
+[data-c="mt-4"] .b1.on .n--hero{animation:mt4land .55s cubic-bezier(.2,.8,.3,1) both}
+@keyframes mt4land{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+[data-c="mt-4"] .b1.on .sub{animation:mt4sub .5s cubic-bezier(.2,.8,.3,1) .3s both}
+@keyframes mt4sub{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+[data-c="mt-4"] .mt4-week{display:flex;gap:16px;align-items:center}
+[data-c="mt-4"] .mt4-week span{display:block;width:2px;height:28px;background:rgba(var(--ink),.44)}
+[data-c="mt-4"] .b2.on .mt4-week span{animation:mt4tick .42s cubic-bezier(.2,.8,.3,1) both}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(2){animation-delay:.07s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(3){animation-delay:.14s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(4){animation-delay:.21s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(5){animation-delay:.28s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(6){animation-delay:.35s}
+[data-c="mt-4"] .b2.on .mt4-week span:nth-child(7){animation-delay:.42s}
+@keyframes mt4tick{from{opacity:0;transform:scaleY(.3)}to{opacity:1;transform:none}}
+
+[data-c="mt-4"] .mt4-note{font-size:13.5px;line-height:1.55;color:var(--text-mid);
+  max-width:26ch;margin-top:18px;letter-spacing:-.005em}
+
+/* ---------- rf-fall : The Fall ----------
+   The number they actually carry, what is LEFT, dropping and settling onto
+   a line that takes the weight. */
+[data-c="rf-fall"] .fl{display:flex;flex-direction:column;align-items:center;width:100%}
+[data-c="rf-fall"] .b1 .fl{margin-top:30px}
+
+[data-c="rf-fall"] .fl__n{display:block;transform:translateY(-26px);opacity:0}
+[data-c="rf-fall"] .b1.on .fl__n{animation:rfFallDrop 1400ms cubic-bezier(.5,.02,.32,1) forwards}
+@keyframes rfFallDrop{
+  0%  {opacity:0;transform:translateY(-26px)}
+  16% {opacity:1}
+  86% {opacity:1;transform:translateY(0)}
+  92% {opacity:1;transform:translateY(4px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+[data-c="rf-fall"] .fl__shelf{position:relative;width:190px;height:1px;margin-top:22px;
+  background:rgba(var(--ink),.13)}
+[data-c="rf-fall"] .fl__lit{position:absolute;left:0;right:0;top:-.5px;height:2px;
+  border-radius:1px;background:var(--accent);
+  opacity:0;transform:scaleX(.24)}
+[data-c="rf-fall"] .b1.on .fl__lit{animation:rfFallLand 460ms cubic-bezier(.2,.85,.25,1) 1.2s forwards}
+@keyframes rfFallLand{from{opacity:0;transform:scaleX(.24)}to{opacity:1;transform:scaleX(1)}}
+[data-c="rf-fall"] .b1.on .fl__bloom{animation:rfFallBloom 760ms ease-out 1.2s forwards}
+@keyframes rfFallBloom{0%{opacity:0}34%{opacity:1}100%{opacity:.46}}
+
+[data-c="rf-fall"] .fl__sub{margin-top:20px}
+
+[data-c="rf-fall"] .fl__led{width:100%;max-width:272px}
+[data-c="rf-fall"] .fl__hd{display:flex;justify-content:space-between;align-items:baseline;
+  padding:0 2px 9px;font-size:11.5px;color:var(--text-lo)}
+[data-c="rf-fall"] .fl__row{display:flex;justify-content:space-between;align-items:baseline;
+  padding:11px 2px;border-top:1px solid var(--hairline);opacity:0}
+[data-c="rf-fall"] .fl__day{font-size:12.5px;color:rgba(var(--ink),.52);
+  font-variant-numeric:tabular-nums}
+[data-c="rf-fall"] .fl__v{font-size:21px;font-weight:700;letter-spacing:-.03em;
+  color:var(--text-mid);font-variant-numeric:tabular-nums}
+[data-c="rf-fall"] .fl__row--now .fl__day{color:var(--text-mid)}
+[data-c="rf-fall"] .fl__row--now .fl__v{font-size:27px;color:var(--text-hi)}
+[data-c="rf-fall"] .b2.on .fl__row{animation:rfFallRow 440ms ease-out forwards;animation-delay:var(--d)}
+@keyframes rfFallRow{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-fall"] .fl__cost{margin-top:28px;opacity:0}
+[data-c="rf-fall"] .b2.on .fl__cost{animation:rfFallRow 480ms ease-out .68s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-fall"] .fl__n{opacity:1;transform:none}
+  [data-c="rf-fall"] .fl__lit{opacity:1;transform:none}
+  [data-c="rf-fall"] .fl__bloom{opacity:.46}
+  [data-c="rf-fall"] .fl__row,
+  [data-c="rf-fall"] .fl__cost{opacity:1;transform:none}
+}
+
+/* ---------- rf-rec : The Record ----------
+   Twelve weeks of days, the ones they showed up lighting in the order they
+   happened. The empty squares stay in: this is evidence, not a trophy. */
+[data-c="rf-rec"] .rc{display:flex;flex-direction:column;align-items:center;width:100%}
+
+[data-c="rf-rec"] .rc__grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+  width:184px;margin-bottom:32px}
+[data-c="rf-rec"] .rc__d{position:relative;aspect-ratio:1;border-radius:2px;
+  background:rgba(var(--ink),.07)}
+[data-c="rf-rec"] .rc__f{position:absolute;inset:0;border-radius:2px;display:block;
+  background:rgba(var(--ink),.34);opacity:0;transform:scale(.62)}
+[data-c="rf-rec"] .b2.on .rc__f{animation:rfRecOn 360ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecOn{from{opacity:0;transform:scale(.62)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__f--now{background:var(--accent)}
+[data-c="rf-rec"] .b2.on .rc__f--now{animation:rfRecNow 520ms cubic-bezier(.2,.8,.3,1) forwards;
+  animation-delay:var(--d)}
+@keyframes rfRecNow{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+[data-c="rf-rec"] .rc__cost{opacity:0}
+[data-c="rf-rec"] .b2.on .rc__cost{animation:rfRecUp 520ms ease-out .26s forwards}
+@keyframes rfRecUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+[data-c="rf-rec"] .rc__note{margin-top:11px;font-size:13px;color:var(--text-mid);
+  letter-spacing:-.01em;opacity:0}
+[data-c="rf-rec"] .b2.on .rc__note{animation:rfRecUp 520ms ease-out 1.28s forwards}
+
+@media (prefers-reduced-motion:reduce){
+  [data-c="rf-rec"] .rc__f{opacity:1;transform:none}
+  [data-c="rf-rec"] .rc__cost,
+  [data-c="rf-rec"] .rc__note{opacity:1;transform:none}
+}

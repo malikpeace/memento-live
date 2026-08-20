@@ -3303,16 +3303,25 @@
       // state is flushed BEFORE anything is drawn. The daily page stamps its
       // own witness before it renders too.
       //
-      // Only 'daily' has a renderer today. 'milestone' and 'finale' fall
-      // through to nothing (phases 2 and 3 build them), 'none' is the spent
-      // finale day and shows nothing by design.
+      // 'daily' and 'milestone' have renderers. 'finale' falls through to
+      // nothing (phase 3 builds it), 'none' is the spent finale day and shows
+      // nothing by design.
+      //
+      // ONE REWARD PER COMPLETION (R1/R2): the tiers are a chain, not a list.
+      // A milestone renders OVER the settled day and the daily does NOT also
+      // show; if the milestone declines (nothing honest to draw for that
+      // event) the day still earns its green page, which is R9's promise.
       try {
         var moment = G('rewardMoment');
         var tier = moment ? moment() : null;
         try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
+        var shown = false;
+        if (tier && tier.tier === 'milestone' && tier.event && window.MilestoneReward) {
+          shown = MilestoneReward.show(tier.event);
+        }
         // A rest day is a kept day, not a move: the count did not rise, so
         // there is nothing for the green page to say. The rest line owns it.
-        if (tier && tier.tier === 'daily' && !rec.off && window.DailyReward) {
+        if (!shown && tier && (tier.tier === 'daily' || tier.tier === 'milestone') && !rec.off && window.DailyReward) {
           DailyReward.show({ day: rec.day, starHash: rec.starHash });
         }
       } catch (e) {}
