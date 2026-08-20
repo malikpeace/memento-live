@@ -218,9 +218,26 @@
          they read it the same way now: js/27 goalDays, js/29 goalDayKeys and
          this are the same rule. */
       ctx.count = goalMoveCount(gp);
-      ctx.countTarget = opts.countTarget; /* undefined -> Infinity: shadow never false-finales */
+      /* THE COUNT GOAL'S FINISH LINE (Stage C sim, 2026-08-20). This read
+         opts.countTarget, which no caller has ever passed, so it compared
+         against Infinity and a count goal could NEVER reach its finale: a
+         90-day "train three times a week" run finished its 150 sessions and
+         got nothing. The real number is on the goal itself, written by
+         actionPlanLand from the plan's targets (js/03). R5 sanctions this
+         shape self-firing from the app's own ledger, and the ledger is now
+         per-goal (goalMoveCount above), so it cannot inherit a retired
+         goal's moves. opts still wins when a caller passes one. */
+      ctx.countTarget = (opts.countTarget !== undefined && opts.countTarget !== null)
+        ? opts.countTarget
+        : ((gp && gp.countTarget !== null && gp.countTarget !== undefined) ? gp.countTarget : undefined);
     }
     if (shape === 'duration') {
+      /* DELIBERATELY STILL DARK (Stage C sim, 2026-08-20). The count shape
+         above was wired to its real target; this one was not, because
+         daysHeld reads the bridged streak while R7 defines it as
+         check-in-credited days, days they showed up and said they held it.
+         Wiring a real target to the wrong signal would fire the finale off a
+         streak bridge. The signal gets fixed first, then the target. */
       ctx.daysHeld = (state.streak && state.streak.count) || 0;
       ctx.daysTarget = opts.daysTarget;
     }
