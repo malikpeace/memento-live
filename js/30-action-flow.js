@@ -2283,11 +2283,12 @@
   // starts actionPlanGenerate(), shows the working list for as long as it takes,
   // lands the plan on success, and has TWO honest terminal states instead of a
   // spinner that never ends:
-  //   needsClarity -> the model's one plain question, and the way back to
-  //                   Clarity. Nothing is half-written.
+  //   needsClarity -> the model's own pre-plan refusal (creed rule 14): the
+  //                   apologetic ask screen collects its 1 to 3 questions and
+  //                   generation runs again. Nothing is half-written.
   //   error        -> one plain line naming what actually happened (signed out,
   //                   not paid yet, the network) and a retry.
-  // Both reuse this screen's own type and the standing CTA. No new language.
+  // Both reuse the flow's own type and the standing CTA. No new language.
   // The fixture path (ActionFlow.demo) is untouched: no opts.real, no AI call.
   // ===========================================================================
   var HOLD_MS = 6000;
@@ -2492,11 +2493,18 @@
           return endState(e1.line, e1.sub, 'Try again', retry);
         }
         if (report.needsClarity) {
-          // Rule 13 of the creed, or two plans that failed review. Either way
-          // the answer is one question, not a plan nobody should follow.
-          var q = String(report.question || 'What number do you want to hit, and by when?');
+          // Rule 14 of the creed: the model refused BEFORE writing a plan, so
+          // the missing context is asked for here and generation runs again.
           if (typeof opts.onNeedsClarity === 'function') return opts.onNeedsClarity(report);
-          return endState(q, 'Answer this in Clarity and the plan can be written.', 'Back to Clarity', backToClarity);
+          var qs = (report.questions && report.questions.length)
+            ? report.questions
+            : [String(report.question || 'What number do you want to hit, and by when?')];
+          // ONE ask, ever: the re-run carries forcePlan so the model may not
+          // refuse a second time. A second refusal becomes the error retry,
+          // never another question screen.
+          var reOpts = Object.assign({}, opts);
+          reOpts.generateOptions = Object.assign({}, opts.generateOptions, { forcePlan: true });
+          return openClarityAsk(qs, { onDone: function () { openLoading(key, reOpts); } });
         }
         // SUCCESS. The plan lands BEFORE the screen says it is ready: the
         // receipt writes before the render, always.
@@ -2525,19 +2533,6 @@
       // it: the shell rebuilds and the old one's timers die with it.
       openLoading(key, opts);
     }
-    // The way back into Clarity is Clarity's own door, never a second one:
-    // the summary once the wizard is done, the wizard if it somehow is not.
-    // ClarityExperience is a bare const in js/02, so it is reached by name.
-    function backToClarity() {
-      destroy();
-      try {
-        if (typeof ClarityExperience === 'undefined') return;
-        var st = S();
-        if (st && st.clarity && st.clarity.completed && ClarityExperience.openSummary) ClarityExperience.openSummary();
-        else if (ClarityExperience.open) ClarityExperience.open();
-      } catch (e) {}
-    }
-
     if (opts.promise && typeof opts.promise.then === 'function') {
       opts.promise.then(function () { at(0, land); }, function () { at(0, land); });
     }
@@ -2554,6 +2549,103 @@
       timers.forEach(clearTimeout);
       if (tickT) clearInterval(tickT);
     };
+    return root;
+  }
+
+  // ===========================================================================
+  // 2.3b  THE CLARITY ASK
+  // The model's own pre-plan refusal (creed rule 14): the goal is not
+  // plannable as stated, so the missing context is asked for, 1 to 3 plain
+  // questions on one screen, rapid fire. Their answers land in the refine
+  // store, one entry each, right where every other refine answer lives, and
+  // generation runs again with them. Everything here is the refine screen's
+  // own language: the same question type, the same free-field rows, the
+  // standing CTA. No new css.
+  // ===========================================================================
+  var CLARITY_ASK_HEAD = 'Sorry, we want to help as much as possible, but we\'re missing a bit of needed context.';
+  function appendClarityAnswers(qs, texts) {
+    var st = S();
+    if (!st) return;
+    if (!st.actionRefine || typeof st.actionRefine !== 'object') {
+      st.actionRefine = { bucket: '', variant: '', answers: [] };
+    }
+    if (!Array.isArray(st.actionRefine.answers)) st.actionRefine.answers = [];
+    var base = st.actionRefine.answers.length;
+    qs.forEach(function (q, k) {
+      st.actionRefine.answers.push({
+        id: 'clarity-ask-' + (base + k + 1),
+        question: q,
+        chips: [],
+        chipList: [],
+        text: String(texts[k] || '').trim()
+      });
+    });
+    st.actionRefine.updatedAt = new Date().toISOString();
+    try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+  }
+  function openClarityAsk(questions, opts) {
+    opts = opts || {};
+    var qs = (questions || []).map(function (q) { return String(q || '').trim(); }).filter(Boolean).slice(0, 3);
+    if (!qs.length) qs = ['What number do you want to hit, and by when?'];
+
+    var col = shell('clarity-ask', { label: 'A bit more context' });
+    var wrap = el('div', 'afl-q');
+    col.appendChild(wrap);
+
+    var head = el('div', 'afl-q__q', CLARITY_ASK_HEAD);
+    wrap.appendChild(head);
+
+    // the questions, stacked: each one a label over its own free-field row,
+    // centered in the answer zone the refine steps already own.
+    var body = el('div', 'afl-q__as');
+    wrap.appendChild(body);
+    var fields = qs.map(function (q, k) {
+      var lab = el('p', 'afl-q__unit', q);
+      if (k > 0) lab.style.marginTop = '26px';
+      body.appendChild(lab);
+      var row = el('div', 'afl-q__own');
+      row.appendChild(el('i'));
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.setAttribute('placeholder', 'Your answer');
+      input.setAttribute('aria-label', q);
+      row.appendChild(input);
+      body.appendChild(row);
+      return { row: row, input: input };
+    });
+
+    var nav = navRow();
+    var go = cta('Continue');
+    go.disabled = true;
+    nav.appendChild(go);
+    col.appendChild(nav);
+
+    function sync() {
+      var all = fields.every(function (f) { return f.input.value.trim().length > 0; });
+      fields.forEach(function (f) { f.row.classList.toggle('is-lit', f.input.value.trim().length > 0); });
+      go.disabled = !all;
+      go.classList.toggle('is-live', all);
+    }
+    fields.forEach(function (f, k) {
+      f.input.addEventListener('input', sync);
+      f.input.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        var next = fields[k + 1];
+        if (next) next.input.focus();
+        else { f.input.blur(); if (!go.disabled) go.click(); }
+      });
+    });
+
+    go.addEventListener('click', function () {
+      if (go.disabled) return;
+      var texts = fields.map(function (f) { return f.input.value.trim(); });
+      appendClarityAnswers(qs, texts);
+      if (typeof opts.onDone === 'function') opts.onDone(texts);
+    });
+
+    enterFade(wrap);
+    enterFade(nav);
     return root;
   }
 
@@ -4625,6 +4717,7 @@
     openNote: openNote,
     openRefine: openRefine,
     openLoading: openLoading,
+    openClarityAsk: openClarityAsk,
     openLogic: openLogic,
     openDay: openDay,
     close: destroy,

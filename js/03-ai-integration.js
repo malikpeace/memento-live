@@ -5477,7 +5477,8 @@ HARD RULES (the judge rejects violations):
     rate, plan the safe rate and say plainly that their date moves.
 14. If the transcript shows the goal is not plannable as stated (no
     judgeable target, two goals fused, or genuine crisis language), do
-    NOT force a plan: return needsClarity with one plain question.
+    NOT force a plan: return needsClarity with 1 to 3 plain questions,
+    only the ones a real plan cannot be written without.
 15. THE STAR FIELD is their goal in their own words, copied verbatim
     from the transcript. You never reword it, even when your plan
     honestly renegotiates the number or the date; the honest numbers go
@@ -5556,7 +5557,7 @@ not apply. Values in <> are descriptions, not literals.
 }
 
 If the goal is not plannable as stated, return ONLY:
-{ "needsClarity": true, "question": "<one plain question, 5th grade reading level>" }`;
+{ "needsClarity": true, "questions": ["<1 to 3 plain questions, 5th grade reading level>"] }`;
 
 // The judge, canonical text from ACTION-GENERATION-PROMPT.md, verbatim.
 const ACTION_JUDGE_SYSTEM_PROMPT = `You are the judge. You receive: the plan JSON, the Clarity transcript,
@@ -5603,6 +5604,43 @@ Check, in order, and report every failure with the field path:
    restriction language, sensitive-goal tone.
 Return { verdict: "pass" | "fail", failures: [{path, rule, note}] }.`;
 
+// The fixer, canonical text from ACTION-GENERATION-PROMPT.md, verbatim. It
+// runs at most once per plan, on the plan model, and its output ships.
+const ACTION_FIX_SYSTEM_PROMPT = `You repair one action plan. You receive: the plan JSON, the list of
+review failures, the Clarity transcript, and the refine answers. Your
+output ships to the person, so every failure you can fix, you fix.
+
+WHAT YOU MAY FIX: anything except the facts. Reword a line, lower the
+reading level, remove banned phrasing, align the numbers so arrow,
+targets, eq and reasoning agree, correct a rounding, cut an orphaned
+number or leftover metadata, repair a malformed field.
+
+WHAT YOU MUST NEVER DO:
+1. NEVER invent a fact. No new claims, no new numbers, no new acts.
+   The only time you choose a number is when a flagged inconsistency
+   forces a choice between numbers already in the plan; pick the honest
+   one and carry it into every field that shows it.
+2. THE STAR FIELD IS UNTOUCHABLE. It is their goal in their own words,
+   verbatim. Copy it through exactly as it stands, character for
+   character, even when a failure seems to point at it.
+3. NEVER weaken a safety call. A safe floor, a capped rate, a moved
+   date stays. If a failure asks for a bolder number, the safety line
+   wins, and the fix is explaining it more plainly, never loosening it.
+
+ONE SET OF NUMBERS. arrow, targets, eq and reasoning must agree. When
+two fields disagree, the honest number already in the plan is THE
+number: it lands in every field, and the stale one is gone.
+
+HONEST ROUNDING. "shown" is the true value rounded, never nudged: 6.07
+shows as 6, never 7; 0.44 shows as 0.4, never 0.5. If a rounded number
+would flatter the plan, keep the extra digit instead.
+
+Keep every field the schema names. Change what the failures require,
+and what those changes force you to keep consistent. Nothing else.
+
+OUTPUT: the FULL corrected plan JSON, exactly one object, no prose
+outside JSON, no markdown fences, the raw object only.`;
+
 function actionPlanSystemPrompt(bucket) {
   const table = ACTION_BUCKET_CADENCE[bucket] || ACTION_BUCKET_CADENCE.focus;
   return ACTION_PLAN_CREED_PROMPT
@@ -5646,7 +5684,16 @@ function actionPlanParse(text) {
   const obj = parseModelJson(text);
   if (!obj) return { ok: false, error: 'The plan did not come back as readable JSON.' };
   if (obj.needsClarity === true) {
-    return { ok: false, needsClarity: true, question: String(obj.question || '').trim(), plan: null };
+    // The schema asks for 1 to 3 "questions"; the old single "question"
+    // string is still accepted so an older prompt or cache cannot break this.
+    let qs = Array.isArray(obj.questions)
+      ? obj.questions.map((q) => String(q == null ? '' : q).trim()).filter(Boolean).slice(0, 3)
+      : [];
+    if (!qs.length) {
+      const one = String(obj.question || '').trim();
+      if (one) qs = [one];
+    }
+    return { ok: false, needsClarity: true, questions: qs, question: qs[0] || '', plan: null };
   }
   if (!obj.star || !Array.isArray(obj.acts) || !obj.acts.length) {
     return { ok: false, error: 'The plan came back without a star act.' };
@@ -5778,6 +5825,71 @@ function actionNumbersIn(text) {
     else if (suffix === 'm') n *= 1e6;
     out.push({ value: n, raw: m[0], index: m.index, hadSuffix: !!suffix, hadDollar: !!m[1] });
   }
+  return out;
+}
+
+/* ---- 5b. THE MECHANICAL ROUNDING REPAIR -----------------------------------
+   Free honesty insurance, run before every lint pass, on every plan. Each
+   eq.compute row's true value is recomputed from its expr with the safe
+   evaluator. An approx that disagrees with the true value (past the strict
+   2%) is rewritten to the true value. A shown that fails actionShownAgrees
+   is rewritten to the honest rounding of the true value: integer step when
+   the original shown was an integer, one decimal otherwise, falling to more
+   digits until actionShownAgrees accepts it. A shown that already agrees is
+   an honest rounding by the checker's own law and is left alone (972 shown
+   as 1000 stays 1000). eq.result.value follows a rewritten row it mirrored.
+   Pure: the plan passed in is never mutated. */
+function actionRoundTo(value, decimals) {
+  const f = Math.pow(10, decimals);
+  return Math.round(value * f) / f;
+}
+function actionHonestShown(value, wasInteger) {
+  const steps = wasInteger ? [0, 1, 2, 4] : [1, 2, 4];
+  for (let i = 0; i < steps.length; i++) {
+    const cand = actionRoundTo(value, steps[i]);
+    if (actionShownAgrees(value, cand)) return cand;
+  }
+  return value;
+}
+function actionPlanRoundRepair(plan) {
+  const out = { plan: plan, changed: false, notes: [] };
+  if (!plan || typeof plan !== 'object' || !plan.eq || typeof plan.eq !== 'object') return out;
+  const copy = JSON.parse(JSON.stringify(plan));
+  const eq = copy.eq;
+  const computes = Array.isArray(eq.compute) ? eq.compute : [];
+  const moved = [];                         // the old number -> the honest one
+  computes.forEach((c, i) => {
+    if (!c || c.expr === undefined || c.expr === null) return;
+    let value;
+    try { value = actionSafeEval(c.expr); } catch (err) { return; }   // lint reports a broken expr
+    const exact = actionRoundTo(value, 4);
+    if (c.approx !== undefined && c.approx !== null && !actionNumbersAgree(value, Number(c.approx))) {
+      moved.push({ from: Number(c.approx), to: exact });
+      c.approx = exact;
+      out.changed = true;
+      out.notes.push('eq.compute[' + i + '].approx recomputed to ' + exact);
+    }
+    if (c.shown !== undefined && c.shown !== null && !actionShownAgrees(value, Number(c.shown))) {
+      const honest = actionHonestShown(value, Number.isInteger(Number(c.shown)));
+      moved.push({ from: Number(c.shown), to: honest });
+      c.shown = honest;
+      out.changed = true;
+      out.notes.push('eq.compute[' + i + '].shown rewritten to ' + honest);
+    }
+  });
+  // The result line often mirrors a compute row; when that row moved, it
+  // moves with it, or the two would show two different numbers for one fact.
+  if (out.changed && eq.result && eq.result.value !== undefined && eq.result.value !== null) {
+    const rv = Number(eq.result.value);
+    for (let i = 0; i < moved.length; i++) {
+      if (isFinite(rv) && isFinite(moved[i].from) && actionNumbersAgree(rv, moved[i].from)) {
+        eq.result.value = moved[i].to;
+        out.notes.push('eq.result.value follows the recomputed row: ' + moved[i].to);
+        break;
+      }
+    }
+  }
+  if (out.changed) out.plan = copy;
   return out;
 }
 
@@ -6063,27 +6175,56 @@ async function actionPlanJudge(plan, inputs, meta) {
   };
 }
 
-// The plainest question to ask when two tries failed. Asked of the same cheap
-// model that judged the plan, so the question comes from what it just read.
-async function actionJudgeQuestion(failures) {
-  const fallback = 'What number do you want to hit, and by when?';
-  try {
-    const notes = (failures || []).slice(0, 8).map((f) => '- ' + (f.path ? f.path + ': ' : '') + (f.note || f.rule || '')).join('\n');
-    const out = await callClaude(
-      [{ role: 'user', content: 'A plan for this person failed twice. Here is what was wrong:\n' + notes
-        + '\n\nWrite ONE plain question to ask the person, so a better plan can be written. 5th grade reading level. No dashes. Reply with the question only.' }],
-      'You write one short, plain question. Nothing else.',
-      { model: ACTION_JUDGE_MODEL, maxTokens: 120, paidAction: true, noProfile: true, _voiceRetry: true, thinking: 'off', timeout: 60000 }
-    );
-    const line = String(out || '').replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0].trim();
-    if (line.length >= 8 && line.length <= 160 && !voiceLint(line).length) return line;
-  } catch (e) {}
-  return fallback;
+/* ---- 8b. THE FIXER PASS ---------------------------------------------------
+   One call, on the plan model (it rewrites customer-facing prose), with the
+   combined judge + lint failure list. It returns the full corrected plan or
+   null when its reply cannot be read as a plan. The proxy carries no
+   temperature knob, so none is sent. */
+async function actionPlanFix(plan, failures, inputs, meta) {
+  const notes = (failures || []).map((f) => '- ' + (f.path ? f.path + ': ' : '') + (f.note || f.rule || '')).join('\n');
+  const block = [
+    '=== THE PLAN JSON ===',
+    JSON.stringify(plan),
+    '',
+    '=== THE REVIEW FAILURES ===',
+    notes || '(none listed)',
+    '',
+    '=== THE CLARITY TRANSCRIPT ===',
+    inputs.transcript.text || '(none)',
+    '',
+    '=== THE REFINE ANSWERS ===',
+    inputs.refine.text || '(none)',
+    '',
+    'Return the full corrected plan JSON only.'
+  ].join('\n');
+  const echo = meta || {};
+  const out = await callClaude(
+    [{ role: 'user', content: block }],
+    ACTION_FIX_SYSTEM_PROMPT,
+    {
+      model: ACTION_PLAN_MODEL,
+      maxTokens: ACTION_PLAN_MAX_TOKENS,
+      paidAction: true,
+      noProfile: true,
+      _voiceRetry: true,
+      _meta: echo,
+      thinking: 'off',
+      timeout: 240000
+    }
+  );
+  const obj = parseModelJson(out);
+  if (!obj || !obj.star || !Array.isArray(obj.acts) || !obj.acts.length) return null;
+  return obj;
 }
 
 /* ---- 9. THE GENERATION CALL ----------------------------------------------
-   ONE Opus call, then the judge, then at most ONE regeneration carrying the
-   exact failures. A second failure asks the person one question instead. */
+   ONE Opus call, then the judge and the client lint. A plan that fails
+   review is REPAIRED, never regenerated: the mechanical rounding repair
+   runs first (it runs on every plan), then at most ONE fixer call carrying
+   the exact failures, then the mechanical repair once more if the fixed
+   plan still shows a math lint failure. The customer always gets a plan.
+   The only ask left is the model's own pre-plan refusal (creed rule 14),
+   which carries 1 to 3 questions. */
 const ACTION_PLAN_MODEL = 'claude-opus-5';
 const ACTION_PLAN_MAX_TOKENS = 6000;
 
@@ -6093,15 +6234,32 @@ async function actionPlanGenerate(options) {
   const inputs = opts.inputs || actionBrainInputs();
   const report = {
     ok: false, plan: null, inputs: inputs, attempts: [],
-    needsClarity: false, question: '', ms: 0, model: '', judgeModel: ''
+    needsClarity: false, question: '', questions: [],
+    fixed: false, fixerFailures: [], finalClientFailures: [],
+    ms: 0, model: '', judgeModel: '', fixerModel: ''
   };
   if (!inputs.star) {
     report.error = 'Memento needs a Neutron Star before it can build a plan.';
     return report;
   }
   const sys = actionPlanSystemPrompt(inputs.bucket);
-  const messages = [{ role: 'user', content: actionPlanUserBlock(inputs) }];
+  // ONE ask, ever (Malik's law): after the clarity-ask screen has run once,
+  // the caller sets forcePlan and the model may not refuse again; whatever is
+  // still unknown becomes a named estimate.
+  let userBlock = actionPlanUserBlock(inputs);
+  if (options && options.forcePlan) {
+    userBlock += '\n\n=== FINAL INSTRUCTION ===\nThe person has already answered '
+      + 'the extra questions above. Returning needsClarity is no longer an option. '
+      + 'Write the plan from what exists; anything still unknown becomes an '
+      + 'estimate named as an estimate in eq.rows.';
+  }
+  const messages = [{ role: 'user', content: userBlock }];
 
+  // ONE plan call. A reply that cannot be read as JSON gets ONE re-ask (a
+  // transport repair, not a review regeneration), then it is an error the
+  // loading screen shows with a retry. Review failures never regenerate.
+  let plan = null;
+  let planRow = null;
   for (let attempt = 0; attempt < 2; attempt++) {
     const echo = {};
     const attemptRow = { attempt: attempt + 1, ms: 0, model: '', raw: '', clientFailures: [], judge: null };
@@ -6135,12 +6293,26 @@ async function actionPlanGenerate(options) {
     report.model = echo.model || report.model;
 
     const parsed = actionPlanParse(raw);
+    if (parsed.needsClarity && options && options.forcePlan) {
+      // The ask already happened once. A second refusal is treated as an
+      // unreadable reply: one transport re-ask, then the error retry. The
+      // customer never sees a second question screen.
+      attemptRow.needsClarity = true;
+      report.attempts.push(attemptRow);
+      report.error = 'Memento could not finish the plan. Try again in a moment.';
+      continue;
+    }
     if (parsed.needsClarity) {
+      // Rule 14: the model's own pre-plan refusal, the ONE ask left in the
+      // pipeline. It carries 1 to 3 questions for the apologetic screen.
       attemptRow.needsClarity = true;
       report.attempts.push(attemptRow);
       report.needsClarity = true;
-      report.reason = 'not-plannable';   // rule 13: the goal itself needs one answer
-      report.question = parsed.question || 'What number do you want to hit, and by when?';
+      report.reason = 'not-plannable';
+      report.questions = (parsed.questions && parsed.questions.length)
+        ? parsed.questions
+        : ['What number do you want to hit, and by when?'];
+      report.question = report.questions[0];
       report.ms = Date.now() - started;
       return report;
     }
@@ -6148,51 +6320,96 @@ async function actionPlanGenerate(options) {
       attemptRow.error = parsed.error;
       attemptRow.clientFailures = [{ path: '', rule: 'schema', note: parsed.error }];
       report.attempts.push(attemptRow);
-      if (attempt === 1) break;
+      if (attempt === 1) {
+        report.error = parsed.error;
+        report.ms = Date.now() - started;
+        return report;
+      }
       messages.push({ role: 'assistant', content: raw });
       messages.push({ role: 'user', content: parsed.error + ' Return the raw JSON object only, with every field the schema names. Fix exactly this, change nothing else.' });
       continue;
     }
-
-    const plan = parsed.plan;
-    const client = actionPlanClientCheck(plan, inputs);
-    attemptRow.clientFailures = client.failures;
-
-    let judge = { verdict: 'pass', failures: [], model: '(skipped)' };
-    if (!opts.skipJudge) {
-      const judgeEcho = {};
-      try {
-        judge = await actionPlanJudge(plan, inputs, judgeEcho);
-      } catch (err) {
-        judge = { verdict: 'fail', failures: [{ path: '', rule: 'judge', note: 'The judge could not be reached: ' + (err && err.message ? err.message : String(err)) }], model: '' };
-      }
-      report.judgeModel = judge.model || report.judgeModel;
-    }
-    attemptRow.judge = judge;
-    report.attempts.push(attemptRow);
-
-    const allFailures = [].concat(judge.failures || [], client.failures);
-    if (judge.verdict === 'pass' && client.ok) {
-      report.ok = true;
-      report.plan = plan;
-      report.ms = Date.now() - started;
-      return report;
-    }
-    if (attempt === 1) {
-      report.failures = allFailures;
-      break;
-    }
-    const notes = allFailures.map((f) => '- ' + (f.path ? f.path + ': ' : '') + (f.note || f.rule || '')).join('\n');
-    messages.push({ role: 'assistant', content: raw });
-    messages.push({ role: 'user', content: 'The plan failed review. Fix exactly these, change nothing else:\n' + notes + '\n\nReturn the whole corrected JSON object only.' });
+    plan = parsed.plan;
+    planRow = attemptRow;
+    report.error = '';
+    break;
+  }
+  if (!plan) {
+    // Both tries refused or broke under forcePlan; the loading screen's
+    // retry owns it from here. report.error is already set.
+    report.ms = Date.now() - started;
+    return report;
   }
 
-  const last = report.attempts[report.attempts.length - 1] || {};
-  const failures = report.failures || [].concat((last.judge && last.judge.failures) || [], last.clientFailures || []);
-  report.needsClarity = true;
-  report.reason = 'failed-twice';        // two plans failed review, so ask instead
-  report.failures = failures;
-  report.question = await actionJudgeQuestion(failures);
+  // Free honesty insurance: the mechanical rounding repair runs on every
+  // plan, before the first lint, so a shown that drifted from its own expr
+  // is corrected without a model in the loop.
+  const repaired = actionPlanRoundRepair(plan);
+  plan = repaired.plan;
+  if (repaired.changed) report.roundRepair = repaired.notes;
+
+  const client = actionPlanClientCheck(plan, inputs);
+  planRow.clientFailures = client.failures;
+
+  let judge = { verdict: 'pass', failures: [], model: '(skipped)' };
+  if (!opts.skipJudge) {
+    const judgeEcho = {};
+    try {
+      judge = await actionPlanJudge(plan, inputs, judgeEcho);
+    } catch (err) {
+      judge = { verdict: 'fail', failures: [{ path: '', rule: 'judge', note: 'The judge could not be reached: ' + (err && err.message ? err.message : String(err)) }], model: '' };
+    }
+    report.judgeModel = judge.model || report.judgeModel;
+  }
+  planRow.judge = judge;
+  report.attempts.push(planRow);
+
+  const allFailures = [].concat(judge.failures || [], client.failures);
+  if (judge.verdict === 'pass' && client.ok) {
+    report.ok = true;
+    report.plan = plan;
+    report.ms = Date.now() - started;
+    return report;
+  }
+
+  // THE FIXER (one call, never a loop). It repairs wording and aligns
+  // numbers; it never invents. The plan ships after this no matter what:
+  // a fixer that cannot be reached or read ships the repaired original.
+  report.failures = allFailures;
+  let shipped = plan;
+  try {
+    const fixEcho = {};
+    const fixedPlan = await actionPlanFix(plan, allFailures, inputs, fixEcho);
+    report.fixerModel = fixEcho.model || '';
+    if (fixedPlan) {
+      fixedPlan.star = plan.star;   // the star is untouchable, enforced here too
+      report.fixed = true;
+      const lint2 = actionPlanClientCheck(fixedPlan, inputs);
+      report.fixerFailures = lint2.failures;   // what remained before the recompute
+      let finalPlan = fixedPlan;
+      let finalLint = lint2;
+      if (lint2.failures.some((f) => f.rule === 'math')) {
+        // The one exception to "ship as fixed": a shown the fixer left
+        // beyond actionShownAgrees is recomputed mechanically and ships
+        // with the recomputed values.
+        const again = actionPlanRoundRepair(fixedPlan);
+        finalPlan = again.plan;
+        finalLint = actionPlanClientCheck(finalPlan, inputs);
+      }
+      shipped = finalPlan;
+      report.finalClientFailures = finalLint.failures;
+    } else {
+      report.fixerError = 'The fixer reply could not be read.';
+      report.fixerFailures = allFailures;
+      report.finalClientFailures = client.failures;
+    }
+  } catch (err) {
+    report.fixerError = err && err.message ? err.message : String(err);
+    report.fixerFailures = allFailures;
+    report.finalClientFailures = client.failures;
+  }
+  report.ok = true;
+  report.plan = shipped;
   report.ms = Date.now() - started;
   return report;
 }
@@ -6298,15 +6515,17 @@ function actionPlanCurrent() {
 }
 
 /* ---- 11. NEEDS CLARITY ----------------------------------------------------
-   One plain question, nothing else. Surfaces render this; the brain does no
-   UI work. */
+   The model's own pre-plan refusal (creed rule 14), the ONE ask left: 1 to 3
+   plain questions. Surfaces render this; the brain does no UI work. */
 function actionPlanNeedsClarity(report) {
+  const qs = (report && Array.isArray(report.questions) && report.questions.length)
+    ? report.questions.slice(0, 3)
+    : [(report && report.question) || 'What number do you want to hit, and by when?'];
   return {
     needsClarity: true,
-    // 'not-plannable' = the goal needs one answer before any plan is real.
-    // 'failed-twice'  = two plans failed review, so ask rather than ship one.
     reason: (report && report.reason) || 'not-plannable',
-    question: (report && report.question) || 'What number do you want to hit, and by when?',
+    questions: qs,
+    question: qs[0],
     ms: (report && report.ms) || 0
   };
 }
@@ -6320,6 +6539,7 @@ try {
   window.actionPlanClientCheck = actionPlanClientCheck;
   window.actionPlanCurrent = actionPlanCurrent;
   window.actionSafeEval = actionSafeEval;
+  window.actionPlanRoundRepair = actionPlanRoundRepair;
   window.actionPlanNeedsClarity = actionPlanNeedsClarity;
 } catch (e) {}
 
@@ -6439,7 +6659,7 @@ window.actionBrainSelfTest = function () {
 /* ---- 13. THE LIVE RUN (dev harness, needs a signed-in paid session) -------
    actionBrainLiveRun() drives the WHOLE pipeline against two built-in
    personas: generate on Opus, judge on the cheap model, the client re-check,
-   and the regeneration path if either fails. It builds its inputs literally,
+   and the fixer pass if either fails. It builds its inputs literally,
    so it reads and writes NOTHING in state: running it cannot touch a real
    goal. Console only.
      actionBrainLiveRun()            both personas
@@ -6551,7 +6771,9 @@ window.actionBrainLiveRun = async function (which) {
       persona: key,
       ok: report.ok,
       needsClarity: report.needsClarity,
-      question: report.question,
+      questions: report.questions,
+      fixed: report.fixed,
+      fixerFailures: (report.fixerFailures || []).length,
       error: report.error,
       seconds: (ms / 1000).toFixed(1),
       planModelEchoed: (report.attempts[0] || {}).model || '',

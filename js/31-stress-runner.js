@@ -1,7 +1,8 @@
 /* DEV-ONLY 30-PERSONA PLAN STRESS RUNNER.
    Drives the REAL Action brain (actionPlanGenerate: Opus generate, judge,
-   client re-check, one regeneration) against thirty authored people, one at
-   a time, and reports what came back.
+   client re-check, one fixer pass when review fails) against thirty authored
+   people, one at a time, and reports what came back. A persona now always
+   yields a plan unless the model itself refuses pre-plan (needsClarity).
 
    It reads and writes NOTHING in state. Inputs are built literally, exactly
    the way actionBrainLiveRun builds them, so a run can never touch a real
@@ -33,7 +34,7 @@
      bucket, a full Clarity transcript, and refine answers written against
      REFINE-QUESTIONS.md v3 for that bucket (multi-select chips where the
      spec marks [MULTI], free text only where it marks [+ free]).
-     expect.needsClarity  the plan SHOULD refuse and ask one question
+     expect.needsClarity  the plan SHOULD refuse pre-plan and ask questions
      expect.tension       the judge is expected to have something to argue
      ====================================================================== */
 
@@ -1262,6 +1263,9 @@
         id: r.id,
         bucket: r.bucket,
         ok: r.ok,
+        shipped: r.shipped,
+        fixed: r.fixed,
+        mathLeft: r.mathLeft,
         needsClarity: r.needsClarity,
         expectedClarity: !!(r.expect && r.expect.needsClarity),
         attempts: r.attempts,
@@ -1292,6 +1296,10 @@
 
   function recordFor(p, report, seconds) {
     var last = (report.attempts && report.attempts[report.attempts.length - 1]) || {};
+    // ok = a plan shipped AND no math lint failure remains on it. A shipped
+    // plan with leftover math is still recorded in full (shipped: true), it
+    // just does not count as clean.
+    var mathLeft = (report.finalClientFailures || []).some(function (f) { return f.rule === 'math'; });
     return {
       id: p.id,
       bucket: p.bucket,
@@ -1301,10 +1309,20 @@
       expect: p.expect,
       star: p.star,
       routedBucket: (report.inputs && report.inputs.routed && report.inputs.routed.bucket) || '',
-      ok: !!report.ok,
+      ok: !!report.ok && !mathLeft,
+      shipped: !!report.ok,
+      mathLeft: mathLeft,
+      fixed: !!report.fixed,
+      fixerFailures: report.fixerFailures || [],
+      fixerError: report.fixerError || '',
+      fixerModel: report.fixerModel || '',
+      finalClientFailures: report.finalClientFailures || [],
       needsClarity: !!report.needsClarity,
       reason: report.reason || '',
       question: report.question || '',
+      questions: (report.questions && report.questions.length)
+        ? report.questions
+        : (report.question ? [report.question] : []),
       error: report.error || '',
       seconds: seconds,
       attempts: (report.attempts || []).length,
@@ -1450,7 +1468,7 @@
       var note = document.createElement('div');
       note.style.cssText = 'margin-bottom:12px;color:#b9bec9;';
       note.textContent = 'This runs the real Action brain against ' + PERSONAS.length + ' people, one at a time.\n'
-        + 'Each one is an Opus plan call plus a judge pass, and up to one regeneration.\n'
+        + 'Each one is an Opus plan call plus a judge pass, and up to one Opus fixer call.\n'
         + 'So roughly ' + PERSONAS.length + ' to ' + (PERSONAS.length * 2) + ' Opus calls and ' + PERSONAS.length + ' judge calls.\n'
         + 'Budget 60 to 90 minutes and real money. It costs whether you watch or not.\n'
         + 'It never touches your goal: nothing lands, nothing is saved to your plan.\n'
@@ -1463,13 +1481,14 @@
 
     var pass = run.results.filter(function (r) { return r.ok; }).length;
     var clarity = run.results.filter(function (r) { return r.needsClarity; }).length;
+    var fixedN = run.results.filter(function (r) { return r.fixed; }).length;
     var fail = run.results.length - pass - clarity;
 
     var line = document.createElement('div');
     line.style.cssText = 'font:13px/1.6 ui-monospace,Menlo,monospace;color:#e8eaef;margin-bottom:8px;';
     line.textContent = run.runId + '\n'
       + run.results.length + ' of ' + PERSONAS.length + ' done   ' + fmtElapsed(liveElapsed(run)) + ' elapsed\n'
-      + 'plan ' + pass + '   asked instead ' + clarity + '   failed ' + fail + '\n'
+      + 'clean ' + pass + ' (' + fixedN + ' fixed)   asked ' + clarity + '   math left ' + fail + '\n'
       + (run.done ? 'RUN COMPLETE' : (run.paused ? 'PAUSED' : (running ? statusLine : 'stopped')));
     bar.appendChild(line);
 
@@ -1496,16 +1515,19 @@
     var tickEl = document.createElement('div');
     sheetEl.appendChild(tickEl);
     var rows = run.results.map(function (r, i) {
-      var mark = r.ok ? 'PLAN' : (r.needsClarity ? 'ASK ' : 'FAIL');
+      var mark = r.ok ? 'PLAN' : (r.needsClarity ? 'ASK ' : 'MATH');
       var flag = '';
       if (r.expect && r.expect.needsClarity && !r.needsClarity) flag = '   <- expected an ask';
       if (r.expect && !r.expect.needsClarity && r.needsClarity) flag = '   <- did not expect an ask';
+      var asks = (r.questions && r.questions.length) ? r.questions : (r.question ? [r.question] : []);
       return String(i + 1).padStart(2, ' ') + '  ' + mark + '  ' + r.id
         + '  ' + r.seconds + 's  ' + r.attempts + ' att'
+        + (r.fixed ? '  fixed' : '')
         + (r.judgeFailures && r.judgeFailures.length ? '  judge:' + r.judgeFailures.length : '')
         + (r.clientFailures && r.clientFailures.length ? '  client:' + r.clientFailures.length : '')
+        + (r.fixerFailures && r.fixerFailures.length ? '  left:' + r.fixerFailures.length : '')
         + flag
-        + (r.needsClarity && r.question ? '\n      asks: ' + r.question : '');
+        + (r.needsClarity && asks.length ? '\n      asks: ' + asks.join(' | ') : '');
     });
     tickEl.textContent = rows.join('\n');
   }
