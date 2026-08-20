@@ -1927,7 +1927,7 @@ const CreatorTools = {
     // Malik can run it from the phone with no console.
     // Push diagnostics: show every eligibility gate + force the ask card.
     bind('creatorPushStatus', async () => {
-      const out = {};
+      const out = { build: String(window.MEMENTO_JS_BUILD || '?') };
       try {
         out.permission = ('Notification' in window) ? Notification.permission : 'unsupported';
         out.standalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
