@@ -1973,6 +1973,13 @@ const CreatorTools = {
       sheet.appendChild(pre);
       document.body.appendChild(sheet);
     });
+    // The 30-persona stress run (js/31). Opens its own sheet with the cost
+    // gate; nothing starts until Malik taps start in there.
+    bind('creatorStressRun', () => {
+      if (!window.StressRun) { this._devToast('stress runner not loaded'); return; }
+      try { this._closeAll(); } catch (e) {}
+      window.StressRun.open();
+    });
     bind('creatorJump7Days', () => this.jump7Days());
     bind('creatorJumpPaywall', () => this.jumpPaywall());
     // The post-payment unlock ceremony (unlock.html in an iframe). dev:true =

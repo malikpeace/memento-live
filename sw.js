@@ -39,7 +39,7 @@ const PRECACHE = [
   './js/26-reward-referee.js', './js/27-rewards-daily.js', './css/rewards-daily.css',
   './js/28-rewards-milestones.js', './css/rewards-milestones.css',
   './js/29-rewards-finale.js', './css/rewards-finale.css',
-  './js/30-action-flow.js', './js/15-router.js',
+  './js/30-action-flow.js', './js/31-stress-runner.js', './js/15-router.js',
   './fonts/fonts.css', './fonts/geist-400.otf', './fonts/geist-500.otf', './fonts/geist-700.otf',
   './fonts/dmsans-0.woff2', './fonts/dmsans-1.woff2',
   './fonts/fraunces-2.woff2', './fonts/fraunces-3.woff2', './fonts/fraunces-4.woff2',
