@@ -1001,9 +1001,15 @@ function initNeutronStarStarView(scope) {
   if (scope.querySelector('#nsStarDetail')) setTimeout(zoomIn, 350);
 
   // v600: quiet dots menu on the minimal summary (Refine / Share / What's this).
+  // v1227 (Malik: the "..." does nothing): the summary mounts through several
+  // paths (openSummary, the ignition-done reveals, the wizard synthesis step)
+  // and more than one can run init on the SAME rendered scene. Each run added
+  // another click listener, so a tap toggled the sheet open then shut in the
+  // same gesture and nothing showed. Bind once per button node and never again.
   const menuBtn = scope.querySelector('#nsMenuBtn');
   const menuSheet = scope.querySelector('#nsMenuSheet');
-  if (menuBtn && menuSheet) {
+  if (menuBtn && menuSheet && !menuBtn.dataset.nsMenuBound) {
+    menuBtn.dataset.nsMenuBound = '1';
     menuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const open = menuSheet.classList.toggle('is-open');

@@ -5449,6 +5449,12 @@ function bindCommandCenter(cc) {
           const u = src;
           u.classList.add('cc-under');
           u.setAttribute('aria-hidden', 'true');
+          // v1227 (Malik: two rows of page dots on the home box). The one
+          // indicator is the deck dots hoisted below the box; an under-card
+          // authors its own dots inside the card, so leaving them here stacked
+          // a second dot row above the real one mid-swipe. Strip them: the
+          // under-card is preview only, the deck dots below are the truth.
+          u.querySelectorAll('.cc-dots').forEach((n) => n.remove());
           u.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
           u.querySelectorAll('input, button, a, [tabindex]').forEach((n) => n.setAttribute('tabindex', '-1'));
           // Geometry: sit exactly where the card sits, one layer down. Height
@@ -9165,12 +9171,15 @@ function applyCardSkin(wrap) {
   if (!sk) {
     if (wrap.dataset.skin) {
       delete wrap.dataset.skin;
-      delete wrap.dataset.skinRing;
       delete wrap.dataset.skinMark;
       wrap.classList.remove('sk-flat', 'sk-void', 'sk-glass');
       _SKIN_VARS.forEach(v => wrap.style.removeProperty(v));
       try { setLivingCardVars(wrap); } catch (e) {}
     }
+    // v1227 (Malik: the ring is missing on the house Memento). The house card
+    // carries the ring choice too, so the Memento view's ring honours White vs
+    // Matched even with no material (Matched falls back to the app accent).
+    wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
     return;
   }
   const S = wrap.style;

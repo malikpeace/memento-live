@@ -5187,6 +5187,47 @@ html.theme-light #deskMission .dkm__inv .cc-dayline b { background: rgba(245, 24
 /* the view shows the NAME; the goal engraving stays a home-card thing */
 #mementoFull .daycard-ns__goal { display: none; }
 
+/* ── LEGIBILITY GUARANTEE (v1227, Malik: some skins hide the view's controls) ─
+   The record's words already read in fixed near-white over a force-dark room,
+   so a DARK material (void) keeps them legible. But a material paints the room
+   its own colour: a near-black one (void) leaves the controls a faint 5% lift
+   on black, and a near-white one (porcelain) washes the room grey and the light
+   controls vanish into it. The foreground gets a contrast net that holds in
+   BOTH directions and touches only the controls, never the material: a light
+   inset edge lifts them off a dark room, a soft dark drop shadow gives them an
+   edge on a light one. No hard borders (Malik's law); the material is untouched. */
+#mementoFull .in-door,
+#mementoFull .in-seal,
+#mementoFull .tsc,
+#mementoFull .lst,
+#mementoFull .seal-hold,
+#mementoFull .seal-write textarea,
+#mementoFull .mf-note {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 2px 14px rgba(0, 0, 0, 0.40) !important;
+}
+/* The close chip owns its corner and must read on any room: dark glass, so a
+   near-white icon always contrasts whether the material left the room black or
+   washed it pale. */
+#mementoFull .in-back {
+  background: rgba(18, 20, 26, 0.52) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  color: rgba(245, 246, 250, 0.97) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 2px 12px rgba(0, 0, 0, 0.45) !important;
+}
+/* Void's card is pure black, so its engraved name (the material's dark ink)
+   fell into the face. While the record is open it reads in a light ink instead.
+   Scoped to body.mf-open #dayCard: the card stays on the home (v1139), it is
+   never inside #mementoFull. */
+body.mf-open #dayCard .daycard-wrap.sk-void .daycard-ns__name {
+  color: rgba(232, 236, 244, 0.66) !important;
+  text-shadow: 0 1px 1.4px rgba(0, 0, 0, 0.6) !important;
+}
+
 .mf-name {
   margin: 20px 0 6px; text-align: center;
   font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em;

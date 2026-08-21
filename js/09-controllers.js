@@ -4829,20 +4829,9 @@ const TabBar = {
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
         toggleRow('prefCompact', 'Compact density', 'Tightens spacing and type so more fits on screen.', compact) +
-        // Corner radius: three named options, no slider (Malik v797). Values
-        // land on the same prefs.uiRadius scale the old slider drove.
-        (function () {
-          const opts = [['Sharp', 0.6], ['Balanced', 1], ['Round', 1.3]];
-          const cur = opts.reduce((a, b) => Math.abs(b[1] - uiRadius) < Math.abs(a[1] - uiRadius) ? b : a);
-          return '<div class="pref-row">' +
-            '<div class="pref-row__text"><div class="pref-row__title">Corner radius</div></div>' +
-            '<div class="you-seg" id="prefRadiusSeg" role="radiogroup" aria-label="Corner radius">' +
-              opts.map(o =>
-                '<button type="button" data-radius="' + o[1] + '" role="radio" aria-checked="' + (o === cur) + '"' +
-                (o === cur ? ' class="is-on"' : '') + '>' + o[0] + '</button>').join('') +
-            '</div>' +
-          '</div>';
-        })() +
+        // (Corner radius control removed v1227, Malik: the ability to change it
+        // is gone from the UI; the uiRadius pref + --rx application in js/01 stay
+        // so anyone who already set a radius keeps it.)
         // (Card shape removed v1153, Malik: the tall card is universal until
         // further notice; js/01 forces tall even on accounts that had square.)
       '</div>' +
@@ -5047,20 +5036,10 @@ const TabBar = {
       });
       el.addEventListener('change', () => persistNow());
     };
-    wireSlider('prefUiRadius', 'uiRadius', 1);
     wireSlider('prefUiGlass', 'uiGlass', 0);
     wireSlider('prefUiBlur', 'uiBlur', 1);
-    // v797: corner radius is three named options now, same uiRadius scale.
-    const radiusSeg = document.getElementById('prefRadiusSeg');
-    if (radiusSeg) radiusSeg.querySelectorAll('[data-radius]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const v = parseFloat(btn.getAttribute('data-radius'));
-        state.prefs.uiRadius = isFinite(v) ? v : 1;
-        persistNow();
-        applyPrefs();
-        this.refreshPrefsSection();
-      });
-    });
+    // (Corner radius control removed v1227, Malik: nothing to wire now; the
+    // uiRadius pref itself is untouched so stored radii still apply.)
     // (card shape control removed v1153; the tall card is universal)
     const feelReset = document.getElementById('prefFeelReset');
     if (feelReset) feelReset.addEventListener('click', () => {
