@@ -108,16 +108,28 @@
   }
 
   /* ---------- page one ---------- */
+  // record milestones: days shown up. A forward pull that stays in Consistency's
+  // lane (about the record growing, never the goal distance).
+  var MILES = [7, 14, 30, 50, 75, 100, 150, 200, 250, 365, 500, 750, 1000];
+  function nextMile(t) { for (var i = 0; i < MILES.length; i++) if (MILES[i] > t) return MILES[i]; return Math.ceil((t + 1) / 500) * 500; }
+  function mileLabel(m) { return m === 7 ? 'your first week' : m === 14 ? 'two weeks' : m === 30 ? 'a month' : m === 365 ? 'a year' : m.toLocaleString() + ' days'; }
+  // what the page reveals as the record grows, so day one is never an empty dashboard
+  var REVEAL = { support: 7, score: 14 };
   function pageOne(s, log) {
     var n = s.total;
     var size = n < 100 ? 132 : n < 1000 ? 112 : 92;
     var word = PERSONA.sub;
+    if (n === 1) word = word.replace(/^actions\b/, 'action');
     var counted = log[log.length - 1].on;
+    var begin = s.N === 1 ? '<div class="one__begin">Day one. This is where the count starts.</div>' : '';
+    var nm = nextMile(n), gap = nm - n;
+    var mile = (gap > 0) ? '<div class="one__mile"><b>' + gap.toLocaleString() + '</b> more to ' + mileLabel(nm) + '</div>' : '';
     return '<div><div class="one__crown' + (counted ? ' lit' : '') + '">' + mMark('', 22) + '</div>' +
       '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
-      (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div></div>' +
+      (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div>' +
+      begin + mile + '</div>' +
       '<div class="one__hint"><svg width="16" height="9" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l6 6 6-6"/></svg></div>';
   }
 
@@ -362,12 +374,15 @@
   }
   function hardDays(s, log) {
     var lines = [];
-    if (s.comebacks > 0) lines.push('You have come back <b>' + plural(s.comebacks, 'time') +
-      '</b>. Every gap in this record ended the same way: you returned.');
-    if (s.best >= 3) lines.push('Your longest run is <b>' + plural(s.best, 'day') +
-      '</b>. Nobody did that for you. That capacity does not expire.');
-    if (s.hours > 0) lines.push('<b>' + s.hours + ' hours</b> of your life are already inside this goal. ' +
-      'Every day you show up, that number grows. It never shrinks.');
+    // a young record has no comeback story yet; lead with the foundation truth
+    if (s.N >= 14) {
+      if (s.comebacks > 0) lines.push('You have come back <b>' + plural(s.comebacks, 'time') +
+        '</b>. Every gap in this record ended the same way: you returned.');
+      if (s.best >= 3) lines.push('Your longest run is <b>' + plural(s.best, 'day') +
+        '</b>. Nobody did that for you. That capacity does not expire.');
+      if (s.hours > 0) lines.push('<b>' + plural(s.hours, 'hour') + '</b> of your life are already inside this goal. ' +
+        'Every day you show up, that number grows. It never shrinks.');
+    }
     if (!lines.length) lines.push('The record is young. Everything you add now is the ' +
       'foundation you will stand on during a harder week.');
     return '<div class="sec"><div class="sec__h"><b>For the hard days</b></div>' +
@@ -388,10 +403,12 @@
     // score is full width; below it a two-column layout that works with glass
     // (CSS multicol drops backdrop-filter panels, so we place columns ourselves).
     // Mobile stacks in reading order: calendar, pill, record, by month, hard days.
-    return scoreBlock(s, log, A) +
+    var scorePart = (s.N >= REVEAL.score) ? scoreBlock(s, log, A) : '';
+    var side = pill + ((s.N >= REVEAL.support) ? support(s) : '') + hardDays(s, log);
+    return scorePart +
       '<div class="evwrap">' +
         '<div class="evcol evcol--main">' + cal + '</div>' +
-        '<div class="evcol evcol--side">' + pill + support(s) + hardDays(s, log) + '</div>' +
+        '<div class="evcol evcol--side">' + side + '</div>' +
       '</div>';
   }
 
