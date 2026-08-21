@@ -11172,12 +11172,12 @@ const ClarityNoteWriter = {
       if (t.state === 'setting') {
         var opts = [1, 2, 3, 5, 10, 15, 20, 25, 30, 45, 60];
         html += '<div class="cn-tmrdrop">' +
-          '<div class="cn-tmrval">' + t.mins + '</div><div class="cn-tmrunit">MINUTES</div>' +
           '<div class="cn-tmrpick" data-tmr="pickwrap"><div class="cn-tmrpick__row">' +
             '<span class="cn-tmrpick__pad"></span>' +
             opts.map(function (m) { return '<button type="button" class="cn-tmrpick__v' + (m === t.mins ? ' sel' : '') + '" data-min="' + m + '" data-tmr="pick">' + m + '</button>'; }).join('') +
             '<span class="cn-tmrpick__pad"></span>' +
           '</div></div>' +
+          '<div class="cn-tmrcap">minutes</div>' +
           '<button type="button" class="cn-tmrgo" data-tmr="start">Start</button>' +
           '<button type="button" class="cn-tmroff" data-tmr="off">No timer</button>' +
           '</div>';
