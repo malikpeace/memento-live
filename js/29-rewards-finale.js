@@ -631,8 +631,8 @@
     next.className = 'gfw-next';
     next.innerHTML =
       M_SVG('gfw-next__m') +
-      '<h2 class="gfw-next__h">That one is done.</h2>' +
-      '<p class="gfw-next__p">It stays in your Memento. When you are ready, pick the next thing you want.</p>' +
+      '<h2 class="gfw-next__h">Neutron Star Completed</h2>' +
+      '<p class="gfw-next__p">Logged in your Memento. When you’re ready, make the next one and we can keep going.</p>' +
       '<button type="button" class="cn-cta" data-gf-new>Name the next goal</button>' +
       '<button type="button" class="cn-skip" data-gf-later>Not yet</button>';
     root.appendChild(next);

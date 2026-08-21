@@ -10,15 +10,46 @@
    stale cached mix (the SW's offline fallback on a bad connection). ONE
    forced reload repairs it; the sessionStorage flag prevents a loop when
    the network genuinely can't deliver the new files yet. */
+/* v1226 (Malik's phone, 2026-08-21, and it must never reach a customer): a
+   plain reload was not enough. The reload goes back through the same service
+   worker, which hands back the same stale file, so the second boot is just as
+   broken as the first and the flag has already been spent. The person is then
+   staring at a dead screen with a Repair button they should never have been
+   shown. So the repair now does what that button does, without them: drop the
+   caches, stand the worker down, and only then reload. Two attempts, then it
+   stops and lets the panel speak, because a third would be a loop. */
+function _mementoHardRepair(reason) {
+  var done = function () {
+    try { location.reload(); } catch (e) {}
+  };
+  try {
+    var jobs = [];
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function (rs) {
+        return Promise.all(rs.map(function (r) { return r.unregister(); }));
+      }).catch(function () {}));
+    }
+    if (window.caches && caches.keys) {
+      jobs.push(caches.keys().then(function (ks) {
+        return Promise.all(ks.map(function (k) { return caches.delete(k); }));
+      }).catch(function () {}));
+    }
+    // never wait on a wedged worker: the reload happens either way
+    setTimeout(done, 2500);
+    Promise.all(jobs).then(done, done);
+  } catch (e) { done(); }
+}
 try {
   if (window.MEMENTO_VERSION && window.MEMENTO_JS_BUILD) {
     if (window.MEMENTO_VERSION !== window.MEMENTO_JS_BUILD) {
-      if (!sessionStorage.getItem('memento_ver_reloaded')) {
-        sessionStorage.setItem('memento_ver_reloaded', '1');
-        location.reload();
+      var tries = 0;
+      try { tries = parseInt(sessionStorage.getItem('memento_ver_reloaded') || '0', 10) || 0; } catch (e) {}
+      if (tries < 2) {
+        try { sessionStorage.setItem('memento_ver_reloaded', String(tries + 1)); } catch (e) {}
+        _mementoHardRepair('build-skew');
       }
     } else {
-      sessionStorage.removeItem('memento_ver_reloaded');
+      try { sessionStorage.removeItem('memento_ver_reloaded'); } catch (e) {}
     }
   }
 } catch (e) {}
@@ -400,6 +431,9 @@ const HONEST_LOADING_GATE = false;
     if (revealed) return;
     revealed = true;
     try { document.body.classList.add('boot-revealed'); } catch (_) {}
+    // A boot that reached the screen earns back its free self-repair, so a
+    // stuck boot later in the same session still gets fixed silently first.
+    try { sessionStorage.removeItem('memento_boot_repaired'); } catch (_) {}
     // The day card's once-a-day "materialize" entrance is gated on boot-revealed +
     // visibility (see renderDayCard), so it never plays under the mask. Now that the
     // mask is lifting, re-render the card once so the entrance actually shows on a

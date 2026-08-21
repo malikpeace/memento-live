@@ -10445,9 +10445,16 @@ function _cpStanding(f, why) {
           '<div class="cp-pts"><span>' + _cpNum(base) + '</span><span>' + _cpNum(tgt) + '</span></div></div>';
         const down = tgt < base;
         const left = Math.max(0, down ? (cur - tgt) : (tgt - cur));
-        html += '<div class="cp-rem" data-cp-down="' + (down ? '1' : '0') + '">' +
-          '<span class="cp-rem__v">' + (left === 0 ? '0' : (down ? '-' : '+') + _cpNum(left)) + '</span>' +
-          '<s>to go</s></div>';
+        /* v1226 (Malik): the line at the end of the road should say they got
+           there. "0 to go" is the arithmetic, not the moment. The number still
+           animates into place first (_cpCountTo drives .cp-rem__v), so the
+           reached line only replaces it once the count has landed on zero. */
+        html += (left === 0)
+          ? '<div class="cp-rem cp-rem--done" data-cp-down="' + (down ? '1' : '0') + '">' +
+              '<span class="cp-rem__v">Reached</span></div>'
+          : '<div class="cp-rem" data-cp-down="' + (down ? '1' : '0') + '">' +
+              '<span class="cp-rem__v">' + ((down ? '-' : '+') + _cpNum(left)) + '</span>' +
+              '<s>to go</s></div>';
       }
     } else {
       /* v1219 (Malik, on-device): plain text failed as a door, he could not
@@ -11526,6 +11533,9 @@ function _cpRepaintSummaryPage(o) {
 function _cpCountTo(el, fromText) {
   if (!el || !fromText) return;
   const toText = el.textContent;
+  // A word is not a number to count to. Without this, "Reached" strips to an
+  // empty string, parses as 0, and the counter overwrites the word with "0".
+  if (!/\d/.test(String(toText))) return;
   const parse = function (s) { return Number(String(s).replace(/[^0-9.\-]/g, '')); };
   const from = parse(fromText), to = parse(toText);
   if (!isFinite(from) || !isFinite(to) || from === to) return;

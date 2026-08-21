@@ -4802,6 +4802,10 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
 /* v1191 (Malik): the remaining line sits closer to the rail, "just a bit". */
 .cp-rem { margin-top: 4px; color: var(--cp-acc); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .cp-rem s { text-decoration: none; color: rgba(255, 255, 255, 0.42); font-size: 12.5px; font-weight: 600; margin-left: 5px; }
+/* v1226 (Malik): the end of the road reads as arrival, in the green that
+   means life everywhere else in the app. Same size and weight as the count it
+   replaces, so the line does not jump when the last update lands. */
+.cp-rem--done { color: #3fd94e; letter-spacing: 0.01em; }
 .cp-lock {
   margin-top: 12px; display: inline-flex; align-items: center; gap: 7px;
   padding: 10px 16px; border-radius: 999px;
@@ -4887,6 +4891,7 @@ html.theme-light .cp-track__fill { background: linear-gradient(90deg, #3fb6cd, #
 html.theme-light .cp-pts { color: rgba(24, 26, 33, 0.45); }
 html.theme-light .cp-rem { color: #0d8ca6; }
 html.theme-light .cp-rem s { color: rgba(24, 26, 33, 0.45); }
+html.theme-light .cp-rem--done { color: #1c9d2c; }
 html.theme-light .cp-lock { color: #0d8ca6; background: rgba(13, 140, 166, 0.09); }
 html.theme-light .cp-anti { color: rgba(24, 26, 33, 0.94); }
 html.theme-light .cp-tweak {
