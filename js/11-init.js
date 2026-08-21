@@ -910,6 +910,43 @@ function initNeutronStarCard(root, onBack) {
   return initNeutronStarCardLegacy(root, onBack);
 }
 
+// v1228: the star's "..." menu, bound ONCE at the document level. Delegation
+// survives every mount path and every re-render of the scene, which the old
+// per-node binding did not (it raced the pager's re-render and bound a stale
+// button). Toggles the sheet on the "..." tap; any tap outside the open sheet
+// closes it. The sheet's own items (#summaryContinue, #nsExplainBtn) keep their
+// existing handlers.
+let _nsMenuDelegateBound = false;
+function bindNeutronStarMenuDelegate() {
+  if (_nsMenuDelegateBound) return;
+  _nsMenuDelegateBound = true;
+  document.addEventListener('click', (ev) => {
+    try {
+      const btn = ev.target && ev.target.closest && ev.target.closest('#nsMenuBtn');
+      if (btn) {
+        ev.stopPropagation();
+        const scene = btn.closest('#nsScene') || document;
+        const sheet = scene.querySelector('#nsMenuSheet');
+        if (!sheet) return;
+        const open = sheet.classList.toggle('is-open');
+        sheet.setAttribute('aria-hidden', open ? 'false' : 'true');
+        return;
+      }
+      // a tap anywhere else closes any open sheet, unless it is inside one
+      if (ev.target && ev.target.closest && ev.target.closest('#nsMenuSheet')) return;
+      document.querySelectorAll('#nsMenuSheet.is-open').forEach((s) => {
+        s.classList.remove('is-open');
+        s.setAttribute('aria-hidden', 'true');
+      });
+    } catch (e) {}
+  }, true);
+}
+// Install the star-menu delegate at boot, unconditionally: the summary's init
+// path does not reliably run in the pager (the very race that broke the old
+// per-node binding), so the ONE handler that owns every "..." tap must not
+// depend on it. Delegation on document works before the button ever mounts.
+try { bindNeutronStarMenuDelegate(); } catch (e) {}
+
 function initNeutronStarStarView(scope) {
   const stage = scope.querySelector('#nsStarStage');
   const detail = scope.querySelector('#nsStarDetail');
@@ -1006,22 +1043,8 @@ function initNeutronStarStarView(scope) {
   // and more than one can run init on the SAME rendered scene. Each run added
   // another click listener, so a tap toggled the sheet open then shut in the
   // same gesture and nothing showed. Bind once per button node and never again.
-  const menuBtn = scope.querySelector('#nsMenuBtn');
-  const menuSheet = scope.querySelector('#nsMenuSheet');
-  if (menuBtn && menuSheet && !menuBtn.dataset.nsMenuBound) {
-    menuBtn.dataset.nsMenuBound = '1';
-    menuBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const open = menuSheet.classList.toggle('is-open');
-      menuSheet.setAttribute('aria-hidden', open ? 'false' : 'true');
-    });
-    scene.addEventListener('click', (ev) => {
-      if (!menuSheet.contains(ev.target) && ev.target !== menuBtn) {
-        menuSheet.classList.remove('is-open');
-        menuSheet.setAttribute('aria-hidden', 'true');
-      }
-    });
-  }
+  // v1228: the "..." menu is handled by a document-level delegate installed at
+  // boot (see below), so nothing to bind per-scene here.
 
   // 3D parallax tilt on the glass card. Desktop only (real mouse + hover).
   // Skipped on touch devices and when prefers-reduced-motion is set.

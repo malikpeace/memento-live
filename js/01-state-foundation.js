@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1227';
+window.MEMENTO_JS_BUILD = 'v1228';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */

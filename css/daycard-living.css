@@ -717,29 +717,41 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
 /* the engraved name inside the view reads in the material's ink */
 #mementoFull .daycard-wrap[data-skin] .daycard-ns__name { color: var(--ink, rgba(24,28,36,0.78)); }
 
-/* ── THE RING, back on the Memento while the record is open (v1227, Malik) ──
-   The card never leaves the home (v1139); the record lifts it above the scrim
-   under body.mf-open, so the ring is scoped there, not to #mementoFull (the
-   card is not inside it). Off the record the home card keeps its Action-earned
-   burn, untouched. White is a clean neutral edge; Matched takes the material's
-   own colour, or the app accent on the house card. Inset shadows on the
-   radius-inheriting rim layer, so the ring follows the corners and can never
-   render as a box (the edge-safety law). The record is self-lit dark in BOTH
-   themes (no per-theme opt-out), so the White ring is one light rule. */
-body.mf-open #dayCard .daycard-theme-living .daycard-ns__rim {
+/* ── THE RING, on the Memento in BOTH view surfaces (v1227/v1228, Malik) ──
+   The card never leaves the home (v1139); two surfaces lift it above a scrim:
+   the record (body.mf-open) and the customize picker (body.mfe-open). The ring
+   must show in BOTH, on EVERY skin, White or Matched (Malik v1228, after the
+   ring only showed on the house card in the picker). A material forces the
+   earned burn off (--act:0), so without this an edged skin showed no ring at
+   all in the picker. These rules force the rim visible independent of --act and,
+   via the #dayCard id, beat even void's opacity:0 (every skin gets a ring now).
+   Inset shadows on the radius-inheriting rim layer, so the ring follows the
+   corners and can never render as a box (the edge-safety law). White is a clean
+   neutral edge; Matched takes the material's own colour, or the app accent on
+   the house card. The card is self-lit dark in both themes, so White is one
+   light rule. Off both surfaces the home card keeps its earned burn, untouched. */
+body.mf-open #dayCard .daycard-theme-living .daycard-ns__rim,
+body.mfe-open #dayCard .daycard-theme-living .daycard-ns__rim {
   opacity: 1 !important;
+  /* v1228 (Malik: every skin should read like the default's ring). A material
+     forces the earned burn off, so the White ring carries the whole edge alone;
+     bright enough to match the house card's presence, still a hairline that
+     follows the corners (edge-safe). */
   box-shadow:
-    inset 0 0 0 1.2px rgba(255, 255, 255, 0.52),
-    inset 0 0 14px rgba(255, 255, 255, 0.13) !important;
+    inset 0 0 0 1.7px rgba(255, 255, 255, 0.82),
+    inset 0 0 10px rgba(255, 255, 255, 0.28),
+    inset 0 0 26px rgba(232, 244, 255, 0.14) !important;
 }
 /* Matched: the app accent (house card, no material). */
-body.mf-open #dayCard .daycard-theme-living[data-skin-ring="1"] .daycard-ns__rim {
+body.mf-open #dayCard .daycard-theme-living[data-skin-ring="1"] .daycard-ns__rim,
+body.mfe-open #dayCard .daycard-theme-living[data-skin-ring="1"] .daycard-ns__rim {
   box-shadow:
     inset 0 0 0 1.3px rgba(var(--accent-rgb), 0.72),
     inset 0 0 16px 1px rgba(var(--accent-rgb), 0.24) !important;
 }
 /* Matched on a material: the material's own edge colour wins. */
-body.mf-open #dayCard .daycard-wrap[data-skin][data-skin-ring="1"].daycard-theme-living .daycard-ns__rim {
+body.mf-open #dayCard .daycard-wrap[data-skin][data-skin-ring="1"].daycard-theme-living .daycard-ns__rim,
+body.mfe-open #dayCard .daycard-wrap[data-skin][data-skin-ring="1"].daycard-theme-living .daycard-ns__rim {
   box-shadow:
     inset 0 0 0 1.3px var(--edge, rgba(255, 255, 255, 0.85)),
     inset 0 0 16px 1px var(--edge, rgba(255, 255, 255, 0.30)) !important;
