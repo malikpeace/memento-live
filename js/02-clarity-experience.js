@@ -11169,7 +11169,11 @@ const ClarityNoteWriter = {
     el.innerHTML =
       '<div class="cn-step cn-step--write">' +
         '<div class="cn-bar">' +
-          '<button type="button" class="cn-bar__x" data-cn-cancel>Cancel</button>' +
+          '<div class="cn-bar__left">' +
+            '<button type="button" class="cn-bar__x" data-cn-cancel>Cancel</button>' +
+            '<button type="button" class="cn-bar__hist" data-cn-undo aria-label="Undo"><svg viewBox="0 0 24 24"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 5 5v1"/></svg></button>' +
+            '<button type="button" class="cn-bar__hist" data-cn-redo aria-label="Redo"><svg viewBox="0 0 24 24"><path d="M15 7l5 5-5 5"/><path d="M20 12H9a5 5 0 0 0-5 5v1"/></svg></button>' +
+          '</div>' +
           '<div class="cn-tmrmount" data-cn-tmr></div>' +
           '<button type="button" class="cn-bar__done" data-cn-finish disabled>Finish</button>' +
         '</div>' +
@@ -11205,8 +11209,28 @@ const ClarityNoteWriter = {
     // toggling a checklist box while writing (contenteditable=false boxes)
     field.addEventListener('click', function (ev) {
       var box = ev.target.closest && ev.target.closest('.cn-ck__box');
-      if (box) { var cke = box.closest('.cn-cke'); if (cke) { cke.setAttribute('data-done', cke.getAttribute('data-done') === '1' ? '0' : '1'); } }
+      if (box) { var cke = box.closest('.cn-cke'); if (cke) { cke.setAttribute('data-done', cke.getAttribute('data-done') === '1' ? '0' : '1'); } return; }
+      // tapping empty space in the field snaps the caret to the end, so you
+      // never land a cursor in dead space you never typed into.
+      var sel = window.getSelection();
+      if (sel && sel.rangeCount && sel.getRangeAt(0).collapsed && sel.getRangeAt(0).startContainer === field) {
+        var end = document.createRange(); end.selectNodeContents(field); end.collapse(false);
+        sel.removeAllRanges(); sel.addRange(end);
+      }
     });
+    // undo / redo, on the contenteditable history. preventDefault to hold focus.
+    var histBtn = function (attr, cmd) {
+      var b = el.querySelector('[' + attr + ']');
+      if (!b) return;
+      b.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+      b.addEventListener('click', function () {
+        field.focus();
+        try { document.execCommand(cmd, false, null); } catch (e) {}
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    };
+    histBtn('data-cn-undo', 'undo');
+    histBtn('data-cn-redo', 'redo');
 
     // the quiet timer (phase 2a). Self-contained: it never touches the field,
     // and every control preventDefaults its press so the keyboard never drops.
@@ -11257,6 +11281,10 @@ const ClarityNoteWriter = {
     document.addEventListener('selectionchange', onSel);
     field.addEventListener('scroll', hide, { passive: true });
     field.addEventListener('blur', function () { setTimeout(hide, 100); });
+    // a fresh tap or any typing kills the popover immediately; it only comes
+    // back when a real selection settles (place() re-shows via selectionchange).
+    field.addEventListener('pointerdown', hide);
+    field.addEventListener('input', hide);
     this._fmtCleanup = function () { document.removeEventListener('selectionchange', onSel); };
 
     var run = function (cmd) {

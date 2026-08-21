@@ -5569,3 +5569,9 @@ html.theme-light .cn-cke .cn-ck__box { background: rgba(24,26,33,0.07); box-shad
 html.theme-light .cn-cke[data-done="1"] .cn-ck__box { background: #0d8ca6; box-shadow: none; }
 html.theme-light .cn-cke[data-done="1"] .cn-ck__box::after { color: #fff; }
 html.theme-light .cn-cke[data-done="1"] .cn-cke__t { color: rgba(24,26,33,0.4); }
+/* undo/redo in the writer bar (v1237) */
+.cn-bar__left { display: flex; align-items: center; gap: 6px; }
+.cn-bar__hist { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0 !important; border-radius: 999px; }
+.cn-bar__hist svg { width: 19px; height: 19px; stroke: rgba(255,255,255,0.55); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cn-bar__hist:active svg { stroke: var(--cn-acc); }
+html.theme-light .cn-bar__hist svg { stroke: rgba(24,26,33,0.5); }
