@@ -31,13 +31,13 @@
   // real goals, so you can see how the same module reads for different people.
   // The structure is universal by design; the shape tunes cadence + wording.
   var PERSONAS = [
-    { label: 'Business', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal' },
-    { label: 'Fitness', shape: 'frequency', cadence: 4, sub: 'workouts toward the rate you keep' },
-    { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit' },
-    { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep' },
-    { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held' },
-    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number' },
-    { label: 'Rough patch', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', rough: true }
+    { label: 'Business', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions' },
+    { label: 'Fitness', shape: 'frequency', cadence: 4, sub: 'workouts toward the rate you keep', unit: 'workouts' },
+    { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit', unit: 'days' },
+    { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep', unit: 'sessions' },
+    { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held', unit: 'days' },
+    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number', unit: 'days' },
+    { label: 'Rough patch', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions', rough: true }
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
@@ -110,9 +110,10 @@
   /* ---------- page one ---------- */
   // record milestones: days shown up. A forward pull that stays in Consistency's
   // lane (about the record growing, never the goal distance).
-  var MILES = [7, 14, 30, 50, 75, 100, 150, 200, 250, 365, 500, 750, 1000];
-  function nextMile(t) { for (var i = 0; i < MILES.length; i++) if (MILES[i] > t) return MILES[i]; return Math.ceil((t + 1) / 500) * 500; }
-  function mileLabel(m) { return m === 7 ? 'your first week' : m === 14 ? 'two weeks' : m === 30 ? 'a month' : m === 365 ? 'a year' : m.toLocaleString() + ' days'; }
+  // milestones count the thing you actually did (actions / workouts / days held),
+  // never calendar weeks. 10 workouts is 10 workouts, at whatever rate you keep.
+  var MILES = [5, 10, 25, 50, 100, 250, 500, 1000, 2000];
+  function nextMile(t) { for (var i = 0; i < MILES.length; i++) if (MILES[i] > t) return MILES[i]; return Math.ceil((t + 1) / 1000) * 1000; }
   // what the page reveals as the record grows, so day one is never an empty dashboard
   var REVEAL = { support: 7 };
   function pageOne(s, log) {
@@ -123,7 +124,7 @@
     var counted = log[log.length - 1].on;
     var begin = s.N === 1 ? '<div class="one__begin">Day one. This is where the count starts.</div>' : '';
     var nm = nextMile(n), gap = nm - n;
-    var mile = (gap > 0) ? '<div class="one__mile"><b>' + gap.toLocaleString() + '</b> more to ' + mileLabel(nm) + '</div>' : '';
+    var mile = (gap > 0) ? '<div class="one__mile"><b>' + gap.toLocaleString() + '</b> more to ' + nm.toLocaleString() + ' ' + PERSONA.unit + '</div>' : '';
     return '<div><div class="one__crown' + (counted ? ' lit' : '') + '">' + mMark('', 22) + '</div>' +
       '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
@@ -384,8 +385,13 @@
     if (s.N >= 14) {
       if (s.comebacks > 0) lines.push('You have come back <b>' + plural(s.comebacks, 'time') +
         '</b>. Every gap in this record ended the same way: you returned.');
-      if (s.best >= 3) lines.push('Your longest run is <b>' + plural(s.best, 'day') +
-        '</b>. Nobody did that for you. That capacity does not expire.');
+      if (SHAPE !== 'frequency') {
+        if (s.best >= 3) lines.push('Your longest run is <b>' + plural(s.best, 'day') +
+          '</b>. Nobody did that for you. That capacity does not expire.');
+      } else if (s.weeks.length >= 3 && s.metWeeks > 0) {
+        lines.push('You have kept your rate <b>' + s.metWeeks + ' of ' + s.weeks.length +
+          ' weeks</b>. The rhythm holds, rest days and all.');
+      }
       if (s.hours > 0) lines.push('<b>' + plural(s.hours, 'hour') + '</b> of your life are already inside this goal. ' +
         'Every day you show up, that number grows. It never shrinks.');
     }
