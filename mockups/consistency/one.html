@@ -94,7 +94,9 @@
   html.light .cal .d.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.28); color: rgba(10,14,10,0.55); }
   html.light .cal .d.rest { color: rgba(10,14,10,0.15); }
   html.light .cal .d.ahead { color: rgba(10,14,10,0.15); }
-  html.light .trk__c b, html.light .mlog__g b, html.light .glance__strip b { background: rgba(10,14,10,0.07); }
+  html.light .trk__c b, html.light .mlog__g b, html.light .glance__strip b { background: rgba(10,14,10,0.09); }
+  html.light .mlog__g b.rest, html.light .trk__c b.rest { background: rgba(10,14,10,0.06); }
+  html.light .mlog__g b.missed, html.light .trk__c b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(10,14,10,0.22); }
   html.light .mlog__g b.ahead { background: rgba(10,14,10,0.045); }
   html.light .mlog__g b.pad { background: transparent; }
   html.light .wkc b.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.14); }
@@ -243,9 +245,10 @@
   .score__delta.down { color: var(--score-sub); }
   .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
     color: var(--score-fg); font-variant-numeric: tabular-nums; margin-top: 2px; }
-  .score__hm { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 18px; }
-  .score__hm b { aspect-ratio: 1; border-radius: 5px; }
-  .score__hm b.e { background: var(--score-empty); }
+  .score__viz { margin-top: 16px; }
+  .spark { display: block; width: 100%; height: 50px; overflow: visible; }
+  .spark__area { fill: rgba(var(--acc-rgb),0.16); }
+  .spark__line { fill: none; stroke: var(--acc); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
   .score__note { font-size: 11.5px; color: var(--score-sub); margin-top: 12px; line-height: 1.45; }
   /* the shown-up pill under the calendar */
   .heropill { display: block; text-align: center; background: rgba(255,255,255,0.045); border-radius: 999px;
@@ -452,7 +455,8 @@
   html.vm-desk .score__m { top: 16px; right: 18px; }
   html.vm-desk .score__head { display: flex; align-items: baseline; gap: 14px; }
   html.vm-desk .score__n { font-size: 66px; }
-  html.vm-desk .score__hm { margin-top: 0; grid-template-columns: repeat(30, 1fr); }
+  html.vm-desk .score__viz { margin-top: 0; }
+  html.vm-desk .spark { height: 58px; }
   html.vm-desk .score__note { grid-column: 1 / -1; margin-top: 4px; }
 
   /* ============ phone view forced on a wide screen ============ */

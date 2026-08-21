@@ -124,6 +124,26 @@
   /* ---------- consistency score: a rolling read that can improve, plus a
      heatmap of the window whose green deepens the more consistent you are.
      Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
+  // the score's rolling trajectory: each point is the 30-day score ending that
+  // day, so the line shows whether the number is climbing. A trend, not 30 dots.
+  function scoreSpark(A, log) {
+    var N = log.length;
+    if (N < 10) return '';
+    var P = Math.min(N, 30), pts = [];
+    for (var k = 0; k < P; k++) {
+      var idx = N - P + k;
+      pts.push(scoreDays(A, log.slice(Math.max(0, idx - 29), idx + 1)));
+    }
+    var W = 300, H = 46, pad = 5;
+    function X(i) { return P === 1 ? W : (i / (P - 1)) * W; }
+    function Y(v) { return (H - pad) - (v / 100) * (H - 2 * pad); }
+    var line = pts.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
+    var area = 'M0 ' + H + ' ' + pts.map(function (v, i) { return 'L' + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ') + ' L' + W + ' ' + H + ' Z';
+    return '<div class="score__viz"><svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path class="spark__area" d="' + area + '"/>' +
+      '<path class="spark__line" d="' + line + '" vector-effect="non-scaling-stroke"/>' +
+      '</svg></div>';
+  }
   function scoreBlock(s, log, A) {
     var win = Math.min(30, log.length), slice = log.slice(-win);
     var kept = 0, sup = 0, missed = 0;
@@ -142,19 +162,11 @@
             : '<svg viewBox="0 0 10 10"><path d="M5 9 L1 2 L9 2 Z"/></svg>') +
         Math.abs(delta) + '</sup>';
     }
-    var a = (0.42 + 0.5 * (score / 100)).toFixed(2);
-    var tone = 'rgba(var(--acc-rgb),' + a + ')';
-    var cells = slice.map(function (d) {
-      var st = stateOf(A, d.date);
-      if (st === 'kept') return '<b style="background:' + tone + '"></b>';
-      if (st === 'sup') return '<b style="background:rgba(var(--acc-rgb),.3)"></b>';
-      return '<b class="e"></b>';
-    }).join('');
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + deltaHTML + '</div></div>' +
-      '<div class="score__hm">' + cells + '</div>' +
+      scoreSpark(A, log) +
       '<div class="score__note">The last 30 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
       '</div></div>';
   }
@@ -298,9 +310,14 @@
       canFwd = YOFF < 0;
     } else {
       var end = new Date(today.getFullYear(), today.getMonth() + YOFF * 12, 1);
-      for (var i = 11; i >= 0; i--) months.push({ y: new Date(end.getFullYear(), end.getMonth() - i, 1).getFullYear(), m: new Date(end.getFullYear(), end.getMonth() - i, 1).getMonth() });
+      // start at the month they began (or 12 months back if the record is older),
+      // so a young record reads from the top, not from an empty year of misses.
+      var sm = new Date(start0.getFullYear(), start0.getMonth(), 1);
+      var sinceStart = (end.getFullYear() - sm.getFullYear()) * 12 + (end.getMonth() - sm.getMonth());
+      var span = Math.min(11, Math.max(0, sinceStart));
+      for (var i = span; i >= 0; i--) { var dd = new Date(end.getFullYear(), end.getMonth() - i, 1); months.push({ y: dd.getFullYear(), m: dd.getMonth() }); }
       titleTxt = K.MON[months[0].m] + ' ' + String(months[0].y).slice(2) + ' to ' + K.MON[end.getMonth()] + ' ' + String(end.getFullYear()).slice(2);
-      canBack = new Date(months[0].y, months[0].m, 1) > new Date(start0.getFullYear(), start0.getMonth(), 1);
+      canBack = new Date(months[0].y, months[0].m, 1) > sm;
       canFwd = YOFF < 0;
     }
     var cells = months.map(function (M) {
@@ -378,7 +395,7 @@
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
     // a flat list of section cards; mobile stacks them, desktop tiles them
-    return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + hardDays(s, log);
+    return scoreBlock(s, log, A) + cal + pill + tracks(log) + monthBars(s) + hardDays(s, log);
   }
 
   /* ---------- the completion moment: today just joined the record ---------- */
