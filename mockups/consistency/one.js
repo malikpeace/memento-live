@@ -41,7 +41,7 @@
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true;
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, VIZ = 'trend';
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -124,25 +124,72 @@
   /* ---------- consistency score: a rolling read that can improve, plus a
      heatmap of the window whose green deepens the more consistent you are.
      Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
-  // the score's rolling trajectory: each point is the 30-day score ending that
-  // day, so the line shows whether the number is climbing. A trend, not 30 dots.
-  function scoreSpark(A, log) {
-    var N = log.length;
-    if (N < 10) return '';
-    var P = Math.min(N, 30), pts = [];
-    for (var k = 0; k < P; k++) {
-      var idx = N - P + k;
+  // ---- FIVE ways to show the score next to the number. VIZ picks one. ----
+  // rolling score sampled across the record, so any of these can show movement.
+  function rollPts(A, log, count, span) {
+    var N = log.length; span = Math.min(N, span || 70);
+    count = Math.max(2, Math.min(count, span));
+    var pts = [];
+    for (var g = 0; g < count; g++) {
+      var idx = N - 1 - Math.round((count - 1 - g) / (count - 1) * (span - 1));
       pts.push(scoreDays(A, log.slice(Math.max(0, idx - 29), idx + 1)));
     }
-    var W = 300, H = 46, pad = 5;
-    function X(i) { return P === 1 ? W : (i / (P - 1)) * W; }
-    function Y(v) { return (H - pad) - (v / 100) * (H - 2 * pad); }
+    return pts;
+  }
+  // 1. TREND: a line, but zoomed to its own range so small moves are visible
+  function vizTrend(A, log) {
+    var pts = rollPts(A, log, Math.min(log.length, 30), 42);
+    var mn = Math.min.apply(null, pts), mx = Math.max.apply(null, pts);
+    var range = Math.max(5, mx - mn), lo = mn - range * 0.4, hi = mx + range * 0.4;
+    var W = 300, H = 46, pad = 6;
+    function X(i) { return pts.length < 2 ? W : (i / (pts.length - 1)) * W; }
+    function Y(v) { return (H - pad) - ((v - lo) / (hi - lo)) * (H - 2 * pad); }
     var line = pts.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ');
     var area = 'M0 ' + H + ' ' + pts.map(function (v, i) { return 'L' + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(' ') + ' L' + W + ' ' + H + ' Z';
-    return '<div class="score__viz"><svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
-      '<path class="spark__area" d="' + area + '"/>' +
-      '<path class="spark__line" d="' + line + '" vector-effect="non-scaling-stroke"/>' +
-      '</svg></div>';
+    var endY = (Y(pts[pts.length - 1]) / H * 100).toFixed(1);
+    return '<div class="score__viz viz-trend"><svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path class="spark__area" d="' + area + '"/><path class="spark__line" d="' + line + '" vector-effect="non-scaling-stroke"/></svg>' +
+      '<i class="spark__dot" style="top:' + endY + '%"></i></div>';
+  }
+  // 2. RING: a thick arc filled to the score, watch-face feel
+  function vizRing(score) {
+    var r = 33, C = 2 * Math.PI * r, off = C * (1 - score / 100);
+    return '<div class="score__viz viz-ring"><svg viewBox="0 0 84 84" aria-hidden="true">' +
+      '<circle class="ring__t" cx="42" cy="42" r="' + r + '"/>' +
+      '<circle class="ring__v" cx="42" cy="42" r="' + r + '" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" transform="rotate(-90 42 42)"/></svg></div>';
+  }
+  // 3. BARS: the score sampled into columns, zoomed so the shape reads
+  function vizBars(A, log) {
+    var pts = rollPts(A, log, 12, 84);
+    var mn = Math.min.apply(null, pts), mx = Math.max.apply(null, pts);
+    var range = Math.max(5, mx - mn), lo = mn - range * 0.35, hi = mx + range * 0.1;
+    return '<div class="score__viz viz-bars">' + pts.map(function (v, i) {
+      var hgt = Math.max(7, Math.round(((v - lo) / (hi - lo)) * 100));
+      return '<u style="height:' + hgt + '%"' + (i === pts.length - 1 ? ' class="now"' : '') + '></u>';
+    }).join('') + '</div>';
+  }
+  // 4. MIX: what the 30 days are actually made of
+  function vizMix(A, log) {
+    var slice = log.slice(-Math.min(30, log.length)), kept = 0, sup = 0, missed = 0;
+    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
+    function seg(n, c) { return n ? '<u class="' + c + '" style="flex:' + n + '"></u>' : ''; }
+    function key(n, c, w) { return n ? '<span><b class="' + c + '"></b>' + n + ' ' + w + '</span>' : ''; }
+    return '<div class="score__viz viz-mix"><div class="mix__bar">' + seg(kept, 'k') + seg(sup, 's') + seg(missed, 'm') + '</div>' +
+      '<div class="mix__key">' + key(kept, 'k', 'kept') + key(sup, 's', 'smaller') + key(missed, 'm', 'missed') + '</div></div>';
+  }
+  // 5. TRACK: the level now, with a ghost of where it was a week ago
+  function vizTrack(score, delta) {
+    var prev = Math.max(0, Math.min(100, score - (delta || 0)));
+    return '<div class="score__viz viz-track"><div class="track"><span class="track__fill" style="width:' + score + '%"></span>' +
+      (delta ? '<i class="track__ghost" style="left:' + prev + '%"></i>' : '') + '</div>' +
+      '<div class="track__scale"><span>last week ' + prev + '</span><span>now ' + score + '</span></div></div>';
+  }
+  function scoreViz(A, log, score, delta) {
+    if (VIZ === 'ring') return vizRing(score);
+    if (VIZ === 'bars') return vizBars(A, log);
+    if (VIZ === 'mix') return vizMix(A, log);
+    if (VIZ === 'track') return vizTrack(score, delta);
+    return vizTrend(A, log);
   }
   function scoreBlock(s, log, A) {
     var win = Math.min(30, log.length), slice = log.slice(-win);
@@ -166,7 +213,7 @@
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + deltaHTML + '</div></div>' +
-      scoreSpark(A, log) +
+      scoreViz(A, log, score, delta) +
       '<div class="score__note">The last 30 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
       '</div></div>';
   }
@@ -527,6 +574,15 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  el('vizChips').innerHTML = ['trend', 'ring', 'bars', 'mix', 'track'].map(function (v) {
+    return '<button data-viz="' + v + '"' + (v === VIZ ? ' class="on"' : '') + '>' + v.charAt(0).toUpperCase() + v.slice(1) + '</button>';
+  }).join('');
+  el('vizChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    VIZ = b.getAttribute('data-viz');
+    [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+    render();
+  });
   el('todayChips').innerHTML = '<button data-t="done" class="on">Today done</button><button data-t="pending">Not yet</button>';
   el('todayChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
