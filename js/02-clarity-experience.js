@@ -11084,9 +11084,9 @@ const ClarityNoteWriter = {
           '<textarea class="cn-field" data-cn-field rows="3" maxlength="' + CN_MAX + '" ' +
             'placeholder="Write it in your own words." ' +
             'autocomplete="off" autocorrect="on" spellcheck="true"></textarea>' +
-          '<div class="cn-jog">' +
-            '<div class="cn-jog__lab">Need a nudge?</div>' +
-            '<div class="cn-jog__chips">' +
+          '<div class="cn-jog" data-cn-jogwrap>' +
+            '<button type="button" class="cn-jog__lab" data-cn-jogtoggle>Need a nudge?<span class="cn-jog__chev">&#8250;</span></button>' +
+            '<div class="cn-jog__chips" hidden>' +
               CN_JOGS.map(function (j) {
                 return '<button type="button" class="cn-jchip" data-cn-jog>' + esc(j) + '</button>';
               }).join('') +
@@ -11117,6 +11117,19 @@ const ClarityNoteWriter = {
         : clarityNotesSave(self._text, CN_TAG_DEFAULT, o);
       self.close(saved);
     });
+
+    // Nudge is a dropdown now: collapsed by default, tap the label to reveal.
+    var jogWrap = el.querySelector('[data-cn-jogwrap]');
+    var jogToggle = el.querySelector('[data-cn-jogtoggle]');
+    var jogChips = jogWrap && jogWrap.querySelector('.cn-jog__chips');
+    if (jogToggle) {
+      jogToggle.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+      jogToggle.addEventListener('click', function () {
+        var open = jogWrap.classList.toggle('is-open');
+        if (jogChips) jogChips.hidden = !open;
+        try { field.focus(); } catch (e) {}
+      });
+    }
 
     // The chips frame the thinking and insert NOTHING. preventDefault on the
     // press keeps focus in the field, so tapping one never drops the keyboard.
@@ -11157,9 +11170,14 @@ const ClarityNoteWriter = {
         '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
         '<span>Timer</span></button>';
       if (t.state === 'setting') {
+        var opts = [1, 2, 3, 5, 10, 15, 20, 25, 30, 45, 60];
         html += '<div class="cn-tmrdrop">' +
           '<div class="cn-tmrval">' + t.mins + '</div><div class="cn-tmrunit">MINUTES</div>' +
-          '<input type="range" min="5" max="60" step="5" value="' + t.mins + '" data-tmr="slide" aria-label="Minutes">' +
+          '<div class="cn-tmrpick" data-tmr="pickwrap"><div class="cn-tmrpick__row">' +
+            '<span class="cn-tmrpick__pad"></span>' +
+            opts.map(function (m) { return '<button type="button" class="cn-tmrpick__v' + (m === t.mins ? ' sel' : '') + '" data-min="' + m + '" data-tmr="pick">' + m + '</button>'; }).join('') +
+            '<span class="cn-tmrpick__pad"></span>' +
+          '</div></div>' +
           '<button type="button" class="cn-tmrgo" data-tmr="start">Start</button>' +
           '<button type="button" class="cn-tmroff" data-tmr="off">No timer</button>' +
           '</div>';
@@ -11178,13 +11196,44 @@ const ClarityNoteWriter = {
     mount.innerHTML = html;
     // every control preventDefaults the press so the field keeps focus
     Array.prototype.slice.call(mount.querySelectorAll('[data-tmr]')).forEach(function (n) {
-      n.addEventListener('pointerdown', function (e) { if (n.getAttribute('data-tmr') !== 'slide') e.preventDefault(); });
-      if (n.getAttribute('data-tmr') === 'slide') {
-        n.addEventListener('input', function () { t.mins = parseInt(n.value, 10) || 10; var v = mount.querySelector('.cn-tmrval'); if (v) v.textContent = t.mins; });
+      var kind = n.getAttribute('data-tmr');
+      if (kind === 'pickwrap') { self._bindPicker(n, mount); return; }
+      // picker values scroll + tap; everything else preventDefaults to hold focus
+      if (kind === 'pick') {
+        n.addEventListener('click', function () {
+          // select directly (deterministic) AND center it
+          var wrap2 = n.closest('.cn-tmrpick');
+          Array.prototype.slice.call(wrap2.querySelectorAll('[data-min]')).forEach(function (v) { v.classList.toggle('sel', v === n); });
+          self._tmr.mins = parseInt(n.getAttribute('data-min'), 10) || 10;
+          var lbl = mount.querySelector('.cn-tmrval'); if (lbl) lbl.textContent = self._tmr.mins;
+          n.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+          try { var f = self.el && self.el.querySelector('[data-cn-field]'); if (f) f.focus(); } catch (e) {}
+        });
         return;
       }
-      n.addEventListener('click', function () { self._tmrAction(n.getAttribute('data-tmr')); });
+      n.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+      n.addEventListener('click', function () { self._tmrAction(kind); });
     });
+  },
+  _bindPicker: function (wrap, mount) {
+    var self = this, t = this._tmr;
+    var row = wrap.querySelector('.cn-tmrpick__row');
+    var vals = Array.prototype.slice.call(wrap.querySelectorAll('[data-min]'));
+    var lbl = mount.querySelector('.cn-tmrval');
+    var pick = function () {
+      var wr = row.getBoundingClientRect(); var cx = wr.left + wr.width / 2;
+      var best = null, bd = 1e9;
+      vals.forEach(function (v) { var r = v.getBoundingClientRect(); var d = Math.abs(r.left + r.width / 2 - cx); if (d < bd) { bd = d; best = v; } });
+      if (best) {
+        vals.forEach(function (v) { v.classList.toggle('sel', v === best); });
+        t.mins = parseInt(best.getAttribute('data-min'), 10) || 10;
+        if (lbl) lbl.textContent = t.mins;
+      }
+    };
+    row.addEventListener('scroll', pick, { passive: true });
+    var cur = wrap.querySelector('[data-min="' + t.mins + '"]');
+    if (cur) { try { cur.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) {} }
+    setTimeout(pick, 60);
   },
   _tmrAction: function (a) {
     var self = this, t = this._tmr;
@@ -11197,7 +11246,7 @@ const ClarityNoteWriter = {
     else if (a === 'stop') { if (t.tick) { clearInterval(t.tick); t.tick = 0; } t.state = 'idle'; }
     this._paintTimer();
     // keep the writer field focused through any timer tap
-    try { var f = this.el && this.el.querySelector('[data-cn-field]'); if (f && a !== 'start' && a !== 'off') f.focus(); } catch (e) {}
+    try { var f = this.el && this.el.querySelector('[data-cn-field]'); if (f) f.focus(); } catch (e) {}
   },
   _tmrRun: function () {
     var self = this, t = this._tmr;
