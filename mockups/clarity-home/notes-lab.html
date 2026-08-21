@@ -11,7 +11,7 @@
   html,body{margin:0;background:#0a0c10;color:var(--hi);
     font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;line-height:1.5}
-  .wrap{max-width:1560px;margin:0 auto;padding:38px 20px 90px}
+  .wrap{max-width:1240px;margin:0 auto;padding:38px 20px 90px}
   header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
   header p{color:var(--mid);font-size:.95rem;margin:0 0 4px;max-width:86ch}
   .grid{display:flex;flex-wrap:wrap;gap:40px;margin-top:30px;align-items:flex-start;justify-content:center}
@@ -39,13 +39,15 @@
 
   .stage{position:relative;min-height:100%;padding:54px 24px 26px;display:flex;flex-direction:column}
   .spacer{flex:1}
-  /* the one accent control: a bare colored + */
-  .plus{width:34px;height:34px;border-radius:50%;background:rgba(139,233,250,.14);color:var(--cyan);
-    display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;font-family:inherit;
-    font-size:22px;font-weight:400;line-height:1;padding-bottom:2px}
+
+  /* the create action: a bottom-right +, clear of the top-right X, thumb-easy */
+  .fab{position:absolute;right:20px;bottom:calc(24px);width:56px;height:56px;border-radius:50%;
+    background:var(--cyan);color:#04161c;display:flex;align-items:center;justify-content:center;
+    font-size:30px;font-weight:400;line-height:1;padding-bottom:3px;cursor:pointer;border:0;font-family:inherit;
+    box-shadow:0 10px 26px rgba(0,0,0,.45), 0 0 0 6px rgba(4,5,10,.5);z-index:6}
 
   /* ============ QUIET LIST (scan) ============ */
-  .qt .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+  .qt .head{margin-bottom:26px}
   .qt .head h2{font-size:20px;font-weight:750;letter-spacing:-.01em;margin:0}
   .qt .note{position:relative;padding:16px 0;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(255,255,255,.05);transition:opacity .15s}
   .qt .note:first-of-type{padding-top:0}
@@ -65,25 +67,33 @@
   .op .otxt{font-size:17.5px;line-height:1.62;color:rgba(255,255,255,.94);font-weight:450;letter-spacing:-.005em;white-space:pre-wrap}
   .op .odate{margin-top:26px;color:var(--lo);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
   .op .odate b{color:var(--mid);font-weight:600}
+  .op .oedit{margin-top:5px;color:rgba(255,255,255,.32);font-size:12.5px;font-weight:500;font-variant-numeric:tabular-nums}
 
   /* ============ WRITE (with the minimal timer) ============ */
-  .wr .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .wr .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;position:relative}
   .wr .cancel{color:var(--lo);font-size:15px;font-weight:600;background:none;border:0;font-family:inherit;cursor:pointer;padding:4px 0}
   .wr .done{color:var(--cyan);font-size:15px;font-weight:700;background:none;border:0;font-family:inherit;cursor:pointer;padding:4px 0}
-  /* the timer: a whisper. a tiny muted countdown, nothing else, sits center-top */
-  .wr .timer{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.32);font-size:12.5px;font-weight:600;
-    font-variant-numeric:tabular-nums;cursor:pointer;background:none;border:0;font-family:inherit;padding:4px 8px}
-  .wr .timer svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.6}
-  .wr .timer.running{color:rgba(139,233,250,.55)}
+  /* the trigger: a whisper. clock + a hair of text, nothing more */
+  .wr .tmr{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.34);font-size:12.5px;font-weight:600;
+    font-variant-numeric:tabular-nums;cursor:pointer;background:none;border:0;font-family:inherit;padding:5px 8px;border-radius:8px}
+  .wr .tmr.live{color:rgba(139,233,250,.62)}
+  .wr .tmr svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6}
+  .wr .tmr .ic{display:flex;align-items:center;gap:10px;margin-left:4px}
+  .wr .tmr .ic span{width:15px;height:15px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55)}
+  /* the dropdown: a slider, not a row of pills */
+  .wr .drop{position:absolute;top:34px;left:50%;transform:translateX(-50%);width:230px;z-index:8;
+    background:#101319;border-radius:14px;padding:16px 16px 14px;
+    box-shadow:0 18px 44px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08)}
+  .wr .drop .val{text-align:center;font-size:24px;font-weight:750;color:#fff;font-variant-numeric:tabular-nums;margin-bottom:2px}
+  .wr .drop .unit{text-align:center;color:var(--lo);font-size:11.5px;font-weight:600;margin-bottom:14px;letter-spacing:.02em}
+  .wr .drop input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:99px;
+    background:rgba(255,255,255,.16);outline:none}
+  .wr .drop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--cyan);cursor:pointer;box-shadow:0 0 0 4px rgba(4,5,10,.6)}
+  .wr .drop .go{margin-top:16px;width:100%;padding:11px 0;border-radius:999px;background:#fff;color:#0b1112;font-size:14px;font-weight:700;border:0;font-family:inherit;cursor:pointer}
+  .wr .drop .off{display:block;width:100%;text-align:center;margin-top:9px;color:var(--lo);font-size:12.5px;font-weight:600;background:none;border:0;font-family:inherit;cursor:pointer}
   .wr .writing{flex:1;padding:30px 2px 0;font-size:17.5px;line-height:1.62;color:rgba(255,255,255,.94);font-weight:450;letter-spacing:-.005em}
   .wr .caret{display:inline-block;width:2px;height:1.1em;background:var(--cyan);vertical-align:-3px;margin-left:1px;animation:blink 1.1s step-end infinite}
   @keyframes blink{50%{opacity:0}}
-  .wr .ph{color:var(--lo)}
-  /* the duration picker: appears under the timer when tapped, minimal chips */
-  .wr .durs{display:flex;gap:7px;justify-content:center;margin-top:12px}
-  .wr .dur{padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.75);
-    font-size:13px;font-weight:600;cursor:pointer;border:0;font-family:inherit}
-  .wr .dur.on{background:rgba(139,233,250,.16);color:var(--cyan)}
   .wr .kbd{margin:0 -24px -26px;height:238px;background:linear-gradient(180deg,#20242c,#15181e);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:6px;padding:12px 8px;align-content:flex-start}
   .wr .kbd i{height:38px;border-radius:6px;background:rgba(255,255,255,.12);flex:1 1 7%}
@@ -94,7 +104,7 @@
 <div class="wrap">
   <header>
     <h1>Reflections, the full rhythm</h1>
-    <p>The reflection module end to end. Scan the list, tap one to open it (read, edit, or delete), and the writing screen with the optional quiet timer, a whisper in the corner so you can reflect for a set stretch without watching the clock. The + is the only colored thing on the list. Tap a reflection in the list to open it.</p>
+    <p>Scan the list, tap one to open it (read, edit, delete). The + sits bottom-right, thumb-easy and clear of the close X. On the write screen the timer is a whisper: tap it, drag the slider to a length, and it counts down with pause and stop, never a row of buttons in your face. Tap a reflection to open it, and tap the timer in the third phone to try it.</p>
   </header>
   <div class="grid" id="grid"></div>
 </div>
@@ -103,36 +113,56 @@
 const NOTES = [
   { text: "because my little brother watches everything i do. every single thing. and i keep thinking about how if i actually pull this off, if i build the thing i keep saying im going to build, hell have proof it was possible. that someone from our house did it. thats the whole reason. not the numbers, not the money. him.", date: "Jul 2", first: true },
   { text: "had one of those weeks where i questioned all of it. spent like 4 hours on a video that got 30 views and i wanted to quit so bad. but i keep coming back to the fact that the reason was never the number, it was becoming someone he could actually believe. reminding myself of that tonight because i almost didnt open the app.", date: "Jul 30", resurfaced: true },
-  { text: "posted the video i almost deleted. the one i thought was too personal, too much. three people messaged me saying it helped them. THREE. i genuinely dont care about the view count on that one. that is literally the entire point of doing this and i almost threw it away because i got scared.", date: "Aug 18" },
+  { text: "posted the video i almost deleted. the one i thought was too personal, too much. three people messaged me saying it helped them. THREE. i genuinely dont care about the view count on that one. that is literally the entire point of doing this and i almost threw it away because i got scared.", date: "Aug 18", edited: "Aug 21" },
   { text: "slower month than i wanted honestly. work was insane, life got in the way, didnt post half of what i planned. not beating myself up about it though. still running the marathon, just walked a few miles this stretch. back at it tomorrow.", date: "Aug 14" },
   { text: "exhausted today. barely slept. showed up and wrote for 20 min anyway even though everything in me wanted to skip it. thats the win today. just didnt break the chain.", date: "Aug 20" },
 ];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const CLOCK = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+const I_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="7" y="6" width="3.4" height="12" rx="1"/><rect x="13.6" y="6" width="3.4" height="12" rx="1"/></svg>';
+const I_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 6v12l10-6z"/></svg>';
+const I_STOP = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>';
 
 function QT(){
   const body = NOTES.map((n,i)=>`<div class="note" data-i="${i}">
     ${n.resurfaced?'<div class="resurf">You wrote this 7 weeks ago</div>':''}
     <div class="date">${n.date}, 2026</div>
     <div class="txt">${esc(n.text)}</div></div>`).join('');
-  return `<div class="head"><h2>Reflections</h2><button class="plus" aria-label="New reflection">+</button></div>${body}<div class="spacer"></div>`;
+  return `<div class="head"><h2>Reflections</h2></div>${body}<div class="spacer"></div>
+    <button class="fab" aria-label="New reflection">+</button>`;
 }
-let OPi = 1;
+let OPi = 2;
 function OP(){
   const n = NOTES[OPi];
   return `<div class="bar"><button class="back">&#8592; Reflections</button>
     <div class="acts"><button class="edit">Edit</button><button class="del">Delete</button></div></div>
     <div class="body"><div class="otxt">${esc(n.text)}</div>
-      <div class="odate">Written <b>${n.date}, 2026</b>${n.first?'. First reflection':''}</div></div>
+      <div class="odate">Written <b>${n.date}, 2026</b>${n.first?'. First reflection':''}</div>
+      ${n.edited?'<div class="oedit">Edited on '+n.edited+', 2026</div>':''}</div>
     <div class="spacer"></div>`;
 }
+
+// ---- the write screen owns a tiny timer state machine ----
+let TM = { state:'idle', mins:10, remain:10*60, tick:null };
+function fmt(s){ const m=Math.floor(s/60), ss=s%60; return m+':'+String(ss).padStart(2,'0'); }
 function WR(){
+  let trigger;
+  if(TM.state==='idle' || TM.state==='setting') trigger = `<button class="tmr" data-t="open">${CLOCK}<span>Timer</span></button>`;
+  else {
+    const icons = TM.state==='paused'
+      ? `<span data-t="resume">${I_PLAY}</span><span data-t="stop">${I_STOP}</span>`
+      : `<span data-t="pause">${I_PAUSE}</span><span data-t="stop">${I_STOP}</span>`;
+    trigger = `<button class="tmr live" data-t="noop">${CLOCK}<span>${fmt(TM.remain)}</span><span class="ic">${icons}</span></button>`;
+  }
+  const drop = TM.state==='setting' ? `<div class="drop">
+      <div class="val">${TM.mins}</div><div class="unit">MINUTES</div>
+      <input type="range" min="5" max="60" step="5" value="${TM.mins}" data-t="slide">
+      <button class="go" data-t="start">Start</button>
+      <button class="off" data-t="off">No timer</button>
+    </div>` : '';
   return `<div class="bar">
-      <button class="cancel">Cancel</button>
-      <button class="timer running">${CLOCK}<span>08:12</span></button>
-      <button class="done">Done</button>
+      <button class="cancel">Cancel</button>${trigger}<button class="done">Done</button>${drop}
     </div>
-    <div class="durs"><button class="dur">5</button><button class="dur on">10</button><button class="dur">20</button><button class="dur">30</button><button class="dur">Off</button></div>
     <div class="writing">honestly not even sure what to write tonight. just needed to sit down and get out of my own head for a minute. the channel felt heavy today, like everyone else is so far ahead and im still figuring out what im even doing<span class="caret"></span></div>
     <div class="kbd">
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -143,9 +173,9 @@ function WR(){
 }
 
 const CELLS = [
-  { key:'qt', name:'Reflections (scan)', sub:'The list. Date, then the words, three lines each. A reflection resurfaces on its own. The + is the only color.', render:QT },
-  { key:'op', name:'Open (read · edit · delete)', sub:'Tap one to open it alone, full width, easy to sit with. Edit and Delete live here, not buried in a gesture.', render:OP },
-  { key:'wr', name:'Write (with the quiet timer)', sub:'The timer is a whisper in the corner, tap it to pick 5 to 30 minutes or Off. Then just write, it counts down without ever getting in the way.', render:WR },
+  { key:'qt', name:'Reflections (scan)', sub:'The list, plus the + in the bottom-right corner where your thumb already is, never near the X. A reflection resurfaces on its own.', render:QT },
+  { key:'op', name:'Open (read · edit · delete)', sub:'Tap one to open it. It shows when it was written, and if you changed it later, a quiet "Edited on" line below.', render:OP },
+  { key:'wr', name:'Write (the quiet timer)', sub:'Tap the timer, drag one slider to a length, Start. It counts down with just pause and stop. No timer at all is one tap away.', render:WR },
 ];
 
 const grid = document.getElementById('grid');
@@ -159,11 +189,34 @@ grid.innerHTML = CELLS.map(c=>`
 function repaint(key){ document.getElementById('ph'+key).innerHTML = CELLS.find(c=>c.key===key).render(); }
 CELLS.forEach(c=>repaint(c.key));
 
+function startTick(){
+  clearInterval(TM.tick);
+  TM.tick = setInterval(()=>{
+    if(TM.state!=='running') return;
+    TM.remain = Math.max(0, TM.remain-1);
+    const el = document.querySelector('#phwr .tmr span'); if(el) el.textContent = fmt(TM.remain);
+    if(TM.remain===0){ clearInterval(TM.tick); TM.state='idle'; repaint('wr'); }
+  }, 1000);
+}
+
 document.addEventListener('click', e=>{
   const note = e.target.closest('#phqt .note');
   if(note){ OPi = +note.dataset.i; repaint('op'); return; }
-  const dur = e.target.closest('#phwr .dur');
-  if(dur){ document.querySelectorAll('#phwr .dur').forEach(d=>d.classList.remove('on')); dur.classList.add('on'); return; }
+  const t = e.target.closest('#phwr [data-t]');
+  if(t){
+    const a = t.dataset.t;
+    if(a==='open'){ TM.state='setting'; repaint('wr'); }
+    else if(a==='start'){ TM.remain = TM.mins*60; TM.state='running'; repaint('wr'); startTick(); }
+    else if(a==='off'){ TM.state='idle'; repaint('wr'); }
+    else if(a==='pause'){ TM.state='paused'; repaint('wr'); }
+    else if(a==='resume'){ TM.state='running'; repaint('wr'); }
+    else if(a==='stop'){ clearInterval(TM.tick); TM.state='idle'; repaint('wr'); }
+    return;
+  }
+});
+document.addEventListener('input', e=>{
+  const s = e.target.closest('#phwr input[type=range]');
+  if(s){ TM.mins = +s.value; const v=document.querySelector('#phwr .drop .val'); if(v) v.textContent = TM.mins; }
 });
 </script>
 </body>
