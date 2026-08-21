@@ -114,7 +114,7 @@
   function nextMile(t) { for (var i = 0; i < MILES.length; i++) if (MILES[i] > t) return MILES[i]; return Math.ceil((t + 1) / 500) * 500; }
   function mileLabel(m) { return m === 7 ? 'your first week' : m === 14 ? 'two weeks' : m === 30 ? 'a month' : m === 365 ? 'a year' : m.toLocaleString() + ' days'; }
   // what the page reveals as the record grows, so day one is never an empty dashboard
-  var REVEAL = { support: 7, score: 14 };
+  var REVEAL = { support: 7 };
   function pageOne(s, log) {
     var n = s.total;
     var size = n < 100 ? 132 : n < 1000 ? 112 : 92;
@@ -137,8 +137,17 @@
      heatmap of the window whose green deepens the more consistent you are.
      Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
   // the score, broken into what the last 30 days are actually made of.
+  // the days the score actually grades: the last 90, minus a today that is
+  // still in progress (an unfinished today is not a miss, so it never drags the
+  // score down before the day is over).
+  function gradedDays(log, A) {
+    var slice = log.slice(-Math.min(90, log.length));
+    var last = slice[slice.length - 1];
+    if (last) { var st = stateOf(A, last.date); if (st !== 'kept' && st !== 'sup') slice = slice.slice(0, -1); }
+    return slice;
+  }
   function scoreViz(A, log) {
-    var slice = log.slice(-Math.min(90, log.length)), kept = 0, sup = 0, missed = 0;
+    var slice = gradedDays(log, A), kept = 0, sup = 0, missed = 0;
     slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
     function seg(n, c) { return n ? '<u class="' + c + '" style="flex:' + n + '"></u>' : ''; }
     function key(n, c, w) { return n ? '<span><b class="' + c + '"></b>' + n + ' ' + w + '</span>' : ''; }
@@ -146,10 +155,7 @@
       '<div class="mix__key">' + key(kept, 'k', 'kept') + key(sup, 's', 'smaller') + key(missed, 'm', 'missed') + '</div></div>';
   }
   function scoreBlock(s, log, A) {
-    var win = Math.min(90, log.length), slice = log.slice(-win);
-    var kept = 0, sup = 0, missed = 0;
-    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
-    // doing something smaller is still progress: the score punishes nothing, not imperfection
+    var slice = gradedDays(log, A), win = Math.min(90, log.length);
     var score = scoreDays(A, slice);
     // which way the score moved over the past week (same window, ended 7 days back).
     // shown as a small exponent: up is accent, down is muted, never red, never shame.
@@ -403,7 +409,7 @@
     // score is full width; below it a two-column layout that works with glass
     // (CSS multicol drops backdrop-filter panels, so we place columns ourselves).
     // Mobile stacks in reading order: calendar, pill, record, by month, hard days.
-    var scorePart = (s.N >= REVEAL.score) ? scoreBlock(s, log, A) : '';
+    var scorePart = (s.total >= 1) ? scoreBlock(s, log, A) : '';
     var side = pill + ((s.N >= REVEAL.support) ? support(s) : '') + hardDays(s, log);
     return scorePart +
       '<div class="evwrap">' +
