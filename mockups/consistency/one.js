@@ -41,7 +41,7 @@
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal';
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true;
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -82,6 +82,13 @@
   }
 
   function stateOf(A, date) { var e = A.map[dkey(date)]; return e ? e.st : null; }
+  // the score for any set of day-objects: kept full, other half, rest ignored
+  function scoreDays(A, days) {
+    var kept = 0, sup = 0, missed = 0;
+    days.forEach(function (x) { var st = stateOf(A, x.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
+    var denom = kept + sup + missed;
+    return denom ? Math.round(100 * (kept + 0.5 * sup) / denom) : 100;
+  }
   function entryOf(A, date) { return A.map[dkey(date)] || null; }
 
   /* the real Memento M, the exact logo path from the app boot mask and tab bar */
@@ -122,7 +129,19 @@
     var kept = 0, sup = 0, missed = 0;
     slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
     // doing something smaller is still progress: the score punishes nothing, not imperfection
-    var denom = kept + sup + missed, score = denom ? Math.round(100 * (kept + 0.5 * sup) / denom) : 100;
+    var score = scoreDays(A, slice);
+    // which way the score moved over the past week (same window, ended 7 days back).
+    // shown as a small exponent: up is accent, down is muted, never red, never shame.
+    var delta = null;
+    if (log.length >= win + 7) delta = score - scoreDays(A, log.slice(-(win + 7), -7));
+    var deltaHTML = '';
+    if (delta) {
+      var up = delta > 0;
+      deltaHTML = '<sup class="score__delta ' + (up ? 'up' : 'down') + '">' +
+        (up ? '<svg viewBox="0 0 10 10"><path d="M5 1 L9 8 L1 8 Z"/></svg>'
+            : '<svg viewBox="0 0 10 10"><path d="M5 9 L1 2 L9 2 Z"/></svg>') +
+        Math.abs(delta) + '</sup>';
+    }
     var a = (0.42 + 0.5 * (score / 100)).toFixed(2);
     var tone = 'rgba(var(--acc-rgb),' + a + ')';
     var cells = slice.map(function (d) {
@@ -134,7 +153,7 @@
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
-      '<div class="score__n">' + score + '</div></div>' +
+      '<div class="score__n">' + score + deltaHTML + '</div></div>' +
       '<div class="score__hm">' + cells + '</div>' +
       '<div class="score__note">The last 30 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
       '</div></div>';
@@ -239,7 +258,8 @@
         anyIn = true;
         if (e) { monthDays++; if (e.st === 'kept') monthKept++; }
         var st = e ? e.st : 'ahead';
-        wk += '<div class="d ' + st + (e && sameDay(d, today) ? ' today' : '') + '"' +
+        var isToday = e && sameDay(d, today);
+        wk += '<div class="d ' + st + (isToday ? ' today ' + (st === 'kept' ? 'done' : 'pending') : '') + '"' +
           (e ? ' data-k="' + dkey(d) + '"' : '') + '>' + d.getDate() + '</div>';
       }
       var met = SHAPE === 'frequency' && weekKept >= A.target;
@@ -361,6 +381,26 @@
     return scoreBlock(s, log, A) + cal + pill + tracks(log) + rhythm(s) + monthBars(s) + hardDays(s, log);
   }
 
+  /* ---------- the completion moment: today just joined the record ---------- */
+  function countUp(el, from, to, ms) {
+    if (!el || from >= to) { if (el) el.textContent = to.toLocaleString(); return; }
+    var start = null;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / ms);
+      var v = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3)));
+      el.textContent = v.toLocaleString();
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function playCompletion() {
+    var el = document.querySelector('.one__num');
+    if (el) { var to = +el.textContent.replace(/[^0-9]/g, ''); countUp(el, to - 1, to, 650); }
+    var ring = document.querySelector('.cal .d.today');
+    if (ring) { ring.classList.remove('justfilled'); void ring.offsetWidth; ring.classList.add('justfilled'); }
+  }
+
   /* ---------- tap a day: a small receipt of what you did ---------- */
   var LASTA = null;
   function closeDaypop() { var p = document.querySelector('.daypop'); if (p) p.remove(); }
@@ -402,6 +442,10 @@
   function render() {
     var N = Math.max(1, DAY);
     var log = K.buildLog(N, SHAPE);
+    // TODAYDONE drives the last day so the completion moment is replayable
+    var lastDay = log[log.length - 1];
+    if (TODAYDONE) { if (!lastDay.on) { lastDay.on = true; lastDay.min = lastDay.min || 30; } }
+    else { lastDay.on = false; lastDay.sup = {}; lastDay.min = 0; }
     if (PERSONA.rough) {
       // ~40% consistency, off the rate for three weeks, a two day comeback underway
       log.forEach(function (d, i) {
@@ -466,6 +510,15 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  el('todayChips').innerHTML = '<button data-t="done" class="on">Today done</button><button data-t="pending">Not yet</button>';
+  el('todayChips').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var wasDone = TODAYDONE;
+    TODAYDONE = b.getAttribute('data-t') === 'done';
+    [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
+    render();
+    if (TODAYDONE && !wasDone) playCompletion();
+  });
   el('modeChips').innerHTML = '<button data-m="dark" class="on">Dark</button><button data-m="light">Light</button>';
   el('modeChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;

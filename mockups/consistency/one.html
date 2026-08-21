@@ -239,6 +239,13 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 36px rgba(0,0,0,0.44); position: relative; overflow: hidden; }
   .score__m { position: absolute; top: 13px; right: 14px; line-height: 0; color: #08130a; }
   .score__lbl { font-size: 13px; font-weight: 600; color: rgba(8,19,10,0.55); }
+  .score__delta { font-size: 15px; font-weight: 750; vertical-align: top; position: relative; top: 7px;
+    margin-left: 7px; display: inline-flex; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
+  .score__delta svg { width: 8.5px; height: 8.5px; fill: currentColor; }
+  .score__delta.up { color: #1f9e2a; }
+  .score__delta.down { color: rgba(8,19,10,0.42); }
+  html.light:not(.glassplus) .score__delta.up { color: var(--acc); }
+  html.light:not(.glassplus) .score__delta.down { color: rgba(244,255,247,0.5); }
   .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
     color: #08130a; font-variant-numeric: tabular-nums; margin-top: 2px; }
   .score__hm { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 18px; }
@@ -279,7 +286,13 @@
   /* a day the goal never asked for is not a miss: no fill, just a quiet number */
   .cal .d.rest { background: transparent; color: rgba(255,255,255,0.15); }
   .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
-  .cal .d.today { outline: 2px solid rgba(var(--acc-rgb),0.95); outline-offset: -2px; }
+  .cal .d.today { outline: 2px solid rgba(255,255,255,0.28); outline-offset: -2px; border-radius: 9px; }
+  .cal .d.today.done { outline-color: rgba(var(--acc-rgb),0.95); background: rgba(var(--acc-rgb),0.13); }
+  html.light .cal .d.today { outline-color: rgba(10,14,10,0.3); }
+  html.light .cal .d.today.done { outline-color: rgba(var(--acc-rgb),0.95); background: rgba(var(--acc-rgb),0.16); }
+  @keyframes ringpop { 0% { transform: scale(1); } 42% { transform: scale(1.14); } 100% { transform: scale(1); } }
+  .cal .d.today.justfilled { animation: ringpop 0.42s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .cal .d.today.justfilled { animation: none; } }
   .key u.r { background: rgba(255,255,255,0.02); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
   .cal .d.rest, .cal .d.ahead { font-weight: 500; }
   .cal .wc { display: flex; align-items: center; justify-content: flex-end;
@@ -463,7 +476,7 @@
     <input type="range" id="slider" min="1" max="365" value="168">
     <div class="chips" id="dayChips"></div>
   </div>
-  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="accChips" style="margin-left:auto"></div><div class="chips" id="modeChips"></div><div class="chips" id="fxChips"></div><div class="chips" id="viewChips"></div></div>
+  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="fxChips"></div><div class="chips" id="viewChips"></div></div>
 </div></div>
 
 <div class="gplus-fx" aria-hidden="true"><i></i><i></i><i></i></div>
