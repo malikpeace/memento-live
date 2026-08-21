@@ -91,7 +91,24 @@
   .wr .drop input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--cyan);cursor:pointer;box-shadow:0 0 0 4px rgba(4,5,10,.6)}
   .wr .drop .go{margin-top:16px;width:100%;padding:11px 0;border-radius:999px;background:#fff;color:#0b1112;font-size:14px;font-weight:700;border:0;font-family:inherit;cursor:pointer}
   .wr .drop .off{display:block;width:100%;text-align:center;margin-top:9px;color:var(--lo);font-size:12.5px;font-weight:600;background:none;border:0;font-family:inherit;cursor:pointer}
-  .wr .writing{flex:1;padding:30px 2px 0;font-size:17.5px;line-height:1.62;color:rgba(255,255,255,.94);font-weight:450;letter-spacing:-.005em}
+  .wr .writing{flex:1;padding:26px 2px 0;font-size:17.5px;line-height:1.62;color:rgba(255,255,255,.94);font-weight:450;letter-spacing:-.005em}
+  .wr .writing b{font-weight:750;color:#fff}
+  .wr .writing i{font-style:italic}
+  /* typed checklist: [ ] becomes a box */
+  .wr .ck{display:flex;align-items:flex-start;gap:10px;margin:9px 0}
+  .wr .ck .box{flex:none;width:19px;height:19px;margin-top:2px;border-radius:5px;background:rgba(255,255,255,.09);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:12px}
+  .wr .ck.done .box{background:rgba(139,233,250,.9);color:#04161c;box-shadow:none}
+  .wr .ck.done span{color:rgba(255,255,255,.4);text-decoration:line-through}
+  /* select-to-format: nothing until you select; then a tiny B / i floats above */
+  .wr .sel{position:relative;background:rgba(139,233,250,.24);border-radius:3px;padding:1px 0}
+  .wr .fmt{position:absolute;left:50%;top:-42px;transform:translateX(-50%);display:flex;
+    background:#161a20;border-radius:9px;box-shadow:0 10px 26px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08);overflow:hidden}
+  .wr .fmt button{width:38px;height:34px;background:none;border:0;color:#fff;font-size:15px;cursor:pointer;font-family:inherit}
+  .wr .fmt button+button{box-shadow:inset 1px 0 0 rgba(255,255,255,.08)}
+  .wr .fmt .fb{font-weight:800}
+  .wr .fmt .fi{font-style:italic;font-weight:600}
+  .wr .fmt .fc{font-size:13px}
   .wr .caret{display:inline-block;width:2px;height:1.1em;background:var(--cyan);vertical-align:-3px;margin-left:1px;animation:blink 1.1s step-end infinite}
   @keyframes blink{50%{opacity:0}}
   .wr .kbd{margin:0 -24px -26px;height:238px;background:linear-gradient(180deg,#20242c,#15181e);
@@ -104,7 +121,7 @@
 <div class="wrap">
   <header>
     <h1>Reflections, the full rhythm</h1>
-    <p>Scan the list, tap one to open it (read, edit, delete). The + sits bottom-right, thumb-easy and clear of the close X. On the write screen the timer is a whisper: tap it, drag the slider to a length, and it counts down with pause and stop, never a row of buttons in your face. Tap a reflection to open it, and tap the timer in the third phone to try it.</p>
+    <p>Scan the list, tap one to open it (read, edit, delete). The + sits bottom-right, thumb-easy and clear of the close X. On the write screen: select text and a tiny B / i / checkbox popover floats up (borrowed from the old rich editor, nothing permanent on screen), type a dash for a checklist, and the timer stays a whisper you tap to set. Tap a reflection to open it; tap the timer in the third phone to try it.</p>
   </header>
   <div class="grid" id="grid"></div>
 </div>
@@ -163,7 +180,11 @@ function WR(){
   return `<div class="bar">
       <button class="cancel">Cancel</button>${trigger}<button class="done">Done</button>${drop}
     </div>
-    <div class="writing">honestly not even sure what to write tonight. just needed to sit down and get out of my own head for a minute. the channel felt heavy today, like everyone else is so far ahead and im still figuring out what im even doing<span class="caret"></span></div>
+    <div class="writing">honestly not even sure what to write tonight. just needed to get out of my own head for a minute. the channel felt <span class="sel">so heavy today<span class="fmt"><button class="fb">B</button><button class="fi">i</button><button class="fc">&#10003;</button></span></span>, like everyone is so far ahead. but the whole reason was never the numbers. reminding myself of that.
+
+what i actually want to get done this week:
+<div class="ck done"><span class="box">&#10003;</span><span>post the video i keep sitting on</span></div><div class="ck"><span class="box"></span><span>reply to the three people who messaged</span></div><div class="ck"><span class="box"></span><span>write for 10 min a day, no excuses</span></div>
+<span class="caret"></span></div>
     <div class="kbd">
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
       <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -175,7 +196,7 @@ function WR(){
 const CELLS = [
   { key:'qt', name:'Reflections (scan)', sub:'The list, plus the + in the bottom-right corner where your thumb already is, never near the X. A reflection resurfaces on its own.', render:QT },
   { key:'op', name:'Open (read · edit · delete)', sub:'Tap one to open it. It shows when it was written, and if you changed it later, a quiet "Edited on" line below.', render:OP },
-  { key:'wr', name:'Write (the quiet timer)', sub:'Tap the timer, drag one slider to a length, Start. It counts down with just pause and stop. No timer at all is one tap away.', render:WR },
+  { key:'wr', name:'Write (timer + light formatting)', sub:'Select any text and a tiny B / i / checkbox floats up, nothing on screen until then. Type a dash to start a checklist. The timer stays a whisper. Bold renders inline, calm blank page otherwise.', render:WR },
 ];
 
 const grid = document.getElementById('grid');
