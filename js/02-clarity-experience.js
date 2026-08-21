@@ -10563,7 +10563,7 @@ function _clarityPageNotes() {
       return '<div class="cp-note" data-cn-id="' + esc(String(n.id || '')) + '" role="button" tabindex="0">' +
         (surf && surf.id === n.id ? '<div class="cp-resurf">' + esc(_cnWeeksAgo(n.day)) + '</div>' : '') +
         (sig ? '<div class="cp-note__date">' + esc(sig) + '</div>' : '') +
-        '<div class="cp-note__txt cp-note__txt--clamp">' + esc(String(n.text || '')) + '</div>' +
+        '<div class="cp-note__txt cp-note__txt--clamp">' + _cnPreview(n.text) + '</div>' +
         '</div>';
     }).join('');
   }
@@ -11026,6 +11026,46 @@ function clarityOpenNotesPage() {
    screen: same reading order as the mock, above the keyboard by geometry
    rather than by measurement.
    ============================================================ */
+/* ---- light markdown for reflections (phase 2b). Bold/italic via markers,
+   checklists via "- [ ] / - [x]". Escape first, then decorate: the note text
+   is stored as plain markdown, rendered only on display. ---- */
+function _cnInline(str) {
+  var e = esc(String(str == null ? '' : str));
+  e = e.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>');
+  e = e.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>');
+  return e;
+}
+function _cnRenderMd(text) {
+  return String(text || '').split('\n').map(function (ln, i) {
+    var m = ln.match(/^\s*- \[( |x|X)\]\s?(.*)$/);
+    if (m) {
+      var done = m[1].toLowerCase() === 'x';
+      return '<div class="cn-ck' + (done ? ' cn-ck--done' : '') + '" data-ck="' + i + '">' +
+        '<span class="cn-ck__box">' + (done ? '\u2713' : '') + '</span>' +
+        '<span class="cn-ck__t">' + _cnInline(m[2]) + '</span></div>';
+    }
+    return '<div class="cn-mdln">' + (ln.trim() ? _cnInline(ln) : '<br>') + '</div>';
+  }).join('');
+}
+/* the list preview: one flowing clamped block, checkbox lines become glyphs. */
+function _cnPreview(text) {
+  var t = String(text || '').replace(/^\s*- \[ \]\s?/gm, '\u2610 ').replace(/^\s*- \[[xX]\]\s?/gm, '\u2611 ');
+  return _cnInline(t.replace(/\n+/g, '  '));
+}
+/* toggle a checkbox line in place. Not an "edit": ticking a box is not
+   rewriting the reflection, so no editedDay stamp. Allowed on any note. */
+function clarityNotesToggleCheck(id, lineIndex) {
+  var s = clarityNotesStore();
+  var n = s.entries.find(function (e2) { return e2 && e2.id === id; });
+  if (!n) return false;
+  var lines = String(n.text || '').split('\n');
+  if (lineIndex < 0 || lineIndex >= lines.length) return false;
+  lines[lineIndex] = lines[lineIndex].replace(/^(\s*- \[)( |x|X)(\])/, function (_, a, c, b) { return a + (c.toLowerCase() === 'x' ? ' ' : 'x') + b; });
+  n.text = lines.join('\n');
+  try { persistNow(); } catch (e) {}
+  return true;
+}
+
 const ClarityNoteWriter = {
   el: null,
   pageWrap: null,       // read by bindKeyboardSettle; the writer never scrolls
@@ -11056,6 +11096,7 @@ const ClarityNoteWriter = {
     if (!this.isOpen) return;
     this.isOpen = false;
     try { if (this._tmr && this._tmr.tick) { clearInterval(this._tmr.tick); this._tmr.tick = 0; } } catch (e) {}
+    try { if (this._fmtCleanup) { this._fmtCleanup(); this._fmtCleanup = null; } } catch (e) {}
     try { if (this._kbSettleCleanup) { this._kbSettleCleanup(); this._kbSettleCleanup = null; } } catch (e) {}
     const el = this.el;
     this.el = null;
@@ -11147,9 +11188,97 @@ const ClarityNoteWriter = {
     // and every control preventDefaults its press so the keyboard never drops.
     this._paintTimer();
 
+    // select-to-format (phase 2b): a B / i / checklist popover that shows only
+    // while text is selected. Every button preventDefaults so focus and the
+    // keyboard stay put; the field is a plain textarea, markers are markdown.
+    this._bindFormat(el, field);
+
     // the proven recipe, verbatim, on a field that already sits high
     try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, field); } catch (e) {}
     setTimeout(function () { try { field.focus(); } catch (e) {} }, 90);
+  },
+
+  // ---- select-to-format (phase 2b) ----
+  _bindFormat: function (el, field) {
+    var self = this;
+    var pop = document.createElement('div');
+    pop.className = 'cn-fmt';
+    pop.hidden = true;
+    pop.innerHTML =
+      '<button type="button" class="cn-fmt__b" data-fmt="b"><b>B</b></button>' +
+      '<button type="button" class="cn-fmt__i" data-fmt="i"><i>i</i></button>' +
+      '<button type="button" class="cn-fmt__c" data-fmt="check">\u2713</button>';
+    el.appendChild(pop);
+    this._fmtPop = pop;
+
+    var hide = function () { pop.hidden = true; };
+    var place = function () {
+      var s = field.selectionStart, e = field.selectionEnd;
+      if (s === e) { hide(); return; }
+      var r = self._selRect(field);
+      if (!r) { hide(); return; }
+      var host = el.getBoundingClientRect();
+      var top = r.top - host.top - 46;
+      var left = r.left - host.left + r.width / 2;
+      if (top < (host.height ? 8 : 8)) top = r.bottom - host.top + 10;
+      pop.style.top = Math.max(6, top) + 'px';
+      pop.style.left = Math.min(Math.max(52, left), host.width - 52) + 'px';
+      pop.hidden = false;
+    };
+
+    var onSel = function () { if (self.isOpen && document.activeElement === field) place(); };
+    document.addEventListener('selectionchange', onSel);
+    field.addEventListener('select', place);
+    field.addEventListener('scroll', hide, { passive: true });
+    field.addEventListener('blur', function () { setTimeout(hide, 120); });
+    this._fmtCleanup = function () { document.removeEventListener('selectionchange', onSel); };
+
+    var wrapSel = function (mk) {
+      var s = field.selectionStart, e = field.selectionEnd, v = field.value;
+      if (s === e) return;
+      field.value = v.slice(0, s) + mk + v.slice(s, e) + mk + v.slice(e);
+      field.selectionStart = s + mk.length; field.selectionEnd = e + mk.length;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      field.focus(); place();
+    };
+    var checklist = function () {
+      var s = field.selectionStart, e = field.selectionEnd, v = field.value;
+      var ls = v.lastIndexOf('\n', s - 1) + 1;
+      field.value = v.slice(0, ls) + '- [ ] ' + v.slice(ls);
+      field.selectionStart = field.selectionEnd = e + 6;
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      field.focus(); hide();
+    };
+    Array.prototype.slice.call(pop.querySelectorAll('[data-fmt]')).forEach(function (b) {
+      b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); });
+      b.addEventListener('click', function () {
+        var k = b.getAttribute('data-fmt');
+        if (k === 'b') wrapSel('**');
+        else if (k === 'i') wrapSel('*');
+        else checklist();
+      });
+    });
+  },
+  // measure the selection rect inside a textarea via a mirror element
+  _selRect: function (field) {
+    try {
+      var cs = getComputedStyle(field);
+      var div = document.createElement('div');
+      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'letterSpacing', 'textTransform', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderLeftWidth'].forEach(function (k) { div.style[k] = cs[k]; });
+      div.style.position = 'absolute'; div.style.visibility = 'hidden'; div.style.whiteSpace = 'pre-wrap'; div.style.wordWrap = 'break-word'; div.style.boxSizing = 'border-box';
+      var fr = field.getBoundingClientRect();
+      div.style.width = field.clientWidth + (parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + 'px';
+      div.style.left = fr.left + 'px'; div.style.top = (fr.top - field.scrollTop) + 'px';
+      var val = field.value;
+      div.textContent = val.slice(0, field.selectionStart);
+      var span = document.createElement('span');
+      span.textContent = val.slice(field.selectionStart, field.selectionEnd) || '.';
+      div.appendChild(span);
+      document.body.appendChild(div);
+      var sr = span.getBoundingClientRect();
+      document.body.removeChild(div);
+      return { top: sr.top, bottom: sr.bottom, left: sr.left, width: sr.width };
+    } catch (e) { return null; }
   },
 
   // ---- the quiet timer: a whisper. slider to set, pause/resume/stop, a
@@ -11329,7 +11458,7 @@ const ClarityNoteReader = {
           '</div>' +
         '</div>' +
         '<div class="cnr__body">' +
-          '<div class="cnr__txt">' + esc(String(n.text || '')) + '</div>' +
+          '<div class="cnr__txt">' + _cnRenderMd(n.text) + '</div>' +
           '<div class="cnr__date">Written <b>' + esc(written) + '</b>' + (n.founding ? '. First reflection' : '') + '</div>' +
           (edited ? '<div class="cnr__edited">Edited on ' + esc(edited) + '</div>' : '') +
         '</div>' +
@@ -11348,6 +11477,14 @@ const ClarityNoteReader = {
     });
     el.querySelector('[data-cnr-del]').addEventListener('click', function () {
       _cnConfirmDelete(n.id, function () { self.close(); });
+    });
+    // tappable checkboxes in the rendered markdown
+    Array.prototype.slice.call(el.querySelectorAll('[data-ck]')).forEach(function (ck) {
+      ck.addEventListener('click', function () {
+        clarityNotesToggleCheck(n.id, parseInt(ck.getAttribute('data-ck'), 10));
+        _cnRepaintNotesPage();
+        self._render();
+      });
     });
   }
 };

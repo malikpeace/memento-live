@@ -4969,7 +4969,7 @@ html.theme-light .cp-ghosttag { color: rgba(24, 26, 33, 0.4); }
 .cn-writer {
   position: fixed; inset: 0; z-index: 100050;
   background: #04050a; color: rgba(255, 255, 255, 0.96);
-  --cn-acc: #8be9fa;
+  --cn-acc: #8be9fa; --cp-acc: #8be9fa;
   --cn-acc-soft: rgba(139, 233, 250, 0.16);
   --cn-acc-ring: rgba(139, 233, 250, 0.45);
   opacity: 0; transition: opacity 0.2s ease;
@@ -5433,6 +5433,7 @@ html.theme-light .cp-fab { background: #0d8ca6; color: #fff; }
 /* THE READER: full screen, same room as the writer */
 .cn-reader {
   position: fixed; inset: 0; z-index: 1400;
+  --cp-acc: #8be9fa;
   background: #04050a;
   opacity: 0; transition: opacity 0.22s ease;
   display: flex;
@@ -5520,3 +5521,32 @@ html.theme-light .cn-tmroff { color: rgba(24, 26, 33, 0.4); }
 .cn-jog.is-open .cn-jog__chev { transform: rotate(90deg); }
 .cn-jog__chips[hidden] { display: none; }
 html.theme-light .cn-jog__lab { color: rgba(24, 26, 33, 0.45); }
+
+/* ---- phase 2b: select-to-format popover + rendered markdown ---- */
+.cn-fmt {
+  position: absolute; z-index: 40; transform: translateX(-50%);
+  display: flex; background: #21262f; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.cn-fmt button { width: 42px; height: 38px; background: none; border: 0; color: #fff; font-family: inherit; font-size: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.cn-fmt button + button { box-shadow: inset 1px 0 0 rgba(255,255,255,0.09); }
+.cn-fmt__b b { font-weight: 800; }
+.cn-fmt__i i { font-style: italic; font-weight: 600; }
+.cn-fmt__c { color: var(--cp-acc); font-size: 15px; }
+html.theme-light .cn-fmt { background: #fff; box-shadow: 0 10px 28px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.9); }
+html.theme-light .cn-fmt button { color: rgba(24,26,33,0.9); }
+html.theme-light .cn-fmt button + button { box-shadow: inset 1px 0 0 rgba(24,26,33,0.08); }
+html.theme-light .cn-fmt__c { color: #0d8ca6; }
+
+/* rendered markdown, in the reader and the list preview */
+.cnr__txt b, .cp-note__txt b { font-weight: 750; color: inherit; }
+.cnr__txt i, .cp-note__txt i { font-style: italic; }
+.cn-mdln { min-height: 1.62em; }
+.cn-ck { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0; cursor: pointer; }
+.cn-ck__box { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 5px; background: rgba(255,255,255,0.09);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16); display: flex; align-items: center; justify-content: center; color: var(--cp-acc); font-size: 12px; }
+.cn-ck--done .cn-ck__box { background: var(--cp-acc); color: #04161c; box-shadow: none; }
+.cn-ck--done .cn-ck__t { color: rgba(255,255,255,0.42); text-decoration: line-through; }
+html.theme-light .cn-ck__box { background: rgba(24,26,33,0.07); box-shadow: inset 0 0 0 1px rgba(24,26,33,0.16); color: #0d8ca6; }
+html.theme-light .cn-ck--done .cn-ck__box { background: #0d8ca6; color: #fff; box-shadow: none; }
+html.theme-light .cn-ck--done .cn-ck__t { color: rgba(24,26,33,0.4); }
