@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Notes, current vs quiet</title>
+<title>Notes, the full rhythm</title>
 <style>
   :root{--ink:#04050a;--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.6);--lo:rgba(255,255,255,.4);
     --cyan:#8be9fa}
@@ -11,7 +11,7 @@
   html,body{margin:0;background:#0a0c10;color:var(--hi);
     font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;line-height:1.5}
-  .wrap{max-width:1080px;margin:0 auto;padding:38px 20px 90px}
+  .wrap{max-width:1240px;margin:0 auto;padding:38px 20px 90px}
   header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
   header p{color:var(--mid);font-size:.95rem;margin:0 0 4px;max-width:82ch}
   .grid{display:flex;flex-wrap:wrap;gap:44px;margin-top:30px;align-items:flex-start;justify-content:center}
@@ -57,22 +57,32 @@
   .cur .sig{margin-top:9px;color:rgba(255,255,255,.4);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
 
   /* ============ QUIET LIST (the pick, cleaned) ============ */
-  /* pure type + rhythm, no tags, no cards, no dividers. star to pin. no "kept" label. */
-  .qt .head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px}
-  .qt .head h2{font-size:20px;font-weight:750;letter-spacing:-.01em;margin:0}
-  .qt .note{position:relative;padding:0 30px 26px 0}
+  /* pure type + rhythm, no tags, no cards, no dividers, no star. one orientation line. */
+  .qt .head{margin-bottom:6px}
+  .qt .head h2{font-size:20px;font-weight:750;letter-spacing:-.01em;margin:0;display:flex;align-items:baseline;justify-content:space-between}
+  .qt .orient{color:var(--lo);font-size:12.5px;font-weight:500;font-variant-numeric:tabular-nums;margin:0 0 26px}
+  .qt .note{position:relative;padding:14px 0;cursor:pointer;box-shadow:inset 0 -1px 0 rgba(255,255,255,.05);transition:opacity .15s}
+  .qt .note:first-of-type{padding-top:0}
+  .qt .note:active{opacity:.6}
   .qt .date{color:var(--lo);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;margin-bottom:8px}
   .qt .txt{font-size:16px;line-height:1.6;color:rgba(255,255,255,.92);font-weight:450}
-  .qt .pinbtn{position:absolute;right:0;top:-3px;color:rgba(255,255,255,.22);font-size:14px;cursor:pointer;
-    background:none;border:0;padding:4px;line-height:1;transition:color .2s}
-  .qt .note.pinned .pinbtn{color:var(--cyan)}
+  .qt .resurf{color:var(--cyan);font-size:11px;font-weight:650;margin-bottom:8px;letter-spacing:.01em}
+
+  /* ============ OPEN A NOTE (read + sit with one) ============ */
+  .op .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:auto}
+  .op .back{color:var(--mid);font-size:15px;font-weight:600;background:none;border:0;font-family:inherit;cursor:pointer;padding:4px 0}
+  .op .del{color:rgba(255,120,110,.9);font-size:14px;font-weight:600;background:none;border:0;font-family:inherit;cursor:pointer;padding:4px 0}
+  .op .body{display:flex;flex-direction:column;justify-content:center;flex:1;padding:0 2px}
+  .op .otxt{font-size:22px;line-height:1.5;color:rgba(255,255,255,.96);font-weight:450;letter-spacing:-.01em}
+  .op .odate{margin-top:22px;color:var(--lo);font-size:13.5px;font-weight:500;font-variant-numeric:tabular-nums}
+  .op .odate b{color:var(--mid);font-weight:600}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Notes, current vs quiet</h1>
-    <p>Left is exactly what ships today. Right is the quiet list, the pick: no category labels, no cards, no dividers, just the date and your words with room to breathe. Star a note to pin it to the top so the ones that matter never get buried, no "Kept" tag. Same five notes in both.</p>
+    <h1>Notes, the full rhythm</h1>
+    <p>Left: what ships today. Middle: the quiet list, cleaned up, star gone, plus one orientation line that gives the pile weight and a note that resurfaced on its own. Right: what happens when you tap a note, it opens alone, full screen, to read and sit with (and where delete lives). Scan on the list, feel on the open. Tap a note in the middle phone to see it open.</p>
   </header>
   <div class="grid" id="grid"></div>
 </div>
@@ -80,7 +90,7 @@
 <script>
 const NOTES = [
   { text: "Because my little brother watches everything I do, and I want him to see someone finish.", date: "Jul 2", tag: "The message you started with", founding: true },
-  { text: "When this feels pointless, remember the reason was never the number. It was becoming someone he could believe.", date: "Jul 30", tag: "A reminder" },
+  { text: "When this feels pointless, remember the reason was never the number. It was becoming someone he could believe.", date: "Jul 30", tag: "A reminder", resurfaced: true },
   { text: "Posted the video I almost deleted. Three people said it helped. That is the whole thing.", date: "Aug 18", tag: "A win" },
   { text: "Slower month than I hoped. Still running the marathon.", date: "Aug 14", tag: "A reminder" },
   { text: "Tired today. Showing up anyway.", date: "Aug 20", tag: "A promise" },
@@ -96,16 +106,28 @@ function CUR(){
   return `<div class="head"><div class="lab">Your notes to yourself</div><button class="add">${PLUS}Add</button></div>${body}<div class="spacer"></div>`;
 }
 function QT(){
-  const body = NOTES.map(n=>`<div class="note ${n.founding?'pinned':''}">
-    <button class="pinbtn" aria-label="Pin">&#9733;</button>
+  const body = NOTES.map((n,i)=>`<div class="note" data-i="${i}">
+    ${n.resurfaced?'<div class="resurf">You wrote this 7 weeks ago</div>':''}
     <div class="date">${n.date}, 2026</div>
     <div class="txt">${esc(n.text)}</div></div>`).join('');
-  return `<div class="head"><h2>Your notes</h2><button class="add">${PLUS}Add</button></div>${body}<div class="spacer"></div>`;
+  return `<div class="head"><h2>Your notes<button class="add">${PLUS}Add</button></h2></div>
+    <div class="orient">5 notes, since July 2</div>${body}<div class="spacer"></div>`;
 }
+function OP(){
+  const n = NOTES[OPi];
+  return `<div class="bar"><button class="back">&#8592; Notes</button><button class="del">Delete</button></div>
+    <div class="body">
+      <div class="otxt">${esc(n.text)}</div>
+      <div class="odate">Written <b>${n.date}, 2026</b>${n.founding?' · where it started':''}</div>
+    </div>
+    <div class="spacer"></div>`;
+}
+let OPi = 0;
 
 const CELLS = [
   { key:'cur', name:'Current (shipped)', sub:'Uppercase category labels on every note, hairline dividers, a small grey timestamp. Reads like a form.', render:CUR },
-  { key:'qt',  name:'Quiet list', sub:'Date, then the words. Nothing else. Star pins a note to the top. The whole thing gets out of the way.', render:QT },
+  { key:'qt',  name:'Quiet list (scan)', sub:'Date, then the words. One orientation line for weight. A note resurfaces on its own. Tap any note to open it.', render:QT },
+  { key:'op',  name:'Open a note (read)', sub:'Tapping a note opens it alone, full screen, big enough to actually sit with. Delete lives here. Back returns to the list.', render:OP },
 ];
 
 const grid = document.getElementById('grid');
@@ -118,9 +140,12 @@ grid.innerHTML = CELLS.map(c=>`
   </div>`).join('');
 CELLS.forEach(c=>{ document.getElementById('ph'+c.key).innerHTML = c.render(); });
 
+function repaint(key){ document.getElementById('ph'+key).innerHTML = CELLS.find(c=>c.key===key).render(); }
 document.addEventListener('click', e=>{
-  const pin = e.target.closest('#phqt .pinbtn');
-  if(pin){ pin.closest('.note').classList.toggle('pinned'); }
+  if(e.target.closest('#phqt .add')) return;
+  const note = e.target.closest('#phqt .note');
+  if(note){ OPi = +note.dataset.i; repaint('op'); document.getElementById('phop').scrollIntoView({block:'nearest'}); return; }
+  if(e.target.closest('#phop .back')){ /* visual only in the mock */ return; }
 });
 </script>
 </body>
