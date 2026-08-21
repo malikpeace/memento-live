@@ -194,6 +194,59 @@
     } catch (e) { return 0; }
   }
 
+  /* THE DAYS A MAINTENANCE GOAL WAS ACTUALLY HELD (R7). A held day is one
+     they showed up for, this goal's day record, not a rest day, and did not
+     break on: if they logged a number that day, it has to sit on the right
+     side of the line. A day with no number logged still counts, because
+     showing up and keeping the day IS the check-in for a goal whose whole
+     shape is "keep holding it". Days nobody showed up for never count, which
+     is the difference between this and the streak it replaced. */
+  function goalHeldDays(gp, star) {
+    try {
+      if (!gp) return 0;
+      var hash = gp.starHash || '';
+      var recs = (state && state.dayRecords) || {};
+      var line = (gp.target === null || gp.target === undefined) ? null : +gp.target;
+      /* The chooser owns direction (L7), and it is reached through the global
+         here on purpose: this half of the file is a different scope from the
+         one that closes over the chooser, and reaching for the closure's name
+         threw a ReferenceError that a catch quietly turned into "up". A wrong
+         direction inverts held and broke, so it never falls back silently:
+         with no chooser, the numbers decide, and a threshold-less goal counts
+         every day it was shown up for. */
+      var CH = (typeof MilestoneChooser !== 'undefined') ? MilestoneChooser
+        : ((typeof window !== 'undefined') ? window.MilestoneChooser : null);
+      var dir;
+      if (CH && typeof CH.direction === 'function') {
+        dir = CH.direction(gp, star || '');
+      } else if (gp.baseline !== null && gp.baseline !== undefined && line !== null && +gp.baseline !== line) {
+        dir = (line < +gp.baseline) ? 'down' : 'up';
+      } else {
+        dir = null;                       /* unknown: the line is not applied */
+      }
+      // the last value they logged on each day, by day
+      var logged = {};
+      var hist = (gp.history && gp.history.length) ? gp.history : [];
+      hist.forEach(function (h) {
+        if (!h || !h.day) return;
+        var v = +h.value;
+        if (isFinite(v)) logged[h.day] = v;
+      });
+      var n = 0;
+      Object.keys(recs).forEach(function (k) {
+        var r = recs[k];
+        if (!r || r.off) return;
+        if (hash && r.starHash && r.starHash !== hash) return;
+        if (dir && line !== null && logged[k] !== undefined) {
+          var held = (dir === 'down') ? (logged[k] <= line) : (logged[k] >= line);
+          if (!held) return;
+        }
+        n++;
+      });
+      return n;
+    } catch (e) { return 0; }
+  }
+
   function buildRewardCtx(opts) {
     opts = opts || {};
     var gp = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : (state.goalProgress || null);
@@ -232,14 +285,17 @@
         : ((gp && gp.countTarget !== null && gp.countTarget !== undefined) ? gp.countTarget : undefined);
     }
     if (shape === 'duration') {
-      /* DELIBERATELY STILL DARK (Stage C sim, 2026-08-20). The count shape
-         above was wired to its real target; this one was not, because
-         daysHeld reads the bridged streak while R7 defines it as
-         check-in-credited days, days they showed up and said they held it.
-         Wiring a real target to the wrong signal would fire the finale off a
-         streak bridge. The signal gets fixed first, then the target. */
-      ctx.daysHeld = (state.streak && state.streak.count) || 0;
-      ctx.daysTarget = opts.daysTarget;
+      /* R7's OWN DEFINITION, at last (Stage C sim, 2026-08-20). daysHeld read
+         state.streak.count, which is the app-wide bridged streak: it spans
+         goals, it survives days this goal never saw, and a grace bridge can
+         hand it days nobody showed up for. R7 says daysHeld counts only days
+         they showed up AND held it, so that is what goalHeldDays measures.
+         The target comes off the goal for the same reason the count shape's
+         does; opts still wins when a caller passes one. */
+      ctx.daysHeld = goalHeldDays(gp, star);
+      ctx.daysTarget = (opts.daysTarget !== undefined && opts.daysTarget !== null)
+        ? opts.daysTarget
+        : ((gp && gp.daysTarget !== null && gp.daysTarget !== undefined) ? gp.daysTarget : undefined);
     }
     return ctx;
   }
@@ -274,6 +330,7 @@
 
   window.resolveRewardShape = resolveRewardShape;
   window.buildRewardCtx = buildRewardCtx;
+  window.goalHeldDays = goalHeldDays;   /* the duration count, for the rig */
   window.rewardMoment = rewardMoment;
   window.rewardShadow = rewardShadow;
 })();
