@@ -351,13 +351,16 @@
     border-radius: 14px; background: transparent; }
   .wk7c span { font-size: 10.5px; font-weight: 600; color: var(--text-lo, rgba(255,255,255,0.4)); }
   .wk7c b { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: rgba(255,255,255,0.28); }
-  .wk7c.kept { background: rgba(var(--acc-rgb),0.13); }
+  .wk7c.kept { background: rgba(var(--acc-rgb),0.2); }
   .wk7c.kept b { color: var(--acc); font-weight: 800; }
-  .wk7c.sup { background: rgba(var(--acc-rgb),0.06); }
-  .wk7c.sup b { color: rgba(var(--acc-rgb),0.75); }
-  .wk7c.missed { background: rgba(255,255,255,0.12); }
-  .wk7c.missed b { color: rgba(255,255,255,0.42); }
+  .wk7c.sup { background: rgba(var(--acc-rgb),0.09); }
+  .wk7c.sup b { color: rgba(var(--acc-rgb),0.82); }
+  .wk7c.missed { background: rgba(255,255,255,0.1); }
+  .wk7c.missed b { color: rgba(255,255,255,0.5); }
+  .wk7c.rest b, .wk7c.out b { color: rgba(255,255,255,0.18); }
+  .wk7c.pending { background: transparent; }
   .wk7c.today { outline: 2px solid var(--acc); outline-offset: -2px; }
+  .wk7c.pending.today b { color: var(--acc); }
   .wkhero { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
   .wkhero b { font-size: 36px; font-weight: 780; letter-spacing: -0.03em; line-height: 0.95;
     font-variant-numeric: tabular-nums; color: var(--text-hi, #fff); }
@@ -369,7 +372,8 @@
   html.light .wk7c.kept b { color: var(--acc); }
   html.light .wk7c.sup b { color: rgba(var(--acc-rgb),0.85); }
   html.light .wk7c.missed { background: rgba(10,14,10,0.1); }
-  html.light .wk7c.missed b { color: rgba(10,14,10,0.44); }
+  html.light .wk7c.missed b { color: rgba(10,14,10,0.5); }
+  html.light .wk7c.rest b, html.light .wk7c.out b { color: rgba(10,14,10,0.2); }
   /* legacy day list (unused now) */
 
   /* ---- the tracks heat map: actions, deep work, reflections ---- */

@@ -179,8 +179,11 @@
     }
     // seven day cells, each filled by its state so the week reads at a glance
     var strip = days.map(function (x) {
+      var isToday = sameDay(x.d, today);
       var cls = (x.st === 'ahead' || x.st === 'before') ? 'out' : x.st;
-      return '<div class="wk7c ' + cls + (sameDay(x.d, today) ? ' today' : '') + '">' +
+      // today can't be a 'miss' yet: if it isn't done, it is pending (a hollow ring)
+      if (isToday && cls !== 'kept' && cls !== 'sup') cls = 'pending';
+      return '<div class="wk7c ' + cls + (isToday ? ' today' : '') + '">' +
         '<span>' + WDM[(x.d.getDay() + 6) % 7] + '</span><b>' + x.d.getDate() + '</b></div>';
     }).join('');
     // the one number that matters this week, big; rate goals show the rate
@@ -197,7 +200,7 @@
     return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd, WOFF !== 0) + '</div>' +
       '<div class="wk7">' + strip + '</div>' +
       '<div class="wkhero"><b class="' + (met ? 'met' : '') + '">' + kept + ' of ' + target + '</b><span>' + heroLbl + '</span></div>' +
-      foot;
+      legend(A, log) + foot;
   }
   function legend(A, log) {
     var seen = {};
@@ -306,7 +309,7 @@
       '<span class="yrctrl">' +
       '<span class="yrsw" id="yrsw"><button type="button" data-y="cal"' + (YRMODE === 'cal' ? ' class="on"' : '') + '>Year</button>' +
       '<button type="button" data-y="roll"' + (YRMODE === 'roll' ? ' class="on"' : '') + '>Rolling</button></span>' +
-      arrows('navYear', canBack, canFwd, YOFF !== 0) + '</span></div>' +
+      ((canBack || canFwd) ? arrows('navYear', canBack, canFwd, YOFF !== 0) : '') + '</span></div>' +
       '<div class="yrgrid">' + cells + '</div>' + legend(A, log);
   }
 
