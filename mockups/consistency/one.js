@@ -126,7 +126,7 @@
      Cadence honest: rest days are not counted, so score = kept / (kept + missed) ---------- */
   // the score, broken into what the last 30 days are actually made of.
   function scoreViz(A, log) {
-    var slice = log.slice(-Math.min(30, log.length)), kept = 0, sup = 0, missed = 0;
+    var slice = log.slice(-Math.min(90, log.length)), kept = 0, sup = 0, missed = 0;
     slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
     function seg(n, c) { return n ? '<u class="' + c + '" style="flex:' + n + '"></u>' : ''; }
     function key(n, c, w) { return n ? '<span><b class="' + c + '"></b>' + n + ' ' + w + '</span>' : ''; }
@@ -134,7 +134,7 @@
       '<div class="mix__key">' + key(kept, 'k', 'kept') + key(sup, 's', 'smaller') + key(missed, 'm', 'missed') + '</div></div>';
   }
   function scoreBlock(s, log, A) {
-    var win = Math.min(30, log.length), slice = log.slice(-win);
+    var win = Math.min(90, log.length), slice = log.slice(-win);
     var kept = 0, sup = 0, missed = 0;
     slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
     // doing something smaller is still progress: the score punishes nothing, not imperfection
@@ -152,11 +152,11 @@
         Math.abs(delta) + '</sup>';
     }
     return '<div class="sec sec--score">' +
-      '<div class="glance glance--score"><div class="score__m">' + mMark('', 17) + '</div>' +
+      '<div class="glance glance--score">' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + deltaHTML + '</div></div>' +
       scoreViz(A, log) +
-      '<div class="score__note">The last 30 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
+      '<div class="score__note">The last 90 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
       '</div></div>';
   }
 
@@ -165,73 +165,47 @@
     var today = log[log.length - 1].date, start0 = log[0].date;
     var ws = addDays(startOfWeek(today), WOFF * 7);
     var canBack = ws > startOfWeek(start0), canFwd = WOFF < 0;
-    var days = [], kept = 0, mins = 0, tracked = 0, deep = 0, notes = 0, checks = 0;
+    var days = [], kept = 0, deep = 0, notes = 0, checks = 0;
     for (var i = 0; i < 7; i++) {
       var d = addDays(ws, i), e = entryOf(A, d);
       var st = e ? e.st : (d > today ? 'ahead' : 'before');
       if (e) {
-        tracked++;
-        if (e.st === 'kept') { kept++; mins += e.d.min || 0; }
+        if (e.st === 'kept') kept++;
         if (e.d.sup.deepwork) deep++;
         if (e.d.sup.reflection) notes++;
         if (e.d.sup.checkin) checks++;
       }
-      days.push({ d: d, e: e, st: st });
+      days.push({ d: d, st: st });
     }
-    // the week at a glance: a row of seven cells, green number on the days kept
+    // seven day cells, each filled by its state so the week reads at a glance
     var strip = days.map(function (x) {
       var cls = (x.st === 'ahead' || x.st === 'before') ? 'out' : x.st;
-      return '<div class="wkc"><span>' + WDM[(x.d.getDay() + 6) % 7] + '</span>' +
-        '<b class="' + cls + (sameDay(x.d, today) ? ' today' : '') + '">' + x.d.getDate() + '</b></div>';
+      return '<div class="wk7c ' + cls + (sameDay(x.d, today) ? ' today' : '') + '">' +
+        '<span>' + WDM[(x.d.getDay() + 6) % 7] + '</span><b>' + x.d.getDate() + '</b></div>';
     }).join('');
-    // three stats: kept vs its target, hours, and how it sits against a usual week
+    // the one number that matters this week, big; rate goals show the rate
     var target = SHAPE === 'frequency' ? A.target : 7;
-    var met = SHAPE === 'frequency' ? kept >= target : null;
-    var keptStat = '<div class="wkstat"><b class="' + (met ? 'met' : '') + '">' + kept + ' of ' + target + '</b><span>' +
-      (SHAPE === 'frequency' ? (met ? 'rate kept' : 'sessions this week') : 'days kept') + '</span></div>';
-    var hoursStat = '<div class="wkstat"><b>' + (mins ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : '0h') + '</b><span>on it this week</span></div>';
+    var met = kept >= target;
+    var heroLbl = SHAPE === 'frequency' ? (met ? 'rate kept this week' : 'toward your rate this week') : 'days kept this week';
+    // supporting line: what else filled the week + the usual-week baseline
+    var extra = [];
+    if (deep) extra.push(deep + ' deep work');
+    if (notes) extra.push(notes + (notes === 1 ? ' note' : ' notes'));
+    if (checks) extra.push(checks + ' check-in' + (checks === 1 ? '' : 's'));
     var usual = s.N >= 14 ? Math.round(s.perWeek) : null;
-    var usualStat = usual === null
-      ? '<div class="wkstat"><b>' + kept + '</b><span>the record is young</span></div>'
-      : '<div class="wkstat"><b>' + usual + '</b><span>days in your usual week</span></div>';
-    // what filled the week
-    var did = [];
-    if (deep) did.push(deep + ' deep work');
-    if (notes) did.push(notes + (notes === 1 ? ' note' : ' notes'));
-    if (checks) did.push(checks + ' check in' + (checks === 1 ? '' : 's'));
-    var didLine = did.length ? '<div class="wkdid">Also this week: ' + did.join(', ') + '.</div>' : '';
+    var foot = '';
+    if (extra.length || usual !== null) {
+      foot = '<div class="wkfoot">' +
+        (extra.length ? 'Also this week: ' + extra.join(', ') + '.' : '') +
+        (usual !== null ? '<span class="wkfoot__u">Your usual week is ' + plural(usual, 'day') + '.</span>' : '') +
+        '</div>';
+    }
     var label = K.MON[ws.getMonth()] + ' ' + ws.getDate();
     return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd, WOFF !== 0) + '</div>' +
-      '<div class="wkstrip">' + strip + '</div>' +
-      '<div class="wkstats">' + keptStat + hoursStat + usualStat + '</div>' + didLine;
+      '<div class="wk7">' + strip + '</div>' +
+      '<div class="wkhero"><b class="' + (met ? 'met' : '') + '">' + kept + ' of ' + target + '</b><span>' + heroLbl + '</span></div>' +
+      foot;
   }
-
-  /* ---------- month grid from the day map ---------- */
-  function gridFor(A, y, m, today, big) {
-    var first = new Date(y, m, 1), dim = new Date(y, m + 1, 0).getDate(), sd = first.getDay();
-    var cells = '', rowKept = 0, tracked = false, out = '', slot = 0, monthKept = 0, monthDays = 0;
-    for (var i = 0; i < sd; i++) { cells += big ? '<div class="d pad"></div>' : '<b class="pad"></b>'; slot++; }
-    for (var dd = 1; dd <= dim; dd++) {
-      var date = new Date(y, m, dd), e = entryOf(A, date);
-      var st = e ? e.st : (date > today ? 'ahead' : 'ahead');
-      if (e) { tracked = true; monthDays++; if (e.st === 'kept') { rowKept++; monthKept++; } }
-      cells += big
-        ? '<div class="d ' + st + (e && sameDay(date, today) ? ' today' : '') + '" data-on="' + (e && e.st === 'kept' ? '1' : '0') + '">' + dd + '</div>'
-        : '<b class="' + (e ? st : 'ahead') + (sameDay(date, today) ? ' today' : '') + '"></b>';
-      slot++;
-      if (big && slot % 7 === 0) { cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>'; out += cells; cells = ''; rowKept = 0; tracked = false; }
-    }
-    if (big) {
-      if (slot % 7 !== 0) {
-        while (slot % 7 !== 0) { cells += '<div class="d pad"></div>'; slot++; }
-        cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>';
-        out += cells;
-      }
-      return { html: out, kept: monthKept, days: monthDays };
-    }
-    return { html: cells, kept: monthKept, days: monthDays };
-  }
-
   function legend(A, log) {
     var seen = {};
     log.forEach(function (d) { var s = stateOf(A, d.date); if (s) seen[s] = 1; });
@@ -242,10 +216,6 @@
     if (seen.rest) chips.push('<span><u class="r"></u>Rest</span>');
     return chips.length >= 2 ? '<div class="key">' + chips.join('') + '</div>' : '';
   }
-
-  /* the month grid: kept days are a green number (no fills, no lines). Per week
-     the count column shows kept, and for a rate goal it reads kept/target and
-     turns green when the week hit the rate, a success you can spot at a glance. */
   function monthGridBig(A, y, m, today) {
     var last = new Date(y, m + 1, 0), cursor = startOfWeek(new Date(y, m, 1));
     var rows = '', monthKept = 0, monthDays = 0;
@@ -408,7 +378,11 @@
   }
   function playCompletion() {
     var el = document.querySelector('.one__num');
-    if (el) { var to = +el.textContent.replace(/[^0-9]/g, ''); countUp(el, to - 1, to, 650); }
+    if (el) {
+      var to = +el.textContent.replace(/[^0-9]/g, '');
+      countUp(el, to - 1, to, 500);
+      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    }
     var ring = document.querySelector('.cal .d.today');
     if (ring) { ring.classList.remove('justfilled'); void ring.offsetWidth; ring.classList.add('justfilled'); }
   }
