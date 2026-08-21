@@ -6,7 +6,10 @@
 <title>Consistency, the merged page</title>
 <link rel="stylesheet" href="_kit.css">
 <style>
-  :root { --acc: #3fd94e; --acc-rgb: 63,217,78; --accent: var(--acc); --accent-rgb: var(--acc-rgb); }
+  :root { --acc: #3fd94e; --acc-rgb: 63,217,78; --accent: var(--acc); --accent-rgb: var(--acc-rgb);
+    /* the score slab is the opposite of the page: white slab on dark, black slab on light */
+    --score-bg: linear-gradient(180deg, #fdfefc 0%, #eef1ec 100%); --score-fg: #08130a;
+    --score-sub: rgba(8,19,10,0.55); --score-empty: rgba(8,19,10,0.08); --score-updelta: #1f9e2a; }
   html, body { background: #060708; }
   body { margin: 0; color: var(--text-hi, #fff); font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif; }
 
@@ -31,9 +34,9 @@
   html.glass .sec:not(.sec--score):not(.sec--pill) .sec__h { margin-top: 0; }
   /* inner tiles lift a touch so they read against the frosted panel */
   html.glass .wkstat, html.glass .wkc b { background: rgba(255,255,255,0.06); }
-  /* the score chip stays bright, frosted white */
+  /* the score chip is frosted; its colour still comes from the theme token */
+  html.glass { --score-bg: rgba(249,251,248,0.85); }
   html.glass .glance--score {
-    background: rgba(249,251,248,0.85);
     -webkit-backdrop-filter: blur(26px) saturate(1.4); backdrop-filter: blur(26px) saturate(1.4);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 36px rgba(0,0,0,0.44); }
   /* the pinned control bar reads as glass too */
@@ -65,16 +68,19 @@
   }
   html.glassplus .sec:not(.sec--score):not(.sec--pill) .sec__h { margin-top: 0; }
   html.glassplus .wkstat, html.glassplus .wkc b { background: rgba(255,255,255,0.05); }
-  /* the score chip stays bright, frosted white */
+  html.glassplus { --score-bg: rgba(250,252,249,0.86); }
   html.glassplus .glance--score {
-    background: rgba(250,252,249,0.86);
     -webkit-backdrop-filter: blur(30px) saturate(1.4); backdrop-filter: blur(30px) saturate(1.4);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 16px 44px rgba(0,0,0,0.5); }
   html.glassplus #bar { background: rgba(3,4,5,0.5); }
 
   /* ============ LIGHT MODE (html.light). The score box inverts to black. ============ */
-  html.light { --text-hi: #0c0e0c; --text-mid: rgba(10,14,10,0.74); --text-lo: rgba(10,14,10,0.46);
-    --hairline: rgba(10,14,10,0.12); }
+  /* flipping --ink flips every kit component (charts, tiles) in one move, so
+     light mode is readable everywhere without hand-listing each element. */
+  html.light { --ink: 10,14,10; --text-hi: #0c0e0c; --text-mid: rgba(10,14,10,0.74); --text-lo: rgba(10,14,10,0.46);
+    --hairline: rgba(10,14,10,0.12);
+    --score-bg: linear-gradient(180deg, #131513 0%, #060807 100%); --score-fg: #f4fff7;
+    --score-sub: rgba(244,255,247,0.55); --score-empty: rgba(255,255,255,0.1); --score-updelta: var(--acc); }
   html.light, html.light body { background: #f2f3f0; color: #0c0e0c; }
   html.light #bar { background: rgba(242,243,240,0.92); border-bottom-color: rgba(10,14,10,0.1); }
   html.light .chips button, html.light .scale button, html.light .nav button, html.light .yrsw button {
@@ -92,14 +98,9 @@
   html.light .mlog__g b.ahead { background: rgba(10,14,10,0.045); }
   html.light .mlog__g b.pad { background: transparent; }
   html.light .wkc b.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.14); }
-  /* the score box inverts: black slab, light elements */
-  html.light .glance--score { background: linear-gradient(180deg, #131513 0%, #060807 100%); color: #f4fff7;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 12px 36px rgba(0,0,0,0.28); }
-  html.light .score__m { color: #f4fff7; }
-  html.light .score__lbl { color: rgba(244,255,247,0.55); }
-  html.light .score__n { color: #f4fff7; }
-  html.light .score__hm b.e { background: rgba(255,255,255,0.1); }
-  html.light .score__note { color: rgba(244,255,247,0.55); }
+  /* the score slab (black in light) is driven by the --score-* tokens above;
+     it only needs its lifted shadow softened for the light ground here */
+  html.light .glance--score { box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 12px 36px rgba(0,0,0,0.28); }
   html.light .one__crown { color: rgba(10,14,10,0.35); }
   html.light .one__today.off u { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.3); }
   html.light .one__hint { color: rgba(10,14,10,0.45); }
@@ -119,25 +120,21 @@
       radial-gradient(52% 50% at 88% 92%, rgba(90,130,255,0.08), transparent 60%), #eef0ec; }
   html.light.glass .sec:not(.sec--score):not(.sec--pill) { background: rgba(255,255,255,0.5);
     border-color: rgba(10,14,10,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 10px 30px rgba(20,30,20,0.1); }
-  /* glass+ stays the black-glass look by design, even in light mode */
-  html.light.glassplus, html.light.glassplus body { background: #030405; color: var(--text-hi); }
-  html.light.glassplus { --text-hi: rgba(235,238,248,0.96); --text-mid: rgba(235,238,248,0.74);
-    --text-lo: rgba(235,238,248,0.46); --hairline: rgba(255,255,255,0.09); }
-  html.light.glassplus #bar { background: rgba(3,4,5,0.5); border-bottom-color: rgba(255,255,255,0.09); }
-  html.light.glassplus .glance--score { background: rgba(250,252,249,0.86); color: #08130a; }
-  html.light.glassplus .score__m { color: #08130a; }
-  html.light.glassplus .score__lbl { color: rgba(8,19,10,0.55); }
-  html.light.glassplus .score__n { color: #08130a; }
-  html.light.glassplus .score__hm b.e { background: rgba(8,19,10,0.08); }
-  html.light.glassplus .score__note { color: rgba(8,19,10,0.5); }
-  html.light.glassplus .chips button { background: rgba(255,255,255,0.05); color: var(--text-mid); }
-  html.light.glassplus .wkstat, html.light.glassplus .wkc b, html.light.glassplus .heropill { background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
-  html.light.glassplus .cal .d { color: rgba(255,255,255,0.3); }
-  html.light.glassplus .cal .d.kept { color: var(--acc); }
-  html.light.glassplus .trk__c b, html.light.glassplus .mlog__g b { background: rgba(255,255,255,0.05); }
+  /* LIGHT glass+ is a real light theme: a light ground with the same green
+     auras, light frosted panels, dark text (inherited from html.light), and
+     the black score slab (from the tokens). Dark glass+ keeps the black glass. */
+  html.light.glassplus, html.light.glassplus body { background: #eceeea; }
+  html.light.glassplus body::before { background:
+      radial-gradient(120% 90% at 50% -10%, rgba(var(--acc-rgb),0.06), transparent 60%), #eceeea; }
+  html.light.glassplus .gplus-fx i { opacity: 0.5; }
+  html.light.glassplus #bar { background: rgba(236,238,234,0.6); border-bottom-color: rgba(10,14,10,0.1); }
+  html.light.glassplus .sec:not(.sec--score):not(.sec--pill) { background: rgba(255,255,255,0.55);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 16px 44px rgba(20,30,20,0.12); }
 
-  .nav__today { font: inherit; font-size: 11.5px; font-weight: 650; color: var(--text-mid, rgba(255,255,255,0.8));
-    background: rgba(255,255,255,0.05); border: 0; border-radius: 9px; padding: 0 11px; height: 27px; cursor: pointer; }
+  .nav__today { font: inherit; font-size: 12px; font-weight: 600; color: var(--acc);
+    background: transparent; border: 0; border-radius: 9px; padding: 0 4px; height: 27px; cursor: pointer;
+    margin-left: 12px; letter-spacing: -0.01em; }
+  .nav__today:hover { opacity: 0.75; }
   html.light .nav__today { background: rgba(10,14,10,0.06); color: rgba(10,14,10,0.74); }
   /* for the hard days: the record talking back */
   .hard p { font-size: 14.5px; line-height: 1.55; color: var(--text-mid, rgba(255,255,255,0.8)); margin: 0 0 13px; }
@@ -199,7 +196,7 @@
   .one__today.off u { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.28); }
   .one__hint { position: absolute; bottom: 28px; left: 26px; right: 26px;
     font-size: 12px; color: var(--text-lo, rgba(255,255,255,0.46)); }
-  .one__hint svg { display: block; margin: 5px 0 0; opacity: 0.6; }
+  .one__hint svg { display: block; opacity: 0.55; }
 
   /* page two: the evidence room */
   #pgTwo { padding: calc(var(--barh, 92px) + 14px) 18px 90px; }
@@ -234,24 +231,22 @@
   .glance { position: relative; overflow: hidden; }
   /* the score card is inverted: a white slab with black elements */
   /* a bright white slab with a subtle top sheen, not a flat grey */
-  .glance--score { background: linear-gradient(180deg, #fdfefc 0%, #eef1ec 100%); color: #08130a;
+  .glance--score { background: var(--score-bg); color: var(--score-fg);
     border-radius: 18px; padding: 18px 18px 20px; -webkit-backdrop-filter: none; backdrop-filter: none;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 36px rgba(0,0,0,0.44); position: relative; overflow: hidden; }
-  .score__m { position: absolute; top: 13px; right: 14px; line-height: 0; color: #08130a; }
-  .score__lbl { font-size: 13px; font-weight: 600; color: rgba(8,19,10,0.55); }
+  .score__m { position: absolute; top: 13px; right: 14px; line-height: 0; color: var(--score-fg); }
+  .score__lbl { font-size: 13px; font-weight: 600; color: var(--score-sub); }
   .score__delta { font-size: 15px; font-weight: 750; vertical-align: top; position: relative; top: 7px;
     margin-left: 7px; display: inline-flex; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
   .score__delta svg { width: 8.5px; height: 8.5px; fill: currentColor; }
-  .score__delta.up { color: #1f9e2a; }
-  .score__delta.down { color: rgba(8,19,10,0.42); }
-  html.light:not(.glassplus) .score__delta.up { color: var(--acc); }
-  html.light:not(.glassplus) .score__delta.down { color: rgba(244,255,247,0.5); }
+  .score__delta.up { color: var(--score-updelta); }
+  .score__delta.down { color: var(--score-sub); }
   .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
-    color: #08130a; font-variant-numeric: tabular-nums; margin-top: 2px; }
+    color: var(--score-fg); font-variant-numeric: tabular-nums; margin-top: 2px; }
   .score__hm { display: grid; grid-template-columns: repeat(15, 1fr); gap: 4px; margin-top: 18px; }
   .score__hm b { aspect-ratio: 1; border-radius: 5px; }
-  .score__hm b.e { background: rgba(8,19,10,0.08); }
-  .score__note { font-size: 11.5px; color: rgba(8,19,10,0.5); margin-top: 12px; line-height: 1.45; }
+  .score__hm b.e { background: var(--score-empty); }
+  .score__note { font-size: 11.5px; color: var(--score-sub); margin-top: 12px; line-height: 1.45; }
   /* the shown-up pill under the calendar */
   .heropill { display: block; text-align: center; background: rgba(255,255,255,0.045); border-radius: 999px;
     padding: 13px 22px; font-size: 13.5px; color: var(--text-mid, rgba(255,255,255,0.8));
@@ -385,7 +380,8 @@
   .chap__n.full { color: var(--text-hi, #fff); }
 
   /* step arrows for month / week / year */
-  .nav { display: inline-flex; align-items: center; gap: 3px; }
+  .nav { display: inline-flex; align-items: center; gap: 4px; }
+  .mh .nav, .mh .nav__today { align-self: center; }
   .nav button { width: 27px; height: 27px; border-radius: 9px; background: rgba(255,255,255,0.05);
     border: 0; color: var(--text-mid, rgba(255,255,255,0.8)); cursor: pointer;
     display: flex; align-items: center; justify-content: center; }

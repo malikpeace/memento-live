@@ -99,8 +99,8 @@
 
 
   function arrows(id, canBack, canFwd, offToday) {
-    return '<span class="nav" id="' + id + '">' +
-      (offToday ? '<button type="button" class="nav__today" data-today>Today</button>' : '') +
+    return (offToday ? '<button type="button" class="nav__today" data-today>Today</button>' : '') +
+      '<span class="nav" id="' + id + '">' +
       '<button type="button" data-step="-1"' + (canBack ? '' : ' disabled') + ' aria-label="Back">' +
       '<svg width="7" height="11" viewBox="0 0 7 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 1L1.5 5.5 6 10"/></svg></button>' +
       '<button type="button" data-step="1"' + (canFwd ? '' : ' disabled') + ' aria-label="Forward">' +
@@ -118,7 +118,7 @@
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
       (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div></div>' +
-      '<div class="one__hint">Scroll<svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l6 6 6-6"/></svg></div>';
+      '<div class="one__hint"><svg width="16" height="9" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l6 6 6-6"/></svg></div>';
   }
 
   /* ---------- consistency score: a rolling read that can improve, plus a
