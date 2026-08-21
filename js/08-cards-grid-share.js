@@ -7309,17 +7309,16 @@ function _mfInsideHtml(d, trailHtml) {
   if (cnLatest) {
     const cnTag = (typeof clarityNoteTag === 'function') ? clarityNoteTag(cnLatest) : 'A note';
     h += '<div class="cn-glance" id="mfNotesGlance" role="button" tabindex="0">' +
-      '<div class="cn-glance__lab">Latest note</div>' +
-      '<div class="cn-glance__tag">' + E(cnTag) + '</div>' +
+      '<div class="cn-glance__lab">Latest reflection</div>' +
       '<p class="cn-glance__txt">' + E(String(cnLatest.text || '').slice(0, 300)) + '</p>' +
       '<div class="cn-glance__more">' +
-        (cnLive.length > 1 ? 'Read all ' + cnLive.length : 'Open your notes') + ' &rarr;</div>' +
+        (cnLive.length > 1 ? 'Read all ' + cnLive.length : 'Open your reflections') + ' &rarr;</div>' +
       '</div>';
   } else {
     h += '<div class="cn-glance cn-glance--empty" id="mfNotesGlance" role="button" tabindex="0">' +
-      '<div class="cn-glance__lab">Notes to yourself</div>' +
+      '<div class="cn-glance__lab">Reflections</div>' +
       '<p class="cn-glance__txt">Nothing here yet. Clarity is where you leave one.</p>' +
-      '<div class="cn-glance__more">Open your notes &rarr;</div>' +
+      '<div class="cn-glance__more">Open your reflections &rarr;</div>' +
       '</div>';
   }
 

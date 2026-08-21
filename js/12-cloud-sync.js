@@ -433,9 +433,16 @@ const CloudSync = (function () {
       const cn = cloud.clarityNotes || { entries: [], tombstones: [] };
       const tomb = Array.from(new Set([].concat(ln.tombstones || [], cn.tombstones || [])));
       const byId = {};
+      // Same-id conflict: the later WRITE wins, where a write is the later of
+      // day and editedDay (v1230: reflections are editable; an edit on one
+      // device must beat the pre-edit copy syncing back from another).
+      const cnStamp = (e2) => {
+        const a = String(e2.day || ''), b = String(e2.editedDay || '');
+        return b > a ? b : a;
+      };
       [].concat(ln.entries || [], cn.entries || []).forEach((e2) => {
         if (!e2 || !e2.id) return;
-        if (!byId[e2.id] || String(e2.day || '') > String(byId[e2.id].day || '')) byId[e2.id] = e2;
+        if (!byId[e2.id] || cnStamp(e2) > cnStamp(byId[e2.id])) byId[e2.id] = e2;
       });
       const entries = Object.keys(byId).filter((id) => tomb.indexOf(id) === -1).map((id) => byId[id]);
       entries.sort((a, b2) => String(a.day || '').localeCompare(String(b2.day || '')));

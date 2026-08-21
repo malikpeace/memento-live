@@ -10513,37 +10513,64 @@ function _clarityPageSummary() {
     '</div>';
 }
 
+/* Which reflection gets the quiet "You wrote this N weeks ago" line: the
+   redesign's returnability hook. Deterministic (no Math.random, the resume
+   law's build constraint): among notes at least 3 weeks old, rotate by ISO
+   week so the surfaced one changes weekly, never twice the same render. */
+function _cnResurfacePick(ordered) {
+  try {
+    const now = Date.now();
+    const olds = ordered.filter(function (n) {
+      const d = _cpDayToDate(n.day);
+      return d && (now - d.getTime()) >= 21 * 86400000;
+    });
+    if (!olds.length) return null;
+    const week = Math.floor(now / (7 * 86400000));
+    return olds[week % olds.length];
+  } catch (e) { return null; }
+}
+function _cnWeeksAgo(day) {
+  try {
+    const d = _cpDayToDate(day);
+    const w = Math.max(1, Math.round((Date.now() - d.getTime()) / (7 * 86400000)));
+    return w === 1 ? 'You wrote this a week ago' : 'You wrote this ' + w + ' weeks ago';
+  } catch (e) { return ''; }
+}
+
 function _clarityPageNotes() {
   // The stack is never empty for a completed-Clarity user: the seed writes
   // entry #1 from their own why the first time this page is drawn.
   try { clarityNotesSeedIfEmpty(); } catch (e) {}
   const ordered = clarityNotesLive();
 
-  const head = '<div class="cp-stackhead"><div class="cp-lab">Your notes to yourself</div>' +
-    '<button type="button" class="cp-add" id="cpAddNote">' + CP_ICON_PLUS + 'Add</button></div>';
+  // The quiet list (mockups/clarity-home/notes-lab.html, ported): date, then
+  // the words, three lines each, hairline under. No tags, no cards. The one
+  // colored control is the + floating bottom-right, clear of the close X.
+  const head = '<div class="cp-refhead"><h2 class="cp-reftitle">Reflections</h2></div>';
 
   let body;
   if (!ordered.length) {
-    body = '<div class="cp-empty">No notes yet. Leave something here for the version of you who forgets why this mattered.</div>' +
-      '<div class="cp-ghost" aria-hidden="true"><div class="cp-note cp-note--founding">' +
-        '<span class="cp-note__tag">A reminder</span>' +
+    body = '<div class="cp-empty">No reflections yet. Leave something here for the version of you who forgets why this mattered.</div>' +
+      '<div class="cp-ghost" aria-hidden="true"><div class="cp-note">' +
+        '<div class="cp-note__sig" style="margin:0 0 8px">someday soon</div>' +
         '<div class="cp-note__txt">The kind of thing you might write: "Remember, you chose this because..."</div>' +
-        '<div class="cp-note__sig">someday soon</div></div></div>' +
+        '</div></div>' +
       '<div class="cp-ghosttag">Only you ever see these.</div>';
   } else {
+    const surf = _cnResurfacePick(ordered);
     body = ordered.map(function (n) {
-      const tag = clarityNoteTag(n);
       const sig = _cpLongDate(_cpDayToDate(n.day));
-      return '<div class="cp-note' + (n.founding ? ' cp-note--founding' : '') +
-        '" data-cn-id="' + esc(String(n.id || '')) + '">' +
-        '<span class="cp-note__tag">' + esc(tag) + '</span>' +
-        '<div class="cp-note__txt">' + esc(String(n.text || '')) + '</div>' +
-        (sig ? '<div class="cp-note__sig">' + esc(sig) + '</div>' : '') + '</div>';
+      return '<div class="cp-note" data-cn-id="' + esc(String(n.id || '')) + '" role="button" tabindex="0">' +
+        (surf && surf.id === n.id ? '<div class="cp-resurf">' + esc(_cnWeeksAgo(n.day)) + '</div>' : '') +
+        (sig ? '<div class="cp-note__date">' + esc(sig) + '</div>' : '') +
+        '<div class="cp-note__txt cp-note__txt--clamp">' + esc(String(n.text || '')) + '</div>' +
+        '</div>';
     }).join('');
   }
 
   return _cpNebula() +
-    '<div class="cp-stage cp-stage--top">' + head + body + '<div class="cp-spacer"></div></div>';
+    '<div class="cp-stage cp-stage--top">' + head + body + '<div class="cp-spacer"></div>' +
+    '<button type="button" class="cp-fab" id="cpAddNote" aria-label="New reflection">+</button></div>';
 }
 
 // Grow the rail in once per page-show. A class swap, not a fill mode, so the
@@ -10597,8 +10624,9 @@ function _bindClarityPager(pager) {
   // Page 2's two doors (phase 4). Rebound after every repaint of the page.
   _cpBindSummaryPage(pager);
 
-  // Page 3 is live from phase 2/3 on: Add opens the writer, a long press on a
-  // note opens the delete confirm. Both rebound after every repaint.
+  // Page 3 is live from phase 2/3 on: the + opens the writer, tapping a
+  // reflection opens the reader (where edit and delete live). Rebound after
+  // every repaint.
   _cnBindNotesPage(pager);
 }
 
@@ -10611,7 +10639,13 @@ function _cnBindNotesPage(pager) {
   if (add) add.addEventListener('click', function () {
     ClarityNoteWriter.open({ onDone: function () { _cnRepaintNotesPage(); } });
   });
-  _cnBindLongPressDelete(pager);
+  Array.prototype.slice.call(pager.querySelectorAll('.cp-note[data-cn-id]')).forEach(function (el) {
+    const id = el.getAttribute('data-cn-id');
+    if (!id) return;
+    const openIt = function () { ClarityNoteReader.open(id); };
+    el.addEventListener('click', openIt);
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openIt(); } });
+  });
 }
 
 /* Repaint the notes stack in place after a save or a delete. Page 3 only, so a
@@ -10627,55 +10661,15 @@ function _cnRepaintNotesPage() {
   } catch (e) {}
 }
 
-/* Delete = long press, 600ms, then a confirm. No swipe-delete and no edit
-   affordance, anywhere, ever: past-you is an artifact. iOS wants to raise its
-   own copy/lookup callout on the same gesture, so the callout is suppressed in
-   CSS and the contextmenu event is cancelled here. */
-function _cnBindLongPressDelete(scope) {
-  const notes = Array.prototype.slice.call(scope.querySelectorAll('.cp-note[data-cn-id]'));
-  notes.forEach(function (el) {
-    const id = el.getAttribute('data-cn-id');
-    if (!id) return;
-    let timer = 0, sx = 0, sy = 0;
-    const cancel = function () {
-      if (timer) { clearTimeout(timer); timer = 0; }
-      el.classList.remove('is-pressing');
-    };
-    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-    el.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
-      sx = e.clientX; sy = e.clientY;
-      el.classList.add('is-pressing');
-      timer = setTimeout(function () {
-        timer = 0;
-        el.classList.remove('is-pressing');
-        try { feel('tap'); } catch (_) {}
-        _cnConfirmDelete(id);
-      }, 600);
-    });
-    el.addEventListener('pointermove', function (e) {
-      if (!timer) return;
-      if (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10) cancel();
-    });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
-      el.addEventListener(ev, cancel);
-    });
-  });
-  // any scroll of the stack kills a press in flight
-  scope.addEventListener('scroll', function () {
-    scope.querySelectorAll('.cp-note.is-pressing').forEach(function (n) { n.classList.remove('is-pressing'); });
-  }, { passive: true, capture: true });
-}
-
 /* The mock's dlgWrap/dlg pattern, ported. */
-function _cnConfirmDelete(id) {
+function _cnConfirmDelete(id, onDone) {
   const wrap = document.createElement('div');
   wrap.className = 'cn-dlgwrap';
   wrap.setAttribute('role', 'dialog');
   wrap.setAttribute('aria-modal', 'true');
   wrap.innerHTML =
     '<div class="cn-dlg">' +
-      '<h4>Delete this note?</h4>' +
+      '<h4>Delete this reflection?</h4>' +
       '<p>You wrote this. Once it is gone, it does not come back.</p>' +
       '<button type="button" class="cn-dlgbtn cn-dlgbtn--danger" data-cn-yes>Delete</button>' +
       '<button type="button" class="cn-dlgbtn cn-dlgbtn--quiet" data-cn-no>Cancel</button>' +
@@ -10687,6 +10681,7 @@ function _cnConfirmDelete(id) {
     clarityNotesDelete(id);
     shut();
     _cnRepaintNotesPage();
+    try { if (typeof onDone === 'function') onDone(); } catch (e) {}
   });
   document.body.appendChild(wrap);
   requestAnimationFrame(function () { wrap.classList.add('is-on'); });
@@ -10852,6 +10847,22 @@ function clarityNotesSave(text, tag, opts) {
   try { persistNow(); } catch (e) {}
   _cnWriteProof(entry, false);
   return entry;
+}
+
+/* Edit. The redesign's rule: reflections are editable, the founding message
+   is frozen (the origin stays true). Editing stamps editedDay, shown as a
+   quiet "Edited on" line in the reader, and never writes a second proof
+   event: the day they showed up was the day they wrote it. */
+function clarityNotesEdit(id, text) {
+  const t = String(text || '').trim();
+  if (!id || !t) return null;
+  const s = clarityNotesStore();
+  const n = s.entries.find(function (e2) { return e2 && e2.id === id; });
+  if (!n || n.founding) return null;
+  n.text = t.slice(0, CN_MAX);
+  n.editedDay = _cnDay();
+  try { persistNow(); } catch (e) {}
+  return n;
 }
 
 /* Delete. Tombstone first, then drop the entry, so a crash between the two
@@ -11026,14 +11037,14 @@ const ClarityNoteWriter = {
   open(opts) {
     if (this.isOpen) return;
     this._opts = opts || {};
-    this._text = '';
+    this._text = String(this._opts.prefill || '');
     this._tag = '';
     this.isOpen = true;
     const el = document.createElement('div');
     el.className = 'cn-writer';
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
-    el.setAttribute('aria-label', 'New note');
+    el.setAttribute('aria-label', this._opts.editId ? 'Edit reflection' : 'New reflection');
     this.el = el;
     document.body.appendChild(el);
     this._renderWrite();
@@ -11064,7 +11075,7 @@ const ClarityNoteWriter = {
       '<div class="cn-step cn-step--write">' +
         '<div class="cn-bar">' +
           '<button type="button" class="cn-bar__x" data-cn-cancel>Cancel</button>' +
-          '<span class="cn-bar__t">New note</span>' +
+          '<span class="cn-bar__t">' + (this._opts && this._opts.editId ? 'Edit reflection' : 'New reflection') + '</span>' +
           '<button type="button" class="cn-bar__done" data-cn-finish disabled>Finish</button>' +
         '</div>' +
         '<div class="cn-body">' +
@@ -11093,10 +11104,16 @@ const ClarityNoteWriter = {
     sync();
 
     el.querySelector('[data-cn-cancel]').addEventListener('click', function () { self.close(null); });
+    // The redesign killed the tag step: Finish just saves. Edit mode updates
+    // the existing entry (editedDay stamped inside clarityNotesEdit).
     done.addEventListener('click', function () {
       if (!String(self._text || '').trim()) return;
       try { field.blur(); } catch (e) {}
-      self._renderTag();
+      const o = self._opts || {};
+      const saved = o.editId
+        ? clarityNotesEdit(o.editId, self._text)
+        : clarityNotesSave(self._text, CN_TAG_DEFAULT, o);
+      self.close(saved);
     });
 
     // The chips frame the thinking and insert NOTHING. preventDefault on the
@@ -11114,84 +11131,87 @@ const ClarityNoteWriter = {
     // the proven recipe, verbatim, on a field that already sits high
     try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, field); } catch (e) {}
     setTimeout(function () { try { field.focus(); } catch (e) {} }, 90);
+  }
+};
+
+/* THE READER (mockups/clarity-home/notes-lab.html, "Open"). Tap a
+   reflection on the list and it opens alone, full screen: read it, edit it
+   (never the founding one), or delete it. Same mount pattern as the writer,
+   no keyboard involved, so no settle binding. */
+const ClarityNoteReader = {
+  el: null,
+  isOpen: false,
+  _id: null,
+
+  open(id) {
+    if (this.isOpen) return;
+    const n = clarityNotesLive().find(function (e2) { return e2 && e2.id === id; });
+    if (!n) return;
+    this._id = id;
+    this.isOpen = true;
+    const el = document.createElement('div');
+    el.className = 'cn-reader';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'Reflection');
+    this.el = el;
+    document.body.appendChild(el);
+    this._render();
+    // rAF with a timeout net: a throttled/hidden tab must never leave the
+    // reader translucent over the list.
+    requestAnimationFrame(function () { el.classList.add('is-on'); });
+    setTimeout(function () { el.classList.add('is-on'); }, 60);
   },
 
-  // step 2: one tap so future-you finds it fast. Never forced.
-  _renderTag() {
+  close() {
+    if (!this.isOpen) return;
+    this.isOpen = false;
+    this._id = null;
+    const el = this.el;
+    this.el = null;
+    if (el) {
+      el.classList.remove('is-on');
+      setTimeout(function () { try { el.remove(); } catch (e) {} }, 220);
+    }
+  },
+
+  _render() {
     const self = this;
     const el = this.el;
     if (!el) return;
-    const quote = String(this._text || '').trim();
-    const short = quote.length > 92 ? (quote.slice(0, 92).trim() + '...') : quote;
+    const n = clarityNotesLive().find(function (e2) { return e2 && e2.id === self._id; });
+    if (!n) { this.close(); return; }
+    const written = _cpLongDate(_cpDayToDate(n.day));
+    const edited = n.editedDay ? _cpLongDate(_cpDayToDate(n.editedDay)) : '';
     el.innerHTML =
-      '<div class="cn-step cn-step--tag">' +
-        // the SHIPPED nebula classes by reference, never a copy (mock step 3)
-        '<div class="cn-neb" aria-hidden="true">' +
-          '<div class="clarity-exp__neb1"></div><div class="clarity-exp__neb2"></div></div>' +
-        '<div class="cn-tagstage">' +
-          // the beat composition law: the content sits optically centered in
-          // the room above the bottom-anchored pill, on a phone and on a
-          // desktop alike (the mock's own justify-content:center intent).
-          '<div class="cn-tagcontent">' +
-            '<div class="cn-lab">You wrote</div>' +
-            '<div class="cn-quote">&ldquo;' + esc(short) + '&rdquo;</div>' +
-            '<h3 class="cn-h">What was this note for?</h3>' +
-            '<p class="cn-sub">A quick tag so future you finds it fast.</p>' +
-            '<div class="cn-tagchips">' +
-              CN_TAGS.map(function (t) {
-                return '<button type="button" class="cn-tagchip" data-cn-tag="' + esc(t) + '">' + esc(t) + '</button>';
-              }).join('') +
-              '<button type="button" class="cn-tagchip cn-tagchip--add" data-cn-own>+ Write my own</button>' +
-            '</div>' +
-            '<div class="cn-own" hidden>' +
-              '<input class="cn-owninput" data-cn-owninput type="text" maxlength="40" ' +
-                'placeholder="Your own tag" autocomplete="off" autocorrect="off" spellcheck="false">' +
-            '</div>' +
+      '<div class="cnr">' +
+        '<div class="cnr__bar">' +
+          '<button type="button" class="cnr__back" data-cnr-back>&#8592; Reflections</button>' +
+          '<div class="cnr__acts">' +
+            (n.founding ? '' : '<button type="button" class="cnr__edit" data-cnr-edit>Edit</button>') +
+            '<button type="button" class="cnr__del" data-cnr-del>Delete</button>' +
           '</div>' +
-          '<button type="button" class="cn-cta" data-cn-save>Save note</button>' +
-          '<button type="button" class="cn-skip" data-cn-skip>Save without a tag</button>' +
+        '</div>' +
+        '<div class="cnr__body">' +
+          '<div class="cnr__txt">' + esc(String(n.text || '')) + '</div>' +
+          '<div class="cnr__date">Written <b>' + esc(written) + '</b>' + (n.founding ? '. First reflection' : '') + '</div>' +
+          (edited ? '<div class="cnr__edited">Edited on ' + esc(edited) + '</div>' : '') +
         '</div>' +
       '</div>';
-
-    const stage = el.querySelector('.cn-step--tag');
-    const own = el.querySelector('.cn-own');
-    const ownInput = el.querySelector('[data-cn-owninput]');
-
-    const pick = function (val) {
-      self._tag = val;
-      Array.prototype.slice.call(el.querySelectorAll('[data-cn-tag]')).forEach(function (c) {
-        c.classList.toggle('is-on', c.getAttribute('data-cn-tag') === val);
-      });
-    };
-    Array.prototype.slice.call(el.querySelectorAll('[data-cn-tag]')).forEach(function (c) {
-      c.addEventListener('click', function () {
-        own.hidden = true;
-        stage.classList.remove('is-own');
-        try { ownInput.value = ''; } catch (e) {}
-        pick(c.getAttribute('data-cn-tag'));
+    el.querySelector('[data-cnr-back]').addEventListener('click', function () { self.close(); });
+    const ed = el.querySelector('[data-cnr-edit]');
+    if (ed) ed.addEventListener('click', function () {
+      ClarityNoteWriter.open({
+        editId: n.id,
+        prefill: String(n.text || ''),
+        onDone: function (saved) {
+          _cnRepaintNotesPage();
+          if (saved) self._render(); // re-read the fresh text + edited line
+        }
       });
     });
-
-    // Writing your own tag re-anchors the whole step to the top, so the input
-    // and both buttons stay above the keyboard. Same recipe, same precondition.
-    el.querySelector('[data-cn-own]').addEventListener('click', function () {
-      pick('');
-      own.hidden = false;
-      stage.classList.add('is-own');
-      try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(self, ownInput); } catch (e) {}
-      setTimeout(function () { try { ownInput.focus(); } catch (e) {} }, 60);
-    });
-    ownInput.addEventListener('input', function () { self._tag = ownInput.value; });
-
-    const commit = function (tag) {
-      const saved = clarityNotesSave(self._text, tag, self._opts || {});
-      self.close(saved);
-    };
-    el.querySelector('[data-cn-save]').addEventListener('click', function () {
-      commit(String(self._tag || '').trim() || CN_TAG_DEFAULT);
-    });
-    el.querySelector('[data-cn-skip]').addEventListener('click', function () {
-      commit(CN_TAG_DEFAULT);
+    el.querySelector('[data-cnr-del]').addEventListener('click', function () {
+      _cnConfirmDelete(n.id, function () { self.close(); });
     });
   }
 };
