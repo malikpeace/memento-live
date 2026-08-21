@@ -5490,13 +5490,13 @@ html.theme-light .cnr__edited { color: rgba(24, 26, 33, 0.35); }
 .cn-tmrpick { position: relative; overflow: hidden; margin: 4px -18px 2px;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 26%, #000 74%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 26%, #000 74%, transparent); }
-.cn-tmrpick__row { display: flex; align-items: center; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 4px 0 6px; }
+.cn-tmrpick__row { display: flex; align-items: center; gap: 8px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; touch-action: pan-x; padding: 16px 0 8px; }
 .cn-tmrpick__row::-webkit-scrollbar { display: none; }
 .cn-tmrpick__pad { flex: 0 0 calc(50% - 26px); }
 .cn-tmrpick__v { flex: 0 0 52px; scroll-snap-align: center; background: none; border: 0; font-family: inherit; cursor: pointer;
-  font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.28); padding: 8px 0;
+  font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.28); padding: 4px 0;
   transition: color 0.18s, transform 0.18s, opacity 0.18s; }
-.cn-tmrpick__v.sel { color: var(--cp-acc); transform: scale(2); font-weight: 700; }
+.cn-tmrpick__v.sel { color: var(--cp-acc); transform: scale(1.6); font-weight: 700; }
 html.theme-light .cn-tmrpick__v { color: rgba(24, 26, 33, 0.32); }
 html.theme-light .cn-tmrpick__v.sel { color: #0d8ca6; background: rgba(13, 140, 166, 0.1); }
 html.theme-light .cn-tmrdrop { background: #fff; box-shadow: 0 24px 60px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(24,26,33,0.06); }
@@ -5550,3 +5550,22 @@ html.theme-light .cn-fmt__c { color: #0d8ca6; }
 html.theme-light .cn-ck__box { background: rgba(24,26,33,0.07); box-shadow: inset 0 0 0 1px rgba(24,26,33,0.16); color: #0d8ca6; }
 html.theme-light .cn-ck--done .cn-ck__box { background: #0d8ca6; color: #fff; box-shadow: none; }
 html.theme-light .cn-ck--done .cn-ck__t { color: rgba(24,26,33,0.4); }
+/* contenteditable writer field (phase 2b v1236): live bold/italic + checklists */
+.cn-field { outline: none; }
+.cn-field:empty::before { content: attr(data-ph); color: rgba(255, 255, 255, 0.4); pointer-events: none; }
+html.theme-light .cn-field:empty::before { color: rgba(24, 26, 33, 0.4); }
+.cn-field b, .cn-field strong { font-weight: 750; }
+.cn-field i, .cn-field em { font-style: italic; }
+/* checklist line inside the editor and the reader share the box look */
+.cn-cke { display: flex; align-items: flex-start; gap: 10px; margin: 4px 0; }
+.cn-cke__t { flex: 1; min-width: 0; }
+.cn-cke .cn-ck__box { flex: none; width: 20px; height: 20px; margin-top: 2px; border-radius: 5px; cursor: pointer;
+  background: rgba(255,255,255,0.09); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
+  display: flex; align-items: center; justify-content: center; color: var(--cp-acc); font-size: 12px; }
+.cn-cke[data-done="1"] .cn-ck__box { background: var(--cp-acc); box-shadow: none; }
+.cn-cke[data-done="1"] .cn-ck__box::after { content: "\2713"; color: #04161c; }
+.cn-cke[data-done="1"] .cn-cke__t { color: rgba(255,255,255,0.42); text-decoration: line-through; }
+html.theme-light .cn-cke .cn-ck__box { background: rgba(24,26,33,0.07); box-shadow: inset 0 0 0 1px rgba(24,26,33,0.16); }
+html.theme-light .cn-cke[data-done="1"] .cn-ck__box { background: #0d8ca6; box-shadow: none; }
+html.theme-light .cn-cke[data-done="1"] .cn-ck__box::after { color: #fff; }
+html.theme-light .cn-cke[data-done="1"] .cn-cke__t { color: rgba(24,26,33,0.4); }

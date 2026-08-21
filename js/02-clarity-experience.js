@@ -10563,7 +10563,7 @@ function _clarityPageNotes() {
       return '<div class="cp-note" data-cn-id="' + esc(String(n.id || '')) + '" role="button" tabindex="0">' +
         (surf && surf.id === n.id ? '<div class="cp-resurf">' + esc(_cnWeeksAgo(n.day)) + '</div>' : '') +
         (sig ? '<div class="cp-note__date">' + esc(sig) + '</div>' : '') +
-        '<div class="cp-note__txt cp-note__txt--clamp">' + _cnPreview(n.text) + '</div>' +
+        '<div class="cp-note__txt cp-note__txt--clamp">' + _cnPreviewAny(n.text) + '</div>' +
         '</div>';
     }).join('');
   }
@@ -11029,6 +11029,44 @@ function clarityOpenNotesPage() {
 /* ---- light markdown for reflections (phase 2b). Bold/italic via markers,
    checklists via "- [ ] / - [x]". Escape first, then decorate: the note text
    is stored as plain markdown, rendered only on display. ---- */
+/* Allowlist sanitizer: keep only b/strong/i/em/u/br/div/span and the checklist
+   structure (.cn-cke[data-done] > .cn-ck__box + .cn-cke__t). Everything else is
+   unwrapped to its text. Runs on save AND on display, so nothing unsafe stores
+   or renders. */
+function _cnSanitize(html) {
+  var wrap = document.createElement('div');
+  wrap.innerHTML = String(html == null ? '' : html);
+  var TAG = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, BR: 1, DIV: 1, SPAN: 1 };
+  (function walk(node) {
+    Array.prototype.slice.call(node.childNodes).forEach(function (n) {
+      if (n.nodeType === 1) {
+        if (!TAG[n.tagName]) { node.replaceChild(document.createTextNode(n.textContent), n); return; }
+        Array.prototype.slice.call(n.attributes).forEach(function (a) {
+          var keep = (a.name === 'class' && /^(cn-cke|cn-ck__box|cn-cke__t)$/.test(a.value)) ||
+                     (a.name === 'data-done' && /^[01]$/.test(a.value)) ||
+                     (a.name === 'contenteditable' && a.value === 'false');
+          if (!keep) n.removeAttribute(a.name);
+        });
+        walk(n);
+      } else if (n.nodeType !== 3) { node.removeChild(n); }
+    });
+  })(wrap);
+  return wrap.innerHTML;
+}
+/* stored -> editable HTML for the writer. HTML passes through sanitized; older
+   plain/markdown notes convert (markdown bold/italic, one line per line). */
+function _cnEditable(text) {
+  var t = String(text || '');
+  if (/<(b|strong|i|em|u|div|br|span)\b/i.test(t)) return _cnSanitize(t);
+  return _cnRenderMd(t);
+}
+/* stored -> display HTML for the reader (same as editable, always sanitized). */
+function _cnDisplay(text) {
+  var t = String(text || '');
+  if (/<(b|strong|i|em|u|div|br|span)\b/i.test(t)) return _cnSanitize(t);
+  return _cnRenderMd(t);
+}
+
 function _cnInline(str) {
   var e = esc(String(str == null ? '' : str));
   e = e.replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>');
@@ -11051,6 +11089,20 @@ function _cnRenderMd(text) {
 function _cnPreview(text) {
   var t = String(text || '').replace(/^\s*- \[ \]\s?/gm, '\u2610 ').replace(/^\s*- \[[xX]\]\s?/gm, '\u2611 ');
   return _cnInline(t.replace(/\n+/g, '  '));
+}
+/* list preview for either storage format (html or markdown/plain). */
+function _cnPreviewAny(text) {
+  var t = String(text || '');
+  if (/<(b|strong|i|em|u|div|br|span)\b/i.test(t)) {
+    var d = document.createElement('div'); d.innerHTML = _cnSanitize(t);
+    Array.prototype.slice.call(d.querySelectorAll('.cn-cke')).forEach(function (c) {
+      var done = c.getAttribute('data-done') === '1';
+      c.insertBefore(document.createTextNode(done ? '\u2611 ' : '\u2610 '), c.firstChild);
+      var box = c.querySelector('.cn-ck__box'); if (box) box.remove();
+    });
+    return esc(d.textContent.replace(/\u200b/g, '').replace(/\s+/g, ' ').trim());
+  }
+  return _cnPreview(t);
 }
 /* toggle a checkbox line in place. Not an "edit": ticking a box is not
    rewriting the reflection, so no editedDay stamp. Allowed on any note. */
@@ -11122,66 +11174,38 @@ const ClarityNoteWriter = {
           '<button type="button" class="cn-bar__done" data-cn-finish disabled>Finish</button>' +
         '</div>' +
         '<div class="cn-body">' +
-          '<textarea class="cn-field" data-cn-field rows="3" maxlength="' + CN_MAX + '" ' +
-            'placeholder="Write it in your own words." ' +
-            'autocomplete="off" autocorrect="on" spellcheck="true"></textarea>' +
-          '<div class="cn-jog" data-cn-jogwrap>' +
-            '<button type="button" class="cn-jog__lab" data-cn-jogtoggle>Need a nudge?<span class="cn-jog__chev">&#8250;</span></button>' +
-            '<div class="cn-jog__chips" hidden>' +
-              CN_JOGS.map(function (j) {
-                return '<button type="button" class="cn-jchip" data-cn-jog>' + esc(j) + '</button>';
-              }).join('') +
-            '</div>' +
-          '</div>' +
+          '<div class="cn-field" data-cn-field contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-ph="Write it in your own words."></div>' +
         '</div>' +
       '</div>';
 
     const field = el.querySelector('[data-cn-field]');
     const done = el.querySelector('[data-cn-finish]');
-    field.value = this._text;
+    // Load prior content. Stored notes may be HTML (formatted) or plain/markdown
+    // (older). _cnEditable turns either into editable HTML for the field.
+    field.innerHTML = _cnEditable(this._text);
     const sync = function () {
-      self._text = field.value;
-      done.disabled = !String(field.value || '').trim();
+      done.disabled = !field.textContent.trim();
     };
     field.addEventListener('input', sync);
     sync();
 
     el.querySelector('[data-cn-cancel]').addEventListener('click', function () { self.close(null); });
-    // The redesign killed the tag step: Finish just saves. Edit mode updates
-    // the existing entry (editedDay stamped inside clarityNotesEdit).
+    // Finish just saves. Store the sanitized HTML so bold/italic/checklists
+    // survive. Edit mode updates the existing entry (editedDay stamped inside).
     done.addEventListener('click', function () {
-      if (!String(self._text || '').trim()) return;
+      if (!field.textContent.trim()) return;
+      var html = _cnSanitize(field.innerHTML);
       try { field.blur(); } catch (e) {}
       const o = self._opts || {};
       const saved = o.editId
-        ? clarityNotesEdit(o.editId, self._text)
-        : clarityNotesSave(self._text, CN_TAG_DEFAULT, o);
+        ? clarityNotesEdit(o.editId, html)
+        : clarityNotesSave(html, CN_TAG_DEFAULT, o);
       self.close(saved);
     });
-
-    // Nudge is a dropdown now: collapsed by default, tap the label to reveal.
-    var jogWrap = el.querySelector('[data-cn-jogwrap]');
-    var jogToggle = el.querySelector('[data-cn-jogtoggle]');
-    var jogChips = jogWrap && jogWrap.querySelector('.cn-jog__chips');
-    if (jogToggle) {
-      jogToggle.addEventListener('pointerdown', function (e) { e.preventDefault(); });
-      jogToggle.addEventListener('click', function () {
-        var open = jogWrap.classList.toggle('is-open');
-        if (jogChips) jogChips.hidden = !open;
-        try { field.focus(); } catch (e) {}
-      });
-    }
-
-    // The chips frame the thinking and insert NOTHING. preventDefault on the
-    // press keeps focus in the field, so tapping one never drops the keyboard.
-    Array.prototype.slice.call(el.querySelectorAll('[data-cn-jog]')).forEach(function (chip) {
-      chip.addEventListener('pointerdown', function (e) { e.preventDefault(); });
-      chip.addEventListener('click', function () {
-        const was = chip.classList.contains('is-on');
-        Array.prototype.slice.call(el.querySelectorAll('[data-cn-jog]')).forEach(function (c) { c.classList.remove('is-on'); });
-        if (!was) chip.classList.add('is-on');
-        try { field.focus(); } catch (e) {}
-      });
+    // toggling a checklist box while writing (contenteditable=false boxes)
+    field.addEventListener('click', function (ev) {
+      var box = ev.target.closest && ev.target.closest('.cn-ck__box');
+      if (box) { var cke = box.closest('.cn-cke'); if (cke) { cke.setAttribute('data-done', cke.getAttribute('data-done') === '1' ? '0' : '1'); } }
     });
 
     // the quiet timer (phase 2a). Self-contained: it never touches the field,
@@ -11198,7 +11222,7 @@ const ClarityNoteWriter = {
     setTimeout(function () { try { field.focus(); } catch (e) {} }, 90);
   },
 
-  // ---- select-to-format (phase 2b) ----
+  // ---- select-to-format (contenteditable, live bold/italic + checklist) ----
   _bindFormat: function (el, field) {
     var self = this;
     var pop = document.createElement('div');
@@ -11210,75 +11234,55 @@ const ClarityNoteWriter = {
       '<button type="button" class="cn-fmt__c" data-fmt="check">\u2713</button>';
     el.appendChild(pop);
     this._fmtPop = pop;
-
     var hide = function () { pop.hidden = true; };
+
+    var inField = function (node) { return node && field.contains(node.nodeType === 3 ? node.parentNode : node); };
     var place = function () {
-      var s = field.selectionStart, e = field.selectionEnd;
-      if (s === e) { hide(); return; }
-      var r = self._selRect(field);
-      if (!r) { hide(); return; }
+      var sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || sel.isCollapsed || !String(sel.toString()).trim()) { hide(); return; }
+      var rng = sel.getRangeAt(0);
+      if (!inField(rng.commonAncestorContainer)) { hide(); return; }
+      var r = rng.getBoundingClientRect();
+      if (!r || (!r.width && !r.height)) { hide(); return; }
       var host = el.getBoundingClientRect();
       var top = r.top - host.top - 46;
+      if (top < 6) top = r.bottom - host.top + 8;
       var left = r.left - host.left + r.width / 2;
-      if (top < (host.height ? 8 : 8)) top = r.bottom - host.top + 10;
       pop.style.top = Math.max(6, top) + 'px';
-      pop.style.left = Math.min(Math.max(52, left), host.width - 52) + 'px';
+      pop.style.left = Math.min(Math.max(54, left), host.width - 54) + 'px';
       pop.hidden = false;
     };
 
-    var onSel = function () { if (self.isOpen && document.activeElement === field) place(); };
+    var onSel = function () { if (self.isOpen) place(); };
     document.addEventListener('selectionchange', onSel);
-    field.addEventListener('select', place);
     field.addEventListener('scroll', hide, { passive: true });
-    field.addEventListener('blur', function () { setTimeout(hide, 120); });
+    field.addEventListener('blur', function () { setTimeout(hide, 100); });
     this._fmtCleanup = function () { document.removeEventListener('selectionchange', onSel); };
 
-    var wrapSel = function (mk) {
-      var s = field.selectionStart, e = field.selectionEnd, v = field.value;
-      if (s === e) return;
-      field.value = v.slice(0, s) + mk + v.slice(s, e) + mk + v.slice(e);
-      field.selectionStart = s + mk.length; field.selectionEnd = e + mk.length;
+    var run = function (cmd) {
+      field.focus();
+      try { document.execCommand(cmd, false, null); } catch (e) {}
       field.dispatchEvent(new Event('input', { bubbles: true }));
-      field.focus(); place();
+      place();
     };
     var checklist = function () {
-      var s = field.selectionStart, e = field.selectionEnd, v = field.value;
-      var ls = v.lastIndexOf('\n', s - 1) + 1;
-      field.value = v.slice(0, ls) + '- [ ] ' + v.slice(ls);
-      field.selectionStart = field.selectionEnd = e + 6;
+      field.focus();
+      try {
+        document.execCommand('insertHTML', false,
+          '<div class="cn-cke" data-done="0"><span class="cn-ck__box" contenteditable="false"></span><span class="cn-cke__t">\u200b</span></div>');
+      } catch (e) {}
       field.dispatchEvent(new Event('input', { bubbles: true }));
-      field.focus(); hide();
+      hide();
     };
     Array.prototype.slice.call(pop.querySelectorAll('[data-fmt]')).forEach(function (b) {
       b.addEventListener('pointerdown', function (ev) { ev.preventDefault(); });
       b.addEventListener('click', function () {
         var k = b.getAttribute('data-fmt');
-        if (k === 'b') wrapSel('**');
-        else if (k === 'i') wrapSel('*');
+        if (k === 'b') run('bold');
+        else if (k === 'i') run('italic');
         else checklist();
       });
     });
-  },
-  // measure the selection rect inside a textarea via a mirror element
-  _selRect: function (field) {
-    try {
-      var cs = getComputedStyle(field);
-      var div = document.createElement('div');
-      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight', 'letterSpacing', 'textTransform', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderLeftWidth'].forEach(function (k) { div.style[k] = cs[k]; });
-      div.style.position = 'absolute'; div.style.visibility = 'hidden'; div.style.whiteSpace = 'pre-wrap'; div.style.wordWrap = 'break-word'; div.style.boxSizing = 'border-box';
-      var fr = field.getBoundingClientRect();
-      div.style.width = field.clientWidth + (parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + 'px';
-      div.style.left = fr.left + 'px'; div.style.top = (fr.top - field.scrollTop) + 'px';
-      var val = field.value;
-      div.textContent = val.slice(0, field.selectionStart);
-      var span = document.createElement('span');
-      span.textContent = val.slice(field.selectionStart, field.selectionEnd) || '.';
-      div.appendChild(span);
-      document.body.appendChild(div);
-      var sr = span.getBoundingClientRect();
-      document.body.removeChild(div);
-      return { top: sr.top, bottom: sr.bottom, left: sr.left, width: sr.width };
-    } catch (e) { return null; }
   },
 
   // ---- the quiet timer: a whisper. slider to set, pause/resume/stop, a
@@ -11360,9 +11364,17 @@ const ClarityNoteWriter = {
       }
     };
     row.addEventListener('scroll', pick, { passive: true });
-    var cur = wrap.querySelector('[data-min="' + t.mins + '"]');
-    if (cur) { try { cur.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) {} }
-    setTimeout(pick, 60);
+    // center the current value deterministically (compute scrollLeft, do not
+    // trust scrollIntoView timing while the dropdown is still laying out)
+    var center = function () {
+      var cur = wrap.querySelector('[data-min="' + t.mins + '"]');
+      if (!cur) return;
+      var rr = row.getBoundingClientRect();
+      var cr = cur.getBoundingClientRect();
+      row.scrollLeft += (cr.left + cr.width / 2) - (rr.left + rr.width / 2);
+      pick();
+    };
+    requestAnimationFrame(function () { requestAnimationFrame(center); });
   },
   _tmrAction: function (a) {
     var self = this, t = this._tmr;
@@ -11458,7 +11470,7 @@ const ClarityNoteReader = {
           '</div>' +
         '</div>' +
         '<div class="cnr__body">' +
-          '<div class="cnr__txt">' + _cnRenderMd(n.text) + '</div>' +
+          '<div class="cnr__txt" data-cnr-txt>' + _cnDisplay(n.text) + '</div>' +
           '<div class="cnr__date">Written <b>' + esc(written) + '</b>' + (n.founding ? '. First reflection' : '') + '</div>' +
           (edited ? '<div class="cnr__edited">Edited on ' + esc(edited) + '</div>' : '') +
         '</div>' +
@@ -11478,12 +11490,21 @@ const ClarityNoteReader = {
     el.querySelector('[data-cnr-del]').addEventListener('click', function () {
       _cnConfirmDelete(n.id, function () { self.close(); });
     });
-    // tappable checkboxes in the rendered markdown
+    // tappable checkboxes: markdown boxes (data-ck line index) OR html boxes
     Array.prototype.slice.call(el.querySelectorAll('[data-ck]')).forEach(function (ck) {
       ck.addEventListener('click', function () {
         clarityNotesToggleCheck(n.id, parseInt(ck.getAttribute('data-ck'), 10));
-        _cnRepaintNotesPage();
-        self._render();
+        _cnRepaintNotesPage(); self._render();
+      });
+    });
+    var txt = el.querySelector('[data-cnr-txt]');
+    if (txt) Array.prototype.slice.call(txt.querySelectorAll('.cn-cke .cn-ck__box')).forEach(function (box, i) {
+      box.addEventListener('click', function () {
+        var cke = box.closest('.cn-cke'); if (!cke) return;
+        cke.setAttribute('data-done', cke.getAttribute('data-done') === '1' ? '0' : '1');
+        var store = clarityNotesStore();
+        var note = store.entries.find(function (e2) { return e2 && e2.id === n.id; });
+        if (note) { note.text = _cnSanitize(txt.innerHTML); try { persistNow(); } catch (e) {} _cnRepaintNotesPage(); }
       });
     });
   }
