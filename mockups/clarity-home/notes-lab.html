@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Notes, five layouts</title>
+<style>
+  :root{--ink:#04050a;--hi:rgba(255,255,255,.96);--mid:rgba(255,255,255,.6);--lo:rgba(255,255,255,.4);
+    --cyan:#8be9fa;--hair:rgba(255,255,255,.1)}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#0a0c10;color:var(--hi);
+    font-family:ui-sans-serif,-apple-system,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1560px;margin:0 auto;padding:38px 20px 90px}
+  header h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:700;letter-spacing:-.03em;margin:0 0 10px}
+  header p{color:var(--mid);font-size:.95rem;margin:0 0 4px;max-width:84ch}
+  .grid{display:flex;flex-wrap:wrap;gap:36px;margin-top:30px;align-items:flex-start}
+  .cell{width:340px}
+  .cap{font-size:.98rem;font-weight:700;margin:0 0 3px}
+  .capsub{color:var(--lo);font-size:.82rem;margin:0 0 14px;min-height:58px;line-height:1.5}
+  .phone{width:340px;border-radius:50px;padding:10px;background:linear-gradient(180deg,#15171c,#0a0b0e);
+    box-shadow:0 34px 90px rgba(0,0,0,.6),inset 0 0 0 1.5px rgba(255,255,255,.06)}
+  .screen{position:relative;border-radius:41px;overflow:hidden;height:720px;background:var(--ink)}
+  .notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:110px;height:28px;border-radius:16px;background:#000;z-index:9}
+  .inner{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none}
+  .inner::-webkit-scrollbar{display:none}
+
+  .neb{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+  .neb1{position:absolute;right:-45%;top:-20%;width:135%;height:64%;
+    background:radial-gradient(55% 55% at 60% 42%, rgba(34,84,96,.36), transparent 68%),
+               radial-gradient(40% 42% at 40% 60%, rgba(24,60,72,.24), transparent 70%);
+    animation:neb1 30s ease-in-out infinite alternate}
+  .neb2{position:absolute;left:-50%;bottom:-24%;width:120%;height:52%;
+    background:radial-gradient(50% 50% at 45% 55%, rgba(26,66,78,.2), transparent 70%);
+    animation:neb2 38s ease-in-out infinite alternate}
+  @keyframes neb1{from{transform:translate(0,0) scale(1)}to{transform:translate(-4.5%,3%) scale(1.07)}}
+  @keyframes neb2{from{transform:translate(0,0) scale(1.05)}to{transform:translate(4%,-2.5%) scale(1)}}
+  @media (prefers-reduced-motion:reduce){.neb1,.neb2{animation:none}}
+
+  .stage{position:relative;min-height:100%;padding:54px 24px 26px;display:flex;flex-direction:column}
+  .head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:26px}
+  .head h2{font-size:20px;font-weight:750;letter-spacing:-.01em;margin:0}
+  .head .n{color:var(--lo);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+  .add{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;
+    background:rgba(139,233,250,.13);color:var(--cyan);font-size:13.5px;font-weight:700;cursor:pointer;
+    border:0;font-family:inherit}
+  .add svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+  .spacer{flex:1}
+
+  /* ============ 1. LETTERS ============ */
+  /* text is the hero, no tags, the date sits quiet in the corner like a signed line */
+  .L1 .letter{padding:4px 0}
+  .L1 .letter + .letter{margin-top:28px;padding-top:28px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  .L1 .txt{font-size:18px;line-height:1.62;color:rgba(255,255,255,.94);font-weight:450;letter-spacing:-.005em}
+  .L1 .date{margin-top:12px;color:var(--lo);font-size:12.5px;font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+  .L1 .first .date::after{content:" · where it started";color:rgba(139,233,250,.6)}
+
+  /* ============ 2. TIMELINE ============ */
+  /* a spine down the left; notes hang off dated nodes. the arc of your own voice, visible */
+  .L2 .track{position:relative;padding-left:26px}
+  .L2 .track::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1.5px;
+    background:linear-gradient(180deg,var(--cyan),rgba(139,233,250,.12))}
+  .L2 .node{position:relative;padding:0 0 26px}
+  .L2 .node::before{content:"";position:absolute;left:-24.5px;top:5px;width:9px;height:9px;border-radius:50%;
+    background:var(--cyan);box-shadow:0 0 0 4px #04050a}
+  .L2 .node.faint::before{background:rgba(139,233,250,.35)}
+  .L2 .date{color:var(--cyan);font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:7px;letter-spacing:.01em}
+  .L2 .txt{font-size:15.5px;line-height:1.56;color:rgba(255,255,255,.92);font-weight:450}
+
+  /* ============ 3. ONE AT A TIME ============ */
+  /* you receive one note, sit with it, flip. re-reading becomes deliberate, not a scroll */
+  .L3 .stage{justify-content:center;text-align:center}
+  .L3 .card{padding:6px 4px}
+  .L3 .txt{font-size:21px;line-height:1.55;color:rgba(255,255,255,.95);font-weight:450;letter-spacing:-.01em;min-height:150px;display:flex;align-items:center;justify-content:center}
+  .L3 .date{margin-top:20px;color:var(--lo);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+  .L3 .nav{display:flex;align-items:center;justify-content:center;gap:26px;margin-top:30px}
+  .L3 .arrow{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--hi);font-size:18px;border:0;font-family:inherit;transition:opacity .2s}
+  .L3 .arrow[disabled]{opacity:.25;cursor:default}
+  .L3 .count{color:var(--lo);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;min-width:46px}
+
+  /* ============ 4. INDEX + DETAIL ============ */
+  /* a tight list of dates + openers; tap one to read it in full. for when notes pile up */
+  .L4 .row{display:block;width:100%;text-align:left;padding:14px 2px;cursor:pointer;
+    box-shadow:inset 0 -1px 0 rgba(255,255,255,.07);background:none;border:0;font-family:inherit}
+  .L4 .row .rdate{color:var(--cyan);font-size:11.5px;font-weight:650;font-variant-numeric:tabular-nums;margin-bottom:4px;letter-spacing:.02em}
+  .L4 .row .rlead{font-size:15px;line-height:1.5;color:rgba(255,255,255,.88);font-weight:450;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .L4 .row.open .rlead{-webkit-line-clamp:unset;overflow:visible;color:rgba(255,255,255,.95);font-size:16px;line-height:1.6;margin-top:2px}
+  .L4 .row .chev{float:right;color:var(--lo);font-size:12px;margin-top:2px;transition:transform .2s}
+  .L4 .row.open .chev{transform:rotate(90deg)}
+
+  /* ============ 5. QUIET LIST ============ */
+  /* pure typography and rhythm. no cards, no dividers. pin a note to keep it on top */
+  .L5 .note{position:relative;padding:0 0 24px}
+  .L5 .meta{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+  .L5 .date{color:var(--lo);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+  .L5 .pin{color:var(--cyan);font-size:11px;font-weight:700}
+  .L5 .txt{font-size:16px;line-height:1.6;color:rgba(255,255,255,.92);font-weight:450}
+  .L5 .pinbtn{position:absolute;right:0;top:-2px;color:rgba(255,255,255,.25);font-size:13px;cursor:pointer;background:none;border:0}
+  .L5 .note.pinned .pinbtn{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Notes, five layouts</h1>
+    <p>Same five notes in every phone. Not five looks, five ways to <b>return</b> to your own words. All stay simple and in the Clarity language (nebula, #8be9fa), all drop the category-tag labels that made the shipped version read like a form. The difference between them is how re-reading feels, and how they hold up once the stack grows.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const NOTES = [
+  { text: "Because my little brother watches everything I do, and I want him to see someone finish.", date: "Jul 2", founding: true },
+  { text: "When this feels pointless, remember the reason was never the number. It was becoming someone he could believe.", date: "Jul 30" },
+  { text: "Posted the video I almost deleted. Three people said it helped. That is the whole thing.", date: "Aug 18" },
+  { text: "Slower month than I hoped. Still running the marathon.", date: "Aug 14" },
+  { text: "Tired today. Showing up anyway.", date: "Aug 20" },
+];
+// chronological helper (founding first, then by natural order given)
+const CHRON = NOTES.slice();
+
+const PLUS = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function head(title, n){
+  return `<div class="head"><h2>${title}</h2>`
+    + (n!=null ? `<span class="n">${n}</span>` : `<button class="add">${PLUS}Add</button>`)
+    + `</div>`;
+}
+
+// 1. LETTERS
+function L1(){
+  const body = NOTES.map((x,i)=>`<div class="letter ${x.founding?'first':''}">
+    <div class="txt">${esc(x.text)}</div><div class="date">${x.date}, 2026</div></div>`).join('');
+  return `<div class="head"><h2>Your notes</h2><button class="add">${PLUS}Add</button></div>${body}<div class="spacer"></div>`;
+}
+// 2. TIMELINE
+function L2(){
+  const body = NOTES.map((x,i)=>`<div class="node ${i>0?'faint':''}">
+    <div class="date">${x.date}</div><div class="txt">${esc(x.text)}</div></div>`).join('');
+  return `<div class="head"><h2>Your notes</h2><button class="add">${PLUS}Add</button></div>
+    <div class="track">${body}</div><div class="spacer"></div>`;
+}
+// 3. ONE AT A TIME
+let L3i = 0;
+function L3(){
+  const x = NOTES[L3i];
+  return `<div class="head"><h2>Your notes</h2><button class="add">${PLUS}Add</button></div>
+    <div class="spacer"></div>
+    <div class="card">
+      <div class="txt">${esc(x.text)}</div>
+      <div class="date">${x.date}, 2026${x.founding?' · where it started':''}</div>
+    </div>
+    <div class="nav">
+      <button class="arrow prev" ${L3i===0?'disabled':''}>&#8592;</button>
+      <span class="count">${L3i+1} of ${NOTES.length}</span>
+      <button class="arrow next" ${L3i===NOTES.length-1?'disabled':''}>&#8594;</button>
+    </div>
+    <div class="spacer"></div>`;
+}
+// 4. INDEX + DETAIL
+function L4(){
+  const body = NOTES.map((x,i)=>`<button class="row ${i===0?'open':''}" data-i="${i}">
+    <span class="chev">&#8250;</span>
+    <div class="rdate">${x.date}, 2026</div>
+    <div class="rlead">${esc(x.text)}</div></button>`).join('');
+  return `${head('Your notes')}${body}<div class="spacer"></div>`;
+}
+// 5. QUIET LIST
+function L5(){
+  const body = NOTES.map((x,i)=>`<div class="note ${x.founding?'pinned':''}">
+    <button class="pinbtn">&#9733;</button>
+    <div class="meta"><span class="date">${x.date}, 2026</span>${x.founding?'<span class="pin">Kept</span>':''}</div>
+    <div class="txt">${esc(x.text)}</div></div>`).join('');
+  return `${head('Your notes')}${body}<div class="spacer"></div>`;
+}
+
+const LAYOUTS = [
+  { key:'L1', name:'1 · Letters', sub:'Text is the hero, no labels, the date signs each one in the corner. The simplest upgrade: it just reads like something a person wrote.', render:L1 },
+  { key:'L2', name:'2 · Timeline', sub:'A quiet spine down the left, one dated node per note. You see the arc of your own voice over time at a glance.', render:L2 },
+  { key:'L3', name:'3 · One at a time', sub:'You receive a single note and sit with it, then flip. Re-reading becomes deliberate instead of a scroll past everything.', render:L3 },
+  { key:'L4', name:'4 · Index', sub:'A tight list of dates and openers; tap one to open it in full. The one that stays usable when you have thirty notes.', render:L4 },
+  { key:'L5', name:'5 · Quiet list', sub:'Pure type and rhythm, no cards, no dividers. Star a note to keep it pinned on top. Less, taken all the way.', render:L5 },
+];
+
+const grid = document.getElementById('grid');
+grid.innerHTML = LAYOUTS.map(l=>`
+  <div class="cell">
+    <p class="cap">${l.name}</p>
+    <p class="capsub">${l.sub}</p>
+    <div class="phone"><div class="screen"><div class="notch"></div>
+      <div class="inner"><div class="stage ${l.key}" id="ph${l.key}"></div></div></div></div>
+  </div>`).join('');
+
+function paint(key){ document.getElementById('ph'+key).innerHTML = LAYOUTS.find(l=>l.key===key).render(); }
+LAYOUTS.forEach(l=>paint(l.key));
+
+// interactions
+document.addEventListener('click', e=>{
+  const prev = e.target.closest('#phL3 .prev');
+  const next = e.target.closest('#phL3 .next');
+  if(prev){ if(L3i>0){L3i--; paint('L3');} return; }
+  if(next){ if(L3i<NOTES.length-1){L3i++; paint('L3');} return; }
+  const row = e.target.closest('#phL4 .row');
+  if(row){ row.classList.toggle('open'); return; }
+  const pin = e.target.closest('#phL5 .pinbtn');
+  if(pin){ pin.closest('.note').classList.toggle('pinned'); return; }
+});
+</script>
+</body>
+</html>
