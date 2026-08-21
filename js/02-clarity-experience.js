@@ -11039,6 +11039,7 @@ const ClarityNoteWriter = {
     this._opts = opts || {};
     this._text = String(this._opts.prefill || '');
     this._tag = '';
+    this._tmr = { state: 'idle', mins: 10, remain: 600, tick: 0 };
     this.isOpen = true;
     const el = document.createElement('div');
     el.className = 'cn-writer';
@@ -11054,6 +11055,7 @@ const ClarityNoteWriter = {
   close(saved) {
     if (!this.isOpen) return;
     this.isOpen = false;
+    try { if (this._tmr && this._tmr.tick) { clearInterval(this._tmr.tick); this._tmr.tick = 0; } } catch (e) {}
     try { if (this._kbSettleCleanup) { this._kbSettleCleanup(); this._kbSettleCleanup = null; } } catch (e) {}
     const el = this.el;
     this.el = null;
@@ -11075,7 +11077,7 @@ const ClarityNoteWriter = {
       '<div class="cn-step cn-step--write">' +
         '<div class="cn-bar">' +
           '<button type="button" class="cn-bar__x" data-cn-cancel>Cancel</button>' +
-          '<span class="cn-bar__t">' + (this._opts && this._opts.editId ? 'Edit reflection' : 'New reflection') + '</span>' +
+          '<div class="cn-tmrmount" data-cn-tmr></div>' +
           '<button type="button" class="cn-bar__done" data-cn-finish disabled>Finish</button>' +
         '</div>' +
         '<div class="cn-body">' +
@@ -11128,9 +11130,94 @@ const ClarityNoteWriter = {
       });
     });
 
+    // the quiet timer (phase 2a). Self-contained: it never touches the field,
+    // and every control preventDefaults its press so the keyboard never drops.
+    this._paintTimer();
+
     // the proven recipe, verbatim, on a field that already sits high
     try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(this, field); } catch (e) {}
     setTimeout(function () { try { field.focus(); } catch (e) {} }, 90);
+  },
+
+  // ---- the quiet timer: a whisper. slider to set, pause/resume/stop, a
+  //      gentle in-app end. No notification, no backgrounding, never near
+  //      the field's focus. ----
+  _fmtClock: function (sec) {
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  },
+  _paintTimer: function () {
+    var self = this;
+    var el = this.el; if (!el) return;
+    var mount = el.querySelector('[data-cn-tmr]'); if (!mount) return;
+    var t = this._tmr;
+    var html;
+    if (t.state === 'idle' || t.state === 'setting') {
+      html = '<button type="button" class="cn-tmr" data-tmr="open">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
+        '<span>Timer</span></button>';
+      if (t.state === 'setting') {
+        html += '<div class="cn-tmrdrop">' +
+          '<div class="cn-tmrval">' + t.mins + '</div><div class="cn-tmrunit">MINUTES</div>' +
+          '<input type="range" min="5" max="60" step="5" value="' + t.mins + '" data-tmr="slide" aria-label="Minutes">' +
+          '<button type="button" class="cn-tmrgo" data-tmr="start">Start</button>' +
+          '<button type="button" class="cn-tmroff" data-tmr="off">No timer</button>' +
+          '</div>';
+      }
+    } else {
+      var live = t.state === 'paused'
+        ? '<span data-tmr="resume" aria-label="Resume"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 6v12l10-6z"/></svg></span>' +
+          '<span data-tmr="stop" aria-label="Stop"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg></span>'
+        : '<span data-tmr="pause" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="7" y="6" width="3.4" height="12" rx="1"/><rect x="13.6" y="6" width="3.4" height="12" rx="1"/></svg></span>' +
+          '<span data-tmr="stop" aria-label="Stop"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg></span>';
+      html = '<div class="cn-tmr cn-tmr--live' + (t.state === 'ended' ? ' cn-tmr--ended' : '') + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' +
+        '<span data-tmr="noop">' + (t.state === 'ended' ? 'Time' : this._fmtClock(t.remain)) + '</span>' +
+        '<span class="cn-tmr__ic">' + live + '</span></div>';
+    }
+    mount.innerHTML = html;
+    // every control preventDefaults the press so the field keeps focus
+    Array.prototype.slice.call(mount.querySelectorAll('[data-tmr]')).forEach(function (n) {
+      n.addEventListener('pointerdown', function (e) { if (n.getAttribute('data-tmr') !== 'slide') e.preventDefault(); });
+      if (n.getAttribute('data-tmr') === 'slide') {
+        n.addEventListener('input', function () { t.mins = parseInt(n.value, 10) || 10; var v = mount.querySelector('.cn-tmrval'); if (v) v.textContent = t.mins; });
+        return;
+      }
+      n.addEventListener('click', function () { self._tmrAction(n.getAttribute('data-tmr')); });
+    });
+  },
+  _tmrAction: function (a) {
+    var self = this, t = this._tmr;
+    if (a === 'noop') return;
+    if (a === 'open') { t.state = 'setting'; }
+    else if (a === 'off') { t.state = 'idle'; }
+    else if (a === 'start') { t.remain = t.mins * 60; t.state = 'running'; this._tmrRun(); }
+    else if (a === 'pause') { t.state = 'paused'; }
+    else if (a === 'resume') { t.state = 'running'; this._tmrRun(); }
+    else if (a === 'stop') { if (t.tick) { clearInterval(t.tick); t.tick = 0; } t.state = 'idle'; }
+    this._paintTimer();
+    // keep the writer field focused through any timer tap
+    try { var f = this.el && this.el.querySelector('[data-cn-field]'); if (f && a !== 'start' && a !== 'off') f.focus(); } catch (e) {}
+  },
+  _tmrRun: function () {
+    var self = this, t = this._tmr;
+    if (t.tick) { clearInterval(t.tick); t.tick = 0; }
+    t.tick = setInterval(function () {
+      if (t.state !== 'running') return;
+      t.remain = Math.max(0, t.remain - 1);
+      var el = self.el; if (!el) return;
+      var span = el.querySelector('[data-cn-tmr] .cn-tmr__ic');
+      var num = el.querySelector('[data-cn-tmr] [data-tmr="noop"]');
+      if (num) num.textContent = self._fmtClock(t.remain);
+      if (t.remain === 0) {
+        clearInterval(t.tick); t.tick = 0;
+        t.state = 'ended';
+        self._paintTimer();
+        // gentle: the whisper dims to "Time", no alarm. Clears back to idle
+        // after a breath so the writer stays clean.
+        setTimeout(function () { if (self._tmr && self._tmr.state === 'ended') { self._tmr.state = 'idle'; self._paintTimer(); } }, 6000);
+      }
+    }, 1000);
   }
 };
 
