@@ -110,10 +110,6 @@
   /* ---------- page one ---------- */
   // record milestones: days shown up. A forward pull that stays in Consistency's
   // lane (about the record growing, never the goal distance).
-  // milestones count the thing you actually did (actions / workouts / days held),
-  // never calendar weeks. 10 workouts is 10 workouts, at whatever rate you keep.
-  var MILES = [5, 10, 25, 50, 100, 250, 500, 1000, 2000];
-  function nextMile(t) { for (var i = 0; i < MILES.length; i++) if (MILES[i] > t) return MILES[i]; return Math.ceil((t + 1) / 1000) * 1000; }
   // what the page reveals as the record grows, so day one is never an empty dashboard
   var REVEAL = { support: 7 };
   function pageOne(s, log) {
@@ -123,14 +119,12 @@
     if (n === 1) word = word.replace(/^actions\b/, 'action');
     var counted = log[log.length - 1].on;
     var begin = s.N === 1 ? '<div class="one__begin">Day one. This is where the count starts.</div>' : '';
-    var nm = nextMile(n), gap = nm - n;
-    var mile = (gap > 0) ? '<div class="one__mile"><b>' + gap.toLocaleString() + '</b> more to ' + nm.toLocaleString() + ' ' + PERSONA.unit + '</div>' : '';
     return '<div><div class="one__crown' + (counted ? ' lit' : '') + '">' + mMark('', 22) + '</div>' +
       '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
       (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div>' +
-      begin + mile + '</div>' +
+      begin + '</div>' +
       '<div class="one__hint"><svg width="16" height="9" viewBox="0 0 14 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 1l6 6 6-6"/></svg></div>';
   }
 
