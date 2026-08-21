@@ -91,12 +91,12 @@
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); }
   html.light .cal .d { color: rgba(10,14,10,0.36); }
   html.light .cal .d.kept { color: var(--acc); }
-  html.light .cal .d.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.28); color: rgba(10,14,10,0.55); }
+  html.light .cal .d.missed { box-shadow: inset 0 0 0 1px rgba(10,14,10,0.1); color: rgba(10,14,10,0.32); }
   html.light .cal .d.rest { color: rgba(10,14,10,0.15); }
   html.light .cal .d.ahead { color: rgba(10,14,10,0.15); }
   html.light .trk__c b, html.light .mlog__g b, html.light .glance__strip b { background: rgba(10,14,10,0.09); }
   html.light .mlog__g b.rest, html.light .trk__c b.rest { background: rgba(10,14,10,0.06); }
-  html.light .mlog__g b.missed, html.light .trk__c b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(10,14,10,0.22); }
+  html.light .mlog__g b.missed, html.light .trk__c b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(10,14,10,0.12); }
   html.light .mlog__g b.ahead { background: rgba(10,14,10,0.045); }
   html.light .mlog__g b.pad { background: transparent; }
   html.light .wkc b.missed { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.14); }
@@ -106,7 +106,7 @@
   html.light .one__crown { color: rgba(10,14,10,0.35); }
   html.light .one__today.off u { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.3); }
   html.light .one__hint { color: rgba(10,14,10,0.45); }
-  html.light .key u.c { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.28); }
+  html.light .key u.c { background: transparent; box-shadow: inset 0 0 0 1px rgba(10,14,10,0.14); }
   html.light .key u.r { background: rgba(10,14,10,0.03); box-shadow: inset 0 0 0 1px rgba(10,14,10,0.16); }
   html.light .heropill { color: rgba(10,14,10,0.74); }
   html.light .heropill b { color: #0c0e0c; }
@@ -246,23 +246,6 @@
   .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
     color: var(--score-fg); font-variant-numeric: tabular-nums; margin-top: 2px; }
   .score__viz { margin-top: 16px; position: relative; }
-  .bar__lbl { font-size: 11px; font-weight: 600; color: var(--text-lo, rgba(255,255,255,0.45)); letter-spacing: 0.02em; }
-  /* 1. trend */
-  .spark { display: block; width: 100%; height: 50px; overflow: visible; }
-  .spark__area { fill: rgba(var(--acc-rgb),0.16); }
-  .spark__line { fill: none; stroke: var(--acc); stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
-  .spark__dot { position: absolute; right: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--acc);
-    box-shadow: 0 0 0 3px rgba(var(--acc-rgb),0.22); transform: translate(50%, -50%); }
-  /* 2. ring */
-  .viz-ring { display: flex; justify-content: flex-start; }
-  .viz-ring svg { width: 84px; height: 84px; }
-  .ring__t { fill: none; stroke: var(--score-empty); stroke-width: 8; }
-  .ring__v { fill: none; stroke: var(--acc); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-  /* 3. bars */
-  .viz-bars { display: flex; align-items: flex-end; gap: 5px; height: 54px; }
-  .viz-bars u { flex: 1; background: rgba(var(--acc-rgb),0.32); border-radius: 3px; min-height: 4px; }
-  .viz-bars u.now { background: var(--acc); }
-  /* 4. mix */
   .mix__bar { display: flex; height: 16px; border-radius: 6px; overflow: hidden; gap: 2px; }
   .mix__bar u { display: block; }
   .mix__bar u.k { background: var(--acc); }
@@ -274,11 +257,7 @@
   .mix__key b.k { background: var(--acc); }
   .mix__key b.s { background: rgba(var(--acc-rgb),0.42); }
   .mix__key b.m { background: var(--score-empty); box-shadow: inset 0 0 0 1px var(--score-sub); }
-  /* 5. track */
-  .track { position: relative; height: 12px; border-radius: 6px; background: var(--score-empty); }
-  .track__fill { display: block; height: 100%; background: var(--acc); border-radius: 6px; transition: width 0.5s ease; }
-  .track__ghost { position: absolute; top: -3px; width: 2px; height: 18px; border-radius: 2px; background: var(--score-fg); opacity: 0.45; }
-  .track__scale { display: flex; justify-content: space-between; margin-top: 9px; font-size: 11.5px; color: var(--score-sub); font-variant-numeric: tabular-nums; }
+  .mix__bar u { display: block; }
   .score__note { font-size: 11.5px; color: var(--score-sub); margin-top: 12px; line-height: 1.45; }
   /* the shown-up pill under the calendar */
   .heropill { display: block; text-align: center; background: rgba(255,255,255,0.045); border-radius: 999px;
@@ -310,7 +289,7 @@
   /* kept days are not filled; the green line under them does the marking */
   .cal .d.kept { color: var(--acc); font-weight: 800; }
   .cal .d.sup { color: rgba(var(--acc-rgb),0.72); font-weight: 650; }
-  .cal .d.missed { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.22); color: rgba(255,255,255,0.5); }
+  .cal .d.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); color: rgba(255,255,255,0.3); }
   /* a day the goal never asked for is not a miss: no fill, just a quiet number */
   .cal .d.rest { background: transparent; color: rgba(255,255,255,0.15); }
   .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
@@ -333,7 +312,7 @@
   .key u { width: 10px; height: 10px; border-radius: 3px; display: block; flex: 0 0 auto; }
   .key u.a { background: rgba(var(--acc-rgb),0.55); }
   .key u.b { background: rgba(var(--acc-rgb),0.2); }
-  .key u.c { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.22); }
+  .key u.c { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12); }
   .runline { font-size: 13.5px; color: var(--text-mid, rgba(255,255,255,0.8)); margin-top: 14px; }
   .runline b { color: var(--text-hi, #fff); font-weight: 700; font-variant-numeric: tabular-nums; }
   /* earlier months log */
@@ -348,8 +327,9 @@
   .mlog__g b.sup { background: rgba(var(--acc-rgb),0.2); }
   .mlog__g b.kept { background: rgba(var(--acc-rgb),0.55); }
   .mlog__g b.rest { background: rgba(255,255,255,0.02); }
-  .mlog__g b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
+  .mlog__g b.missed { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08); }
   .mlog__g b.ahead { background: rgba(255,255,255,0.032); }
+  .mlog__g b.today { box-shadow: 0 0 0 1.6px var(--acc), 0 0 7px rgba(var(--acc-rgb),0.55); position: relative; z-index: 1; }
   .mlog__g b.pad { background: transparent; }
   /* week view: a real detailed week */
   .wkstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; margin-bottom: 18px; }
@@ -475,20 +455,22 @@
   html.vm-desk .one__hint { display: none; }
   html.vm-desk #pgTwo { padding: 26px 0 110px; }
   html.vm-desk .ev__hero { display: none; }
-  /* the section cards tile into a balanced two-column masonry */
-  html.vm-desk .ev { max-width: none; margin: 0; column-count: 2; column-gap: 26px; }
-  html.vm-desk .ev > .sec { margin: 0 0 22px; break-inside: avoid; width: 100%; }
-  /* the score is a full-width banner across the top, number left, heatmap right */
-  html.vm-desk .sec--score { column-span: all; }
+  /* score is a full-width banner; below it, calendar left and the rest right.
+     (CSS multicol silently drops backdrop-filter panels, so we place columns.) */
+  html.vm-desk .ev { max-width: none; margin: 0; }
+  html.vm-desk .sec--score { margin: 0 0 22px; }
+  html.vm-desk .evwrap { display: flex; gap: 26px; align-items: flex-start; }
+  html.vm-desk .evcol { min-width: 0; }
+  html.vm-desk .evcol--main { flex: 1.05; }
+  html.vm-desk .evcol--side { flex: 1; display: flex; flex-direction: column; }
+  html.vm-desk .evcol .sec { margin: 0 0 22px; }
+  html.vm-desk .evcol .sec:last-child { margin-bottom: 0; }
   html.vm-desk .glance--score { display: grid; grid-template-columns: auto 1fr; align-items: center;
     gap: 30px; padding: 22px 48px 22px 26px; }
   html.vm-desk .score__m { top: 16px; right: 18px; }
   html.vm-desk .score__head { display: flex; align-items: baseline; gap: 14px; }
   html.vm-desk .score__n { font-size: 66px; }
   html.vm-desk .score__viz { margin-top: 0; }
-  html.vm-desk .spark { height: 58px; }
-  html.vm-desk .viz-bars { height: 60px; }
-  html.vm-desk .viz-ring { justify-content: flex-end; }
   html.vm-desk .score__note { grid-column: 1 / -1; margin-top: 4px; }
 
   /* ============ phone view forced on a wide screen ============ */
@@ -514,8 +496,7 @@
     <input type="range" id="slider" min="1" max="365" value="168">
     <div class="chips" id="dayChips"></div>
   </div>
-  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="fxChips"></div><div class="chips" id="viewChips"></div></div>
-  <div class="bar__row"><span class="bar__lbl">Score viz</span><div class="chips" id="vizChips"></div></div>
+  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="viewChips"></div></div>
 </div></div>
 
 <div class="gplus-fx" aria-hidden="true"><i></i><i></i><i></i></div>
