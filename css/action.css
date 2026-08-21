@@ -799,7 +799,7 @@ html.theme-light .action-exp__bg .action-exp__bg-orb3::before {
 .action-plan__plan-details-btn {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%; padding: 14px;
-  border-radius: var(--r-card);
+  border-radius: var(--btn-r);
   background: var(--kfill-04);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
   color: rgba(var(--ink),0.6);
@@ -1742,7 +1742,7 @@ html.theme-light .action-exp__bg .action-exp__bg-orb3::before {
   width: 100%;
   margin-top: 4px;
   padding: 10px 14px;
-  border-radius: var(--r-ctrl);
+  border-radius: var(--btn-r);
   background: var(--kfill-05);
   border: 1px solid var(--hairline);
   color: rgba(220, 237, 240, 0.95);
@@ -2319,7 +2319,7 @@ html.theme-light .action-exp__bg .action-exp__bg-orb3::before {
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--ctl-r);
   border: 1px solid rgba(160, 241, 255,0.32);
   background: rgba(160, 241, 255,0.10);
   color: rgba(210, 248, 255,0.95);
@@ -2695,7 +2695,7 @@ html.theme-light .action-exp__bg .action-exp__bg-orb3::before {
 }
 .action-plan__when-chip {
   padding: 8px 16px;
-  border-radius: var(--r-ctrl);
+  border-radius: var(--ctl-r);
   border: 1px solid rgba(var(--ink),0.14);
   background: var(--kfill-04);
   color: rgba(var(--ink),0.7);
@@ -3695,7 +3695,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
    17.6px/600 sitting 62px off. Two products, one screen apart. If Clarity's
    nav metrics ever change, change them here too. */
 .intake-beat__cta {
-  width: 100%; padding: 18px; border: none; border-radius: var(--r-ctrl);
+  width: 100%; padding: 18px; border: none; border-radius: var(--btn-r);
   background: var(--solid-bg); color: var(--solid-fg); font-family: var(--font); font-size: var(--fs-lg);
   font-weight: 600; cursor: pointer; margin-bottom: 0;
   box-shadow: 0 8px 30px rgba(0,0,0,0.38); transition: transform 0.15s ease;
@@ -3769,7 +3769,7 @@ body.exit-grabber .action-exp__close { display: none !important; }
 }
 /* Locator chips (Night 3): fills, no borders, sized like real controls. */
 .action-intake #intakeChips .action-plan__when-chip {
-  border: none; padding: 12px 18px; border-radius: 12px;
+  border: none; padding: 12px 18px; border-radius: var(--ctl-r);
   background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.88);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
   font-size: 0.875rem;
@@ -4211,7 +4211,7 @@ html.theme-light .aloop-card[data-tier="extreme"] { box-shadow: inset 0 1px 0 rg
 }
 .aloop-hold {
   position: relative; overflow: hidden; display: block; width: 100%;
-  padding: 18px; border: none; border-radius: var(--r-ctrl); cursor: pointer;
+  padding: 18px; border: none; border-radius: var(--btn-r); cursor: pointer;
   background: var(--solid-bg); color: var(--solid-fg);
   font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   box-shadow: 0 8px 30px rgba(0,0,0,0.38);
@@ -4268,7 +4268,7 @@ html.theme-light .aloop-card[data-tier="extreme"] { box-shadow: inset 0 1px 0 rg
 }
 .aloop-capture__row { display: flex; gap: 9px; padding-bottom: calc(var(--safe-b, 0px) + 16px); }
 .aloop-capture__btn {
-  flex: 1; padding: 14px; border: none; border-radius: 12px; cursor: pointer;
+  flex: 1; padding: 14px; border: none; border-radius: var(--btn-r); cursor: pointer;
   background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.92);
   font-family: var(--font); font-size: 0.9375rem; font-weight: 700;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -4301,7 +4301,7 @@ html.theme-light .aloop-card[data-tier="extreme"] { box-shadow: inset 0 1px 0 rg
 .aloop-next__t { margin: 8px 0 0; font-size: 1.0625rem; font-weight: 700; line-height: 1.35; color: rgba(var(--ink),0.95); }
 .aloop-pillrow { display: flex; gap: 9px; margin-top: 16px; }
 .aloop-pill {
-  flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer;
+  flex: 1; padding: 12px; border: none; border-radius: var(--btn-r); cursor: pointer;
   text-align: center; font-family: var(--font); font-size: 0.84375rem; font-weight: 700;
   background: rgba(var(--ink),0.07); color: rgba(var(--ink),0.92);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
@@ -4903,7 +4903,7 @@ html.theme-light .afl--cine {
 }
 .afl-cta {
   position: relative; display: block; width: 100%; overflow: hidden;
-  padding: 18px; border: 0; border-radius: var(--r-ctrl);
+  padding: 18px; border: 0; border-radius: var(--btn-r);
   font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   background: var(--kfill-04); color: rgba(var(--ink), 0.58);
   cursor: default; -webkit-user-select: none; user-select: none;
@@ -5892,7 +5892,7 @@ html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
 .afl-nav--day { position: relative; z-index: 3; display: flex; flex-direction: column; }
 .afl-day__hold {
   position: relative; display: block; width: 100%; padding: 18px; border: 0;
-  border-radius: var(--r-ctrl); background: var(--solid-bg); color: var(--solid-fg);
+  border-radius: var(--btn-r); background: var(--solid-bg); color: var(--solid-fg);
   font-family: var(--font); font-size: var(--fs-lg); font-weight: 600;
   cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none;
   /* v1187: the callout was the missing one here. iOS raises it on a long press

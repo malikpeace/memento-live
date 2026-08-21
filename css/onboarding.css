@@ -111,7 +111,7 @@
 
 .wiz__nav { display: flex; gap: 10px; margin-top: 8px; }
 .wiz__nav-btn {
-  flex: 1; padding: 14px; border-radius: var(--r-card);
+  flex: 1; padding: 14px; border-radius: var(--btn-r);
   font-family: var(--font); font-size: var(--fs-md); font-weight: 600;
   cursor: pointer; transition: all var(--t-fast); border: none;
 }
@@ -589,7 +589,7 @@ body.lite .ctraj__line, body.calm-motion .ctraj__line, html.lowfx .ctraj__line {
 .hmctl__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .hmctl__label { font-size: var(--fs-sm); color: var(--text-2); }
 .hmseg { display: inline-flex; gap: 2px; background: var(--kfill-05); border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 2px; }
-.hmseg__btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); padding: 4px 12px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
+.hmseg__btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: var(--ctl-r); padding: 4px 12px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
 .hmseg__btn:hover { color: var(--text-1); }
 .hmseg__btn--on { background: var(--kfill-10); color: var(--text-hi); }
 .cgraph__legend { display: flex; align-items: center; gap: 3px; margin-top: 8px; font-size: 0.56rem; color: var(--text-faint); opacity: 0.8; }
@@ -715,7 +715,7 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 /* Quick-add chips */
 .quick-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 16px; }
 .chip {
-  padding: 8px 14px; border-radius: var(--r-ctrl);
+  padding: 8px 14px; border-radius: var(--ctl-r);
   border: 1px solid var(--hairline);
   background: var(--kfill-04);
   color: var(--text-2); font-family: var(--font);
@@ -861,7 +861,7 @@ body.calm-motion .empty-state, body.lite .empty-state { animation: none; }
 .login__input:focus { border-color: var(--color-clarity); }
 .login__input::placeholder { color: var(--text-3); }
 .login__btn {
-  width: 100%; padding: 16px; border-radius: var(--r-card); border: none;
+  width: 100%; padding: 16px; border-radius: var(--btn-r); border: none;
   background: var(--color-clarity); color: #fff;
   font-family: var(--font); font-size: 1rem; font-weight: 700;
   cursor: pointer; transition: all var(--t-fast);
@@ -1190,7 +1190,7 @@ body.calm-motion .welcome-intro__pillar-ground {
 }
 .welcome-intro__back-btn {
   width: 52px; align-self: stretch; min-height: 44px; flex-shrink: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--btn-r);
   border: 1px solid transparent;
   background: var(--kfill-032);
   box-shadow: var(--glass-shadow-soft), var(--glass-highlight);
@@ -1205,7 +1205,7 @@ body.calm-motion .welcome-intro__pillar-ground {
 .welcome-intro__back-btn:active { transform: scale(0.97); }
 .welcome-intro__btn {
   width: 100%; max-width: 320px; padding: 16px;
-  border-radius: var(--r-sm);
+  border-radius: var(--btn-r);
   border: 1px solid transparent;
   background: var(--kfill-038);
   backdrop-filter: var(--glass-blur);
@@ -1326,7 +1326,7 @@ body.calm-motion .welcome-intro__pillar-ground {
   width: 100%;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   text-align: left;
-  padding: 14px 16px; border-radius: var(--r-sm);
+  padding: 14px 16px; border-radius: var(--ctl-r);
   border: 1px solid transparent;
   background: var(--kfill-06);
   box-shadow: none;
@@ -1957,7 +1957,7 @@ body.lite .welcome-intro__rays { opacity: calc(0.6 + var(--wi-beam-boost, 0) * 0
 .wi-cine__pillicon svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 13px currentColor); }
 body.lite .wi-cine__pillicon svg { filter: none; }
 .wi-cine__chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 16px; max-width: 300px; }
-.wi-cine__chip { font-size: 0.8rem; line-height: 1; padding: 8px 12px; border-radius: 9px; color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+.wi-cine__chip { font-size: 0.8rem; line-height: 1; padding: 8px 12px; border-radius: var(--ctl-r); color: rgba(255,255,255,0.88); background: rgba(255,255,255,0.05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
 
 /* ── THE STORY ORB ───────────────────────────────────────────────────────────
    One persistent visual for the whole post-first-win story. The rings are the
@@ -2708,7 +2708,7 @@ body:has(.action-intake-page--cine) .fullscreen-close-global {
   color: #0a0a0e;
   background: #f4f5f7;
   border: none;
-  border-radius: var(--r-ctrl);
+  border-radius: var(--btn-r);
   cursor: pointer;
   box-shadow: 0 8px 28px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
   transition: box-shadow 0.26s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -2934,7 +2934,7 @@ body.calm-motion .module-intro--flash .module-intro__icon { animation: none; }
   color: var(--text-2); max-width: 300px; margin-bottom: 40px;
 }
 .module-intro__cta {
-  padding: 14px 48px; border-radius: var(--pill-r); border: none;
+  padding: 14px 48px; border-radius: var(--btn-r); border: none;
   font-family: var(--font); font-size: var(--fs-md); font-weight: 600;
   cursor: pointer; transition: transform var(--t-fast) ease, background var(--t-fast) ease;
 }
@@ -3113,7 +3113,7 @@ body.lite .dash-mission__neutron.ns-pulse .dash-mission__neutron-star { animatio
 .milestone-banner__row { display: flex; gap: 8px; margin-top: 14px; }
 .milestone-banner__btn {
   flex: 1; font: inherit; font-size: var(--fs-sm); cursor: pointer;
-  padding: 8px 12px; border-radius: var(--r-sm); outline: none;
+  padding: 8px 12px; border-radius: var(--btn-r); outline: none;
   border: 1px solid var(--hairline, rgba(var(--ink),0.12));
   background: var(--kfill-05); color: var(--text-1, #e7e7ea);
   transition: background var(--t-base) ease, border-color var(--t-base) ease;
@@ -3182,7 +3182,7 @@ body.calm-motion .milestone-banner.is-on, body.lite .milestone-banner.is-on { tr
 .mori-wiz__egg.is-good { color: #5fb967; }
 .mori-wiz__nav { display: flex; gap: 12px; margin-top: auto; padding-top: 32px; }
 .mori-wiz__btn {
-  flex: 1; padding: 16px; border-radius: var(--r-ctrl); border: none; cursor: pointer;
+  flex: 1; padding: 16px; border-radius: var(--btn-r); border: none; cursor: pointer;
   background: var(--color-mori); color: #fff; font-family: var(--font);
   font-size: var(--fs-md); font-weight: 700; letter-spacing: 0.01em;
   transition: filter var(--t-fast), transform 0.1s;
@@ -3265,14 +3265,14 @@ body.calm-motion .milestone-banner.is-on, body.lite .milestone-banner.is-on { tr
 }
 .mori-toggle-pill {
   display: flex; border: 1px solid rgba(142,142,147,0.2);
-  padding: 4px; border-radius: var(--r-ctrl); margin-bottom: 16px;
+  padding: 4px; border-radius: var(--ctl-r); margin-bottom: 16px;
 }
 .mori-t-btn {
   flex: 1; padding: 8px; font-size: var(--fs-xs); font-weight: 700;
   cursor: pointer; border: none; background: transparent;
   color: var(--text-3); transition: all var(--t-base);
   font-family: var(--font); letter-spacing: 0.05em;
-  text-transform: uppercase; border-radius: var(--r-sm);
+  text-transform: uppercase; border-radius: var(--ctl-r);
 }
 .mori-t-btn.active { background: var(--color-mori); color: #fff; }
 /* Energy 14-day per-dimension trend sparklines */
@@ -3676,7 +3676,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
   color: #0a0a0e;
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(255,255,255,0.2);
-  border-radius: var(--r-ctrl);
+  border-radius: var(--btn-r);
   cursor: pointer;
   transition: background var(--t-fast) ease, transform var(--t-fast) ease;
 }
@@ -3827,7 +3827,7 @@ html.lowfx .auth-screen__card, body.lite .auth-screen__card { background: rgba(1
 .wc-chip {
   width: 100%; text-align: left; font: inherit; font-size: 1.05rem; font-weight: 500;
   color: rgba(var(--ink),0.95); background: rgba(var(--ink),0.045); border: none;
-  border-radius: var(--r-ctrl); padding: 16px 18px; cursor: pointer;
+  border-radius: var(--ctl-r); padding: 16px 18px; cursor: pointer;
   -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
   transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
   opacity: 0; animation: wcRise 0.5s cubic-bezier(0.16,1,0.3,1) forwards;

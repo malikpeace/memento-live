@@ -440,7 +440,7 @@ body.calm-motion .sheet--exp.open .exp-reveal { animation: none; opacity: 1; tra
 .cbreak { margin-top: 2px; }
 .cbreak__title { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 10px; }
 .cscale { display: inline-flex; gap: 2px; margin-bottom: 14px; background: var(--kfill-05); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); border-radius: var(--r-sm); padding: 2px; }
-.cscale__btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: calc(6px * var(--rx, 1)); padding: 4px 12px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
+.cscale__btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); background: transparent; border: 0; border-radius: var(--ctl-r); padding: 4px 12px; cursor: pointer; transition: background var(--t-fast) ease, color var(--t-fast) ease; }
 .cscale__btn--on { color: var(--text-hi); background: var(--kfill-10); }
 .cbk__stat { display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px; }
 .cbk__num { font-size: var(--fs-2xl); font-weight: 700; color: var(--color-consistency); letter-spacing: -0.02em; line-height: 1; }
@@ -637,7 +637,7 @@ html.theme-light body.lite .more-space__sheet, html.theme-light.lowfx .more-spac
 .ci-mood.is-on svg { color: var(--color-lifestats); }
 .ci-segs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .ci-seg {
-  height: 26px; border-radius: var(--r-ctrl); border: 1px solid var(--hairline);
+  height: 26px; border-radius: var(--ctl-r); border: 1px solid var(--hairline);
   background: transparent; cursor: pointer;
   transition: background var(--t-base) ease, border-color var(--t-base) ease;
 }
@@ -896,7 +896,7 @@ html.theme-light .sheet:has(.exp-shell--dw) {
 }
 .dwrun__acts { display: flex; gap: 10px; }
 .dwrun__btn {
-  min-width: 118px; padding: 13px 22px; border: 0; border-radius: 999px;
+  min-width: 118px; padding: 13px 22px; border: 0; border-radius: var(--btn-pill);
   cursor: pointer; font: inherit; font-size: 0.92rem; font-weight: 650;
   background: rgba(var(--dwink), 0.08); color: rgba(var(--dwink), 0.92);
   box-shadow: inset 0 1px 0 rgba(var(--dwink), 0.08);

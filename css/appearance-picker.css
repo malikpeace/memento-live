@@ -157,7 +157,7 @@
   width: 100%;
   margin-top: 18px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--btn-r);
   padding: 16px 20px;
   font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
   color: #0a0a0e;
