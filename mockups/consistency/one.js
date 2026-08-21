@@ -113,7 +113,7 @@
     var size = n < 100 ? 132 : n < 1000 ? 112 : 92;
     var word = PERSONA.sub;
     var counted = log[log.length - 1].on;
-    return '<div><div class="one__crown">' + mMark('', 22) + '</div>' +
+    return '<div><div class="one__crown' + (counted ? ' lit' : '') + '">' + mMark('', 22) + '</div>' +
       '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
@@ -156,7 +156,7 @@
       '<div class="score__head"><div class="score__lbl">Score</div>' +
       '<div class="score__n">' + score + deltaHTML + '</div></div>' +
       scoreViz(A, log) +
-      '<div class="score__note">The last 90 days. Kept days count in full, the smaller stuff counts half. A guide, not a rule.</div>' +
+      '<div class="score__note">Remember: the goal is to be better, not perfect.</div>' +
       '</div></div>';
   }
 
@@ -189,17 +189,10 @@
     var heroLbl = SHAPE === 'frequency' ? (met ? 'rate kept this week' : 'toward your rate this week') : 'days kept this week';
     // supporting line: what else filled the week + the usual-week baseline
     var extra = [];
-    if (deep) extra.push(deep + ' deep work');
-    if (notes) extra.push(notes + (notes === 1 ? ' note' : ' notes'));
+    if (deep) extra.push(deep + ' deep work session' + (deep === 1 ? '' : 's'));
+    if (notes) extra.push(notes + ' reflection' + (notes === 1 ? '' : 's'));
     if (checks) extra.push(checks + ' check-in' + (checks === 1 ? '' : 's'));
-    var usual = s.N >= 14 ? Math.round(s.perWeek) : null;
-    var foot = '';
-    if (extra.length || usual !== null) {
-      foot = '<div class="wkfoot">' +
-        (extra.length ? 'Also this week: ' + extra.join(', ') + '.' : '') +
-        (usual !== null ? '<span class="wkfoot__u">Your usual week is ' + plural(usual, 'day') + '.</span>' : '') +
-        '</div>';
-    }
+    var foot = extra.length ? '<div class="wkfoot">' + extra.join('. ') + '.</div>' : '';
     var label = K.MON[ws.getMonth()] + ' ' + ws.getDate();
     return '<div class="mh"><b style="font-size:20px">Week of ' + label + '</b>' + arrows('navWeek', canBack, canFwd, WOFF !== 0) + '</div>' +
       '<div class="wk7">' + strip + '</div>' +
@@ -215,6 +208,30 @@
     if (seen.missed) chips.push('<span><u class="c"></u>Missed</span>');
     if (seen.rest) chips.push('<span><u class="r"></u>Rest</span>');
     return chips.length >= 2 ? '<div class="key">' + chips.join('') + '</div>' : '';
+  }
+  function gridFor(A, y, m, today, big) {
+    var first = new Date(y, m, 1), dim = new Date(y, m + 1, 0).getDate(), sd = first.getDay();
+    var cells = '', rowKept = 0, tracked = false, out = '', slot = 0, monthKept = 0, monthDays = 0;
+    for (var i = 0; i < sd; i++) { cells += big ? '<div class="d pad"></div>' : '<b class="pad"></b>'; slot++; }
+    for (var dd = 1; dd <= dim; dd++) {
+      var date = new Date(y, m, dd), e = entryOf(A, date);
+      var st = e ? e.st : (date > today ? 'ahead' : 'ahead');
+      if (e) { tracked = true; monthDays++; if (e.st === 'kept') { rowKept++; monthKept++; } }
+      cells += big
+        ? '<div class="d ' + st + (e && sameDay(date, today) ? ' today' : '') + '" data-on="' + (e && e.st === 'kept' ? '1' : '0') + '">' + dd + '</div>'
+        : '<b class="' + (e ? st : 'ahead') + (sameDay(date, today) ? ' today' : '') + '"></b>';
+      slot++;
+      if (big && slot % 7 === 0) { cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>'; out += cells; cells = ''; rowKept = 0; tracked = false; }
+    }
+    if (big) {
+      if (slot % 7 !== 0) {
+        while (slot % 7 !== 0) { cells += '<div class="d pad"></div>'; slot++; }
+        cells += '<div class="wc">' + (tracked ? rowKept : '') + '</div>';
+        out += cells;
+      }
+      return { html: out, kept: monthKept, days: monthDays };
+    }
+    return { html: cells, kept: monthKept, days: monthDays };
   }
   function monthGridBig(A, y, m, today) {
     var last = new Date(y, m + 1, 0), cursor = startOfWeek(new Date(y, m, 1));
@@ -378,11 +395,10 @@
   }
   function playCompletion() {
     var el = document.querySelector('.one__num');
-    if (el) {
-      var to = +el.textContent.replace(/[^0-9]/g, '');
-      countUp(el, to - 1, to, 500);
-      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-    }
+    if (el) { var to = +el.textContent.replace(/[^0-9]/g, ''); countUp(el, to - 1, to, 550); }
+    // the M in the corner gains its colour: that is the moment
+    var m = document.querySelector('.one__crown');
+    if (m) { m.classList.remove('litpop'); void m.offsetWidth; m.classList.add('litpop'); }
     var ring = document.querySelector('.cal .d.today');
     if (ring) { ring.classList.remove('justfilled'); void ring.offsetWidth; ring.classList.add('justfilled'); }
   }

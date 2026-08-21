@@ -90,7 +90,7 @@
   html.light .wkstat, html.light .wkc b, html.light .heropill { background: rgba(10,14,10,0.05);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.5); }
   html.light .cal .d { color: rgba(10,14,10,0.36); }
-  html.light .cal .d.kept { color: var(--acc); background: rgba(var(--acc-rgb),0.16); }
+  html.light .cal .d.kept { color: var(--acc); }
   html.light .cal .d.missed { background: rgba(10,14,10,0.1); color: rgba(10,14,10,0.46); box-shadow: none; }
   html.light .cal .d.rest { background: transparent; color: rgba(10,14,10,0.2); }
   html.light .cal .d.ahead { color: rgba(10,14,10,0.15); }
@@ -103,7 +103,8 @@
   /* the score slab (black in light) is driven by the --score-* tokens above;
      it only needs its lifted shadow softened for the light ground here */
   html.light .glance--score { box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 12px 36px rgba(0,0,0,0.28); }
-  html.light .one__crown { color: rgba(10,14,10,0.35); }
+  html.light .one__crown { color: rgba(10,14,10,0.28); }
+  html.light .one__crown.lit { color: var(--acc); }
   html.light .one__today.off u { box-shadow: inset 0 0 0 1.5px rgba(10,14,10,0.3); }
   html.light .one__hint { color: rgba(10,14,10,0.45); }
   html.light .key u.c { background: rgba(10,14,10,0.16); }
@@ -188,8 +189,16 @@
   /* page one: the number, left aligned */
   #pgOne { display: grid; align-content: center; justify-items: start; text-align: left;
     padding: calc(var(--barh, 92px) + 26px) 26px 70px; position: relative; }
-  .one__crown { line-height: 0; margin: 0 0 6px 7px; color: rgba(255,255,255,0.34); }
-  .one__num { font-weight: 700; color: var(--text-hi, #fff); line-height: 0.86; letter-spacing: -0.05em;
+  .one__crown { line-height: 0; margin: 0 0 6px 7px; color: rgba(255,255,255,0.28); transition: color 0.45s ease; }
+  .one__crown.lit { color: var(--acc); }
+  @keyframes crownpop {
+    0% { transform: scale(0.92); color: rgba(255,255,255,0.28); filter: drop-shadow(0 0 0 transparent); }
+    45% { transform: scale(1.22); color: var(--acc); filter: drop-shadow(0 0 10px rgba(var(--acc-rgb),0.8)); }
+    100% { transform: scale(1); color: var(--acc); filter: drop-shadow(0 0 3px rgba(var(--acc-rgb),0.3)); }
+  }
+  .one__crown.litpop { animation: crownpop 0.6s ease-out; transform-origin: left center; }
+  @media (prefers-reduced-motion: reduce) { .one__crown.litpop { animation: none; } }
+  .one__num { font-weight: 700; color: var(--text-hi, #fff); line-height: 0.86; letter-spacing: -0.025em;
     font-variant-numeric: tabular-nums; margin: 0 0 14px; }
   .one__sub { font-size: 17px; color: var(--text-mid, rgba(255,255,255,0.8)); line-height: 1.45; max-width: 320px; }
   .one__today { display: flex; align-items: center; gap: 9px; margin-top: 22px;
@@ -288,8 +297,8 @@
   .cal .d.pad { background: transparent; }
   /* days the goal asked for get a fill (green = kept, grey = missed); a rest
      day the goal never asked for stays blank. fill-vs-blank makes them clear. */
-  .cal .d.kept { color: var(--acc); font-weight: 800; background: rgba(var(--acc-rgb),0.13); }
-  .cal .d.sup { color: rgba(var(--acc-rgb),0.75); font-weight: 650; background: rgba(var(--acc-rgb),0.06); }
+  .cal .d.kept { color: var(--acc); font-weight: 800; }
+  .cal .d.sup { color: rgba(var(--acc-rgb),0.75); font-weight: 650; }
   .cal .d.missed { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.5); }
   .cal .d.rest { background: transparent; color: rgba(255,255,255,0.15); }
   .cal .d.ahead { background: transparent; color: rgba(255,255,255,0.13); }
@@ -298,9 +307,6 @@
   html.light .cal .d.today { outline-color: rgba(10,14,10,0.3); }
   html.light .cal .d.today.done { outline-color: rgba(var(--acc-rgb),0.95); background: rgba(var(--acc-rgb),0.16); }
   @keyframes ringpop { 0% { transform: scale(1); } 42% { transform: scale(1.14); } 100% { transform: scale(1); } }
-  @keyframes numpop { 0% { transform: scale(1); } 34% { transform: scale(1.08); } 100% { transform: scale(1); } }
-  .one__num.pop { animation: numpop 0.45s cubic-bezier(.2,.8,.3,1); transform-origin: left center; }
-  @media (prefers-reduced-motion: reduce) { .one__num.pop { animation: none; } }
   .cal .d.today.justfilled { animation: ringpop 0.42s ease-out; }
   @media (prefers-reduced-motion: reduce) { .cal .d.today.justfilled { animation: none; } }
   .key u.r { background: transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
@@ -361,15 +367,6 @@
   html.light .wk7c.missed { background: rgba(10,14,10,0.1); }
   html.light .wk7c.missed b { color: rgba(10,14,10,0.44); }
   /* legacy day list (unused now) */
-  .wk7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
-  .wk7 > div { text-align: center; }
-  .wk7 b { display: block; aspect-ratio: 1; border-radius: 14px; background: rgba(255,255,255,0.045); }
-  .wk7 b.kept { background: rgba(var(--acc-rgb),0.55); }
-  .wk7 b.rest { background: rgba(255,255,255,0.02); }
-  .wk7 b.sup { background: rgba(var(--acc-rgb),0.2); }
-  .wk7 b.today { outline: 2px solid rgba(var(--acc-rgb),0.95); outline-offset: -2px; }
-  .wk7 b.pad { background: transparent; }
-  .wk7 span { display: block; font-size: 10.5px; color: var(--text-lo, rgba(255,255,255,0.46)); margin-top: 6px; }
 
   /* ---- the tracks heat map: actions, deep work, reflections ---- */
   /* label above so the strip gets the full column width; sub pixel cells are unreadable */
