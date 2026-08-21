@@ -302,8 +302,8 @@
       return '<div class="mlog__m"><span>' + K.MON[M.m] + '<b>' + (g.days ? g.kept : '') + '</b></span>' +
         '<div class="mlog__g">' + g.html + '</div></div>';
     }).join('');
-    return '<div class="mh"><b style="font-size:22px">' + titleTxt + '</b>' +
-      '<span style="display:flex;align-items:center;gap:10px"><i><em>' + total + '</em> days</i>' +
+    return '<div class="mh mh--year"><b class="yrtitle">' + titleTxt + '</b>' +
+      '<span class="yrctrl">' +
       '<span class="yrsw" id="yrsw"><button type="button" data-y="cal"' + (YRMODE === 'cal' ? ' class="on"' : '') + '>Year</button>' +
       '<button type="button" data-y="roll"' + (YRMODE === 'roll' ? ' class="on"' : '') + '>Rolling</button></span>' +
       arrows('navYear', canBack, canFwd, YOFF !== 0) + '</span></div>' +
@@ -357,7 +357,8 @@
     if (!lines.length) lines.push('The record is young. Everything you add now is the ' +
       'foundation you will stand on during a harder week.');
     return '<div class="sec"><div class="sec__h"><b>For the hard days</b></div>' +
-      '<div class="hard">' + lines.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</div></div>';
+      '<div class="hard">' + lines.map(function (t) { return '<p>' + t + '</p>'; }).join('') +
+      '<p class="hard__end">Keep going until you remember why you started.</p></div></div>';
   }
 
   /* ---------- page two ---------- */
@@ -366,7 +367,7 @@
       s.total.toLocaleString() + '</b> of ' + plural(s.N, 'day') + ' since ' +
       K.MON[log[0].date.getMonth()] + '&nbsp;' + log[0].date.getDate() + '</div></div>';
     var body = SCALE === 'week' ? weekView(log, s, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
-    var cal = '<div class="sec"><div class="sec__h"><b>The calendar</b><span class="scale" id="scale">' +
+    var cal = '<div class="sec"><div class="sec__h"><b>History</b><span class="scale" id="scale">' +
       ['week', 'month', 'year'].map(function (sc) {
         return '<button type="button" data-sc="' + sc + '"' + (sc === SCALE ? ' class="on"' : '') + '>' + sc.charAt(0).toUpperCase() + sc.slice(1) + '</button>';
       }).join('') + '</span></div>' + body + '</div>';
