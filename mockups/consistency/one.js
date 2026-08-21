@@ -349,6 +349,17 @@
   }
 
   /* the record talking back: evidence for the day you want to quit */
+  // the supporting work: deep work (sessions + time), reflections, check-ins.
+  // deep-work time is derived here for the mock; real durations replace it on port.
+  function support(s) {
+    var rows = [], dw = s.sup.deepwork || 0, rf = s.sup.reflection || 0, ci = s.sup.checkin || 0;
+    if (dw > 0) rows.push(['Deep work', dw + (dw === 1 ? ' session' : ' sessions') + ' \u00b7 ' + Math.max(1, Math.round(dw * 0.8)) + 'h']);
+    if (rf > 0) rows.push(['Reflections', rf + (rf === 1 ? ' entry' : ' entries')]);
+    if (ci > 0) rows.push(['Check-ins', ci + (ci === 1 ? ' morning' : ' mornings')]);
+    if (!rows.length) return '';
+    return '<div class="sec"><div class="sec__h"><b>Also showing up</b></div><div class="led">' +
+      rows.map(function (r) { return '<div class="led__r"><span>' + r[0] + '</span><b>' + r[1] + '</b></div>'; }).join('') + '</div></div>';
+  }
   function hardDays(s, log) {
     var lines = [];
     if (s.comebacks > 0) lines.push('You have come back <b>' + plural(s.comebacks, 'time') +
@@ -380,7 +391,7 @@
     return scoreBlock(s, log, A) +
       '<div class="evwrap">' +
         '<div class="evcol evcol--main">' + cal + '</div>' +
-        '<div class="evcol evcol--side">' + pill + tracks(log) + monthBars(s) + hardDays(s, log) + '</div>' +
+        '<div class="evcol evcol--side">' + pill + support(s) + hardDays(s, log) + '</div>' +
       '</div>';
   }
 
