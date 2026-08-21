@@ -5635,6 +5635,14 @@ HONEST ROUNDING. "shown" is the true value rounded, never nudged: 6.07
 shows as 6, never 7; 0.44 shows as 0.4, never 0.5. If a rounded number
 would flatter the plan, keep the extra digit instead.
 
+THE TRAILING CONTRAST, the one you keep leaving in. Any sentence that
+ends by naming what a thing is NOT is banned, in every wording:
+"the number is the day's job, not the clock", "the rule is order, not
+a ban", "real material, not just prep". Say the positive half and stop:
+"the number is the day's job". Sweep every string you touch for this
+shape before you return, including the ones no failure mentioned; your
+own rewrite is where it usually appears.
+
 Keep every field the schema names. Change what the failures require,
 and what those changes force you to keep consistent. Nothing else.
 
@@ -5984,7 +5992,16 @@ function actionPlanArithmeticCheck(plan, inputs) {
       const after = block.text.slice(num.index + num.raw.length, num.index + num.raw.length + 4);
       const inRaw = block.text.slice(num.index, num.index + num.raw.length + 4);
       if (/^\s*(am|pm)\b/i.test(after)) return;                              // 9 pm
-      if (/:\d\d/.test(inRaw)) return;                                       // 21:00
+      if (/:\d\d/.test(inRaw)) return;                                       // 21:00, the hour
+      // ...and the MINUTES of that same clock time. This guard only looked
+      // forward, so "stop at 9:15" passed the 9 and then failed the 15 as an
+      // unexplained number (stress run 2026-08-20: three plans died on a
+      // clock). A digit and a colon immediately before it means this is the
+      // back half of a time, never a claim about the math.
+      if (/\d:$/.test(block.text.slice(Math.max(0, num.index - 3), num.index))) return;
+      // A day of the month is a date, not a claim: "by October 31", "March 4th".
+      if (/\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+$/i
+          .test(block.text.slice(Math.max(0, num.index - 12), num.index))) return;
       if (!num.hadSuffix && !num.hadDollar && num.value >= 1900 && num.value <= 2099
           && /^\d{4}$/.test(num.raw.replace(/[^\d]/g, ''))
           && /\b(by|in|since|until|before|of)\s*$/i.test(block.text.slice(Math.max(0, num.index - 10), num.index))) return;
