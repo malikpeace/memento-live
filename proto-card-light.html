@@ -45,142 +45,75 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
 .desc h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .desc p { margin-top: 6px; font-size: 14px; line-height: 1.5; color: rgba(242,246,247,0.64); }
 
-/* the lighting layers: the ONLY thing this lab adds inside the real card */
-.daycard-ns .lite { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+/* ════════════════════════════════════════════════════════════════════════
+   LIQUID FREEDOM (round 5, Malik's own direction: "the blurs and colors
+   inside the memento in TRULY random positions and move 100% freely...
+   complete freedom and movement").
+   The six pillar blobs keep their colours and their pillar-gated opacity,
+   but they WANDER: each blob walks its own long loop across the whole card,
+   grows and shrinks, breathes in and out. Paths are per-blob with prime-ish
+   durations (29s..53s) so the composition never visibly repeats.
+   The variant class sits on the daycard-wrap, so the liquid, its bloom echo
+   and the floor reflection all move as one.
+   --amp scales how far they roam, --spd scales how fast (variant knobs).
+   Everything is transform + opacity only: compositor-friendly by design.
+   ════════════════════════════════════════════════════════════════════════ */
 
-/* ROUND 4 (Malik: "EXTREMELY subtle... make it more noticeable, more Apple
-   like, something actually different"): every look is now unmistakable at a
-   glance and moves in its own way. Values are deliberately loud; the ported
-   version can be dialed down AFTER he picks a direction. */
+.lq .blob { transition: none; }
 
-/* ── A. SWEEP (the Apple Pay card flash) ────────────────────────────────────
-   One wide, bright diagonal blade that travels the full card with tilt. */
-.c-a .lite--band {
-  inset: -6% -40%;
-  background: linear-gradient(112deg,
-    transparent 30%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.92) 50%,
-    rgba(255,255,255,0.28) 58%, transparent 70%);
-  transform: translateX(calc(var(--tx, 0) * 52%));
-  mix-blend-mode: screen;
-}
-.c-a .lite--under {
-  background: linear-gradient(112deg, rgba(255,255,255,0.10), transparent 55%);
-}
+.lq .blob.b1 { animation: lqB1 calc(41s * var(--spd, 1)) ease-in-out infinite; }
+.lq .blob.b2 { animation: lqB2 calc(53s * var(--spd, 1)) ease-in-out infinite; }
+.lq .blob.b3 { animation: lqB3 calc(37s * var(--spd, 1)) ease-in-out infinite; }
+.lq .blob.b4 { animation: lqB4 calc(29s * var(--spd, 1)) ease-in-out infinite; }
+.lq .blob.b5 { animation: lqB5 calc(47s * var(--spd, 1)) ease-in-out infinite; }
 
-/* ── B. SPOTLIGHT (dark product studio) ─────────────────────────────────────
-   The room goes dark; one hard light pins the card where you point it. The
-   card visibly dims and flares as you tilt. */
-.c-b .lite--veil {
-  background: radial-gradient(60% 46% at calc(50% + var(--tx, 0) * 46%) calc(42% + var(--ty, 0) * 42%),
-    transparent 22%, rgba(4, 7, 11, 0.42) 58%, rgba(4, 7, 11, 0.78) 100%);
+/* the cyan: born top-left, visits the right rail and the floor of the card */
+@keyframes lqB1 {
+  0%   { transform: translate(0, 0) scale(1);            opacity: calc(var(--clar, 0) * 0.9); }
+  28%  { transform: translate(calc(58% * var(--amp, 1)), calc(30% * var(--amp, 1))) scale(0.82); opacity: calc(var(--clar, 0) * 0.55); }
+  52%  { transform: translate(calc(30% * var(--amp, 1)), calc(78% * var(--amp, 1))) scale(1.18); opacity: var(--clar, 0); }
+  78%  { transform: translate(calc(-12% * var(--amp, 1)), calc(22% * var(--amp, 1))) scale(0.95); opacity: calc(var(--clar, 0) * 0.7); }
+  100% { transform: translate(0, 0) scale(1);            opacity: calc(var(--clar, 0) * 0.9); }
 }
-.c-b .lite--beam {
-  background: radial-gradient(34% 26% at calc(50% + var(--tx, 0) * 46%) calc(42% + var(--ty, 0) * 42%),
-    rgba(255,255,255,0.85), rgba(255,255,255,0.25) 55%, transparent 78%);
-  mix-blend-mode: screen;
+/* the white: the biggest mass, a slow deep sway that re-lights the room */
+@keyframes lqB2 {
+  0%   { transform: translate(0, 0) scale(1);            opacity: calc(var(--act, 0) * 0.82); }
+  35%  { transform: translate(calc(22% * var(--amp, 1)), calc(18% * var(--amp, 1))) scale(0.88); opacity: calc(var(--act, 0) * 0.5); }
+  65%  { transform: translate(calc(-16% * var(--amp, 1)), calc(28% * var(--amp, 1))) scale(1.12); opacity: calc(var(--act, 0) * 0.95); }
+  100% { transform: translate(0, 0) scale(1);            opacity: calc(var(--act, 0) * 0.82); }
 }
-
-/* ── C. EDGE GLOW (the light runs the rim) ──────────────────────────────────
-   A bright arc that races around the card's edge as you tilt, drawn on a
-   3px ring via the mask-ring technique the card's own ::before uses. */
-/* the card's own static glass ring stands down on this look, so the racing
-   arc owns the edge (otherwise white-on-white swallows it) */
-.daycard-ns.c-c::before { opacity: 0.22; }
-.c-c .lite--halo {
-  border-radius: inherit;
-  padding: 15px;
-  background: conic-gradient(from calc(var(--tx, 0) * 200deg + var(--ty, 0) * 80deg + 140deg) at 50% 50%,
-    transparent 0deg, rgba(255,255,255,0.95) 26deg, rgba(255,255,255,0.4) 52deg, transparent 96deg,
-    transparent 170deg, rgba(255,255,255,0.4) 205deg, transparent 250deg, transparent 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask-composite: exclude;
-  filter: blur(7px);
-  mix-blend-mode: screen;
+/* the green: born bottom-right, climbs to the top-right, then crosses to the
+   left half grown a third larger (Malik's own example) */
+@keyframes lqB3 {
+  0%   { transform: translate(0, 0) scale(1);            opacity: var(--cons, 0); }
+  26%  { transform: translate(calc(6% * var(--amp, 1)), calc(-62% * var(--amp, 1))) scale(0.9);  opacity: calc(var(--cons, 0) * 0.6); }
+  55%  { transform: translate(calc(-48% * var(--amp, 1)), calc(-26% * var(--amp, 1))) scale(1.34); opacity: var(--cons, 0); }
+  80%  { transform: translate(calc(-14% * var(--amp, 1)), calc(8% * var(--amp, 1))) scale(1.05); opacity: calc(var(--cons, 0) * 0.75); }
+  100% { transform: translate(0, 0) scale(1);            opacity: var(--cons, 0); }
 }
-.c-c .lite--ring {
-  border-radius: inherit;
-  padding: 13px;
-  /* the unlit ring is smoked glass, so the racing light always has contrast */
-  background: conic-gradient(from calc(var(--tx, 0) * 200deg + var(--ty, 0) * 80deg + 140deg) at 50% 50%,
-    rgba(6, 9, 13, 0.72) 0deg, #ffffff 26deg, rgba(255,255,255,0.8) 52deg, rgba(6, 9, 13, 0.72) 96deg,
-    rgba(6, 9, 13, 0.72) 170deg, rgba(255,255,255,0.7) 205deg, rgba(6, 9, 13, 0.72) 250deg, rgba(6, 9, 13, 0.72) 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask-composite: exclude;
+/* the periwinkle: the free spirit, roams the middle and almost disappears */
+@keyframes lqB4 {
+  0%   { transform: translate(0, 0) scale(1);            opacity: var(--mix, 0); }
+  22%  { transform: translate(calc(38% * var(--amp, 1)), calc(-32% * var(--amp, 1))) scale(1.2);  opacity: calc(var(--mix, 0) * 0.45); }
+  48%  { transform: translate(calc(52% * var(--amp, 1)), calc(12% * var(--amp, 1))) scale(0.8);  opacity: calc(var(--mix, 0) * 0.18); }
+  74%  { transform: translate(calc(12% * var(--amp, 1)), calc(26% * var(--amp, 1))) scale(1.1);  opacity: var(--mix, 0); }
+  100% { transform: translate(0, 0) scale(1);            opacity: var(--mix, 0); }
 }
-.c-c .lite--ringhaze {
-  background: radial-gradient(120% 120% at calc(50% + var(--tx, 0) * 60%) calc(50% - var(--ty, 0) * 60%),
-    rgba(255,255,255,0.22), transparent 45%);
-  mix-blend-mode: screen;
+/* the second green: counter-swims against b3 so the greens trade sides */
+@keyframes lqB5 {
+  0%   { transform: translate(0, 0) scale(1);            opacity: calc(var(--cons, 0) * 0.5); }
+  30%  { transform: translate(calc(-44% * var(--amp, 1)), calc(32% * var(--amp, 1))) scale(0.82); opacity: calc(var(--cons, 0) * 0.3); }
+  62%  { transform: translate(calc(-20% * var(--amp, 1)), calc(-38% * var(--amp, 1))) scale(1.26); opacity: calc(var(--cons, 0) * 0.62); }
+  100% { transform: translate(0, 0) scale(1);            opacity: calc(var(--cons, 0) * 0.5); }
 }
 
-/* ── D. DEEP GLASS (visionOS slab) ──────────────────────────────────────────
-   The card reads as thick glass: heavy bevel light on the near edge, deep
-   shade on the far one, and the inside layers slide HARD with tilt. */
-.c-d .lite--bevel {
-  background:
-    linear-gradient(calc(140deg + var(--tx, 0) * 30deg),
-      rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.35) 4%, transparent 14%),
-    linear-gradient(calc(-40deg + var(--tx, 0) * 30deg),
-      rgba(3, 6, 10, 0.72) 0%, rgba(3, 6, 10, 0.3) 8%, transparent 24%);
-}
-.c-d .lite--mid {
-  inset: -14%;
-  background: radial-gradient(58% 46% at 40% 32%, rgba(255,255,255,0.5), transparent 70%);
-  transform: translate(calc(var(--tx, 0) * -40px), calc(var(--ty, 0) * -32px));
-  mix-blend-mode: screen;
-}
-.c-d .lite--near {
-  inset: -18%;
-  background: radial-gradient(40% 30% at 64% 70%, rgba(3, 6, 10, 0.4), transparent 68%);
-  transform: translate(calc(var(--tx, 0) * -70px), calc(var(--ty, 0) * -54px));
-}
-
-/* ── E. FOIL (the gift-card shimmer, kept silver) ───────────────────────────
-   Hard shimmer bands that rip across the card the moment it moves. */
-.c-e .lite--bands {
-  inset: -10% -60%;
-  background: repeating-linear-gradient(calc(104deg + var(--ty, 0) * 14deg),
-    transparent 0 26px, rgba(255,255,255,0.38) 34px 44px,
-    rgba(255,255,255,0.10) 52px 60px, transparent 68px 96px);
-  transform: translateX(calc(var(--tx, 0) * 34%));
-  mix-blend-mode: screen;
-}
-.c-e .lite--flare {
-  background: radial-gradient(30% 20% at calc(50% + var(--tx, 0) * 52%) calc(36% + var(--ty, 0) * 44%),
-    rgba(255,255,255,0.8), transparent 72%);
-  mix-blend-mode: screen;
-}
-
-/* ── F. CAUSTICS (light through water) ──────────────────────────────────────
-   Bright ripple webs crawling inside the glass on their own; tilt steers
-   the pool they gather toward. */
-.c-f .lite--web1, .c-f .lite--web2 { inset: -22%; mix-blend-mode: screen; }
-.c-f .lite--web1 {
-  background:
-    repeating-radial-gradient(120% 90% at 28% 24%,
-      transparent 0 34px, rgba(255,255,255,0.30) 42px 47px, transparent 55px 89px);
-  animation: caus1 11s ease-in-out infinite alternate;
-}
-.c-f .lite--web2 {
-  background:
-    repeating-radial-gradient(110% 100% at 72% 78%,
-      transparent 0 41px, rgba(255,255,255,0.24) 49px 54px, transparent 62px 103px);
-  animation: caus2 9s ease-in-out infinite alternate;
-}
-.c-f .lite--pool {
-  background: radial-gradient(46% 36% at calc(50% + var(--tx, 0) * 46%) calc(46% + var(--ty, 0) * 44%),
-    rgba(255,255,255,0.4), transparent 74%);
-  mix-blend-mode: screen;
-}
-@keyframes caus1 { from { transform: translate(0,0) scale(1); } to { transform: translate(6%, 9%) scale(1.12); } }
-@keyframes caus2 { from { transform: translate(0,0) scale(1.08); } to { transform: translate(-7%, -6%) scale(0.96); } }
+/* the variant knobs (on the wrap; every blob copy inherits) */
+.lq--drift { --amp: 0.55; --spd: 1.7; }
+.lq--free  { --amp: 1;    --spd: 1;   }
+.lq--alive { --amp: 1.3;  --spd: 0.55; }
 
 @media (prefers-reduced-motion: reduce) {
-  .c-f .lite--web1, .c-f .lite--web2 { animation: none; }
+  .lq .blob { animation: none !important; }
 }
 
 .foot { padding: 56px 0 0; font-size: 13px; line-height: 1.6; color: rgba(242,246,247,0.38); }
@@ -193,7 +126,7 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
 <div class="wrap">
   <div class="hero">
     <h1>Card light</h1>
-    <p>The real Memento. Tap a look to swap it instantly; Stock is the card exactly as it ships today. Tilt your phone or drag the card.</p>
+    <p>The real Memento, and the liquid set free. Tap a level; Stock is the card exactly as it ships today. Tilt still works.</p>
     <button id="motionBtn" type="button">Enable motion</button>
   </div>
 
@@ -202,7 +135,7 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
   <div class="picker" id="picker" role="tablist" aria-label="Lighting options"></div>
   <div class="desc"><h2 id="descT"></h2><p id="descP"></p></div>
 
-  <p class="foot">One card, the app's own markup and styles at a lively founder state. Each look adds only thin light layers inside the card; Stock adds nothing at all. Every recipe is in this page's source; the pick gets ported verbatim.</p>
+  <p class="foot">One card, the app's own markup and styles at a lively founder state. The colors keep their pillar meaning and their earned opacity; only their FREEDOM changes. The liquid, its glow and the floor reflection move as one. The pick's exact keyframes are in this page's source and get ported verbatim.</p>
 </div>
 
 <script>
@@ -212,13 +145,10 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
   var BLOBS = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
   var EMBLEM = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   var OPTS = [
-    { key: 'stock', k: 'Stock', name: 'Stock', lites: '', desc: 'The card exactly as it ships right now. Untouched. The baseline.' },
-    { key: 'a', k: 'A', name: 'Sweep', lites: '<i class="lite lite--under"></i><i class="lite lite--band"></i>', desc: 'The Apple Pay flash: one wide bright blade that travels the whole card as you tilt.' },
-    { key: 'b', k: 'B', name: 'Spotlight', lites: '<i class="lite lite--veil"></i><i class="lite lite--beam"></i>', desc: 'A dark product studio. One hard light pins the card where you point it; the rest falls away.' },
-    { key: 'c', k: 'C', name: 'Edge glow', lites: '<i class="lite lite--halo"></i><i class="lite lite--ring"></i>', desc: 'The light lives on the rim and races around the edge as you tilt.' },
-    { key: 'd', k: 'D', name: 'Deep glass', lites: '<i class="lite lite--bevel"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>', desc: 'Thick glass. Heavy bevel light, deep shade, and the inside slides hard with the tilt.' },
-    { key: 'e', k: 'E', name: 'Foil', lites: '<i class="lite lite--bands"></i><i class="lite lite--flare"></i>', desc: 'Gift-card shimmer, kept strictly silver. Hard bands rip across the moment it moves.' },
-    { key: 'f', k: 'F', name: 'Caustics', lites: '<i class="lite lite--web1"></i><i class="lite lite--web2"></i><i class="lite lite--pool"></i>', desc: 'Light through water. Ripple webs crawl inside the glass; tilt steers the pool.' }
+    { key: 'stock', k: 'Stock', name: 'Stock', wrapCls: '', desc: 'The card exactly as it ships right now. The colors hold their corners.' },
+    { key: 'drift', k: 'G1', name: 'Drift', wrapCls: 'lq lq--drift', desc: 'The colors wander the whole card, slow and quiet. You notice it the way you notice clouds.' },
+    { key: 'free', k: 'G2', name: 'Free', wrapCls: 'lq lq--free', desc: 'Complete freedom. The cyan climbs, the green crosses the card and grows, the white re-lights the room, the periwinkle almost vanishes and returns.' },
+    { key: 'alive', k: 'G3', name: 'Alive', wrapCls: 'lq lq--alive', desc: 'The same freedom, bigger and faster. The card visibly breathes and never shows the same face twice.' }
   ];
 
   var stage = document.getElementById('stage');
@@ -257,15 +187,12 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
   var descT = document.getElementById('descT');
   var descP = document.getElementById('descP');
   function pick(opt, btn) {
-    // instant swap, exactly as asked: the light layers change, nothing else
-    card.className = 'daycard-ns' + (opt.key === 'stock' ? '' : ' c-' + opt.key);
-    liteHost.innerHTML = opt.lites;
-    liteHost.querySelectorAll('.lite').forEach(function (n) { /* inherit host inset via class CSS */ });
+    // instant swap: only the wander class on the wrap changes
+    wrap.className = 'daycard-wrap daycard-theme-living' + (opt.wrapCls ? ' ' + opt.wrapCls : '');
     descT.textContent = opt.name;
     descP.textContent = opt.desc;
     picker.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b === btn); });
-  }
-  OPTS.forEach(function (opt, i) {
+  }  OPTS.forEach(function (opt, i) {
     var b = document.createElement('button');
     b.type = 'button';
     b.textContent = opt.k === opt.name ? opt.name : opt.k + ' \u00b7 ' + opt.name;
