@@ -1206,8 +1206,13 @@ const MoreSpace = {
     const w = document.getElementById('moreSpace');
     if (!w) { this._restoreWidgetGrid(); return; }
     if (instant) { this._restoreWidgetGrid(); try { w.remove(); } catch (e) {} return; }
+    const finish = () => { this._restoreWidgetGrid(); try { w.remove(); } catch (e) {} };
+    const sheet = w.querySelector('.more-space__sheet');
+    if (window.Doors && Doors.waitForEnd) {
+      return Doors.waitForEnd(sheet, () => { w.classList.remove('open'); }).then(finish);
+    }
     w.classList.remove('open');
-    setTimeout(() => { this._restoreWidgetGrid(); try { w.remove(); } catch (e) {} }, 300);
+    finish();
   },
   _openModule(key) {
     this.close();

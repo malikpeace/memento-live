@@ -254,15 +254,24 @@
      < toasts < splash/auth (always on top). */
   --z-base: 1;
   --z-raised: 10;
-  --z-nav: 100;
-  --z-sheet: 500;
-  --z-modal: 800;
-  --z-toast: 900;
-  --z-splash: 1000;
+  --z-nav: 900;
+  --z-sheet: 1000;
+  --z-exp: 1100;
+  --z-ceremony: 1200;
+  --z-modal: var(--z-ceremony);
+  --z-toast: 1300;
+  --z-splash: 1400;
   /* UI motion tiers (ambient/narrative animations keep their own timing). */
   --t-fast: 150ms;
   --t-base: 200ms;
   --t-slow: 300ms;
+  /* Root-surface motion. Doors owns these values; in-surface motion keeps the
+     three general timing tokens above. */
+  --t-door: 480ms;
+  --t-door-exit: 340ms;
+  --t-cine: 600ms;
+  --ease-door: var(--spring);
+  --scrim: rgba(4, 6, 9, 0.62);
   --ring-accent: 0 0 0 1px rgba(var(--accent-rgb), 0.55), 0 0 0 4px rgba(var(--accent-rgb), 0.16);
   /* High-contrast SOLID control (the inverted primary button: white-on-dark).
      In light mode it inverts to dark-on-white so it never goes invisible. Use

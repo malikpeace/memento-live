@@ -30,6 +30,7 @@ const PRECACHE = [
   './js/01-state-foundation.js', './js/02-clarity-experience.js', './js/03-ai-integration.js',
   './js/04-templates-proof.js', './js/05-vivere.js', './js/06-consistency-mori.js',
   './js/07-sheet-templates.js', './js/08-cards-grid-share.js', './js/09-controllers.js',
+  './js/16-doors.js',
   './js/10-demo-backend.js', './js/17-journey.js', './js/18-install.js', './js/20-push.js',
   './js/11-init.js', './js/12-cloud-sync.js', './js/13-clarity-paywall.js',
   './js/22-billing.js',

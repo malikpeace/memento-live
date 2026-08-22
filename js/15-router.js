@@ -1,386 +1,260 @@
 /* ===========================================================================
-   15-router.js  —  Back / forward + hash-URL routing for Memento (Phase 1).
+   15-router.js
 
-   GOAL (per Malik): the browser/mouse back & forward buttons walk the trail of
-   screens you visit (modules, experiences, tabs); refresh reopens where you
-   were; a link to a screen opens that screen; locked/invalid links route to a
-   safe place. Onboarding is left ALONE.
-
-   SAFETY DESIGN (why this can't break the app):
-   - Additive + revertable: this file WRAPS the existing public open/close fns;
-     it never rewrites any teardown. Remove the <script> tag = fully reverted.
-   - Inert until onboarding is done: every entry point checks routerEnabled().
-     Nothing the splash / onboarding / appearance picker does can touch history.
-   - Touches ONLY location.hash (never location.search), so ?demo= and OAuth
-     ?code= survive untouched.
-   - The "current screen" is always re-derived from the real DOM/flags, never a
-     possibly-stale mirror.
-   - Heavily try/caught: any error no-ops rather than wedging navigation.
-
-   This is Phase 1 (top-level screens). Phase 2 (sub-views inside modules) is
-   layered on later via the same machinery.
+   Late adapters for root surfaces loaded after 16-doors.js. The controller
+   owns ordering and browser history; each surface keeps its own renderer.
    =========================================================================== */
 (function () {
   'use strict';
 
-  var R = {
-    ready: false,        // wrapped + initialised
-    frames: [],          // logical screen trail; frames[0] === 'home' once live
-    navLock: false,      // true while WE drive a transition (suppress observation)
-    suppressPop: 0,      // >0 while a history.back() WE issued is in flight
-    pendingClose: null,  // {timer} window to detect a close+open handoff
-    lastSlug: 'home'
-  };
+  var installed = false;
+  var booted = false;
 
-  // --- the onboarding boundary (mirror of js/09 _appBlocked) -----------------
-  function appBlocked() {
-    try {
-      var sp = document.getElementById('splash');
-      if (sp && !sp.classList.contains('dismissed')) return true;
-      var lg = document.getElementById('loginScreen');
-      if (lg && !lg.classList.contains('hidden')) return true;
-      if (document.querySelector('.welcome-intro.open')) return true;
-    } catch (e) {}
-    return false;
-  }
-  function routerEnabled() {
-    try {
-      return R.ready &&
-        typeof state !== 'undefined' && state && state.meta &&
-        state.meta.welcomeSeen === true && !appBlocked();
-    } catch (e) { return false; }
+  function internal() {
+    return !!(window.Doors && Doors._isInternal && Doors._isInternal());
   }
 
-  // --- slug <-> module-key remap (friendly URLs) -----------------------------
-  var KEY_TO_SLUG = { reflection: 'notes', streak: 'consistency' };
-  var SLUG_TO_KEY = { notes: 'reflection', consistency: 'streak' };
-  function moduleSlug(key) { return 'm/' + (KEY_TO_SLUG[key] || key); }
-  function slugToKey(rest) { return SLUG_TO_KEY[rest] || rest; }
-
-  // --- derive the CURRENT top screen straight from the DOM/flags -------------
-  //     (single source of truth; never trust a mirror)
-  function currentTopSlug() {
-    try {
-      if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall._open) return 'paywall';
-      if (typeof MementoView !== 'undefined' && MementoView.isActive()) return 'memento-full';
-      var ms = document.getElementById('moreSpace');
-      if (ms && ms.classList.contains('open')) return 'modules';
-      if (typeof ClarityExperience !== 'undefined' && ClarityExperience.isOpen) return 'clarity';
-      // merge 3.1: the NEW Action flow (js/30) is the same 'action' screen.
-      if (typeof ActionFlow !== 'undefined' && ActionFlow.isOpen) return 'action';
-      if (typeof ActionExperience !== 'undefined' && ActionExperience.isOpen) return 'action';
-      if (typeof Sheet !== 'undefined' && Sheet.isOpen && Sheet.currentWidget) return moduleSlug(Sheet.currentWidget);
-      if (typeof TabBar !== 'undefined' && TabBar.activeTab && TabBar.activeTab !== 'home') return TabBar.activeTab;
-      return 'home';
-    } catch (e) { return 'home'; }
-  }
-
-  // --- hash helpers (hash ONLY; preserve query verbatim) ---------------------
-  function hashFor(slug) {
-    var h = (slug === 'home' || !slug) ? '' : '#' + slug;
-    // keep the path + search exactly; only swap the fragment
-    return location.pathname + location.search + h;
-  }
-  function parseHash() {
-    try { return decodeURIComponent((location.hash || '').replace(/^#/, '')); }
-    catch (e) { return (location.hash || '').replace(/^#/, ''); }
-  }
-
-  function topFrame() { return R.frames.length ? R.frames[R.frames.length - 1] : 'home'; }
-
-  function pushSlug(slug) {
-    R.frames.push(slug);
-    try { history.pushState({ slug: slug, i: R.frames.length }, '', hashFor(slug)); } catch (e) {}
-    R.lastSlug = slug;
-  }
-  function replaceSlug(slug) {
-    if (R.frames.length) R.frames[R.frames.length - 1] = slug; else R.frames.push(slug);
-    try { history.replaceState({ slug: slug, i: R.frames.length }, '', hashFor(slug)); } catch (e) {}
-    R.lastSlug = slug;
-  }
-  // a deliberate back step that WE issue (closing via X / handoff collapse) so
-  // the URL mirrors the screen without the popstate re-running a close.
-  function silentBack() {
-    if (R.frames.length > 1) {
-      R.frames.pop();
-      R.suppressPop++;
-      try { history.back(); } catch (e) { R.suppressPop--; }
-    } else {
-      // nothing beneath: just rewrite the fragment to the base
-      replaceSlug('home');
+  function routeClose(slug, rawFn, ctx, args) {
+    if (internal() || !window.Doors || !Doors.enabled() || Doors.current() !== slug) {
+      return rawFn && rawFn.apply(ctx, args || []);
     }
+    return Doors.back();
   }
 
-  // --- reconcile the URL to whatever screen is actually on top ----------------
-  //     Called (debounced through the handoff window) after any wrapped action.
-  // Bottom-bar tabs are SIBLINGS, not a stack (Malik v686): switching tabs must
-  // never create a history entry, or the iOS edge swipe "goes back" through old
-  // tabs from the Home page. Tab -> tab is a REPLACE; only genuinely deeper
-  // screens (modules, experiences, paywall) push and get back-to-close.
-  var TAB_SLUGS = { home: 1, path: 1, reflect: 1, profile: 1 };
-
-  function reconcile() {
-    if (!routerEnabled() || R.navLock) return;
-    ensureSeeded();
-    var now = currentTopSlug();
-    var top = topFrame();
-    if (now === top) return;                       // no change / collapse-repeat
-    if (TAB_SLUGS[now] && TAB_SLUGS[top]) {        // lateral tab hop: no history
-      replaceSlug(now);
-      return;
-    }
-    var below = R.frames.length >= 2 ? R.frames[R.frames.length - 2] : 'home';
-    if (now === below) {
-      // screen got shallower and matches the frame beneath -> it's a BACK step
-      silentBack();
-    } else if (now === 'home' && top !== 'home') {
-      // closed back to the base
-      silentBack();
-    } else {
-      // a NEW (deeper / sideways) screen -> forward push
-      pushSlug(now);
-    }
-  }
-
-  // Handoff-aware scheduler: a close immediately followed by an open (the app
-  // chains them, 100-1100ms apart) must net to ONE step. We wait a short beat
-  // after a wrapped action before reconciling, and any further wrapped action
-  // inside the window resets it, so only the SETTLED top screen is recorded.
-  function scheduleReconcile() {
-    if (R.pendingClose) { clearTimeout(R.pendingClose); }
-    R.pendingClose = setTimeout(function () {
-      R.pendingClose = null;
-      reconcile();
-    }, 140);
-  }
-
-  // ----------------------------------------------------------------- wrapping
-  // Wrap a method so the original runs untouched, then we schedule a reconcile.
-  function wrapAround(obj, name) {
-    try {
-      if (!obj || typeof obj[name] !== 'function') return false;
-      if (obj['__navwrap_' + name]) return true;
-      var orig = obj[name];
-      obj[name] = function () {
-        var r = orig.apply(obj, arguments);
-        if (routerEnabled() && !R.navLock) scheduleReconcile();
-        return r;
-      };
-      obj['__navwrap_' + name] = true;
-      return true;
-    } catch (e) { return false; }
-  }
-  // Wrap a GLOBAL function (openMementoFull, exitToModules) the same way.
-  function wrapGlobal(name) {
-    try {
-      if (typeof window[name] !== 'function') return false;
-      if (window['__navwrap_' + name]) return true;
-      var orig = window[name];
-      window[name] = function () {
-        var r = orig.apply(this, arguments);
-        if (routerEnabled() && !R.navLock) scheduleReconcile();
-        return r;
-      };
-      window['__navwrap_' + name] = true;
-      return true;
-    } catch (e) { return false; }
-  }
-
-  // --- close the current top screen via its OWN existing close path ----------
-  //     (used by popstate when the user presses browser back)
-  function closeTopScreen() {
-    var slug = currentTopSlug();
-    R.navLock = true;
-    try {
-      if (slug === 'paywall') { if (typeof ClarityPaywall !== 'undefined') ClarityPaywall.hide(); }
-      else if (slug === 'memento-full') {
-        // v1140: one owner, one close. The record is now persistent, so
-        // asking the DOM whether it exists is meaningless.
-        if (typeof MementoView !== 'undefined') MementoView.close();
+  function waitUntil(test, capMs) {
+    return new Promise(function (resolve) {
+      var done = false;
+      var cap = setTimeout(finish, capMs || 900);
+      function finish() {
+        if (done) return;
+        done = true;
+        clearTimeout(cap);
+        resolve();
       }
-      else if (slug === 'modules') { if (typeof MoreSpace !== 'undefined') MoreSpace.close(); }
-      else if (slug === 'clarity') { if (typeof exitToModules === 'function') exitToModules('clarity'); }
-      // merge 3.1: back out of the NEW flow through its own close; the old
-      // module still leaves the way it always did.
-      else if (slug === 'action') {
-        if (typeof ActionFlow !== 'undefined' && ActionFlow.isOpen) ActionFlow.close();
-        else if (typeof exitToModules === 'function') exitToModules('action');
+      function check() {
+        var stillOpen = false;
+        try { stillOpen = !!test(); } catch (e) {}
+        if (!stillOpen) { finish(); return; }
+        requestAnimationFrame(check);
       }
-      else if (slug.indexOf('m/') === 0) { if (typeof Sheet !== 'undefined') Sheet.close(); }
-      else if (slug === 'profile') { if (typeof TabBar !== 'undefined') TabBar.switchTo('home'); }
-    } catch (e) {}
-    // release the lock after the close animation settles
-    setTimeout(function () { R.navLock = false; }, 360);
+      check();
+    });
   }
 
-  // --- open a target screen from a slug (used by forward + deep-link) ---------
-  //     Returns the slug actually resolved (may differ: locked -> paywall, etc.)
-  function openSlug(slug, opts) {
-    opts = opts || {};
-    var key, rest;
-    R.navLock = true;
-    var resolved = slug;
-    try {
-      if (!slug || slug === 'home') {
-        if (typeof TabBar !== 'undefined') TabBar.switchTo('home');
-        resolved = 'home';
-      } else if (slug === 'profile') {
-        if (typeof TabBar !== 'undefined') TabBar.switchTo('profile'); resolved = 'profile';
-      } else if (slug === 'modules') {
-        if (typeof MoreSpace !== 'undefined') MoreSpace.open({ mode: 'switcher' });
-        resolved = currentTopSlug();
-      } else if (slug.indexOf('m/') === 0) {
-        key = slugToKey(slug.slice(2));
-        if (typeof Sheet !== 'undefined' && typeof WIDGET_DEFS !== 'undefined' &&
-            WIDGET_DEFS[key] && typeof SHEET_TEMPLATES !== 'undefined' && SHEET_TEMPLATES[key] && key !== 'search') {
-          Sheet.open(key);
-          resolved = currentTopSlug();   // paywall gate may have fired
-        } else { resolved = 'home'; if (typeof TabBar !== 'undefined') TabBar.switchTo('home'); }
-      } else if (slug === 'clarity') {
-        if (typeof ClarityExperience !== 'undefined') {
-          if (state.clarity && state.clarity.completed && ClarityExperience.openSummary) ClarityExperience.openSummary();
-          else ClarityExperience.open();
+  function registerLateRoots() {
+    var raw = Doors._raw;
+
+    if (typeof ClarityExperience !== 'undefined') {
+      raw.clarityOpen = ClarityExperience.open;
+      raw.clarityOpenSummary = ClarityExperience.openSummary;
+      raw.clarityClose = ClarityExperience.close;
+      Doors.register('clarity', {
+        gesture: 'back',
+        el: function () { return document.getElementById('clarityExp'); },
+        active: function () { return !!ClarityExperience.isOpen; },
+        open: function (opts) {
+          if (opts && Object.prototype.hasOwnProperty.call(opts, 'summary')) {
+            if (opts.summary && raw.clarityOpenSummary) {
+              return Doors.internal(raw.clarityOpenSummary, ClarityExperience);
+            }
+            return Doors.internal(raw.clarityOpen, ClarityExperience);
+          }
+          if (state.clarity && state.clarity.completed && raw.clarityOpenSummary) {
+            return Doors.internal(raw.clarityOpenSummary, ClarityExperience);
+          }
+          return Doors.internal(raw.clarityOpen, ClarityExperience);
+        },
+        close: function () { return Doors.internal(raw.clarityClose, ClarityExperience); },
+        forceClose: function () { return Doors.internal(raw.clarityClose, ClarityExperience); }
+      });
+
+      ClarityExperience.open = function () {
+        if (internal() || !Doors.enabled()) return raw.clarityOpen.apply(ClarityExperience, arguments);
+        return Doors.go('clarity', { summary: false });
+      };
+      ClarityExperience.openSummary = function () {
+        if (internal() || !Doors.enabled()) return raw.clarityOpenSummary.apply(ClarityExperience, arguments);
+        return Doors.go('clarity', { summary: true });
+      };
+      ClarityExperience.close = function () {
+        return routeClose('clarity', raw.clarityClose, ClarityExperience, arguments);
+      };
+    }
+
+    if (typeof ActionFlow !== 'undefined') {
+      raw.actionStart = ActionFlow.start;
+      raw.actionClose = ActionFlow.close;
+      if (typeof ActionExperience !== 'undefined') {
+        raw.actionLegacyOpen = ActionExperience.open;
+        raw.actionLegacyClose = ActionExperience.close;
+      }
+      Doors.register('action', {
+        gesture: 'back',
+        el: function () { return document.querySelector('.afl') || document.getElementById('actionExp'); },
+        active: function () {
+          return !!ActionFlow.isOpen ||
+            (typeof ActionExperience !== 'undefined' && !!ActionExperience.isOpen);
+        },
+        open: function (opts) { return Doors.internal(raw.actionStart, ActionFlow, [opts || {}]); },
+        close: function () {
+          if (ActionFlow.isOpen) return Doors.internal(raw.actionClose, ActionFlow);
+          if (raw.actionLegacyClose && typeof ActionExperience !== 'undefined') {
+            return Doors.waitForEnd(document.getElementById('actionExp'), function () {
+              Doors.internal(raw.actionLegacyClose, ActionExperience);
+            });
+          }
+        },
+        forceClose: function () {
+          if (ActionFlow.isOpen) return Doors.internal(raw.actionClose, ActionFlow);
+          if (raw.actionLegacyClose && typeof ActionExperience !== 'undefined') {
+            return Doors.internal(raw.actionLegacyClose, ActionExperience);
+          }
         }
-        resolved = currentTopSlug();
-      } else if (slug === 'action') {
-        // merge 3.1: #action is the NEW flow. start() carries the wall +
-        // paywall gate, so a locked deep link still resolves to 'paywall'.
-        if (typeof ActionFlow !== 'undefined') ActionFlow.start();
-        else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
-        resolved = currentTopSlug();
-      } else if (slug === 'memento-full') {
-        if (typeof openMementoFull === 'function') openMementoFull();
-        resolved = currentTopSlug();
-      } else if (slug === 'paywall') {
-        // only meaningful if something is actually locked; otherwise home
-        if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show();
-        resolved = currentTopSlug();
-      } else {
-        resolved = 'home';
-        if (typeof TabBar !== 'undefined') TabBar.switchTo('home');
-      }
-    } catch (e) { resolved = currentTopSlug(); }
-    setTimeout(function () { R.navLock = false; }, 360);
-    return resolved;
-  }
+      });
 
-  // seed the base trail lazily the first time we are live (covers the
-  // onboarding -> app transition without needing a hook into the reveal)
-  function ensureSeeded() {
-    if (routerEnabled() && R.frames.length === 0) {
-      var now = currentTopSlug();
-      R.frames = (now !== 'home') ? ['home', now] : ['home'];
+      ActionFlow.start = function (opts) {
+        if (internal() || !Doors.enabled()) return raw.actionStart.apply(ActionFlow, arguments);
+        return Doors.go('action', opts || {});
+      };
+      ActionFlow.close = function () {
+        return routeClose('action', raw.actionClose, ActionFlow, arguments);
+      };
+
+      if (typeof ActionExperience !== 'undefined') {
+        ActionExperience.open = function () {
+          var devStates = false;
+          try { devStates = /[?&]dev=action-states\b/.test(location.search); } catch (e) {}
+          if (internal() || !Doors.enabled() || devStates || ActionFlow.legacyRedirect === false) {
+            return raw.actionLegacyOpen.apply(ActionExperience, arguments);
+          }
+          return Doors.go('action');
+        };
+        ActionExperience.close = function () {
+          return routeClose('action', raw.actionLegacyClose, ActionExperience, arguments);
+        };
+      }
+    }
+
+    if (typeof ClarityPaywall !== 'undefined') {
+      raw.paywallShow = ClarityPaywall.show;
+      raw.paywallHide = ClarityPaywall.hide;
+      Doors.register('paywall', {
+        gesture: 'none',
+        el: function () { return document.getElementById('clarityPaywall'); },
+        active: function () { return !!ClarityPaywall._open; },
+        open: function (opts) { return Doors.internal(raw.paywallShow, ClarityPaywall, [opts || {}]); },
+        close: function () {
+          return Doors.waitForEnd(document.getElementById('clarityPaywall'), function () {
+            Doors.internal(raw.paywallHide, ClarityPaywall);
+          });
+        },
+        forceClose: function () { return Doors.internal(raw.paywallHide, ClarityPaywall); }
+      });
+
+      ClarityPaywall.show = function (opts) {
+        if (internal() || !Doors.enabled()) return raw.paywallShow.apply(ClarityPaywall, arguments);
+        return Doors.go('paywall', opts || {});
+      };
+      ClarityPaywall.hide = function () {
+        return routeClose('paywall', raw.paywallHide, ClarityPaywall, arguments);
+      };
+    }
+
+    if (typeof MementoView !== 'undefined') {
+      raw.mementoOpen = MementoView.open;
+      raw.mementoClose = MementoView.close;
+      raw.mementoToggle = MementoView.toggle;
+      Doors.register('memento-full', {
+        gesture: 'back',
+        el: function () { return document.getElementById('mementoFull'); },
+        active: function () { return !!MementoView.isActive(); },
+        open: function () { return Doors.internal(raw.mementoOpen, MementoView); },
+        close: function () {
+          Doors.internal(raw.mementoClose, MementoView);
+          return waitUntil(function () { return MementoView.isActive(); }, 900);
+        },
+        forceClose: function () { return Doors.internal(raw.mementoClose, MementoView); }
+      });
+
+      MementoView.open = function () {
+        if (internal() || !Doors.enabled()) return raw.mementoOpen.apply(MementoView, arguments);
+        return Doors.go('memento-full');
+      };
+      MementoView.close = function () {
+        return routeClose('memento-full', raw.mementoClose, MementoView, arguments);
+      };
+      MementoView.toggle = function () {
+        if (internal() || !Doors.enabled()) return raw.mementoToggle.apply(MementoView, arguments);
+        return Doors.current() === 'memento-full' ? Doors.back() : Doors.go('memento-full');
+      };
+    }
+
+    raw.openMementoFull = window.openMementoFull;
+    if (typeof raw.openMementoFull === 'function') {
+      window.openMementoFull = function () {
+        if (internal() || !Doors.enabled()) return raw.openMementoFull.apply(window, arguments);
+        return Doors.go('memento-full');
+      };
+    }
+
+    raw.exitToModules = window.exitToModules;
+    if (typeof raw.exitToModules === 'function') {
+      window.exitToModules = function () {
+        if (!Doors.enabled()) return raw.exitToModules.apply(window, arguments);
+        var now = Doors.current();
+        if (!internal() && (now === 'clarity' || now === 'action' || now.indexOf('m/') === 0)) {
+          return Doors.back();
+        }
+        return raw.exitToModules.apply(window, arguments);
+      };
     }
   }
 
-  // ----------------------------------------------------------------- popstate
-  function onPopState(ev) {
-    if (R.suppressPop > 0) { R.suppressPop--; return; }   // our own silentBack
-    if (!routerEnabled()) return;                          // inert in onboarding
-    ensureSeeded();
-    var target = (ev && ev.state && ev.state.slug) || parseHash() || 'home';
-    var now = currentTopSlug();
-    if (target === now) return;                            // already there
-
-    // Did we go BACK (the target is somewhere beneath us in our trail)?
-    var idx = R.frames.lastIndexOf(target);
-    if (idx !== -1 && idx < R.frames.length - 1) {
-      // close one screen at a time until we reach the target (usually one)
-      var guard = 0;
-      while (currentTopSlug() !== target && R.frames.length > idx + 1 && guard < 8) {
-        R.frames.pop();
-        closeTopScreen();
-        guard++;
-      }
-      // align the mirror
-      R.frames.length = idx + 1;
-    } else {
-      // FORWARD (or a deep-link target not in our trail): open it
-      var resolved = openSlug(target);
-      if (resolved === target) { R.frames.push(target); }
-      else { replaceSlug(resolved); }   // e.g. locked -> paywall
-    }
-  }
-
-  // ----------------------------------------------------------------- wrap all
-  function wrapAll() {
-    if (typeof Sheet !== 'undefined') { wrapAround(Sheet, 'open'); wrapAround(Sheet, 'close'); }
-    if (typeof TabBar !== 'undefined') { wrapAround(TabBar, 'switchTo'); }
-    if (typeof ClarityExperience !== 'undefined') { wrapAround(ClarityExperience, 'open'); wrapAround(ClarityExperience, 'openSummary'); }
-    if (typeof ActionExperience !== 'undefined') { wrapAround(ActionExperience, 'open'); }
-    // merge 3.1: the NEW Action flow reports its own open/close the same way.
-    if (typeof ActionFlow !== 'undefined') { wrapAround(ActionFlow, 'start'); wrapAround(ActionFlow, 'close'); }
-    if (typeof MoreSpace !== 'undefined') { wrapAround(MoreSpace, 'open'); wrapAround(MoreSpace, 'close'); }
-    if (typeof ClarityPaywall !== 'undefined') { wrapAround(ClarityPaywall, 'show'); wrapAround(ClarityPaywall, 'hide'); }
-    wrapGlobal('openMementoFull');
-    wrapGlobal('exitToModules');
-    // NOTE: ClarityExperience.close is intentionally NOT wrapped (it is already
-    // self-wrapped/reassigned elsewhere). exitToModules covers the close path.
-  }
-
-  // ----------------------------------------------------------------- boot
-  // Self-booting: the existing boot IIFE (js/11) already restored the last view
-  // (or a deep-linked hash points somewhere). We reconcile ONCE: seed the trail
-  // to match whatever ended up open, and if an explicit hash points elsewhere,
-  // navigate there. No edit to the sacred boot file required.
   function bootReconcile() {
-    try {
-      if (R.booted || !routerEnabled()) return;
-      R.booted = true;
-      var hash = parseHash();
-      var now = currentTopSlug();
-      if (hash && hash !== 'home' && hash !== now) {
-        // explicit deep-link wins over the plain restore
-        var resolved = openSlug(hash);
-        setTimeout(function () {
-          var top = currentTopSlug();
-          R.frames = (top !== 'home') ? ['home', top] : ['home'];
-          replaceSlug(top);
-          var app = document.getElementById('app'); if (app) app.style.opacity = '1';
-        }, 80);
-      } else {
-        // normal reload: mirror whatever is open into the trail + URL
-        R.frames = (now !== 'home') ? ['home', now] : ['home'];
-        replaceSlug(now);
-      }
-    } catch (e) {}
+    if (booted || !Doors.enabled()) return;
+    booted = true;
+    var hash = '';
+    try { hash = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (e) {}
+    var now = Doors.current();
+    if (hash && hash !== 'home' && hash !== now) {
+      Doors.go(hash, { history: 'replace' }).catch(function () {
+        Doors.go('home', { history: 'replace' });
+      });
+    } else {
+      Doors.sync();
+    }
   }
 
-  // Keep trying to boot until the app is past onboarding/splash (returning users
-  // are ready almost immediately; brand-new users finish onboarding much later,
-  // at which point the first navigation seeds the trail via ensureSeeded()).
   function scheduleBoot() {
     var tries = 0;
     (function attempt() {
-      if (R.booted) return;
-      if (routerEnabled()) { bootReconcile(); return; }
-      if (tries++ < 10) setTimeout(attempt, 250);
+      if (booted) return;
+      if (Doors.enabled()) { bootReconcile(); return; }
+      if (tries++ < 40) setTimeout(attempt, 250);
     })();
   }
 
-  function init() {
-    if (R.ready) return;
-    wrapAll();
-    window.addEventListener('popstate', onPopState);
-    R.ready = true;
-    // run AFTER the existing boot restore (its view open fires on a ~50ms timer)
+  function install() {
+    if (installed || !window.Doors) return false;
+    installed = true;
+    registerLateRoots();
+    window.Router = {
+      init: install,
+      enabled: Doors.enabled,
+      go: Doors.go,
+      back: Doors.back,
+      sync: Doors.sync,
+      _top: Doors.current,
+      _state: { frames: Doors._frames }
+    };
     setTimeout(scheduleBoot, 220);
+    return true;
   }
 
-  // Tiny debug/inspection surface.
-  // v1140: the Memento record no longer opens/closes through a wrapped global
-  // (it is a state machine with several close paths), so it tells the router
-  // directly whenever its state settles.
-  window.Router = { init: init, enabled: routerEnabled, _state: R, _top: currentTopSlug,
-    sync: function () { try { if (routerEnabled() && !R.navLock) scheduleReconcile(); } catch (e) {} } };
+  function tryInstall() {
+    if (!install()) setTimeout(tryInstall, 60);
+  }
 
-  function tryInit() {
-    if (typeof state === 'undefined') { setTimeout(tryInit, 60); return; }
-    init();
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
-  } else {
-    tryInit();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInstall);
+  else tryInstall();
 })();
