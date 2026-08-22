@@ -1887,7 +1887,163 @@ const ComebackPicker = {
 };
 
 const CreatorTools = {
+  _gateCheck: null,
+
+  // The only visibility decision for the Cheat Code Bar. Local development is
+  // always allowed. On the live app, the immutable auth user id inside the
+  // current Supabase session must be Malik's documented owner account. This is
+  // a client-local QA surface only; every paid server action stays protected by
+  // the normal backend checks.
+  _devCondition() {
+    try {
+      const host = String(location.hostname || '').toLowerCase();
+      if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') return true;
+      const token = window.CloudSync && CloudSync.accessToken ? CloudSync.accessToken() : '';
+      const part = String(token || '').split('.')[1] || '';
+      if (!part) return false;
+      const padded = part.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - part.length % 4) % 4);
+      const payload = JSON.parse(atob(padded));
+      return payload && payload.sub === '9f5216bc-cc93-4a79-b2c4-2bfaec097648';
+    } catch (e) { return false; }
+  },
+
+  _markup() {
+    return `<section class="creator-box" id="creatorBox">
+      <div class="creator-box__top" id="creatorBoxToggle">
+        <div class="creator-box__label">&#127918; Cheat Code Bar</div>
+        <div class="creator-box__right">
+          <div class="creator-box__state" id="creatorState">Normal flow</div>
+          <div class="creator-box__arrow" id="creatorArrow">&#8964;</div>
+        </div>
+      </div>
+      <div class="creator-box__actions" id="creatorBoxActions">
+        <div class="creator-box__divider">Live run (destructive)</div>
+        <button class="creator-box__btn" id="creatorFreshStart">Start as a new user</button>
+        <div class="creator-box__divider">Jump to (non-destructive)</div>
+        <button class="creator-box__btn" id="creatorJumpSplash">Splash screen</button>
+        <button class="creator-box__btn" id="creatorJumpOnboarding">Onboarding</button>
+        <button class="creator-box__btn" id="creatorJumpStyle">Choose style</button>
+        <button class="creator-box__btn" id="creatorJumpCelebration">Celebration</button>
+        <button class="creator-box__btn" id="creatorGiveNeutronStar">Give Neutron Star</button>
+        <div class="creator-box__divider">Stages &amp; animations</div>
+        <button class="creator-box__btn" id="creatorJumpBlankCard">Blank card</button>
+        <button class="creator-box__btn" id="creatorJumpUnlock">Evolution 1 · cyan (Clarity)</button>
+        <button class="creator-box__btn" id="creatorJumpEvoPlat">Evolution 2 · platinum (Action)</button>
+        <button class="creator-box__btn" id="creatorJumpEvoGreen">Evolution 3 · green (Consistency)</button>
+        <button class="creator-box__btn" id="creatorJumpAfterCinema">After cinematic</button>
+        <button class="creator-box__btn" id="creatorJumpFinalQ">Final question</button>
+        <button class="creator-box__btn" id="creatorJumpSynth">Synthesis</button>
+        <button class="creator-box__btn" id="creatorJumpClarityEnd">End of Clarity</button>
+        <button class="creator-box__btn" id="creatorActionFlowWeight">New Action flow (weight)</button>
+        <button class="creator-box__btn" id="creatorActionFlowBiz">New Action flow (business)</button>
+        <button class="creator-box__btn" id="creatorActionBrainTest">Action: real plan test (paid AI)</button>
+        <button class="creator-box__btn" id="creatorPushStatus">Push: status + force ask</button>
+        <button class="creator-box__btn" id="creatorStressRun">Stress run: 30 personas (paid AI, ~60-90 min)</button>
+        <button class="creator-box__btn" id="creatorJump7Days">First 7 days</button>
+        <button class="creator-box__btn" id="creatorJumpPaywall">Paywall</button>
+        <button class="creator-box__btn" id="creatorJumpPayCeremony">Unlock ceremony (after paying)</button>
+        <button class="creator-box__btn" id="creatorJumpDay1">Day 1 moment</button>
+        <button class="creator-box__btn" id="creatorJumpAction">Action module</button>
+        <button class="creator-box__btn" id="creatorRestartAction">Restart Action</button>
+        <button class="creator-box__btn" id="creatorJumpMori">Mori moment</button>
+        <button class="creator-box__btn" id="creatorJumpVivere">Vivere moment</button>
+        <button class="creator-box__btn" id="creatorJumpWoven">Woven card</button>
+        <button class="creator-box__btn" id="creatorExitStyle">Exit: ✕</button>
+        <div class="creator-box__divider">Comeback stress test (safe demo)</div>
+        <button class="creator-box__btn" data-comeback-gap="0">Active today</button>
+        <button class="creator-box__btn" data-comeback-gap="1">Missed 1 day</button>
+        <button class="creator-box__btn" data-comeback-gap="3">Missed 3 days</button>
+        <button class="creator-box__btn" data-comeback-gap="7">Missed 1 week</button>
+        <button class="creator-box__btn" data-comeback-gap="14">Missed 2 weeks</button>
+        <div class="creator-box__divider">Entitlements</div>
+        <button class="creator-box__btn" id="creatorTogglePaid">Paid / Free</button>
+      </div>
+    </section>`;
+  },
+
+  _placeBox(box) {
+    if (!box) return;
+    try {
+      const mobile = window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches;
+      const profile = mobile ? document.getElementById('profileBody') : null;
+      if (profile && profile.childElementCount) {
+        profile.appendChild(box);
+        return;
+      }
+      if (typeof Sidebar !== 'undefined' && Sidebar._relocateCreatorBox) {
+        Sidebar._relocateCreatorBox();
+        if (box.parentNode && box.parentNode.id === 'sidebarCreatorSlot') return;
+      }
+    } catch (e) {}
+    const anchor = document.getElementById('dashGreetingMobile');
+    if (anchor && anchor.parentNode) anchor.insertAdjacentElement('afterend', box);
+  },
+
+  _mount() {
+    if (document.getElementById('creatorBox')) return;
+    const template = document.createElement('template');
+    template.innerHTML = this._markup().trim();
+    const box = template.content.firstElementChild;
+    if (!box) return;
+    const anchor = document.getElementById('dashGreetingMobile');
+    if (!anchor || !anchor.parentNode) return;
+    anchor.insertAdjacentElement('afterend', box);
+    this._bindMountedBox();
+    this._placeBox(box);
+    try {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE && typeof _injectDemoBar === 'function') {
+        const persona = new URLSearchParams(location.search).get('demo') || 'creator';
+        _injectDemoBar(persona);
+      }
+    } catch (e) {}
+  },
+
+  _unmount() {
+    const box = document.getElementById('creatorBox');
+    if (box) box.remove();
+  },
+
+  _syncGate() {
+    if (this._devCondition()) this._mount();
+    else this._unmount();
+  },
+
   init() {
+    if (this._gateCheck) return;
+    this._gateCheck = () => {
+      this._syncGate();
+      setTimeout(() => this._syncGate(), 250);
+      setTimeout(() => this._syncGate(), 1200);
+    };
+    this._syncGate();
+    // CloudSync loads after this file. These bounded probes catch its restored
+    // session without leaving a permanent polling loop alive in the app.
+    [0, 100, 500, 2000, 5000, 12000].forEach((ms) => setTimeout(this._gateCheck, ms));
+    window.addEventListener('focus', this._gateCheck);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) this._gateCheck();
+    });
+    // Every deliberate sign-in and sign-out goes through these public methods.
+    // Wrap them once after CloudSync appears so the DOM follows the real auth
+    // result immediately, including removal on sign-out.
+    setTimeout(() => {
+      try {
+        const sync = window.CloudSync;
+        if (!sync || sync.__creatorGateWrapped) return;
+        sync.__creatorGateWrapped = true;
+        ['verifyCode', 'signOut'].forEach((name) => {
+          const original = sync[name];
+          if (typeof original !== 'function') return;
+          sync[name] = async (...args) => {
+            try { return await original.apply(sync, args); }
+            finally { this._gateCheck(); }
+          };
+        });
+      } catch (e) {}
+    }, 0);
+  },
+
+  _bindMountedBox() {
     const bind = (id, fn) => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', fn);
