@@ -31,17 +31,17 @@
   // real goals, so you can see how the same module reads for different people.
   // The structure is universal by design; the shape tunes cadence + wording.
   var PERSONAS = [
-    { label: 'Business', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions' },
-    { label: 'Fitness', shape: 'frequency', cadence: 4, sub: 'workouts toward the rate you keep', unit: 'workouts' },
-    { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit', unit: 'days' },
-    { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep', unit: 'sessions' },
-    { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held', unit: 'days' },
-    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number', unit: 'days' },
-    { label: 'Rough patch', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions', rough: true }
+    { label: 'Business', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions', target: 0.6 },
+    { label: 'Fitness', shape: 'frequency', cadence: 4, sub: 'workouts toward the rate you keep', unit: 'workouts', target: 0.5 },
+    { label: 'Screen time', shape: 'maintenance', cadence: 7, sub: 'days you stayed under your limit', unit: 'days', target: 0.85 },
+    { label: 'School', shape: 'frequency', cadence: 5, sub: 'study sessions toward the rate you keep', unit: 'sessions', target: 0.65 },
+    { label: 'Sobriety', shape: 'maintenance', cadence: 7, sub: 'days the line has held', unit: 'days', target: 0.9 },
+    { label: 'Weight loss', shape: 'quantity_down', cadence: 7, sub: 'days you moved the number', unit: 'days', target: 0.55 },
+    { label: 'Rough patch', shape: 'quantity_up', cadence: 7, sub: 'actions completed toward your goal', unit: 'actions', target: 0.4, rough: true }
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true;
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null;
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -65,16 +65,9 @@
     });
     var map = {};
     Object.keys(byWeek).forEach(function (k) {
-      var days = byWeek[k];
-      var kept = days.filter(function (d) { return d.on; });
-      var plain = days.filter(function (d) { return !d.on && !Object.keys(d.sup).length; });
-      var open = +k === curWeek;
-      var short = open ? 0 : Math.min(plain.length, Math.max(0, target - kept.length));
-      // the shortfall lands on the most recent empty days of that week
-      var missSet = {};
-      plain.slice(plain.length - short).forEach(function (d) { missSet[dkey(d.date)] = 1; });
-      days.forEach(function (d) {
-        var st = d.on ? 'kept' : (Object.keys(d.sup).length ? 'sup' : (missSet[dkey(d.date)] ? 'missed' : 'rest'));
+      byWeek[k].forEach(function (d) {
+        // consistency is a fill rate, not a streak: an empty day is not a miss.
+        var st = d.on ? 'kept' : (Object.keys(d.sup).length ? 'sup' : 'rest');
         map[dkey(d.date)] = { d: d, st: st };
       });
     });
@@ -135,6 +128,18 @@
   // the days the score actually grades: the last 90, minus a today that is
   // still in progress (an unfinished today is not a miss, so it never drags the
   // score down before the day is over).
+  // the consistency target: what fraction of days you're aiming to show up.
+  // set once at onboarding (the swipe-the-heatmap moment); adjustable here to preview.
+  function curTarget() { return TARGETOVR != null ? TARGETOVR : (PERSONA.target || 0.6); }
+  // fill rate = share of days you showed up (main = full, support = half), over the window.
+  // an empty day is just a day you did not show up: it is in the denominator, never a "miss".
+  function fillOf(A, days) {
+    var shown = 0, total = 0;
+    days.forEach(function (x) { var st = stateOf(A, x.date); if (st === 'kept') { shown += 1; total++; } else if (st === 'sup') { shown += 0.5; total++; } else { total++; } });
+    return total ? shown / total : 0;
+  }
+  // the score is your standing vs your target: at target = 100, above = 100+.
+  function targetScore(A, days, tgt) { return Math.round((fillOf(A, days) / Math.max(0.05, tgt)) * 100); }
   function gradedDays(log, A) {
     var slice = log.slice(-Math.min(90, log.length));
     var last = slice[slice.length - 1];
@@ -142,20 +147,24 @@
     return slice;
   }
   function scoreViz(A, log) {
-    var slice = gradedDays(log, A), kept = 0, sup = 0, missed = 0;
-    slice.forEach(function (d) { var st = stateOf(A, d.date); if (st === 'kept') kept++; else if (st === 'sup') sup++; else if (st === 'missed') missed++; });
-    function seg(n, c) { return n ? '<u class="' + c + '" style="flex:' + n + '"></u>' : ''; }
-    function key(n, c, w) { return n ? '<span><b class="' + c + '"></b>' + n + ' ' + w + '</span>' : ''; }
-    return '<div class="score__viz viz-mix"><div class="mix__bar">' + seg(kept, 'k') + seg(sup, 's') + seg(missed, 'm') + '</div>' +
-      '<div class="mix__key">' + key(kept, 'k', 'kept') + key(sup, 's', 'smaller') + key(missed, 'm', 'missed') + '</div></div>';
+    var slice = gradedDays(log, A);
+    var rate = fillOf(A, slice), tgt = curTarget();
+    var pct = Math.round(rate * 100), tpct = Math.round(tgt * 100), over = rate >= tgt;
+    return '<div class="score__viz viz-fill">' +
+      '<div class="fillbar' + (over ? ' over' : '') + '">' +
+        '<span class="fillbar__fill" style="width:' + Math.min(100, pct) + '%"></span>' +
+        '<i class="fillbar__tgt" style="left:' + Math.min(100, tpct) + '%"></i>' +
+      '</div>' +
+      '<div class="fillbar__key"><span><b>' + pct + '%</b> of days shown up</span>' +
+        '<span class="fillbar__t">goal ' + tpct + '%</span></div>' +
+      '</div>';
   }
   function scoreBlock(s, log, A) {
-    var slice = gradedDays(log, A), win = Math.min(90, log.length);
-    var score = scoreDays(A, slice);
-    // which way the score moved over the past week (same window, ended 7 days back).
-    // shown as a small exponent: up is accent, down is muted, never red, never shame.
+    var slice = gradedDays(log, A), win = Math.min(90, log.length), tgt = curTarget();
+    var score = targetScore(A, slice, tgt);
+    // which way it moved over the past week (same window, ended 7 days back)
     var delta = null;
-    if (log.length >= win + 7) delta = score - scoreDays(A, log.slice(-(win + 7), -7));
+    if (log.length >= win + 7) delta = score - targetScore(A, log.slice(-(win + 7), -7), tgt);
     var deltaHTML = '';
     if (delta) {
       var up = delta > 0;
@@ -167,7 +176,8 @@
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score">' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
-      '<div class="score__n">' + score + deltaHTML + '</div></div>' +
+      '<div class="score__n">' + score + '<em class="score__pct">%</em>' + deltaHTML + '</div></div>' +
+      '<div class="score__basis">based on your ' + Math.round(tgt * 100) + '% goal</div>' +
       scoreViz(A, log) +
       '<div class="score__note">Remember: the goal is to be better, not perfect.</div>' +
       '</div></div>';
@@ -219,10 +229,9 @@
     var seen = {};
     log.forEach(function (d) { var s = stateOf(A, d.date); if (s) seen[s] = 1; });
     var chips = [];
-    if (seen.kept) chips.push('<span><u class="a"></u>Action</span>');
-    if (seen.sup) chips.push('<span><u class="b"></u>Other</span>');
+    if (seen.kept) chips.push('<span><u class="a"></u>Shown up</span>');
+    if (seen.sup) chips.push('<span><u class="b"></u>Something smaller</span>');
     if (seen.missed) chips.push('<span><u class="c"></u>Missed</span>');
-    if (seen.rest) chips.push('<span><u class="r"></u>Rest</span>');
     return chips.length >= 2 ? '<div class="key">' + chips.join('') + '</div>' : '';
   }
   function gridFor(A, y, m, today, big) {
@@ -537,7 +546,8 @@
   });
   el('shapeChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
-    PERSONA = PERSONAS[+b.getAttribute('data-p')]; SHAPE = PERSONA.shape; MOFF = 0; WOFF = 0; YOFF = 0;
+    PERSONA = PERSONAS[+b.getAttribute('data-p')]; SHAPE = PERSONA.shape;
+    TARGETOVR = null; if (el('tgtSlider')) { el('tgtSlider').value = Math.round((PERSONA.target||0.6)*100); el('tgtLbl').textContent = 'Target ' + el('tgtSlider').value + '%'; } MOFF = 0; WOFF = 0; YOFF = 0;
     [].forEach.call(this.querySelectorAll('button'), function (x) { x.classList.toggle('on', x === b); });
     render();
   });
@@ -550,6 +560,12 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  var tgtSl = el('tgtSlider'), tgtLbl = el('tgtLbl');
+  if (tgtSl) tgtSl.addEventListener('input', function () {
+    TARGETOVR = +this.value / 100;
+    tgtLbl.textContent = 'Target ' + this.value + '%';
+    render();
+  });
   el('todayChips').innerHTML = '<button data-t="done" class="on">Today done</button><button data-t="pending">Not yet</button>';
   el('todayChips').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;

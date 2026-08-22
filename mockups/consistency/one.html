@@ -174,6 +174,7 @@
   .bar__in { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
   .bar__row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .bar__row input[type=range] { flex: 1; min-width: 120px; accent-color: var(--acc); height: 4px; }
+  .bar__lbl { font-size: 11px; font-weight: 600; color: var(--text-lo, rgba(255,255,255,0.5)); min-width: 74px; font-variant-numeric: tabular-nums; }
   .bar__day { font-size: 14px; font-weight: 700; min-width: 74px; font-variant-numeric: tabular-nums; }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; }
   .chips button { font: inherit; font-size: 11.5px; font-weight: 600; color: var(--text-mid, rgba(255,255,255,0.8));
@@ -256,19 +257,17 @@
   .score__delta.down { color: var(--score-sub); }
   .score__n { font-size: 60px; font-weight: 780; letter-spacing: -0.045em; line-height: 0.88;
     color: var(--score-fg); font-variant-numeric: tabular-nums; margin-top: 2px; }
-  .score__viz { margin-top: 16px; position: relative; }
-  .mix__bar { display: flex; height: 16px; border-radius: 6px; overflow: hidden; gap: 2px; }
-  .mix__bar u { display: block; }
-  .mix__bar u.k { background: var(--acc); }
-  .mix__bar u.s { background: rgba(var(--acc-rgb),0.42); }
-  .mix__bar u.m { background: var(--score-empty); }
-  .mix__key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 11px; }
-  .mix__key span { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--score-sub); font-variant-numeric: tabular-nums; }
-  .mix__key b { width: 9px; height: 9px; border-radius: 2.5px; display: block; }
-  .mix__key b.k { background: var(--acc); }
-  .mix__key b.s { background: rgba(var(--acc-rgb),0.42); }
-  .mix__key b.m { background: var(--score-empty); box-shadow: inset 0 0 0 1px var(--score-sub); }
-  .mix__bar u { display: block; }
+  .score__viz { margin-top: 18px; position: relative; }
+  /* the % after the big number, and the "based on your X% goal" basis line */
+  .score__pct { font-style: normal; font-size: 0.42em; font-weight: 700; opacity: 0.55; margin-left: 2px; letter-spacing: 0; }
+  .score__basis { font-size: 12px; color: var(--score-sub); margin-top: 5px; font-variant-numeric: tabular-nums; }
+  /* the fill-vs-target bar: filled to your real days-shown-up %, with a target marker */
+  .fillbar { position: relative; height: 14px; border-radius: 7px; background: var(--score-empty); }
+  .fillbar__fill { display: block; height: 100%; border-radius: 7px; background: rgba(var(--acc-rgb),0.5); transition: width 0.45s ease; }
+  .fillbar.over .fillbar__fill { background: var(--acc); }
+  .fillbar__tgt { position: absolute; top: -4px; bottom: -4px; width: 2px; border-radius: 2px; background: var(--score-fg); opacity: 0.6; }
+  .fillbar__key { display: flex; justify-content: space-between; align-items: baseline; margin-top: 11px; font-size: 12.5px; color: var(--score-sub); font-variant-numeric: tabular-nums; }
+  .fillbar__key b { color: var(--score-fg); font-weight: 750; }
   .score__note { font-size: 11.5px; color: var(--score-sub); margin-top: 12px; line-height: 1.45; }
   /* the shown-up pill under the calendar */
   .heropill { display: block; text-align: center; background: rgba(255,255,255,0.045); border-radius: 999px;
@@ -514,6 +513,7 @@
     <div class="chips" id="dayChips"></div>
   </div>
   <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="viewChips"></div></div>
+  <div class="bar__row"><span class="bar__lbl" id="tgtLbl">Target 60%</span><input type="range" id="tgtSlider" min="10" max="100" step="5" value="60"></div>
 </div></div>
 
 <div class="gplus-fx" aria-hidden="true"><i></i><i></i><i></i></div>
