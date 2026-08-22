@@ -11277,21 +11277,26 @@ const ClarityNoteWriter = {
       pop.hidden = false;
     };
 
-    var onSel = function () { if (self.isOpen) place(); };
+    // EPHEMERAL: exists only during a live non-collapsed selection, gone the
+    // instant anything else happens. selectionchange fires constantly, so hide
+    // is the default and show is the gated exception.
+    var suppress = false;
+    var maybe = function () { if (!self.isOpen || suppress) { hide(); return; } place(); };
+    var killNow = function () { suppress = true; hide(); setTimeout(function () { suppress = false; }, 350); };
+    var onSel = function () { maybe(); };
     document.addEventListener('selectionchange', onSel);
     field.addEventListener('scroll', hide, { passive: true });
-    field.addEventListener('blur', function () { setTimeout(hide, 100); });
-    // a fresh tap or any typing kills the popover immediately; it only comes
-    // back when a real selection settles (place() re-shows via selectionchange).
-    field.addEventListener('pointerdown', hide);
+    field.addEventListener('blur', function () { hide(); });
+    field.addEventListener('pointerdown', killNow);
+    field.addEventListener('keydown', killNow);
     field.addEventListener('input', hide);
     this._fmtCleanup = function () { document.removeEventListener('selectionchange', onSel); };
+    this._bindSwipeDismiss(el, field);
 
     var run = function (cmd) {
       field.focus();
       try { document.execCommand(cmd, false, null); } catch (e) {}
       field.dispatchEvent(new Event('input', { bubbles: true }));
-      place();
     };
     var checklist = function () {
       field.focus();
@@ -11311,6 +11316,29 @@ const ClarityNoteWriter = {
         else checklist();
       });
     });
+  },
+
+  // swipe down anywhere in the writer to dismiss the keyboard, like a native
+  // iOS text view. Only a clear vertical-down drag with no active selection.
+  _bindSwipeDismiss: function (el, field) {
+    var sy = 0, sx = 0, on = false;
+    el.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { on = false; return; }
+      var t = e.target;
+      if (t.closest && t.closest('button, .cn-tmrdrop, .cn-fmt, .cn-tmrpick')) { on = false; return; }
+      sy = e.touches[0].clientY; sx = e.touches[0].clientX; on = true;
+    }, { passive: true });
+    el.addEventListener('touchmove', function (e) {
+      if (!on || e.touches.length !== 1) return;
+      var dy = e.touches[0].clientY - sy, dx = Math.abs(e.touches[0].clientX - sx);
+      var collapsed = true;
+      try { collapsed = window.getSelection().isCollapsed; } catch (er) {}
+      if (dy > 64 && dx < 46 && collapsed && document.activeElement === field) {
+        on = false;
+        try { field.blur(); } catch (er) {}
+      }
+    }, { passive: true });
+    el.addEventListener('touchend', function () { on = false; }, { passive: true });
   },
 
   // ---- the quiet timer: a whisper. slider to set, pause/resume/stop, a
