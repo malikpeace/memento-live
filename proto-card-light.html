@@ -48,111 +48,139 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
 /* the lighting layers: the ONLY thing this lab adds inside the real card */
 .daycard-ns .lite { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 
-/* ── A. STUDIO SPECULAR ──────────────────────────────────────────────────────
-   PORTABLE RECIPE
-   spec:  radial-gradient(46% 34% at calc(50% + var(--tx)*44%) calc(42% + var(--ty)*40%),
-          rgba(255,255,255,0.42), rgba(255,255,255,0.10) 55%, transparent 76%), screen
-   shade: radial-gradient(70% 60% at calc(50% - var(--tx)*40%) calc(58% - var(--ty)*36%),
-          rgba(8,12,16,0.16), transparent 70%) */
-.c-a .lite--spec {
-  background: radial-gradient(46% 34% at calc(50% + var(--tx, 0) * 44%) calc(42% + var(--ty, 0) * 40%),
-    rgba(255,255,255,0.42), rgba(255,255,255,0.10) 55%, transparent 76%);
+/* ROUND 4 (Malik: "EXTREMELY subtle... make it more noticeable, more Apple
+   like, something actually different"): every look is now unmistakable at a
+   glance and moves in its own way. Values are deliberately loud; the ported
+   version can be dialed down AFTER he picks a direction. */
+
+/* ── A. SWEEP (the Apple Pay card flash) ────────────────────────────────────
+   One wide, bright diagonal blade that travels the full card with tilt. */
+.c-a .lite--band {
+  inset: -6% -40%;
+  background: linear-gradient(112deg,
+    transparent 30%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.92) 50%,
+    rgba(255,255,255,0.28) 58%, transparent 70%);
+  transform: translateX(calc(var(--tx, 0) * 52%));
   mix-blend-mode: screen;
 }
-.c-a .lite--shade {
-  background: radial-gradient(70% 60% at calc(50% - var(--tx, 0) * 40%) calc(58% - var(--ty, 0) * 36%),
-    rgba(8, 12, 16, 0.16), transparent 70%);
+.c-a .lite--under {
+  background: linear-gradient(112deg, rgba(255,255,255,0.10), transparent 55%);
 }
 
-/* ── B. BRUSHED SHEEN ────────────────────────────────────────────────────────
-   PORTABLE RECIPE
-   grain: repeating-linear-gradient(100deg, rgba(255,255,255,0.07) 0 1px, transparent 1px 3px), opacity 0.6
-   band:  linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.28) 46%,
-          rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.28) 54%, transparent 66%)
-          on a layer inset -4% -30%, transform translateX(calc(var(--tx)*55%)), screen */
-.c-b .lite--grain {
-  background: repeating-linear-gradient(100deg, rgba(255,255,255,0.07) 0 1px, transparent 1px 3px);
-  opacity: 0.6;
+/* ── B. SPOTLIGHT (dark product studio) ─────────────────────────────────────
+   The room goes dark; one hard light pins the card where you point it. The
+   card visibly dims and flares as you tilt. */
+.c-b .lite--veil {
+  background: radial-gradient(60% 46% at calc(50% + var(--tx, 0) * 46%) calc(42% + var(--ty, 0) * 42%),
+    transparent 22%, rgba(4, 7, 11, 0.42) 58%, rgba(4, 7, 11, 0.78) 100%);
 }
-.c-b .lite--band {
-  inset: -4% -30%;
-  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.28) 46%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.28) 54%, transparent 66%);
-  transform: translateX(calc(var(--tx, 0) * 55%));
+.c-b .lite--beam {
+  background: radial-gradient(34% 26% at calc(50% + var(--tx, 0) * 46%) calc(42% + var(--ty, 0) * 42%),
+    rgba(255,255,255,0.85), rgba(255,255,255,0.25) 55%, transparent 78%);
   mix-blend-mode: screen;
 }
 
-/* ── C. RIM LIGHT ────────────────────────────────────────────────────────────
-   PORTABLE RECIPE
-   top rim opacity   = 0.35 + ty * 0.65
-   bottom rim opacity = 0.35 - ty * 0.65
-   (rides ON TOP of the card's own ::before ring; the ring is the glass edge,
-   this is the light finding it) */
-.c-c .lite--rimtop {
-  background: linear-gradient(180deg, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.2) 2.5%, transparent 13%);
-  opacity: calc(0.35 + var(--ty, 0) * 0.65);
+/* ── C. EDGE GLOW (the light runs the rim) ──────────────────────────────────
+   A bright arc that races around the card's edge as you tilt, drawn on a
+   3px ring via the mask-ring technique the card's own ::before uses. */
+/* the card's own static glass ring stands down on this look, so the racing
+   arc owns the edge (otherwise white-on-white swallows it) */
+.daycard-ns.c-c::before { opacity: 0.22; }
+.c-c .lite--halo {
+  border-radius: inherit;
+  padding: 15px;
+  background: conic-gradient(from calc(var(--tx, 0) * 200deg + var(--ty, 0) * 80deg + 140deg) at 50% 50%,
+    transparent 0deg, rgba(255,255,255,0.95) 26deg, rgba(255,255,255,0.4) 52deg, transparent 96deg,
+    transparent 170deg, rgba(255,255,255,0.4) 205deg, transparent 250deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  filter: blur(7px);
+  mix-blend-mode: screen;
 }
-.c-c .lite--rimbot {
-  background: linear-gradient(0deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.14) 2.5%, transparent 11%);
-  opacity: calc(0.35 - var(--ty, 0) * 0.65);
+.c-c .lite--ring {
+  border-radius: inherit;
+  padding: 13px;
+  /* the unlit ring is smoked glass, so the racing light always has contrast */
+  background: conic-gradient(from calc(var(--tx, 0) * 200deg + var(--ty, 0) * 80deg + 140deg) at 50% 50%,
+    rgba(6, 9, 13, 0.72) 0deg, #ffffff 26deg, rgba(255,255,255,0.8) 52deg, rgba(6, 9, 13, 0.72) 96deg,
+    rgba(6, 9, 13, 0.72) 170deg, rgba(255,255,255,0.7) 205deg, rgba(6, 9, 13, 0.72) 250deg, rgba(6, 9, 13, 0.72) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+}
+.c-c .lite--ringhaze {
+  background: radial-gradient(120% 120% at calc(50% + var(--tx, 0) * 60%) calc(50% - var(--ty, 0) * 60%),
+    rgba(255,255,255,0.22), transparent 45%);
+  mix-blend-mode: screen;
 }
 
-/* ── D. DEPTH PARALLAX ───────────────────────────────────────────────────────
-   PORTABLE RECIPE (no specular: depth IS the light)
-   deep translate(tx*-6px,  ty*-5px), mid translate(tx*-14px, ty*-11px),
-   near translate(tx*-24px, ty*-19px), every layer inset -6% */
-.c-d .lite--deep, .c-d .lite--mid, .c-d .lite--near { inset: -6%; }
-.c-d .lite--deep {
-  background: radial-gradient(85% 70% at 55% 65%, rgba(10, 16, 20, 0.14), transparent 70%);
-  transform: translate(calc(var(--tx, 0) * -6px), calc(var(--ty, 0) * -5px));
+/* ── D. DEEP GLASS (visionOS slab) ──────────────────────────────────────────
+   The card reads as thick glass: heavy bevel light on the near edge, deep
+   shade on the far one, and the inside layers slide HARD with tilt. */
+.c-d .lite--bevel {
+  background:
+    linear-gradient(calc(140deg + var(--tx, 0) * 30deg),
+      rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.35) 4%, transparent 14%),
+    linear-gradient(calc(-40deg + var(--tx, 0) * 30deg),
+      rgba(3, 6, 10, 0.72) 0%, rgba(3, 6, 10, 0.3) 8%, transparent 24%);
 }
 .c-d .lite--mid {
-  background: radial-gradient(60% 48% at 38% 30%, rgba(255,255,255,0.22), transparent 72%);
-  transform: translate(calc(var(--tx, 0) * -14px), calc(var(--ty, 0) * -11px));
+  inset: -14%;
+  background: radial-gradient(58% 46% at 40% 32%, rgba(255,255,255,0.5), transparent 70%);
+  transform: translate(calc(var(--tx, 0) * -40px), calc(var(--ty, 0) * -32px));
+  mix-blend-mode: screen;
 }
 .c-d .lite--near {
-  background: radial-gradient(46% 34% at 62% 22%, rgba(255,255,255,0.16), transparent 70%);
-  transform: translate(calc(var(--tx, 0) * -24px), calc(var(--ty, 0) * -19px));
+  inset: -18%;
+  background: radial-gradient(40% 30% at 64% 70%, rgba(3, 6, 10, 0.4), transparent 68%);
+  transform: translate(calc(var(--tx, 0) * -70px), calc(var(--ty, 0) * -54px));
 }
 
-/* ── E. LIQUID LIGHT ─────────────────────────────────────────────────────────
-   PORTABLE RECIPE
-   blob 1: 36%x30% radial rgba(255,255,255,0.24), 26s drift
-   blob 2: 30%x26% radial rgba(210,235,240,0.4), 21s opposite phase
-   dot: 13%x10% specular tracking tilt, screen */
-.c-e .lite--blob1 {
-  inset: -10%;
-  background: radial-gradient(36% 30% at 30% 35%, rgba(255,255,255,0.24), transparent 70%);
-  animation: liqA 26s ease-in-out infinite alternate;
-}
-.c-e .lite--blob2 {
-  inset: -10%;
-  background: radial-gradient(30% 26% at 70% 68%, rgba(210, 235, 240, 0.4), transparent 70%);
-  animation: liqB 21s ease-in-out infinite alternate;
-}
-.c-e .lite--dot {
-  background: radial-gradient(13% 10% at calc(50% + var(--tx, 0) * 56%) calc(40% + var(--ty, 0) * 52%),
-    rgba(255,255,255,0.5), transparent 75%);
+/* ── E. FOIL (the gift-card shimmer, kept silver) ───────────────────────────
+   Hard shimmer bands that rip across the card the moment it moves. */
+.c-e .lite--bands {
+  inset: -10% -60%;
+  background: repeating-linear-gradient(calc(104deg + var(--ty, 0) * 14deg),
+    transparent 0 26px, rgba(255,255,255,0.38) 34px 44px,
+    rgba(255,255,255,0.10) 52px 60px, transparent 68px 96px);
+  transform: translateX(calc(var(--tx, 0) * 34%));
   mix-blend-mode: screen;
 }
-@keyframes liqA { from { transform: translate(0, 0) scale(1); } to { transform: translate(9%, 12%) scale(1.15); } }
-@keyframes liqB { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-8%, -10%) scale(0.95); } }
+.c-e .lite--flare {
+  background: radial-gradient(30% 20% at calc(50% + var(--tx, 0) * 52%) calc(36% + var(--ty, 0) * 44%),
+    rgba(255,255,255,0.8), transparent 72%);
+  mix-blend-mode: screen;
+}
 
-/* ── F. FOIL SHIFT (strictly grayscale, never rainbow) ──────────────────────
-   PORTABLE RECIPE
-   foil: conic-gradient(from calc(var(--tx)*80deg + 210deg) at 50% 42%, ...silver stops...),
-         soft-light, opacity 0.85; plus a small tracking specular, screen */
-.c-f .lite--foil {
-  background: conic-gradient(from calc(var(--tx, 0) * 80deg + 210deg) at 50% 42%,
-    transparent 0deg, rgba(255,255,255,0.45) 40deg, transparent 80deg,
-    rgba(255,255,255,0.2) 160deg, transparent 220deg,
-    rgba(255,255,255,0.36) 300deg, transparent 360deg);
-  mix-blend-mode: soft-light;
-  opacity: 0.85;
+/* ── F. CAUSTICS (light through water) ──────────────────────────────────────
+   Bright ripple webs crawling inside the glass on their own; tilt steers
+   the pool they gather toward. */
+.c-f .lite--web1, .c-f .lite--web2 { inset: -22%; mix-blend-mode: screen; }
+.c-f .lite--web1 {
+  background:
+    repeating-radial-gradient(120% 90% at 28% 24%,
+      transparent 0 34px, rgba(255,255,255,0.30) 42px 47px, transparent 55px 89px);
+  animation: caus1 11s ease-in-out infinite alternate;
 }
-.c-f .lite--foilspec {
-  background: radial-gradient(30% 22% at calc(50% + var(--tx, 0) * 40%) calc(38% + var(--ty, 0) * 34%),
-    rgba(255,255,255,0.26), transparent 72%);
+.c-f .lite--web2 {
+  background:
+    repeating-radial-gradient(110% 100% at 72% 78%,
+      transparent 0 41px, rgba(255,255,255,0.24) 49px 54px, transparent 62px 103px);
+  animation: caus2 9s ease-in-out infinite alternate;
+}
+.c-f .lite--pool {
+  background: radial-gradient(46% 36% at calc(50% + var(--tx, 0) * 46%) calc(46% + var(--ty, 0) * 44%),
+    rgba(255,255,255,0.4), transparent 74%);
   mix-blend-mode: screen;
+}
+@keyframes caus1 { from { transform: translate(0,0) scale(1); } to { transform: translate(6%, 9%) scale(1.12); } }
+@keyframes caus2 { from { transform: translate(0,0) scale(1.08); } to { transform: translate(-7%, -6%) scale(0.96); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .c-f .lite--web1, .c-f .lite--web2 { animation: none; }
 }
 
 .foot { padding: 56px 0 0; font-size: 13px; line-height: 1.6; color: rgba(242,246,247,0.38); }
@@ -184,13 +212,13 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
   var BLOBS = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
   var EMBLEM = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   var OPTS = [
-    { key: 'stock', k: 'Stock', name: 'Stock', lites: '', desc: 'The card exactly as it ships right now. Untouched. The baseline everything else is judged against.' },
-    { key: 'a', k: 'A', name: 'Studio specular', lites: '<i class="lite lite--shade"></i><i class="lite lite--spec"></i>', desc: 'One soft key light. The highlight follows the tilt, the shadow leans away.' },
-    { key: 'b', k: 'B', name: 'Brushed sheen', lites: '<i class="lite lite--grain"></i><i class="lite lite--band"></i>', desc: 'A fine metal grain with one bright band that sweeps as you tilt.' },
-    { key: 'c', k: 'C', name: 'Rim light', lites: '<i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>', desc: 'The light lives on the glass edge. Tilt back and the top catches it, tilt forward and the bottom does.' },
-    { key: 'd', k: 'D', name: 'Depth parallax', lites: '<i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>', desc: 'No highlight at all. Layers inside the glass slide at different speeds, so the card reads deep instead of shiny.' },
-    { key: 'e', k: 'E', name: 'Liquid light', lites: '<i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>', desc: 'Light moves inside the material on its own, slow as water. A small bright point still answers your tilt.' },
-    { key: 'f', k: 'F', name: 'Foil shift', lites: '<i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>', desc: 'A foil sheen that rotates around the card as you tilt. Kept strictly silver, never rainbow.' }
+    { key: 'stock', k: 'Stock', name: 'Stock', lites: '', desc: 'The card exactly as it ships right now. Untouched. The baseline.' },
+    { key: 'a', k: 'A', name: 'Sweep', lites: '<i class="lite lite--under"></i><i class="lite lite--band"></i>', desc: 'The Apple Pay flash: one wide bright blade that travels the whole card as you tilt.' },
+    { key: 'b', k: 'B', name: 'Spotlight', lites: '<i class="lite lite--veil"></i><i class="lite lite--beam"></i>', desc: 'A dark product studio. One hard light pins the card where you point it; the rest falls away.' },
+    { key: 'c', k: 'C', name: 'Edge glow', lites: '<i class="lite lite--halo"></i><i class="lite lite--ring"></i>', desc: 'The light lives on the rim and races around the edge as you tilt.' },
+    { key: 'd', k: 'D', name: 'Deep glass', lites: '<i class="lite lite--bevel"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>', desc: 'Thick glass. Heavy bevel light, deep shade, and the inside slides hard with the tilt.' },
+    { key: 'e', k: 'E', name: 'Foil', lites: '<i class="lite lite--bands"></i><i class="lite lite--flare"></i>', desc: 'Gift-card shimmer, kept strictly silver. Hard bands rip across the moment it moves.' },
+    { key: 'f', k: 'F', name: 'Caustics', lites: '<i class="lite lite--web1"></i><i class="lite lite--web2"></i><i class="lite lite--pool"></i>', desc: 'Light through water. Ripple webs crawl inside the glass; tilt steers the pool.' }
   ];
 
   var stage = document.getElementById('stage');
