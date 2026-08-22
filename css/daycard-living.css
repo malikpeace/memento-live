@@ -176,7 +176,15 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
 .daycard-theme-living .daycard-bloom {
   position: absolute; inset: -14%; z-index: 0;
   pointer-events: none;
-  filter: blur(34px) saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
+  /* THE BLACK BEHIND THE TILTING CARD, killed for good (Malik, raised many
+     times; root-caused 2026-08-22 in the card-light lab). The bloom rotates
+     WITH the card (v1062), and css blur() on a masked, 3D-rotated layer makes
+     the compositor rasterize the blurred fringe as a hard BLACK rect edge
+     that tracks the tilt. LAW (extends the no-filter-on-the-wrap law): NO
+     blur() on any layer that 3D-rotates. The blobs are radial gradients,
+     soft by construction, so the blur bought nothing the eye can prove.
+     saturate + the skin hue-rotate are extent-free and stay. */
+  filter: saturate(var(--sat, 1.5)) hue-rotate(var(--mm-hue, 0deg));
   opacity: calc(var(--emit, 0.55) * var(--lit, 0));
   -webkit-mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
           mask: radial-gradient(ellipse 68% 66% at 50% 44%, #000 42%, transparent 71%);
