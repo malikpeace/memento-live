@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Door Feel Lab</title>
+<style>
+/* ============================================================================
+   DOOR FEEL LAB (step 8 playground, 2026-08-22).
+   Five dismissal physics for Memento's sheets. Every frame below is a live
+   sheet: drag it down with your finger, throw it, catch it mid-flight. The
+   X always works too. Each option's PORTABLE VALUES sit in a comment above
+   its config in the script; the pick becomes the gesture law Codex builds
+   into the door controller (phase 2 of DOORS-SPEC.md).
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --r-card: 14px;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --text-hi: rgba(242, 246, 247, 0.96);
+  --text-mid: rgba(242, 246, 247, 0.64);
+  --text-lo: rgba(242, 246, 247, 0.38);
+}
+html, body { background: #050608; color: var(--text-hi); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
+body { overflow-x: hidden; }
+.wrap { max-width: 520px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top)) 22px calc(60px + env(safe-area-inset-bottom)); }
+.hero { padding: 34px 0 6px; }
+.hero h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+.hero p { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--text-mid); }
+
+.opt { padding: 48px 0 4px; }
+.opt__head { display: flex; align-items: baseline; gap: 12px; }
+.opt__k { font-size: 13px; font-weight: 700; color: var(--text-lo); }
+.opt__head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.opt__head + p { margin: 8px 0 20px; font-size: 14px; line-height: 1.5; color: var(--text-mid); }
+
+/* the mini phone: a fixed-height room the sheet lives in */
+.frame {
+  position: relative; height: 430px; overflow: hidden;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, #101318 0%, #07090c 60%, #050608 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.frame .room {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--text-lo); font-size: 13px;
+}
+.frame .scrim {
+  position: absolute; inset: 0; background: rgba(4, 6, 9, 0.62);
+  opacity: var(--p, 1); pointer-events: none;
+}
+.sheet {
+  position: absolute; left: 3.5%; right: 3.5%; bottom: 0; height: 78%;
+  border-radius: 16px 16px 0 0;
+  background: rgba(20, 23, 28, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 -18px 50px rgba(0,0,0,0.5);
+  touch-action: none;
+  will-change: transform;
+}
+.sheet .grab {
+  width: 40px; height: 5px; border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  margin: 10px auto 0;
+}
+.sheet .x {
+  position: absolute; top: 12px; right: 12px; width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: 0; color: var(--text-mid); font-size: 19px; line-height: 1;
+}
+.sheet .body { padding: 26px 24px 0; }
+.sheet .body h3 { font-size: 18px; font-weight: 700; }
+.sheet .body p { margin-top: 10px; font-size: 14px; line-height: 1.55; color: var(--text-mid); }
+.sheet .rows { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+.sheet .rows i {
+  display: block; height: 46px; border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.reopen {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  font: inherit; font-size: 15px; font-weight: 600; color: var(--text-hi);
+  background: rgba(255,255,255,0.08); border: 0; border-radius: 10px;
+  padding: 12px 22px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  opacity: 0; pointer-events: none; transition: opacity 0.2s ease-out;
+}
+.reopen.show { opacity: 1; pointer-events: auto; }
+.foot { padding: 56px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-lo); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Door feel</h1>
+    <p>Five ways a sheet can answer your finger. Drag each one down, throw it, catch it mid-flight, or change your mind halfway. The one you pick becomes the law for every door in Memento.</p>
+  </div>
+
+  <section class="opt" data-door="a">
+    <div class="opt__head"><span class="opt__k">A</span><h2>iOS faithful</h2></div>
+    <p>Apple's sheet numbers. Firm rubber band, lets go at 30 percent or a real flick, settles with the house spring.</p>
+    <div class="frame"><div class="room">the room behind</div><div class="scrim"></div>
+      <div class="sheet"><div class="grab"></div><button class="x" aria-label="Close">✕</button>
+        <div class="body"><h3>A sheet</h3><p>Drag me down. Throw me. Catch me.</p>
+          <div class="rows"><i></i><i></i><i></i></div></div>
+      </div><button class="reopen">Reopen</button>
+    </div>
+  </section>
+
+  <section class="opt" data-door="b">
+    <div class="opt__head"><span class="opt__k">B</span><h2>Heavy</h2></div>
+    <p>More mass. Stiffer band, needs a fuller pull, returns slower. Feels expensive, asks more of the finger.</p>
+    <div class="frame"><div class="room">the room behind</div><div class="scrim"></div>
+      <div class="sheet"><div class="grab"></div><button class="x" aria-label="Close">✕</button>
+        <div class="body"><h3>A sheet</h3><p>Drag me down. Throw me. Catch me.</p>
+          <div class="rows"><i></i><i></i><i></i></div></div>
+      </div><button class="reopen">Reopen</button>
+    </div>
+  </section>
+
+  <section class="opt" data-door="c">
+    <div class="opt__head"><span class="opt__k">C</span><h2>Feather</h2></div>
+    <p>Light and eager. Loose band, dismisses early, snaps back fast. Feels quick, risks feeling cheap.</p>
+    <div class="frame"><div class="room">the room behind</div><div class="scrim"></div>
+      <div class="sheet"><div class="grab"></div><button class="x" aria-label="Close">✕</button>
+        <div class="body"><h3>A sheet</h3><p>Drag me down. Throw me. Catch me.</p>
+          <div class="rows"><i></i><i></i><i></i></div></div>
+      </div><button class="reopen">Reopen</button>
+    </div>
+  </section>
+
+  <section class="opt" data-door="d">
+    <div class="opt__head"><span class="opt__k">D</span><h2>Magnetic</h2></div>
+    <p>No flick reading at all. Wherever you let go, the nearer end wins, half way decides. Predictable, deliberate.</p>
+    <div class="frame"><div class="room">the room behind</div><div class="scrim"></div>
+      <div class="sheet"><div class="grab"></div><button class="x" aria-label="Close">✕</button>
+        <div class="body"><h3>A sheet</h3><p>Drag me down. Throw me. Catch me.</p>
+          <div class="rows"><i></i><i></i><i></i></div></div>
+      </div><button class="reopen">Reopen</button>
+    </div>
+  </section>
+
+  <section class="opt" data-door="e">
+    <div class="opt__head"><span class="opt__k">E</span><h2>Momentum</h2></div>
+    <p>The throw is everything. Almost no rubber band, velocity decides, the sheet keeps your speed as it leaves.</p>
+    <div class="frame"><div class="room">the room behind</div><div class="scrim"></div>
+      <div class="sheet"><div class="grab"></div><button class="x" aria-label="Close">✕</button>
+        <div class="body"><h3>A sheet</h3><p>Drag me down. Throw me. Catch me.</p>
+          <div class="rows"><i></i><i></i><i></i></div></div>
+      </div><button class="reopen">Reopen</button>
+    </div>
+  </section>
+
+  <p class="foot">Every option is interruptible: a new touch grabs the sheet wherever it is, mid-animation, and hands it to your finger. The X always closes. The scrim tracks the drag one to one.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  /* PORTABLE VALUES per option. threshold = fraction of sheet height;
+     velocity = px per ms that dismisses regardless of position (null = never);
+     band = rubber-band constant c in x' = (x*d*c)/(d+c*x);
+     returnMs / exitMs = spring-back and exit durations at zero velocity;
+     carry = whether the exit duration shortens with throw speed. */
+  var CONFIGS = {
+    a: { threshold: 0.30, velocity: 0.5,  band: 0.55, returnMs: 480, exitMs: 340, carry: true  },
+    b: { threshold: 0.40, velocity: 0.75, band: 0.38, returnMs: 620, exitMs: 420, carry: true  },
+    c: { threshold: 0.22, velocity: 0.35, band: 0.72, returnMs: 300, exitMs: 260, carry: true  },
+    d: { threshold: 0.50, velocity: null, band: 0.55, returnMs: 420, exitMs: 360, carry: false },
+    e: { threshold: 0.60, velocity: 0.30, band: 0.85, returnMs: 380, exitMs: 320, carry: true  }
+  };
+  var EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+
+  document.querySelectorAll('[data-door]').forEach(function (section) {
+    var cfg = CONFIGS[section.getAttribute('data-door')];
+    var frame = section.querySelector('.frame');
+    var sheet = section.querySelector('.sheet');
+    var scrim = section.querySelector('.scrim');
+    var reopen = section.querySelector('.reopen');
+    var xBtn = section.querySelector('.x');
+
+    var open = true;
+    var y = 0;                     // current translateY in px
+    var anim = null;
+    var drag = null;
+
+    function H() { return sheet.getBoundingClientRect().height; }
+    function render(v) {
+      y = v;
+      sheet.style.transform = 'translateY(' + v + 'px)';
+      var p = Math.max(0, Math.min(1, 1 - v / H()));
+      scrim.style.setProperty('--p', p.toFixed(3));
+    }
+    function currentY() {
+      var m = new DOMMatrixReadOnly(getComputedStyle(sheet).transform);
+      return m.m42;
+    }
+    function stopAnim() {
+      if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    }
+    function animateTo(target, ms, done) {
+      stopAnim();
+      var from = y;
+      anim = sheet.animate(
+        [{ transform: 'translateY(' + from + 'px)' }, { transform: 'translateY(' + target + 'px)' }],
+        { duration: ms, easing: EASE, fill: 'forwards' }
+      );
+      var sc = scrim.animate(
+        [{ opacity: scrim.style.getPropertyValue('--p') || 1 }],
+        { duration: 1 }
+      );
+      sc.cancel();
+      var t0 = performance.now();
+      (function track() {
+        if (!anim) return;
+        var k = Math.min(1, (performance.now() - t0) / ms);
+        // scrim follows the eased position approximately via computed transform
+        var v = currentY();
+        var p = Math.max(0, Math.min(1, 1 - v / H()));
+        scrim.style.setProperty('--p', p.toFixed(3));
+        if (k < 1 && anim) requestAnimationFrame(track);
+      })();
+      anim.onfinish = function () { render(target); anim = null; if (done) done(); };
+    }
+    function dismiss(speed) {
+      open = false;
+      var ms = cfg.exitMs;
+      if (cfg.carry && speed > 0.2) ms = Math.max(140, Math.min(cfg.exitMs, (H() - y) / speed));
+      animateTo(H() * 1.05, ms, function () { reopen.classList.add('show'); });
+    }
+    function settleBack() { animateTo(0, cfg.returnMs); }
+
+    function band(dy) {
+      if (dy >= 0) return dy;
+      // above origin: rubber band
+      var d = H(), c = cfg.band;
+      var x = -dy;
+      return -((x * d * c) / (d + c * x));
+    }
+
+    sheet.addEventListener('pointerdown', function (e) {
+      if (!open && !anim) return;
+      if (e.target === xBtn) return;
+      // INTERRUPTIBLE: grab the sheet at its CURRENT position, even mid-flight
+      var liveY = anim ? currentY() : y;
+      stopAnim();
+      open = true;
+      reopen.classList.remove('show');
+      render(liveY);
+      drag = { startPointer: e.clientY, startY: liveY, lastY: e.clientY, lastT: performance.now(), v: 0 };
+      sheet.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    sheet.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var now = performance.now();
+      var dt = now - drag.lastT;
+      if (dt > 0) drag.v = (e.clientY - drag.lastY) / dt;
+      drag.lastY = e.clientY; drag.lastT = now;
+      render(band(drag.startY + (e.clientY - drag.startPointer)));
+    });
+    function release() {
+      if (!drag) return;
+      var v = drag.v; drag = null;
+      var flung = cfg.velocity != null && v > cfg.velocity;
+      if (flung || y > H() * cfg.threshold) dismiss(Math.max(0, v));
+      else settleBack();
+    }
+    sheet.addEventListener('pointerup', release);
+    sheet.addEventListener('pointercancel', release);
+
+    xBtn.addEventListener('click', function () { if (open) dismiss(0); });
+    reopen.addEventListener('click', function () {
+      reopen.classList.remove('show');
+      open = true;
+      animateTo(0, cfg.returnMs);
+    });
+    render(0);
+  });
+})();
+</script>
+</body>
+</html>
