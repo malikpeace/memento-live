@@ -399,7 +399,7 @@
   /* ---------- page two ---------- */
   function pageTwo(s, log, A) {
     var pill = '<div class="sec sec--pill"><div class="heropill">You’ve shown up <b>' +
-      s.total.toLocaleString() + '</b> of ' + plural(s.N, 'day') + ' since ' +
+      s.total.toLocaleString() + '</b> ' + (s.total === 1 ? 'day' : 'days') + ' since ' +
       K.MON[log[0].date.getMonth()] + '&nbsp;' + log[0].date.getDate() + '</div></div>';
     var body = SCALE === 'week' ? weekView(log, s, A) : SCALE === 'year' ? yearView(log, A) : monthView(log, s, A);
     var cal = '<div class="sec"><div class="sec__h"><b>History</b><span class="scale" id="scale">' +
