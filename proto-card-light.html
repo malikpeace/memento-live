@@ -4,303 +4,294 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Card Light Lab</title>
+<!-- THE REAL CARD (Malik's call): this page loads the app's own stylesheets
+     and renders the app's own living-card markup, verbatim from js/08's
+     renderDayCard (wrap > aura + stage > bloom + floor + daycard-ns with the
+     liquid, iri, sheen, plat/tint/rim and the debossed M). The ONLY additions
+     are the .lite layers inside each card: the six lighting treatments under
+     evaluation. Pillar levels are set to a lively founder state on each wrap
+     (--clar/--act/--cons/--mix/--lit), tilt drives the card's own
+     --dc-rx/--dc-ry vars, so what you see is what ships. -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/daycard-living.css">
 <style>
-/* ============================================================================
-   CARD LIGHT LAB (step 8 playground, 2026-08-22).
-   Six lighting treatments on the real card geometry (320/452, 14px radius,
-   the bare M). Tilt your phone (tap Enable motion once) or drag a card.
-   Each option's PORTABLE RECIPE is in a comment right above its CSS block:
-   when Malik picks, port those exact values, never remix (standing law).
-   Dark-only by design: this is a lab for the dark home, the card's soul.
-   ========================================================================== */
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-:root {
-  --r-card: 14px;
-  --spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --text-hi: rgba(242, 246, 247, 0.96);
-  --text-mid: rgba(242, 246, 247, 0.64);
-  --text-lo: rgba(242, 246, 247, 0.38);
-}
-html, body { background: #050608; color: var(--text-hi); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
-body { overflow-x: hidden; }
-
+/* lab chrome only; the card itself is styled by the app's real CSS above */
+html, body { background: #050608; }
+body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-family: var(--font, -apple-system, BlinkMacSystemFont, sans-serif); }
 .wrap { max-width: 520px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top)) 22px calc(60px + env(safe-area-inset-bottom)); }
-.hero { padding: 34px 0 10px; }
+.hero { padding: 34px 0 6px; }
 .hero h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
-.hero p { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--text-mid); }
+.hero p { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--text-mid, rgba(242,246,247,0.64)); }
 #motionBtn {
   margin-top: 16px; display: none; font: inherit; font-size: 15px; font-weight: 600;
-  color: var(--text-hi); background: rgba(255,255,255,0.06); border: 0;
+  color: inherit; background: rgba(255,255,255,0.06); border: 0;
   border-radius: 10px; padding: 12px 18px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 #motionBtn.show { display: inline-block; }
-
-.opt { padding: 52px 0 8px; }
+.opt { padding: 48px 0 4px; }
 .opt__head { display: flex; align-items: baseline; gap: 12px; }
-.opt__k { font-size: 13px; font-weight: 700; color: var(--text-lo); font-variant-numeric: tabular-nums; }
+.opt__k { font-size: 13px; font-weight: 700; color: rgba(242,246,247,0.38); }
 .opt__head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-.opt__head + p { margin: 8px 0 22px; font-size: 14px; line-height: 1.5; color: var(--text-mid); }
+.opt__head + p { margin: 8px 0 6px; font-size: 14px; line-height: 1.5; color: rgba(242,246,247,0.64); }
+.stage { padding: 4px 0 34px; }
+/* the home card's proportions (320/452), so the judgment transfers 1:1 */
+.stage .daycard-ns { width: min(72vw, 300px); min-height: 0; aspect-ratio: 320 / 452; }
 
-.stage { display: flex; justify-content: center; padding: 8px 0 26px; perspective: 900px; }
-.cardw { position: relative; width: min(72vw, 300px); aspect-ratio: 320 / 452; }
-/* the outer glow: RADIAL, fades to nothing before its own bounds (the edge-
-   safe glow law). Never a clipped blurred rect. */
-.cardw .glow {
-  position: absolute; inset: -22%; z-index: 0; pointer-events: none;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(198, 230, 236, 0.55), rgba(198, 230, 236, 0.18) 56%, transparent 76%);
-}
-.card {
-  position: absolute; inset: 0; z-index: 1;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  clip-path: inset(0 round var(--r-card));
-  contain: paint;
-  transform: rotateX(calc(var(--ty, 0) * -6deg)) rotateY(calc(var(--tx, 0) * 7deg));
-  will-change: transform;
-  touch-action: pan-y;
-}
-/* the shared face: today's house skin feel, identical across options so the
-   only variable is the LIGHT. */
-.card .face {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(120% 90% at 30% 18%, #aed9e8 0%, rgba(174, 217, 232, 0) 62%),
-    radial-gradient(130% 110% at 72% 85%, #a3d9b6 0%, rgba(163, 217, 182, 0) 66%),
-    linear-gradient(164deg, #cfe2ea 0%, #bdd9c9 100%);
-}
-.card .m {
-  position: absolute; left: 50%; top: 50%; width: 21%; height: auto;
-  transform: translate(-50%, -50%);
-  fill: #3c4147; filter: drop-shadow(0 1px 1px rgba(255,255,255,0.35));
-}
-.card > .lite { position: absolute; inset: 0; pointer-events: none; }
+/* the lighting layers: the ONLY thing this lab adds inside the real card */
+.daycard-ns .lite { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 
-/* ── A. STUDIO SPECULAR ─────────────────────────────────────────────────────
+/* ── A. STUDIO SPECULAR ──────────────────────────────────────────────────────
    PORTABLE RECIPE
-   layer 1 (spec):  radial-gradient(46% 34% at P, rgba(255,255,255,0.52), rgba(255,255,255,0.14) 55%, transparent 76%)
-                    P = calc(50% + var(--tx) * 44%) calc(42% + var(--ty) * 40%)
-                    mix-blend-mode: screen
-   layer 2 (shade): radial-gradient(70% 60% at opposite corner, rgba(8,12,16,0.18), transparent 70%)
-                    opposite = calc(50% - var(--tx) * 40%) calc(58% - var(--ty) * 36%)
-   card transform:  rotateX(ty * -6deg) rotateY(tx * 7deg), perspective 900px */
+   spec:  radial-gradient(46% 34% at calc(50% + var(--tx)*44%) calc(42% + var(--ty)*40%),
+          rgba(255,255,255,0.42), rgba(255,255,255,0.10) 55%, transparent 76%), screen
+   shade: radial-gradient(70% 60% at calc(50% - var(--tx)*40%) calc(58% - var(--ty)*36%),
+          rgba(8,12,16,0.16), transparent 70%) */
 .c-a .lite--spec {
   background: radial-gradient(46% 34% at calc(50% + var(--tx, 0) * 44%) calc(42% + var(--ty, 0) * 40%),
-    rgba(255,255,255,0.52), rgba(255,255,255,0.14) 55%, transparent 76%);
+    rgba(255,255,255,0.42), rgba(255,255,255,0.10) 55%, transparent 76%);
   mix-blend-mode: screen;
 }
 .c-a .lite--shade {
   background: radial-gradient(70% 60% at calc(50% - var(--tx, 0) * 40%) calc(58% - var(--ty, 0) * 36%),
-    rgba(8, 12, 16, 0.18), transparent 70%);
+    rgba(8, 12, 16, 0.16), transparent 70%);
 }
 
-/* ── B. BRUSHED SHEEN ───────────────────────────────────────────────────────
+/* ── B. BRUSHED SHEEN ────────────────────────────────────────────────────────
    PORTABLE RECIPE
-   grain:  repeating-linear-gradient(100deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px), opacity 0.7
-   band:   linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.34) 46%, rgba(255,255,255,0.58) 50%, rgba(255,255,255,0.34) 54%, transparent 66%)
-           on a layer inset -4% -30%; transform: translateX(calc(var(--tx) * 55%))
-           mix-blend-mode: screen */
+   grain: repeating-linear-gradient(100deg, rgba(255,255,255,0.07) 0 1px, transparent 1px 3px), opacity 0.6
+   band:  linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.28) 46%,
+          rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.28) 54%, transparent 66%)
+          on a layer inset -4% -30%, transform translateX(calc(var(--tx)*55%)), screen */
 .c-b .lite--grain {
-  background: repeating-linear-gradient(100deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px);
-  opacity: 0.7;
+  background: repeating-linear-gradient(100deg, rgba(255,255,255,0.07) 0 1px, transparent 1px 3px);
+  opacity: 0.6;
 }
 .c-b .lite--band {
   inset: -4% -30%;
-  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.34) 46%, rgba(255,255,255,0.58) 50%, rgba(255,255,255,0.34) 54%, transparent 66%);
+  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.28) 46%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.28) 54%, transparent 66%);
   transform: translateX(calc(var(--tx, 0) * 55%));
   mix-blend-mode: screen;
 }
 
-/* ── C. RIM LIGHT ───────────────────────────────────────────────────────────
+/* ── C. RIM LIGHT ────────────────────────────────────────────────────────────
    PORTABLE RECIPE
-   top rim:    inset 0 1.5px 0 rgba(255,255,255,0.8) as a gradient layer whose
-               opacity = 0.35 + ty * 0.65 (light "above" when tilted back)
-   bottom rim: mirror, opacity = 0.35 - ty * 0.65
-   bloom:      the .glow sibling breathes: scale 1 -> 1.06, opacity 0.75 -> 1,
-               7s ease-in-out alternate infinite (paused under reduced motion) */
+   top rim opacity   = 0.35 + ty * 0.65
+   bottom rim opacity = 0.35 - ty * 0.65
+   (rides ON TOP of the card's own ::before ring; the ring is the glass edge,
+   this is the light finding it) */
 .c-c .lite--rimtop {
-  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0, rgba(255,255,255,0.25) 2.5%, transparent 14%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.7) 0, rgba(255,255,255,0.2) 2.5%, transparent 13%);
   opacity: calc(0.35 + var(--ty, 0) * 0.65);
 }
 .c-c .lite--rimbot {
-  background: linear-gradient(0deg, rgba(255,255,255,0.65) 0, rgba(255,255,255,0.18) 2.5%, transparent 12%);
+  background: linear-gradient(0deg, rgba(255,255,255,0.5) 0, rgba(255,255,255,0.14) 2.5%, transparent 11%);
   opacity: calc(0.35 - var(--ty, 0) * 0.65);
 }
-.opt--c .glow { animation: rimBloom 7s ease-in-out infinite alternate; }
-@keyframes rimBloom { from { transform: scale(1); opacity: 0.75; } to { transform: scale(1.06); opacity: 1; } }
 
-/* ── D. DEPTH PARALLAX ──────────────────────────────────────────────────────
-   PORTABLE RECIPE (no specular at all: depth IS the light)
-   deep:  translate(tx * -6px,  ty * -5px)   soft dark pool, low contrast
-   mid:   translate(tx * -14px, ty * -11px)  the face's own colour, brighter
-   near:  translate(tx * -24px, ty * -19px)  faint white haze veil
-   every layer oversized 112% so edges never show */
+/* ── D. DEPTH PARALLAX ───────────────────────────────────────────────────────
+   PORTABLE RECIPE (no specular: depth IS the light)
+   deep translate(tx*-6px,  ty*-5px), mid translate(tx*-14px, ty*-11px),
+   near translate(tx*-24px, ty*-19px), every layer inset -6% */
 .c-d .lite--deep, .c-d .lite--mid, .c-d .lite--near { inset: -6%; }
 .c-d .lite--deep {
-  background: radial-gradient(85% 70% at 55% 65%, rgba(10, 16, 20, 0.16), transparent 70%);
+  background: radial-gradient(85% 70% at 55% 65%, rgba(10, 16, 20, 0.14), transparent 70%);
   transform: translate(calc(var(--tx, 0) * -6px), calc(var(--ty, 0) * -5px));
 }
 .c-d .lite--mid {
-  background: radial-gradient(60% 48% at 38% 30%, rgba(255,255,255,0.28), transparent 72%);
+  background: radial-gradient(60% 48% at 38% 30%, rgba(255,255,255,0.22), transparent 72%);
   transform: translate(calc(var(--tx, 0) * -14px), calc(var(--ty, 0) * -11px));
 }
 .c-d .lite--near {
-  background: radial-gradient(46% 34% at 62% 22%, rgba(255,255,255,0.20), transparent 70%);
+  background: radial-gradient(46% 34% at 62% 22%, rgba(255,255,255,0.16), transparent 70%);
   transform: translate(calc(var(--tx, 0) * -24px), calc(var(--ty, 0) * -19px));
 }
 
-/* ── E. LIQUID LIGHT ────────────────────────────────────────────────────────
+/* ── E. LIQUID LIGHT ─────────────────────────────────────────────────────────
    PORTABLE RECIPE
-   blob 1: 70% wide radial, rgba(255,255,255,0.30), drifts 26s ease-in-out
-   blob 2: 56% wide radial, rgba(174,217,232,0.5), drifts 21s, opposite phase
-   dot:    12% specular dot tracking tilt at 1.4x, screen blend
-   blobs live INSIDE the clip; drift is transform-only */
+   blob 1: 36%x30% radial rgba(255,255,255,0.24), 26s drift
+   blob 2: 30%x26% radial rgba(210,235,240,0.4), 21s opposite phase
+   dot: 13%x10% specular tracking tilt, screen */
 .c-e .lite--blob1 {
   inset: -10%;
-  background: radial-gradient(36% 30% at 30% 35%, rgba(255,255,255,0.30), transparent 70%);
+  background: radial-gradient(36% 30% at 30% 35%, rgba(255,255,255,0.24), transparent 70%);
   animation: liqA 26s ease-in-out infinite alternate;
 }
 .c-e .lite--blob2 {
   inset: -10%;
-  background: radial-gradient(30% 26% at 70% 68%, rgba(174, 217, 232, 0.5), transparent 70%);
+  background: radial-gradient(30% 26% at 70% 68%, rgba(210, 235, 240, 0.4), transparent 70%);
   animation: liqB 21s ease-in-out infinite alternate;
 }
 .c-e .lite--dot {
   background: radial-gradient(13% 10% at calc(50% + var(--tx, 0) * 56%) calc(40% + var(--ty, 0) * 52%),
-    rgba(255,255,255,0.65), transparent 75%);
+    rgba(255,255,255,0.5), transparent 75%);
   mix-blend-mode: screen;
 }
 @keyframes liqA { from { transform: translate(0, 0) scale(1); } to { transform: translate(9%, 12%) scale(1.15); } }
 @keyframes liqB { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-8%, -10%) scale(0.95); } }
 
-/* ── F. FOIL SHIFT (kept strictly grayscale, never rainbow) ────────────────
+/* ── F. FOIL SHIFT (strictly grayscale, never rainbow) ──────────────────────
    PORTABLE RECIPE
-   foil: conic-gradient(from calc(var(--tx) * 80deg + 210deg) at 50% 42%,
-         transparent 0deg, rgba(255,255,255,0.5) 40deg, transparent 80deg,
-         rgba(255,255,255,0.22) 160deg, transparent 220deg,
-         rgba(255,255,255,0.4) 300deg, transparent 360deg)
-         mix-blend-mode: soft-light, opacity 0.9 */
+   foil: conic-gradient(from calc(var(--tx)*80deg + 210deg) at 50% 42%, ...silver stops...),
+         soft-light, opacity 0.85; plus a small tracking specular, screen */
 .c-f .lite--foil {
   background: conic-gradient(from calc(var(--tx, 0) * 80deg + 210deg) at 50% 42%,
-    transparent 0deg, rgba(255,255,255,0.5) 40deg, transparent 80deg,
-    rgba(255,255,255,0.22) 160deg, transparent 220deg,
-    rgba(255,255,255,0.4) 300deg, transparent 360deg);
+    transparent 0deg, rgba(255,255,255,0.45) 40deg, transparent 80deg,
+    rgba(255,255,255,0.2) 160deg, transparent 220deg,
+    rgba(255,255,255,0.36) 300deg, transparent 360deg);
   mix-blend-mode: soft-light;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 .c-f .lite--foilspec {
   background: radial-gradient(30% 22% at calc(50% + var(--tx, 0) * 40%) calc(38% + var(--ty, 0) * 34%),
-    rgba(255,255,255,0.3), transparent 72%);
+    rgba(255,255,255,0.26), transparent 72%);
   mix-blend-mode: screen;
 }
 
-.foot { padding: 60px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-lo); }
-
+.foot { padding: 56px 0 0; font-size: 13px; line-height: 1.6; color: rgba(242,246,247,0.38); }
 @media (prefers-reduced-motion: reduce) {
-  .opt--c .glow, .c-e .lite--blob1, .c-e .lite--blob2 { animation: none; }
+  .c-e .lite--blob1, .c-e .lite--blob2 { animation: none; }
 }
 </style>
 </head>
-<body>
+<body class="ns-bloom boot-revealed">
 <div class="wrap">
   <div class="hero">
     <h1>Card light</h1>
-    <p>Six ways light can live on the Memento. Tilt your phone, or drag a card with your finger. Same card, same skin. Only the light changes.</p>
+    <p>The real Memento, the app's own card, six ways light can live on it. Tilt your phone, or drag a card with your finger. Only the light changes.</p>
     <button id="motionBtn" type="button">Enable motion</button>
   </div>
 
-  <section class="opt opt--a">
+  <section class="opt" data-name="Studio specular" data-k="A">
     <div class="opt__head"><span class="opt__k">A</span><h2>Studio specular</h2></div>
-    <p>One soft key light. The highlight follows the tilt, the shadow leans away. The classic "held under a lamp" look.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-a" data-tilt><div class="face"></div><i class="lite lite--shade"></i><i class="lite lite--spec"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <p>One soft key light. The highlight follows the tilt, the shadow leans away.</p>
+    <div class="stage" data-card="a"></div>
   </section>
 
-  <section class="opt opt--b">
+  <section class="opt" data-name="Brushed sheen" data-k="B">
     <div class="opt__head"><span class="opt__k">B</span><h2>Brushed sheen</h2></div>
-    <p>A fine metal grain with one bright band that sweeps as you tilt. The platinum feel, on every skin.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-b" data-tilt><div class="face"></div><i class="lite lite--grain"></i><i class="lite lite--band"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <p>A fine metal grain with one bright band that sweeps as you tilt.</p>
+    <div class="stage" data-card="b"></div>
   </section>
 
-  <section class="opt opt--c">
+  <section class="opt" data-name="Rim light" data-k="C">
     <div class="opt__head"><span class="opt__k">C</span><h2>Rim light</h2></div>
-    <p>The light lives on the edges. Tilt back and the top edge catches it, tilt forward and the bottom does. The glow behind breathes slowly.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-c" data-tilt><div class="face"></div><i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <p>The light lives on the glass edge. Tilt back and the top catches it, tilt forward and the bottom does.</p>
+    <div class="stage" data-card="c"></div>
   </section>
 
-  <section class="opt opt--d">
+  <section class="opt" data-name="Depth parallax" data-k="D">
     <div class="opt__head"><span class="opt__k">D</span><h2>Depth parallax</h2></div>
-    <p>No highlight at all. Three layers of the material slide at different speeds, so the card reads as deep instead of shiny.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-d" data-tilt><div class="face"></div><i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <p>No highlight at all. Layers inside the glass slide at different speeds, so the card reads deep instead of shiny.</p>
+    <div class="stage" data-card="d"></div>
   </section>
 
-  <section class="opt opt--e">
+  <section class="opt" data-name="Liquid light" data-k="E">
     <div class="opt__head"><span class="opt__k">E</span><h2>Liquid light</h2></div>
     <p>Light moves inside the material on its own, slow as water. A small bright point still answers your tilt.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-e" data-tilt><div class="face"></div><i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <div class="stage" data-card="e"></div>
   </section>
 
-  <section class="opt opt--f">
+  <section class="opt" data-name="Foil shift" data-k="F">
     <div class="opt__head"><span class="opt__k">F</span><h2>Foil shift</h2></div>
     <p>A foil sheen that rotates around the card as you tilt. Kept strictly silver, never rainbow.</p>
-    <div class="stage"><div class="cardw"><span class="glow"></span>
-      <div class="card c-f" data-tilt><div class="face"></div><i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>
-        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
-      </div></div></div>
+    <div class="stage" data-card="f"></div>
   </section>
 
-  <p class="foot">Every option carries its exact recipe in this page's source. The pick gets ported verbatim onto the real card, on every skin, with the tilt driven by device motion the way this page does it.</p>
+  <p class="foot">This is the app's real card: its own glass, liquid, rim, bloom and floor reflection, at a lively founder state. Every option's exact recipe is in this page's source; the pick gets ported verbatim.</p>
 </div>
 
 <script>
 (function () {
   'use strict';
-  var cards = [].slice.call(document.querySelectorAll('[data-tilt]'));
-  var tx = 0, ty = 0;             // the shared, device-driven tilt
-  var lastInput = 0;
 
-  function write(card, x, y) {
-    card.style.setProperty('--tx', x.toFixed(3));
-    card.style.setProperty('--ty', y.toFixed(3));
+  // THE REAL MARKUP, verbatim from js/08 renderDayCard (living theme).
+  var BLOBS = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
+  var EMBLEM = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  var LITES = {
+    a: '<i class="lite lite--shade"></i><i class="lite lite--spec"></i>',
+    b: '<i class="lite lite--grain"></i><i class="lite lite--band"></i>',
+    c: '<i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>',
+    d: '<i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>',
+    e: '<i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>',
+    f: '<i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>'
+  };
+  function cardHtml(key) {
+    return '' +
+      '<div class="daycard-wrap daycard-theme-living">' +
+        '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
+        '<div class="daycard-living-stage">' +
+          '<span class="daycard-bloom" aria-hidden="true">' + BLOBS + '</span>' +
+          '<span class="daycard-floor" aria-hidden="true">' + BLOBS +
+            '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
+          '</span>' +
+          '<div class="daycard-ns c-' + key + '">' +
+            '<span class="daycard-ns__liquid" aria-hidden="true">' + BLOBS + '</span>' +
+            '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
+            '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
+            '<span class="daycard-ns__plat" aria-hidden="true"></span>' +
+            '<span class="daycard-ns__tint" aria-hidden="true"></span>' +
+            '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
+            LITES[key] +
+            '<div class="daycard-ns__body">' + EMBLEM + '</div>' +
+            '<div class="daycard-ns__foot"><span class="daycard-ns__name">Malik</span></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
   }
 
-  // Per-card finger override: dragging one card steers just that card.
-  cards.forEach(function (card) {
+  var stages = [].slice.call(document.querySelectorAll('[data-card]'));
+  stages.forEach(function (stage) {
+    stage.innerHTML = cardHtml(stage.getAttribute('data-card'));
+    var wrap = stage.querySelector('.daycard-wrap');
+    // a lively founder state, the same vars js/08's setLivingCardVars writes
+    wrap.style.setProperty('--clar', '0.95');
+    wrap.style.setProperty('--act', '0.70');
+    wrap.style.setProperty('--cons', '0.85');
+    wrap.style.setProperty('--mix', '0.64');
+    wrap.style.setProperty('--lit', '1');
+  });
+
+  // -------------------------------------------------------------- tilt -----
+  var tx = 0, ty = 0, lastInput = 0;
+  function apply(stage, x, y) {
+    var st = stage.querySelector('.daycard-living-stage');
+    var ns = stage.querySelector('.daycard-ns');
+    if (!st || !ns) return;
+    // the card's OWN tilt vars (bindDayCardTilt's contract in the app)
+    st.style.setProperty('--dc-rx', (y * -6).toFixed(2) + 'deg');
+    st.style.setProperty('--dc-ry', (x * 7).toFixed(2) + 'deg');
+    // the light layers' vars
+    ns.style.setProperty('--tx', x.toFixed(3));
+    ns.style.setProperty('--ty', y.toFixed(3));
+  }
+
+  stages.forEach(function (stage) {
+    var card = stage.querySelector('.daycard-ns');
     var dragging = false;
-    card.addEventListener('pointerdown', function (e) { dragging = true; card.setPointerCapture(e.pointerId); });
+    card.style.touchAction = 'pan-y';
+    card.addEventListener('pointerdown', function (e) {
+      dragging = true;
+      try { card.setPointerCapture(e.pointerId); } catch (err) {}
+    });
     card.addEventListener('pointermove', function (e) {
       if (!dragging) return;
       var r = card.getBoundingClientRect();
       var x = ((e.clientX - r.left) / r.width) * 2 - 1;
       var y = ((e.clientY - r.top) / r.height) * 2 - 1;
-      card._own = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) };
+      stage._own = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) };
       lastInput = Date.now();
     });
-    function drop() { dragging = false; card._own = null; }
+    function drop() { dragging = false; stage._own = null; }
     card.addEventListener('pointerup', drop);
     card.addEventListener('pointercancel', drop);
   });
 
-  // Device tilt. iOS needs a user-gesture permission request once.
   var btn = document.getElementById('motionBtn');
   function bindOrientation() {
     window.addEventListener('deviceorientation', function (e) {
       if (e.beta == null && e.gamma == null) return;
-      // neutral hold is ~40deg beta (phone in hand), gamma 0
       ty = Math.max(-1, Math.min(1, (40 - e.beta) / 28));
       tx = Math.max(-1, Math.min(1, e.gamma / 24));
       lastInput = Date.now();
@@ -317,8 +308,6 @@ body { overflow-x: hidden; }
     bindOrientation();
   }
 
-  // The idle sweep: with no input for 2.5s, a slow lissajous shows each
-  // option's character on its own (reduced motion holds still instead).
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var t0 = Date.now();
   (function loop() {
@@ -329,9 +318,9 @@ body { overflow-x: hidden; }
       gx = Math.sin(t * 0.42) * 0.55;
       gy = Math.sin(t * 0.31 + 1.2) * 0.4;
     } else if (idle && reduce) { gx = 0.25; gy = 0.2; }
-    cards.forEach(function (card) {
-      var o = card._own;
-      write(card, o ? o.x : gx, o ? o.y : gy);
+    stages.forEach(function (stage) {
+      var o = stage._own;
+      apply(stage, o ? o.x : gx, o ? o.y : gy);
     });
     requestAnimationFrame(loop);
   })();
