@@ -41,7 +41,7 @@
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null;
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null, FILLOVR = null, ONBT = 0.6;
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -130,6 +130,19 @@
   // score down before the day is over).
   // the consistency target: what fraction of days you're aiming to show up.
   // set once at onboarding (the swipe-the-heatmap moment); adjustable here to preview.
+  function noise(d, s) { var n = Math.sin((d.getTime() / 86400000 + s * 99.7) * 12.9898) * 43758.5453; return n - Math.floor(n); }
+  // overwrite the log to a chosen fill rate, so the lab can show any kind of person
+  function applyFill(log, f) {
+    log.forEach(function (d) {
+      var dt = d.date;
+      d.on = noise(dt, 1) < f;
+      d.min = d.on ? 25 + Math.round(noise(dt, 2) * 70) : 0;
+      var sup = {};
+      if (d.on) { if (noise(dt, 3) < 0.6) sup.deepwork = 1 + Math.floor(noise(dt, 4) * 2); if (noise(dt, 5) < 0.4) sup.reflection = 1; if (noise(dt, 6) < 0.7) sup.checkin = 1; }
+      else if (noise(dt, 7) < 0.15) sup.checkin = 1;
+      d.sup = sup;
+    });
+  }
   function curTarget() { return TARGETOVR != null ? TARGETOVR : (PERSONA.target || 0.6); }
   // fill rate = share of days you showed up (main = full, support = half), over the window.
   // an empty day is just a day you did not show up: it is in the denominator, never a "miss".
@@ -487,15 +500,49 @@
   });
   window.addEventListener('scroll', closeDaypop, true);
 
+  /* ---------- onboarding: pick your consistency target ---------- */
+  // a fixed scattered order so the fill looks like a heatmap but the COUNT matches the %
+  var ONB_ORDER = (function () { var a = []; for (var i = 0; i < 91; i++) a.push(i);
+    a.sort(function (x, y) { return (Math.sin((x + 1) * 12.9898) - Math.sin((y + 1) * 12.9898)); }); return a; })();
+  function renderOnb() {
+    var pct = Math.round(ONBT * 100), n = Math.round(ONBT * 91);
+    var mEl = document.querySelector('.onb__m'); if (mEl && !mEl.firstChild) mEl.innerHTML = mMark('', 26);
+    var heat = el('onbHeat'); if (!heat) return;
+    if (heat.children.length !== 91) { var s = ''; for (var i = 0; i < 91; i++) s += '<b></b>'; heat.innerHTML = s; }
+    var onSet = {}; for (var k = 0; k < n; k++) onSet[ONB_ORDER[k]] = 1;
+    [].forEach.call(heat.children, function (b, i) { b.classList.toggle('on', !!onSet[i]); });
+    el('onbPct').textContent = pct;
+  }
+  function openOnb() { renderOnb(); el('onb').hidden = false; }
+  function bindOnb() {
+    var heat = el('onbHeat'); if (!heat) return;
+    var dragging = false;
+    function setFromX(clientX) {
+      var r = heat.getBoundingClientRect();
+      ONBT = Math.max(0.05, Math.min(1, (clientX - r.left) / r.width));
+      renderOnb();
+    }
+    heat.addEventListener('pointerdown', function (e) { dragging = true; heat.setPointerCapture(e.pointerId); setFromX(e.clientX); });
+    heat.addEventListener('pointermove', function (e) { if (dragging) setFromX(e.clientX); });
+    heat.addEventListener('pointerup', function () { dragging = false; });
+    el('onbGo').addEventListener('click', function () {
+      TARGETOVR = ONBT;
+      var t = el('tgtSlider'); if (t) { t.value = Math.round(ONBT * 100); el('tgtLbl').textContent = 'Target ' + t.value + '%'; }
+      el('onb').hidden = true; render();
+    });
+    var sb = el('setupBtn'); if (sb) sb.addEventListener('click', openOnb);
+  }
+
   /* ---------- render + wiring ---------- */
   function render() {
     var N = Math.max(1, DAY);
     var log = K.buildLog(N, SHAPE);
+    if (FILLOVR != null) applyFill(log, FILLOVR);
     // TODAYDONE drives the last day so the completion moment is replayable
     var lastDay = log[log.length - 1];
     if (TODAYDONE) { if (!lastDay.on) { lastDay.on = true; lastDay.min = lastDay.min || 30; } }
     else { lastDay.on = false; lastDay.sup = {}; lastDay.min = 0; }
-    if (PERSONA.rough) {
+    if (FILLOVR == null && PERSONA.rough) {
       // ~40% consistency, off the rate for three weeks, a two day comeback underway
       log.forEach(function (d, i) {
         var fromEnd = log.length - i;
@@ -560,6 +607,12 @@
     document.documentElement.classList.toggle('vm-framed', mode === 'phone' && wide);
     [].forEach.call(document.querySelectorAll('#viewChips button'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === mode); });
   }
+  var conSl = el('conSlider'), conLbl = el('conLbl');
+  if (conSl) conSl.addEventListener('input', function () {
+    FILLOVR = +this.value / 100;
+    conLbl.textContent = 'Consistency ' + this.value + '%';
+    render();
+  });
   var tgtSl = el('tgtSlider'), tgtLbl = el('tgtLbl');
   if (tgtSl) tgtSl.addEventListener('input', function () {
     TARGETOVR = +this.value / 100;
@@ -606,6 +659,7 @@
     document.documentElement.style.setProperty('--barh', Math.round(barEl.getBoundingClientRect().height) + 'px');
   }
   measureBar();
+  bindOnb();
   if (window.ResizeObserver) new ResizeObserver(measureBar).observe(barEl);
   window.addEventListener('resize', function () { measureBar(); applyView(); });
   applyView();

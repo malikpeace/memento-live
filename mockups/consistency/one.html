@@ -503,6 +503,31 @@
   html.vm-framed .pg { min-height: 780px; }
   html.vm-framed #pgOne { padding-top: 40px; }
   html.vm-framed #pgTwo { padding-top: 26px; }
+  /* ============ onboarding: pick your consistency target ============ */
+  .onb { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(120% 85% at 50% -8%, rgba(var(--acc-rgb),0.16), transparent 58%), #030405; }
+  .onb[hidden] { display: none; }
+  .onb__in { width: 100%; max-width: 470px; padding: 40px 30px; text-align: center; color: rgba(235,238,248,0.96);
+    max-height: 100%; overflow-y: auto; }
+  .onb__m { color: var(--acc); width: 26px; margin: 0 auto 22px; line-height: 0; }
+  .onb__h { font-size: 27px; font-weight: 750; letter-spacing: -0.02em; margin: 0 0 14px; line-height: 1.15; }
+  .onb__p { font-size: 14.5px; line-height: 1.6; color: rgba(235,238,248,0.68); margin: 0 auto 28px; max-width: 400px; }
+  .onb__heat { display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px; margin: 0 0 20px; cursor: ew-resize; touch-action: none; }
+  .onb__heat b { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.06); transition: background 0.1s ease; }
+  .onb__heat b.on { background: var(--acc); }
+  .onb__read { display: flex; align-items: baseline; justify-content: center; gap: 7px; margin: 0 0 8px; }
+  .onb__read b { font-size: 48px; font-weight: 790; letter-spacing: -0.03em; color: #fff; font-variant-numeric: tabular-nums; }
+  .onb__read span { font-size: 16px; color: rgba(235,238,248,0.6); }
+  .onb__hint { font-size: 13px; color: rgba(235,238,248,0.5); margin: 0 auto 30px; max-width: 360px; line-height: 1.5; }
+  .onb__go { font: inherit; font-size: 16px; font-weight: 650; color: #06140a; background: var(--acc); border: 0;
+    border-radius: 13px; padding: 16px 34px; cursor: pointer; width: 100%; max-width: 320px; }
+  .onb__go:active { transform: scale(0.99); }
+  html.light .onb { background: radial-gradient(120% 85% at 50% -8%, rgba(var(--acc-rgb),0.12), transparent 58%), #eceeea; color: #0c0e0c; }
+  html.light .onb__h { color: #0c0e0c; }
+  html.light .onb__p { color: rgba(10,14,10,0.7); }
+  html.light .onb__read b { color: #0c0e0c; }
+  html.light .onb__read span, html.light .onb__hint { color: rgba(10,14,10,0.55); }
+  html.light .onb__heat b { background: rgba(10,14,10,0.08); }
 </style>
 </head>
 <body>
@@ -512,11 +537,22 @@
     <input type="range" id="slider" min="1" max="365" value="168">
     <div class="chips" id="dayChips"></div>
   </div>
-  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="viewChips"></div></div>
-  <div class="bar__row"><span class="bar__lbl" id="tgtLbl">Target 60%</span><input type="range" id="tgtSlider" min="10" max="100" step="5" value="60"></div>
+  <div class="bar__row"><div class="chips" id="shapeChips"></div><div class="chips" id="todayChips" style="margin-left:auto"></div><div class="chips" id="accChips"></div><div class="chips" id="modeChips"></div><div class="chips" id="viewChips"></div><div class="chips" id="setupChips"><button id="setupBtn">Setup</button></div></div>
+  <div class="bar__row"><span class="bar__lbl" id="tgtLbl">Target 60%</span><input type="range" id="tgtSlider" min="10" max="100" step="5" value="60"><span class="bar__lbl" id="conLbl">Consistency &mdash;</span><input type="range" id="conSlider" min="0" max="100" step="5" value="60"></div>
 </div></div>
 
 <div class="gplus-fx" aria-hidden="true"><i></i><i></i><i></i></div>
+<div id="onb" class="onb" hidden>
+  <div class="onb__in">
+    <div class="onb__m"></div>
+    <h1 class="onb__h">How consistent do you want to be?</h1>
+    <p class="onb__p">The goal was never perfection. Showing up 100% of days is a fantasy, and chasing it is how people quit. Consistency is the long game: showing up more often than not, month after month. Pick a level you can actually hold, then beat it.</p>
+    <div class="onb__heat" id="onbHeat"></div>
+    <div class="onb__read"><b id="onbPct">60</b><span>% of days</span></div>
+    <p class="onb__hint">Drag to set your bar. Aim high, but real, most people hold 50 to 70%.</p>
+    <button class="onb__go" id="onbGo">Enter Consistency</button>
+  </div>
+</div>
 <div id="snap">
   <section class="pg" id="pgOne"></section>
   <section class="pg" id="pgTwo"><div class="ev" id="ev"></div></section>
