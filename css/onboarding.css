@@ -1448,6 +1448,15 @@ body.calm-motion .welcome-intro__pillar-ground {
   }
 }
 
+/* The mobile splash rules above deliberately use an !important animation
+   shorthand while the splash is visible. A shorthand also resets play-state
+   to running, so it used to defeat dashboard.css once the splash was hidden.
+   This more-specific dismissed state wins without changing the visible boot. */
+.splash.dismissed .splash__rays .ambient__rays-beam,
+.splash.dismissed .splash__rays .ambient__rays-beam-shaft {
+  animation-play-state: paused !important;
+}
+
 /* Clickable elements should feel alive on pointer hover, even in the mobile
    preview width. Keep it subtle so the layout does not jump. */
 @media (hover: hover) {
