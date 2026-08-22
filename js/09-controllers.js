@@ -5339,7 +5339,11 @@ const TabBar = {
       if (!text) { if (msg) msg.textContent = 'Write a few words first.'; return; }
       submitFeedback(kind, text);
       if (ta) ta.value = '';
-      if (msg) msg.textContent = 'Sent. Thank you, I read every one.';
+      // Honest words (wave 2): the queue is real, so the message tells the
+      // truth in both states instead of claiming "Sent" while offline.
+      if (msg) msg.textContent = (navigator.onLine === false)
+        ? 'Saved. It sends when you are back online.'
+        : 'Sent. Thank you, I read every one.';
     });
     const why = root.querySelector('#whyBuilt'); const body = root.querySelector('#whyBuiltBody');
     if (why && body) why.addEventListener('click', () => { const open = body.style.display !== 'none'; body.style.display = open ? 'none' : 'block'; why.classList.toggle('is-open', !open); });
@@ -5393,7 +5397,7 @@ const TabBar = {
     }
     return '<div style="font-size:0.8125rem;color:var(--text-2);line-height:1.45;margin-bottom:12px;">Keep your data safe across devices.</div>' +
       '<button class="sheet-btn" id="acctOpenAuth" style="background: rgba(58, 217, 245,0.12); color: var(--color-clarity); border: 1px solid rgba(58, 217, 245,0.25);">Sign in</button>' +
-      '<div style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;">No password. We email you a link.</div>';
+      '<div style="font-size:0.6875rem; color: var(--text-3); margin-top:8px;">No password. We email you a 6-digit code.</div>';
   },
 
   // Wires the account card buttons. Re-renders just the card on state change.
