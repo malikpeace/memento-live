@@ -3353,6 +3353,188 @@
     }
   }
 
+  // ===========================================================================
+  // THE ONE COMPLETION CEREMONY + THE HOME DOOR (WO-2, wave 1)
+  // closeRewardCeremony is the single reward call every completion door runs:
+  // the flow's closeReward delegates here, and completeFromHome (below) is the
+  // home box's route into the exact same pipeline. The referee stays the only
+  // decider; receipts land before render (v1149).
+  // ===========================================================================
+  function closeRewardCeremony(rec, prevGp) {
+    // ======================= THE CLOSE SEAM ============================
+    // THE ONE REWARD CALL (THE-MERGE resolution B, Rewards phase 1).
+    // The day is written and the pulse has had its ask, so this is the
+    // moment the reward is earned. rewardMoment() builds the full context
+    // out of real state (js/26's buildRewardCtx: shape, star, gp,
+    // count/countTarget, daysHeld/daysTarget, prevValue, ledger, goalDone,
+    // userSaysDone, askedDay, today) and the referee returns ONE tier.
+    //
+    // prevValue is the standing number from BEFORE the close (v1207). The
+    // ask can have moved it a moment ago, and the chooser reads the pair to
+    // know which marks this pulse crossed; passing today's value as its own
+    // previous value would hide every crossing the ask just produced.
+    //
+    // RENDER FOLLOWS PERSISTENCE (the v1149 law): the referee writes the
+    // finale receipt and pays the milestone ledger inside decide(), so the
+    // state is flushed BEFORE anything is drawn. The daily page stamps its
+    // own witness before it renders too.
+    //
+    // 'daily', 'milestone' and (phase 3) 'finale' have renderers; 'none' is
+    // the spent finale day and shows nothing by design.
+    //
+    // userSaysDone is READ FROM STATE here (phase 3). Clarity's fulfilled
+    // hold persists gp.userSaysDone and never writes a receipt, so the
+    // declaration is a standing fact the referee needs at every door, not
+    // just the one it was made at. Without it a target goal declared done
+    // yesterday would close today as an ordinary day.
+    //
+    // ONE REWARD PER COMPLETION (R1/R2): the tiers are a chain, not a list.
+    // A milestone renders OVER the settled day and the daily does NOT also
+    // show; if the milestone declines (nothing honest to draw for that
+    // event) the day still earns its green page, which is R9's promise.
+    try {
+      var moment = G('rewardMoment');
+      var said = false;
+      try { var gpNow = S().goalProgress; said = !!(gpNow && gpNow.userSaysDone); } catch (e) {}
+      var tier = moment ? moment({ userSaysDone: said, prevValue: prevGp }) : null;
+      try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
+      var shown = false;
+      // THE FINALE OUTRANKS EVERYTHING (R2). The receipt is already written
+      // inside decide(), so the ceremony renders after persistence.
+      if (tier && tier.tier === 'finale' && window.GrandFinale) {
+        shown = GrandFinale.show(tier, { source: 'close' });
+      }
+      // ...and while the goal's own line is crossed but not yet confirmed,
+      // that crossing belongs to the finale. The chooser calls the target
+      // itself a 'final' MARK, so without this the same number would be
+      // celebrated twice: the mark here, the finale when they confirm. Only
+      // the final is held back; an ordinary rung on the same day is still
+      // theirs, and a held-back day still earns its green page (R9).
+      var finaleOwns = false;
+      try {
+        finaleOwns = !!(window.GrandFinale && GrandFinale.owns()
+          && tier && tier.event && tier.event.kind === 'final');
+      } catch (e) {}
+      if (!shown && !finaleOwns && tier && tier.tier === 'milestone' && tier.event && window.MilestoneReward) {
+        shown = MilestoneReward.show(tier.event);
+      }
+      // A rest day is a kept day, not a move: the count did not rise, so
+      // there is nothing for the green page to say. The rest line owns it.
+      if (!shown && tier && (tier.tier === 'daily' || tier.tier === 'milestone') && !rec.off && window.DailyReward) {
+        DailyReward.show({ day: rec.day, starHash: rec.starHash });
+      }
+    } catch (e) {}
+    // ===================================================================
+  }
+
+  var _homeCloseBusy = false;
+  function completeFromHome() {
+    var st = S();
+    if (!st) return { ok: false, reason: 'no-state' };
+    if (_homeCloseBusy) return { ok: false, reason: 'busy' };
+    var dk = dayKey();
+    try {
+      var ex = st.dayRecords && st.dayRecords[dk];
+      if (ex && !ex.off) return { ok: false, reason: 'already-closed' };
+    } catch (e) {}
+    _homeCloseBusy = true;
+    try {
+      var plan = null;
+      try { plan = livePlan(); } catch (e) {}
+      var prevGp = null;
+      try { var g0 = st.goalProgress; prevGp = g0 ? g0.current : null; } catch (e) {}
+      var starText = '';
+      try {
+        starText = (plan && plan.acts && plan.acts[0] && plan.acts[0].text) || liveStar() || '';
+      } catch (e) {}
+      // The home door closes the STAR act only: the box shows one move and one
+      // hold. Supports live in the day view; an empty list is the honest record
+      // of what this door showed. The pulse ask stays a flow moment (its screen
+      // lives there); skipping it leaves the ask due, never skipped-forever.
+      var rec = {
+        day: dk,
+        starHash: (plan && plan.starHash) || liveStarHash() || '',
+        star: true,
+        supports: [],
+        size: null,
+        off: false,
+        text: String(starText).replace(/\n/g, ' '),
+        at: Date.now()
+      };
+      var res = writeDayClose(rec, plan);
+      setTimeout(function () { try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {} }, 0);
+      closeRewardCeremony(rec, prevGp);
+      return { ok: !!(res && res.ok), rec: rec };
+    } finally {
+      _homeCloseBusy = false;
+    }
+  }
+
+  function undoDayData(starHash) {
+    var st = S();
+    if (!st) return false;
+    var dk = dayKey();
+    var hash = (starHash !== undefined && starHash !== null) ? starHash : liveStarHash();
+    var key = hash || 'nostar';
+    // v1210: THE TOMBSTONES. Deleting a row locally is not enough: every one
+    // of these three stores merges by UNION in js/12, so the cloud copy
+    // would hand the day straight back on the next sync. Each deletion below
+    // writes the key it removed, and js/12 drops tombstoned keys from all
+    // three unions (js/01 owns the store and its cap).
+    var tomb = null;
+    try {
+      if (!st.action || typeof st.action !== 'object') st.action = {};
+      if (!st.action.completionTombstones || typeof st.action.completionTombstones !== 'object') st.action.completionTombstones = {};
+      tomb = st.action.completionTombstones;
+    } catch (e) { tomb = null; }
+    var now = Date.now();
+    function mark(k) { if (tomb && k) tomb[k] = now; }
+    try {
+      if (st.dayRecords) delete st.dayRecords[dk];
+      mark('day:' + dk);
+      var hist = (st.action && Array.isArray(st.action.completionHistory)) ? st.action.completionHistory : null;
+      if (hist) {
+        var mid = 'plan_' + key;
+        for (var i = hist.length - 1; i >= 0; i--) {
+          var h = hist[i];
+          if (!h || h.missionId !== mid) continue;
+          var hd = '';
+          try {
+            hd = (typeof actionDayKey === 'function')
+              ? actionDayKey(new Date(h.date))
+              : String(h.date || '').slice(0, 10);
+          } catch (e) {}
+          if (hd === dk) { mark(h.id); hist.splice(i, 1); break; }
+        }
+      }
+      var dedupe = closeDedupeKey({ starHash: hash, day: dk });
+      mark(dedupe);
+      if (Array.isArray(st.proofEvents)) {
+        st.proofEvents = st.proofEvents.filter(function (e) {
+          if (e && e.metadata && e.metadata.dedupeKey === dedupe) { mark(e.id); return false; }
+          return true;
+        });
+      }
+      if (st.rewards) {
+        if (st.rewards.dailySeen) delete st.rewards.dailySeen[key + '|' + dk];
+        if (!st.rewards.counts || typeof st.rewards.counts !== 'object') st.rewards.counts = {};
+        var n = 0, recs = st.dayRecords || {};
+        Object.keys(recs).forEach(function (k) {
+          var r = recs[k];
+          if (!r || r.off) return;
+          if (hash && r.starHash && r.starHash !== hash) return;
+          n++;
+        });
+        st.rewards.counts[key] = n;
+      }
+      try { var rs = G('recalculateStreak'); if (rs) rs(); } catch (e) {}
+      try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+      try { if (window.MementoPush && MementoPush.sync) MementoPush.sync(); } catch (e) {}
+      try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
+    } catch (e) {}
+    return true;
+  }
+
   function openDay(key, opts) {
     opts = opts || {};
     var fx = FIXTURES[key] || FIXTURES.weight;
@@ -3834,70 +4016,9 @@
     }
 
     function closeReward(rec, prevGp) {
-      // ======================= THE CLOSE SEAM ============================
-      // THE ONE REWARD CALL (THE-MERGE resolution B, Rewards phase 1).
-      // The day is written and the pulse has had its ask, so this is the
-      // moment the reward is earned. rewardMoment() builds the full context
-      // out of real state (js/26's buildRewardCtx: shape, star, gp,
-      // count/countTarget, daysHeld/daysTarget, prevValue, ledger, goalDone,
-      // userSaysDone, askedDay, today) and the referee returns ONE tier.
-      //
-      // prevValue is the standing number from BEFORE the close (v1207). The
-      // ask can have moved it a moment ago, and the chooser reads the pair to
-      // know which marks this pulse crossed; passing today's value as its own
-      // previous value would hide every crossing the ask just produced.
-      //
-      // RENDER FOLLOWS PERSISTENCE (the v1149 law): the referee writes the
-      // finale receipt and pays the milestone ledger inside decide(), so the
-      // state is flushed BEFORE anything is drawn. The daily page stamps its
-      // own witness before it renders too.
-      //
-      // 'daily', 'milestone' and (phase 3) 'finale' have renderers; 'none' is
-      // the spent finale day and shows nothing by design.
-      //
-      // userSaysDone is READ FROM STATE here (phase 3). Clarity's fulfilled
-      // hold persists gp.userSaysDone and never writes a receipt, so the
-      // declaration is a standing fact the referee needs at every door, not
-      // just the one it was made at. Without it a target goal declared done
-      // yesterday would close today as an ordinary day.
-      //
-      // ONE REWARD PER COMPLETION (R1/R2): the tiers are a chain, not a list.
-      // A milestone renders OVER the settled day and the daily does NOT also
-      // show; if the milestone declines (nothing honest to draw for that
-      // event) the day still earns its green page, which is R9's promise.
-      try {
-        var moment = G('rewardMoment');
-        var said = false;
-        try { var gpNow = S().goalProgress; said = !!(gpNow && gpNow.userSaysDone); } catch (e) {}
-        var tier = moment ? moment({ userSaysDone: said, prevValue: prevGp }) : null;
-        try { var p1 = G('persistNow'); if (p1) p1(); } catch (e) {}
-        var shown = false;
-        // THE FINALE OUTRANKS EVERYTHING (R2). The receipt is already written
-        // inside decide(), so the ceremony renders after persistence.
-        if (tier && tier.tier === 'finale' && window.GrandFinale) {
-          shown = GrandFinale.show(tier, { source: 'close' });
-        }
-        // ...and while the goal's own line is crossed but not yet confirmed,
-        // that crossing belongs to the finale. The chooser calls the target
-        // itself a 'final' MARK, so without this the same number would be
-        // celebrated twice: the mark here, the finale when they confirm. Only
-        // the final is held back; an ordinary rung on the same day is still
-        // theirs, and a held-back day still earns its green page (R9).
-        var finaleOwns = false;
-        try {
-          finaleOwns = !!(window.GrandFinale && GrandFinale.owns()
-            && tier && tier.event && tier.event.kind === 'final');
-        } catch (e) {}
-        if (!shown && !finaleOwns && tier && tier.tier === 'milestone' && tier.event && window.MilestoneReward) {
-          shown = MilestoneReward.show(tier.event);
-        }
-        // A rest day is a kept day, not a move: the count did not rise, so
-        // there is nothing for the green page to say. The rest line owns it.
-        if (!shown && tier && (tier.tier === 'daily' || tier.tier === 'milestone') && !rec.off && window.DailyReward) {
-          DailyReward.show({ day: rec.day, starHash: rec.starHash });
-        }
-      } catch (e) {}
-      // ===================================================================
+      // Extracted to module scope (WO-2): every completion door shares ONE
+      // ceremony. This flow calls the same function the home door calls.
+      closeRewardCeremony(rec, prevGp);
     }
 
     // =========================================================================
@@ -4196,67 +4317,9 @@
     // body or their business, not a fact about this day being closed.
     // =========================================================================
     function undoDay() {
-      var st = S();
-      if (!st) return;
-      var dk = dayKey();
-      var hash = plan.starHash || liveStarHash();
-      var key = hash || 'nostar';
-      // v1210: THE TOMBSTONES. Deleting a row locally is not enough: every one
-      // of these three stores merges by UNION in js/12, so the cloud copy
-      // would hand the day straight back on the next sync. Each deletion below
-      // writes the key it removed, and js/12 drops tombstoned keys from all
-      // three unions (js/01 owns the store and its cap).
-      var tomb = null;
-      try {
-        if (!st.action || typeof st.action !== 'object') st.action = {};
-        if (!st.action.completionTombstones || typeof st.action.completionTombstones !== 'object') st.action.completionTombstones = {};
-        tomb = st.action.completionTombstones;
-      } catch (e) { tomb = null; }
-      var now = Date.now();
-      function mark(k) { if (tomb && k) tomb[k] = now; }
-      try {
-        if (st.dayRecords) delete st.dayRecords[dk];
-        mark('day:' + dk);
-        var hist = (st.action && Array.isArray(st.action.completionHistory)) ? st.action.completionHistory : null;
-        if (hist) {
-          var mid = 'plan_' + key;
-          for (var i = hist.length - 1; i >= 0; i--) {
-            var h = hist[i];
-            if (!h || h.missionId !== mid) continue;
-            var hd = '';
-            try {
-              hd = (typeof actionDayKey === 'function')
-                ? actionDayKey(new Date(h.date))
-                : String(h.date || '').slice(0, 10);
-            } catch (e) {}
-            if (hd === dk) { mark(h.id); hist.splice(i, 1); break; }
-          }
-        }
-        var dedupe = closeDedupeKey({ starHash: hash, day: dk });
-        mark(dedupe);
-        if (Array.isArray(st.proofEvents)) {
-          st.proofEvents = st.proofEvents.filter(function (e) {
-            if (e && e.metadata && e.metadata.dedupeKey === dedupe) { mark(e.id); return false; }
-            return true;
-          });
-        }
-        if (st.rewards) {
-          if (st.rewards.dailySeen) delete st.rewards.dailySeen[key + '|' + dk];
-          if (!st.rewards.counts || typeof st.rewards.counts !== 'object') st.rewards.counts = {};
-          var n = 0, recs = st.dayRecords || {};
-          Object.keys(recs).forEach(function (k) {
-            var r = recs[k];
-            if (!r || r.off) return;
-            if (hash && r.starHash && r.starHash !== hash) return;
-            n++;
-          });
-          st.rewards.counts[key] = n;
-        }
-        try { var rs = G('recalculateStreak'); if (rs) rs(); } catch (e) {}
-        try { var p = G('persistNow'); if (p) p(); } catch (e) {}
-        try { if (window.MementoPush && MementoPush.sync) MementoPush.sync(); } catch (e) {}
-        try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {}
-      } catch (e) {}
+      // Data reversal extracted to module scope (WO-2): the home door's undo
+      // runs the exact same tombstoned reversal. UI reset stays here.
+      undoDayData(plan.starHash || liveStarHash());
       // ...and the screen is a live day again: the hold is armed, the content
       // is back at full strength, the green is gone.
       written = false;
@@ -4713,6 +4776,10 @@
   }
 
   var ActionFlow = {
+    // WO-2 (wave 1): the home door's route into the ONE completion pipeline,
+    // and the shared tombstoned undo it pairs with. js/08 consumes these.
+    completeFromHome: completeFromHome,
+    undoTodayData: undoDayData,
     openIntent: openIntent,
     openNote: openNote,
     openRefine: openRefine,

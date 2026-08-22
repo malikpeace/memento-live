@@ -3855,6 +3855,25 @@ function showHomeCompletionWash() {
 }
 
 function completeTodayActionFromHome() {
+  // WO-2 (wave 1): ONE completion engine. The home door routes through the
+  // exact pipeline the Action day view runs (writeDayClose -> the referee ->
+  // the identical ceremony, Malik's explicit call), and its undo is the same
+  // tombstoned reversal, so the cloud can never resurrect an undone day. The
+  // old wash is gone on this path: the ceremony IS the moment now.
+  if (window.ActionFlow && ActionFlow.completeFromHome) {
+    const res = ActionFlow.completeFromHome();
+    if (res && res.ok) {
+      if (typeof showUndoToast === 'function') {
+        try { showUndoToast('Today is closed. You showed up.', function () {
+          try { ActionFlow.undoTodayData(res.rec ? res.rec.starHash : null); } catch (e) {}
+        }); } catch (e) {}
+      }
+      return res.rec ? res.rec.day : true;
+    }
+    if (res && (res.reason === 'already-closed' || res.reason === 'busy')) return null;
+    // any other refusal falls through to the legacy spine below, so a customer
+    // can never be left with a dead button.
+  }
   showHomeCompletionWash();
   const creditedId = creditTodayAction();
   try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
