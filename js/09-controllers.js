@@ -3404,18 +3404,40 @@ const Sidebar = {
   init() {
     this.el = document.getElementById('appSidebar');
     if (!this.el) return;
-    document.body.classList.add('sidebar-active');
+
+    // Vivere is deliberately parked. Keep its desktop launcher out of the DOM
+    // as well as guarding the route, so the sidebar cannot expose a retired
+    // destination while the rest of the app correctly treats it as unavailable.
+    if (typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED) {
+      const vivereNav = this.el.querySelector('.sidebar__nav-item[data-nav="vivere"]');
+      if (vivereNav) vivereNav.remove();
+    }
 
     // Drawer model on desktop: the sidebar rests collapsed (off-screen) and is
     // opened on demand via the persistent top-left menu button, so that button
     // stays a constant fixture. Mobile uses its own drawer and is never
     // collapsed here. Stay in sync if the window crosses the breakpoint.
     const _isDesktopWidth = () => { try { return !!(window.matchMedia && window.matchMedia('(min-width: 860px)').matches); } catch (_) { return true; } };
-    if (_isDesktopWidth()) document.body.classList.add('sidebar-collapsed');
-    window.addEventListener('resize', () => {
-      if (document.body.classList.contains('menu-peek')) return;
-      document.body.classList.toggle('sidebar-collapsed', _isDesktopWidth());
-    });
+    const _syncSidebarBreakpoint = () => {
+      const desktop = _isDesktopWidth();
+      document.body.classList.toggle('sidebar-active', desktop);
+      if (desktop) {
+        if (!document.body.classList.contains('menu-peek')) document.body.classList.add('sidebar-collapsed');
+        return;
+      }
+
+      // A live desktop -> mobile resize must hand navigation back to the bottom
+      // tab bar. Clear every desktop drawer state; leaving sidebar-active behind
+      // hides the tab bar and strands the user with no navigation.
+      const wasPeek = document.body.classList.contains('menu-peek');
+      document.body.classList.remove('sidebar-collapsed', 'menu-peek', 'menu-peek-closing', 'mobile-menu-open');
+      if (wasPeek) {
+        try { if (state.ui) state.ui.menuPinned = false; } catch (e) {}
+        try { localStorage.removeItem('memento_menu_pinned'); } catch (e) {}
+      }
+    };
+    _syncSidebarBreakpoint();
+    window.addEventListener('resize', _syncSidebarBreakpoint);
 
     // The in-sidebar collapse arrow simply closes the open drawer.
     const collapseBtn = document.getElementById('sidebarCollapse');
@@ -4128,6 +4150,7 @@ const Sidebar = {
         const tab = item.dataset.tab;
         const nav = item.dataset.nav;
         if (nav) {
+          if (nav === 'vivere' && typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED) return;
           if (typeof TabBar !== 'undefined') TabBar.switchTo('home');
           this.setActiveTab('home');
           this._closeMobileMenu && this._closeMobileMenu();

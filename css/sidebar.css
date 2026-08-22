@@ -285,6 +285,13 @@ body:has(.clarity-exp.open) #app { visibility: hidden !important; }
 @media (pointer: coarse) {
   #sidebarReveal, .sidebar-reveal { display: none !important; }
 }
+/* The persistent desktop menu button occupies the same top-left coordinate as
+   the Memento record/customize back control. Those surfaces own that coordinate;
+   hiding the menu button keeps Back clickable instead of opening the sidebar. */
+body.mf-open #sidebarReveal,
+body.mf-open .sidebar-reveal,
+body.mfe-open #sidebarReveal,
+body.mfe-open .sidebar-reveal { display: none !important; }
 /* Mobile: the quick-capture FAB is hidden. It crowded the bottom-right corner,
    and capture lives in the menu / "c" shortcut on desktop. Phones get a cleaner
    screen (the bottom tab bar is the one fixed control down there). */
