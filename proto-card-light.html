@@ -30,14 +30,20 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
 }
 #motionBtn.show { display: inline-block; }
-.opt { padding: 48px 0 4px; }
-.opt__head { display: flex; align-items: baseline; gap: 12px; }
-.opt__k { font-size: 13px; font-weight: 700; color: rgba(242,246,247,0.38); }
-.opt__head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-.opt__head + p { margin: 8px 0 6px; font-size: 14px; line-height: 1.5; color: rgba(242,246,247,0.64); }
-.stage { padding: 4px 0 34px; }
+.stage { padding: 16px 0 30px; }
 /* the home card's proportions (320/452), so the judgment transfers 1:1 */
 .stage .daycard-ns { width: min(72vw, 300px); min-height: 0; aspect-ratio: 320 / 452; }
+/* one look mounted at a time; the buttons swap them instantly (Malik's call) */
+.picker { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 4px 0 14px; }
+.picker button {
+  font: inherit; font-size: 14px; font-weight: 600; color: rgba(242,246,247,0.64);
+  background: rgba(255,255,255,0.05); border: 0; border-radius: 8px;
+  padding: 10px 14px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.picker button.on { color: #0a0c0f; background: rgba(242,246,247,0.92); }
+.desc { min-height: 64px; text-align: center; padding: 2px 8px 0; }
+.desc h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+.desc p { margin-top: 6px; font-size: 14px; line-height: 1.5; color: rgba(242,246,247,0.64); }
 
 /* the lighting layers: the ONLY thing this lab adds inside the real card */
 .daycard-ns .lite { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
@@ -159,134 +165,113 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
 <div class="wrap">
   <div class="hero">
     <h1>Card light</h1>
-    <p>The real Memento, the app's own card, six ways light can live on it. Tilt your phone, or drag a card with your finger. Only the light changes.</p>
+    <p>The real Memento. Tap a look to swap it instantly; Stock is the card exactly as it ships today. Tilt your phone or drag the card.</p>
     <button id="motionBtn" type="button">Enable motion</button>
   </div>
 
-  <section class="opt" data-name="Studio specular" data-k="A">
-    <div class="opt__head"><span class="opt__k">A</span><h2>Studio specular</h2></div>
-    <p>One soft key light. The highlight follows the tilt, the shadow leans away.</p>
-    <div class="stage" data-card="a"></div>
-  </section>
+  <div class="stage" id="stage"></div>
 
-  <section class="opt" data-name="Brushed sheen" data-k="B">
-    <div class="opt__head"><span class="opt__k">B</span><h2>Brushed sheen</h2></div>
-    <p>A fine metal grain with one bright band that sweeps as you tilt.</p>
-    <div class="stage" data-card="b"></div>
-  </section>
+  <div class="picker" id="picker" role="tablist" aria-label="Lighting options"></div>
+  <div class="desc"><h2 id="descT"></h2><p id="descP"></p></div>
 
-  <section class="opt" data-name="Rim light" data-k="C">
-    <div class="opt__head"><span class="opt__k">C</span><h2>Rim light</h2></div>
-    <p>The light lives on the glass edge. Tilt back and the top catches it, tilt forward and the bottom does.</p>
-    <div class="stage" data-card="c"></div>
-  </section>
-
-  <section class="opt" data-name="Depth parallax" data-k="D">
-    <div class="opt__head"><span class="opt__k">D</span><h2>Depth parallax</h2></div>
-    <p>No highlight at all. Layers inside the glass slide at different speeds, so the card reads deep instead of shiny.</p>
-    <div class="stage" data-card="d"></div>
-  </section>
-
-  <section class="opt" data-name="Liquid light" data-k="E">
-    <div class="opt__head"><span class="opt__k">E</span><h2>Liquid light</h2></div>
-    <p>Light moves inside the material on its own, slow as water. A small bright point still answers your tilt.</p>
-    <div class="stage" data-card="e"></div>
-  </section>
-
-  <section class="opt" data-name="Foil shift" data-k="F">
-    <div class="opt__head"><span class="opt__k">F</span><h2>Foil shift</h2></div>
-    <p>A foil sheen that rotates around the card as you tilt. Kept strictly silver, never rainbow.</p>
-    <div class="stage" data-card="f"></div>
-  </section>
-
-  <p class="foot">This is the app's real card: its own glass, liquid, rim, bloom and floor reflection, at a lively founder state. Every option's exact recipe is in this page's source; the pick gets ported verbatim.</p>
+  <p class="foot">One card, the app's own markup and styles at a lively founder state. Each look adds only thin light layers inside the card; Stock adds nothing at all. Every recipe is in this page's source; the pick gets ported verbatim.</p>
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  // THE REAL MARKUP, verbatim from js/08 renderDayCard (living theme).
   var BLOBS = '<i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>';
   var EMBLEM = '<svg class="daycard-ns__emblem" viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
-  var LITES = {
-    a: '<i class="lite lite--shade"></i><i class="lite lite--spec"></i>',
-    b: '<i class="lite lite--grain"></i><i class="lite lite--band"></i>',
-    c: '<i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>',
-    d: '<i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>',
-    e: '<i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>',
-    f: '<i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>'
-  };
-  function cardHtml(key) {
-    return '' +
-      '<div class="daycard-wrap daycard-theme-living">' +
-        '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
-        '<div class="daycard-living-stage">' +
-          '<span class="daycard-bloom" aria-hidden="true">' + BLOBS + '</span>' +
-          '<span class="daycard-floor" aria-hidden="true">' + BLOBS +
-            '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
-          '</span>' +
-          '<div class="daycard-ns c-' + key + '">' +
-            '<span class="daycard-ns__liquid" aria-hidden="true">' + BLOBS + '</span>' +
-            '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
-            '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
-            '<span class="daycard-ns__plat" aria-hidden="true"></span>' +
-            '<span class="daycard-ns__tint" aria-hidden="true"></span>' +
-            '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
-            LITES[key] +
-            '<div class="daycard-ns__body">' + EMBLEM + '</div>' +
-            '<div class="daycard-ns__foot"><span class="daycard-ns__name">Malik</span></div>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-  }
+  var OPTS = [
+    { key: 'stock', k: 'Stock', name: 'Stock', lites: '', desc: 'The card exactly as it ships right now. Untouched. The baseline everything else is judged against.' },
+    { key: 'a', k: 'A', name: 'Studio specular', lites: '<i class="lite lite--shade"></i><i class="lite lite--spec"></i>', desc: 'One soft key light. The highlight follows the tilt, the shadow leans away.' },
+    { key: 'b', k: 'B', name: 'Brushed sheen', lites: '<i class="lite lite--grain"></i><i class="lite lite--band"></i>', desc: 'A fine metal grain with one bright band that sweeps as you tilt.' },
+    { key: 'c', k: 'C', name: 'Rim light', lites: '<i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>', desc: 'The light lives on the glass edge. Tilt back and the top catches it, tilt forward and the bottom does.' },
+    { key: 'd', k: 'D', name: 'Depth parallax', lites: '<i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>', desc: 'No highlight at all. Layers inside the glass slide at different speeds, so the card reads deep instead of shiny.' },
+    { key: 'e', k: 'E', name: 'Liquid light', lites: '<i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>', desc: 'Light moves inside the material on its own, slow as water. A small bright point still answers your tilt.' },
+    { key: 'f', k: 'F', name: 'Foil shift', lites: '<i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>', desc: 'A foil sheen that rotates around the card as you tilt. Kept strictly silver, never rainbow.' }
+  ];
 
-  var stages = [].slice.call(document.querySelectorAll('[data-card]'));
-  stages.forEach(function (stage) {
-    stage.innerHTML = cardHtml(stage.getAttribute('data-card'));
-    var wrap = stage.querySelector('.daycard-wrap');
-    // a lively founder state, the same vars js/08's setLivingCardVars writes
-    wrap.style.setProperty('--clar', '0.95');
-    wrap.style.setProperty('--act', '0.70');
-    wrap.style.setProperty('--cons', '0.85');
-    wrap.style.setProperty('--mix', '0.64');
-    wrap.style.setProperty('--lit', '1');
+  var stage = document.getElementById('stage');
+  stage.innerHTML =
+    '<div class="daycard-wrap daycard-theme-living">' +
+      '<span class="daycard-wrap__aura" aria-hidden="true"></span>' +
+      '<div class="daycard-living-stage">' +
+        '<span class="daycard-bloom" aria-hidden="true">' + BLOBS + '</span>' +
+        '<span class="daycard-floor" aria-hidden="true">' + BLOBS +
+          '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
+        '</span>' +
+        '<div class="daycard-ns" id="theCard">' +
+          '<span class="daycard-ns__liquid" aria-hidden="true">' + BLOBS + '</span>' +
+          '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
+          '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
+          '<span class="daycard-ns__plat" aria-hidden="true"></span>' +
+          '<span class="daycard-ns__tint" aria-hidden="true"></span>' +
+          '<span class="daycard-ns__rim" aria-hidden="true"></span>' +
+          '<span id="liteHost"></span>' +
+          '<div class="daycard-ns__body">' + EMBLEM + '</div>' +
+          '<div class="daycard-ns__foot"><span class="daycard-ns__name">Malik</span></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  var wrap = stage.querySelector('.daycard-wrap');
+  wrap.style.setProperty('--clar', '0.95');
+  wrap.style.setProperty('--act', '0.70');
+  wrap.style.setProperty('--cons', '0.85');
+  wrap.style.setProperty('--mix', '0.64');
+  wrap.style.setProperty('--lit', '1');
+  var card = document.getElementById('theCard');
+  var liteHost = document.getElementById('liteHost');
+  liteHost.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:3;display:block;';
+
+  var picker = document.getElementById('picker');
+  var descT = document.getElementById('descT');
+  var descP = document.getElementById('descP');
+  function pick(opt, btn) {
+    // instant swap, exactly as asked: the light layers change, nothing else
+    card.className = 'daycard-ns' + (opt.key === 'stock' ? '' : ' c-' + opt.key);
+    liteHost.innerHTML = opt.lites;
+    liteHost.querySelectorAll('.lite').forEach(function (n) { /* inherit host inset via class CSS */ });
+    descT.textContent = opt.name;
+    descP.textContent = opt.desc;
+    picker.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b === btn); });
+  }
+  OPTS.forEach(function (opt, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = opt.k === opt.name ? opt.name : opt.k + ' \u00b7 ' + opt.name;
+    b.addEventListener('click', function () { pick(opt, b); });
+    picker.appendChild(b);
+    if (i === 0) pick(opt, b);
   });
 
   // -------------------------------------------------------------- tilt -----
   var tx = 0, ty = 0, lastInput = 0;
-  function apply(stage, x, y) {
-    var st = stage.querySelector('.daycard-living-stage');
-    var ns = stage.querySelector('.daycard-ns');
-    if (!st || !ns) return;
-    // the card's OWN tilt vars (bindDayCardTilt's contract in the app)
-    st.style.setProperty('--dc-rx', (y * -6).toFixed(2) + 'deg');
-    st.style.setProperty('--dc-ry', (x * 7).toFixed(2) + 'deg');
-    // the light layers' vars
-    ns.style.setProperty('--tx', x.toFixed(3));
-    ns.style.setProperty('--ty', y.toFixed(3));
+  var stStage = stage.querySelector('.daycard-living-stage');
+  function apply(x, y) {
+    stStage.style.setProperty('--dc-rx', (y * -6).toFixed(2) + 'deg');
+    stStage.style.setProperty('--dc-ry', (x * 7).toFixed(2) + 'deg');
+    card.style.setProperty('--tx', x.toFixed(3));
+    card.style.setProperty('--ty', y.toFixed(3));
   }
-
-  stages.forEach(function (stage) {
-    var card = stage.querySelector('.daycard-ns');
-    var dragging = false;
-    card.style.touchAction = 'pan-y';
-    card.addEventListener('pointerdown', function (e) {
-      dragging = true;
-      try { card.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    card.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      var r = card.getBoundingClientRect();
-      var x = ((e.clientX - r.left) / r.width) * 2 - 1;
-      var y = ((e.clientY - r.top) / r.height) * 2 - 1;
-      stage._own = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) };
-      lastInput = Date.now();
-    });
-    function drop() { dragging = false; stage._own = null; }
-    card.addEventListener('pointerup', drop);
-    card.addEventListener('pointercancel', drop);
+  var dragging = false, own = null;
+  card.style.touchAction = 'pan-y';
+  card.addEventListener('pointerdown', function (e) {
+    dragging = true;
+    try { card.setPointerCapture(e.pointerId); } catch (err) {}
   });
+  card.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var r = card.getBoundingClientRect();
+    var x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    var y = ((e.clientY - r.top) / r.height) * 2 - 1;
+    own = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) };
+    lastInput = Date.now();
+  });
+  function drop() { dragging = false; own = null; }
+  card.addEventListener('pointerup', drop);
+  card.addEventListener('pointercancel', drop);
 
   var btn = document.getElementById('motionBtn');
   function bindOrientation() {
@@ -318,10 +303,7 @@ body { overflow-x: hidden; color: var(--text-hi, rgba(242,246,247,0.96)); font-f
       gx = Math.sin(t * 0.42) * 0.55;
       gy = Math.sin(t * 0.31 + 1.2) * 0.4;
     } else if (idle && reduce) { gx = 0.25; gy = 0.2; }
-    stages.forEach(function (stage) {
-      var o = stage._own;
-      apply(stage, o ? o.x : gx, o ? o.y : gy);
-    });
+    apply(own ? own.x : gx, own ? own.y : gy);
     requestAnimationFrame(loop);
   })();
 })();
