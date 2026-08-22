@@ -4130,3 +4130,13 @@ html.theme-light .ai-progress__fill {
 @media (min-width: 641px) {
   .wi-cine.wi-recap, .wi-cine.wi-moriview { margin-bottom: min(22vh, 220px); }
 }
+
+/* ── WO-3b: the hidden login screen burns nothing (2026-08-22) ───────────────
+   #loginScreen keeps its four floating orbs animating behind
+   visibility:hidden on desktop, all session. .hidden is the screen's own
+   show/hide truth (js/09 + js/18 both key on it). */
+#loginScreen.hidden *,
+#loginScreen.hidden *::before,
+#loginScreen.hidden *::after {
+  animation-play-state: paused !important;
+}

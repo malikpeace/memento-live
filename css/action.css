@@ -6193,3 +6193,15 @@ html.theme-light .afl-rl__in::placeholder { color: rgba(var(--ink), 0.34); }
    is open the sidebar has no business painting at all. Same :has() idiom
    misc.css uses for #topFade. */
 body:has(.afl) #appSidebar { box-shadow: none; }
+
+/* ── WO-3b: the closed legacy room burns nothing (2026-08-22) ────────────────
+   Same census, same fix as #clarityExp in clarity.css: #actionExp idles at
+   opacity 0 with its orb beams still animating. aria-hidden is flipped by
+   the same js/02 experience class; the fade is a transition and unaffected.
+   (The NEW flow's rooms in js/30 are created and destroyed per visit, so
+   they never idle.) */
+#actionExp[aria-hidden="true"] *,
+#actionExp[aria-hidden="true"] *::before,
+#actionExp[aria-hidden="true"] *::after {
+  animation-play-state: paused !important;
+}

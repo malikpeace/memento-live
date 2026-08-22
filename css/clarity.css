@@ -5575,3 +5575,16 @@ html.theme-light .cn-cke[data-done="1"] .cn-cke__t { color: rgba(24,26,33,0.4); 
 .cn-bar__hist svg { width: 19px; height: 19px; stroke: rgba(255,255,255,0.55); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .cn-bar__hist:active svg { stroke: var(--cn-acc); }
 html.theme-light .cn-bar__hist svg { stroke: rgba(24,26,33,0.5); }
+
+/* ── WO-3b: a closed room burns nothing (2026-08-22) ─────────────────────────
+   #clarityExp sits mounted at opacity 0 between visits, and its two nebulae
+   plus the eight ray shafts kept animating: ten invisible composited layers
+   ticking every frame, all session (the overnight audit's hidden-animation
+   census). aria-hidden is the room's own truth: js/02 flips it false before
+   any entrance runs and true only when the room is done, and the open/close
+   fade is a TRANSITION, which a paused animation cannot touch. */
+#clarityExp[aria-hidden="true"] *,
+#clarityExp[aria-hidden="true"] *::before,
+#clarityExp[aria-hidden="true"] *::after {
+  animation-play-state: paused !important;
+}
