@@ -8749,6 +8749,14 @@ function setAtmosphereVars() {
 // and lowfx (color still shows, motion holds).
 let _dcLivingRaf = 0;
 function startLivingWander(wrap) {
+  // v1257: RETIRED. The free liquid is CSS now (daycard-living.css dcRoam1-5,
+  // Malik's "G3 Alive" lab pick): every blob copy wanders on the compositor,
+  // on every device including phones, with pillar gating intact. One system
+  // owns the motion (the state-machine law), so this rAF writer stands down;
+  // its inline transform/opacity writes would fight the keyframes. The
+  // function stays as a no-op so its call sites need no churn.
+  return;
+  /* eslint-disable no-unreachable */
   stopLivingWander();
   try {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

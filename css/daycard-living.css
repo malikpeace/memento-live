@@ -166,6 +166,66 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
   background: radial-gradient(circle, rgba(255,72,86,1.0), transparent 66%);
   opacity: 0; }   /* the "red test" pillar has no real data; held off in-app */
 
+/* ════════════════════════════════════════════════════════════════════════
+   THE FREE LIQUID (v1257, Malik's pick "G3 Alive" from the card-light lab,
+   ported verbatim with the variant knobs baked in: amp 1.3, speed 0.55).
+   The pillar glows WANDER the whole card: per-blob loops with prime-ish
+   durations so the composition never visibly repeats, each blob grows,
+   shrinks, breathes out and returns. Opacity stops stay pillar-gated
+   (calc of the same vars the resting rules use), so an unearned pillar
+   still shows nothing and cinema pours still read through the motion.
+   One selector covers all three copies of each blob (liquid + bloom +
+   floor), so the glow and the ground reflection move as one.
+   Transform + opacity only: compositor work, no layout, no paint.
+   This RETIRES the JS wander (js/08 startLivingWander is a no-op now):
+   one system owns the motion, per the state-machine law.
+   ════════════════════════════════════════════════════════════════════════ */
+.daycard-theme-living .blob.b1 { animation: dcRoam1 22.55s ease-in-out infinite; }
+.daycard-theme-living .blob.b2 { animation: dcRoam2 29.15s ease-in-out infinite; }
+.daycard-theme-living .blob.b3 { animation: dcRoam3 20.35s ease-in-out infinite; }
+.daycard-theme-living .blob.b4 { animation: dcRoam4 15.95s ease-in-out infinite; }
+.daycard-theme-living .blob.b5 { animation: dcRoam5 25.85s ease-in-out infinite; }
+
+@keyframes dcRoam1 {
+  0%   { transform: translate(0, 0) scale(1);              opacity: calc(var(--clar, 0) * 0.9); }
+  28%  { transform: translate(75.4%, 39%) scale(0.82);     opacity: calc(var(--clar, 0) * 0.55); }
+  52%  { transform: translate(39%, 101.4%) scale(1.18);    opacity: var(--clar, 0); }
+  78%  { transform: translate(-15.6%, 28.6%) scale(0.95);  opacity: calc(var(--clar, 0) * 0.7); }
+  100% { transform: translate(0, 0) scale(1);              opacity: calc(var(--clar, 0) * 0.9); }
+}
+@keyframes dcRoam2 {
+  0%   { transform: translate(0, 0) scale(1);              opacity: calc(var(--act, 0) * 0.82); }
+  35%  { transform: translate(28.6%, 23.4%) scale(0.88);   opacity: calc(var(--act, 0) * 0.5); }
+  65%  { transform: translate(-20.8%, 36.4%) scale(1.12);  opacity: calc(var(--act, 0) * 0.95); }
+  100% { transform: translate(0, 0) scale(1);              opacity: calc(var(--act, 0) * 0.82); }
+}
+@keyframes dcRoam3 {
+  0%   { transform: translate(0, 0) scale(1);              opacity: var(--cons, 0); }
+  26%  { transform: translate(7.8%, -80.6%) scale(0.9);    opacity: calc(var(--cons, 0) * 0.6); }
+  55%  { transform: translate(-62.4%, -33.8%) scale(1.34); opacity: var(--cons, 0); }
+  80%  { transform: translate(-18.2%, 10.4%) scale(1.05);  opacity: calc(var(--cons, 0) * 0.75); }
+  100% { transform: translate(0, 0) scale(1);              opacity: var(--cons, 0); }
+}
+@keyframes dcRoam4 {
+  0%   { transform: translate(0, 0) scale(1);              opacity: var(--mix, 0); }
+  22%  { transform: translate(49.4%, -41.6%) scale(1.2);   opacity: calc(var(--mix, 0) * 0.45); }
+  48%  { transform: translate(67.6%, 15.6%) scale(0.8);    opacity: calc(var(--mix, 0) * 0.18); }
+  74%  { transform: translate(15.6%, 33.8%) scale(1.1);    opacity: var(--mix, 0); }
+  100% { transform: translate(0, 0) scale(1);              opacity: var(--mix, 0); }
+}
+@keyframes dcRoam5 {
+  0%   { transform: translate(0, 0) scale(1);              opacity: calc(var(--cons, 0) * 0.5); }
+  30%  { transform: translate(-57.2%, 41.6%) scale(0.82);  opacity: calc(var(--cons, 0) * 0.3); }
+  62%  { transform: translate(-26%, -49.4%) scale(1.26);   opacity: calc(var(--cons, 0) * 0.62); }
+  100% { transform: translate(0, 0) scale(1);              opacity: calc(var(--cons, 0) * 0.5); }
+}
+
+/* stillness where stillness is asked for */
+@media (prefers-reduced-motion: reduce) {
+  .daycard-theme-living .blob { animation: none !important; }
+}
+html.lowfx .daycard-theme-living .blob { animation: none !important; }
+
 /* ── Color bloom: a blurred echo behind the card that bleeds the hue out ─────
    EDGE-SAFE BY CONSTRUCTION (Malik v682, the recurring "purple box outside the
    card"): this layer used to be a rounded RECT bigger than the card with
@@ -295,9 +355,10 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
-  /* The wander is off on mobile, so the blobs never transform; release their
-     per-layer promotion so they rasterize INTO the one retained stage layer
-     (one cacheable bitmap) instead of each demanding a layer iOS can evict. */
+  /* v1257: the CSS roam runs on mobile too (compositor-only), so the blobs
+     DO transform now; the will-change release stays because running CSS
+     animations promote their own layers, and dropping the standing hint
+     lets a paused/reduced-motion card still collapse into one bitmap. */
   .daycard-theme-living .daycard-ns__liquid .blob,
   .daycard-theme-living .daycard-bloom .blob,
   .daycard-theme-living .daycard-floor .blob { will-change: auto; }
