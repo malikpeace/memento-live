@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Card Light Lab</title>
+<style>
+/* ============================================================================
+   CARD LIGHT LAB (step 8 playground, 2026-08-22).
+   Six lighting treatments on the real card geometry (320/452, 14px radius,
+   the bare M). Tilt your phone (tap Enable motion once) or drag a card.
+   Each option's PORTABLE RECIPE is in a comment right above its CSS block:
+   when Malik picks, port those exact values, never remix (standing law).
+   Dark-only by design: this is a lab for the dark home, the card's soul.
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --r-card: 14px;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --text-hi: rgba(242, 246, 247, 0.96);
+  --text-mid: rgba(242, 246, 247, 0.64);
+  --text-lo: rgba(242, 246, 247, 0.38);
+}
+html, body { background: #050608; color: var(--text-hi); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; }
+body { overflow-x: hidden; }
+
+.wrap { max-width: 520px; margin: 0 auto; padding: calc(24px + env(safe-area-inset-top)) 22px calc(60px + env(safe-area-inset-bottom)); }
+.hero { padding: 34px 0 10px; }
+.hero h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+.hero p { margin-top: 10px; font-size: 15px; line-height: 1.55; color: var(--text-mid); }
+#motionBtn {
+  margin-top: 16px; display: none; font: inherit; font-size: 15px; font-weight: 600;
+  color: var(--text-hi); background: rgba(255,255,255,0.06); border: 0;
+  border-radius: 10px; padding: 12px 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+#motionBtn.show { display: inline-block; }
+
+.opt { padding: 52px 0 8px; }
+.opt__head { display: flex; align-items: baseline; gap: 12px; }
+.opt__k { font-size: 13px; font-weight: 700; color: var(--text-lo); font-variant-numeric: tabular-nums; }
+.opt__head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.opt__head + p { margin: 8px 0 22px; font-size: 14px; line-height: 1.5; color: var(--text-mid); }
+
+.stage { display: flex; justify-content: center; padding: 8px 0 26px; perspective: 900px; }
+.cardw { position: relative; width: min(72vw, 300px); aspect-ratio: 320 / 452; }
+/* the outer glow: RADIAL, fades to nothing before its own bounds (the edge-
+   safe glow law). Never a clipped blurred rect. */
+.cardw .glow {
+  position: absolute; inset: -22%; z-index: 0; pointer-events: none;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(198, 230, 236, 0.55), rgba(198, 230, 236, 0.18) 56%, transparent 76%);
+}
+.card {
+  position: absolute; inset: 0; z-index: 1;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  clip-path: inset(0 round var(--r-card));
+  contain: paint;
+  transform: rotateX(calc(var(--ty, 0) * -6deg)) rotateY(calc(var(--tx, 0) * 7deg));
+  will-change: transform;
+  touch-action: pan-y;
+}
+/* the shared face: today's house skin feel, identical across options so the
+   only variable is the LIGHT. */
+.card .face {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 90% at 30% 18%, #aed9e8 0%, rgba(174, 217, 232, 0) 62%),
+    radial-gradient(130% 110% at 72% 85%, #a3d9b6 0%, rgba(163, 217, 182, 0) 66%),
+    linear-gradient(164deg, #cfe2ea 0%, #bdd9c9 100%);
+}
+.card .m {
+  position: absolute; left: 50%; top: 50%; width: 21%; height: auto;
+  transform: translate(-50%, -50%);
+  fill: #3c4147; filter: drop-shadow(0 1px 1px rgba(255,255,255,0.35));
+}
+.card > .lite { position: absolute; inset: 0; pointer-events: none; }
+
+/* ── A. STUDIO SPECULAR ─────────────────────────────────────────────────────
+   PORTABLE RECIPE
+   layer 1 (spec):  radial-gradient(46% 34% at P, rgba(255,255,255,0.52), rgba(255,255,255,0.14) 55%, transparent 76%)
+                    P = calc(50% + var(--tx) * 44%) calc(42% + var(--ty) * 40%)
+                    mix-blend-mode: screen
+   layer 2 (shade): radial-gradient(70% 60% at opposite corner, rgba(8,12,16,0.18), transparent 70%)
+                    opposite = calc(50% - var(--tx) * 40%) calc(58% - var(--ty) * 36%)
+   card transform:  rotateX(ty * -6deg) rotateY(tx * 7deg), perspective 900px */
+.c-a .lite--spec {
+  background: radial-gradient(46% 34% at calc(50% + var(--tx, 0) * 44%) calc(42% + var(--ty, 0) * 40%),
+    rgba(255,255,255,0.52), rgba(255,255,255,0.14) 55%, transparent 76%);
+  mix-blend-mode: screen;
+}
+.c-a .lite--shade {
+  background: radial-gradient(70% 60% at calc(50% - var(--tx, 0) * 40%) calc(58% - var(--ty, 0) * 36%),
+    rgba(8, 12, 16, 0.18), transparent 70%);
+}
+
+/* ── B. BRUSHED SHEEN ───────────────────────────────────────────────────────
+   PORTABLE RECIPE
+   grain:  repeating-linear-gradient(100deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px), opacity 0.7
+   band:   linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.34) 46%, rgba(255,255,255,0.58) 50%, rgba(255,255,255,0.34) 54%, transparent 66%)
+           on a layer inset -4% -30%; transform: translateX(calc(var(--tx) * 55%))
+           mix-blend-mode: screen */
+.c-b .lite--grain {
+  background: repeating-linear-gradient(100deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px);
+  opacity: 0.7;
+}
+.c-b .lite--band {
+  inset: -4% -30%;
+  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.34) 46%, rgba(255,255,255,0.58) 50%, rgba(255,255,255,0.34) 54%, transparent 66%);
+  transform: translateX(calc(var(--tx, 0) * 55%));
+  mix-blend-mode: screen;
+}
+
+/* ── C. RIM LIGHT ───────────────────────────────────────────────────────────
+   PORTABLE RECIPE
+   top rim:    inset 0 1.5px 0 rgba(255,255,255,0.8) as a gradient layer whose
+               opacity = 0.35 + ty * 0.65 (light "above" when tilted back)
+   bottom rim: mirror, opacity = 0.35 - ty * 0.65
+   bloom:      the .glow sibling breathes: scale 1 -> 1.06, opacity 0.75 -> 1,
+               7s ease-in-out alternate infinite (paused under reduced motion) */
+.c-c .lite--rimtop {
+  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0, rgba(255,255,255,0.25) 2.5%, transparent 14%);
+  opacity: calc(0.35 + var(--ty, 0) * 0.65);
+}
+.c-c .lite--rimbot {
+  background: linear-gradient(0deg, rgba(255,255,255,0.65) 0, rgba(255,255,255,0.18) 2.5%, transparent 12%);
+  opacity: calc(0.35 - var(--ty, 0) * 0.65);
+}
+.opt--c .glow { animation: rimBloom 7s ease-in-out infinite alternate; }
+@keyframes rimBloom { from { transform: scale(1); opacity: 0.75; } to { transform: scale(1.06); opacity: 1; } }
+
+/* ── D. DEPTH PARALLAX ──────────────────────────────────────────────────────
+   PORTABLE RECIPE (no specular at all: depth IS the light)
+   deep:  translate(tx * -6px,  ty * -5px)   soft dark pool, low contrast
+   mid:   translate(tx * -14px, ty * -11px)  the face's own colour, brighter
+   near:  translate(tx * -24px, ty * -19px)  faint white haze veil
+   every layer oversized 112% so edges never show */
+.c-d .lite--deep, .c-d .lite--mid, .c-d .lite--near { inset: -6%; }
+.c-d .lite--deep {
+  background: radial-gradient(85% 70% at 55% 65%, rgba(10, 16, 20, 0.16), transparent 70%);
+  transform: translate(calc(var(--tx, 0) * -6px), calc(var(--ty, 0) * -5px));
+}
+.c-d .lite--mid {
+  background: radial-gradient(60% 48% at 38% 30%, rgba(255,255,255,0.28), transparent 72%);
+  transform: translate(calc(var(--tx, 0) * -14px), calc(var(--ty, 0) * -11px));
+}
+.c-d .lite--near {
+  background: radial-gradient(46% 34% at 62% 22%, rgba(255,255,255,0.20), transparent 70%);
+  transform: translate(calc(var(--tx, 0) * -24px), calc(var(--ty, 0) * -19px));
+}
+
+/* ── E. LIQUID LIGHT ────────────────────────────────────────────────────────
+   PORTABLE RECIPE
+   blob 1: 70% wide radial, rgba(255,255,255,0.30), drifts 26s ease-in-out
+   blob 2: 56% wide radial, rgba(174,217,232,0.5), drifts 21s, opposite phase
+   dot:    12% specular dot tracking tilt at 1.4x, screen blend
+   blobs live INSIDE the clip; drift is transform-only */
+.c-e .lite--blob1 {
+  inset: -10%;
+  background: radial-gradient(36% 30% at 30% 35%, rgba(255,255,255,0.30), transparent 70%);
+  animation: liqA 26s ease-in-out infinite alternate;
+}
+.c-e .lite--blob2 {
+  inset: -10%;
+  background: radial-gradient(30% 26% at 70% 68%, rgba(174, 217, 232, 0.5), transparent 70%);
+  animation: liqB 21s ease-in-out infinite alternate;
+}
+.c-e .lite--dot {
+  background: radial-gradient(13% 10% at calc(50% + var(--tx, 0) * 56%) calc(40% + var(--ty, 0) * 52%),
+    rgba(255,255,255,0.65), transparent 75%);
+  mix-blend-mode: screen;
+}
+@keyframes liqA { from { transform: translate(0, 0) scale(1); } to { transform: translate(9%, 12%) scale(1.15); } }
+@keyframes liqB { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-8%, -10%) scale(0.95); } }
+
+/* ── F. FOIL SHIFT (kept strictly grayscale, never rainbow) ────────────────
+   PORTABLE RECIPE
+   foil: conic-gradient(from calc(var(--tx) * 80deg + 210deg) at 50% 42%,
+         transparent 0deg, rgba(255,255,255,0.5) 40deg, transparent 80deg,
+         rgba(255,255,255,0.22) 160deg, transparent 220deg,
+         rgba(255,255,255,0.4) 300deg, transparent 360deg)
+         mix-blend-mode: soft-light, opacity 0.9 */
+.c-f .lite--foil {
+  background: conic-gradient(from calc(var(--tx, 0) * 80deg + 210deg) at 50% 42%,
+    transparent 0deg, rgba(255,255,255,0.5) 40deg, transparent 80deg,
+    rgba(255,255,255,0.22) 160deg, transparent 220deg,
+    rgba(255,255,255,0.4) 300deg, transparent 360deg);
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+}
+.c-f .lite--foilspec {
+  background: radial-gradient(30% 22% at calc(50% + var(--tx, 0) * 40%) calc(38% + var(--ty, 0) * 34%),
+    rgba(255,255,255,0.3), transparent 72%);
+  mix-blend-mode: screen;
+}
+
+.foot { padding: 60px 0 0; font-size: 13px; line-height: 1.6; color: var(--text-lo); }
+
+@media (prefers-reduced-motion: reduce) {
+  .opt--c .glow, .c-e .lite--blob1, .c-e .lite--blob2 { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Card light</h1>
+    <p>Six ways light can live on the Memento. Tilt your phone, or drag a card with your finger. Same card, same skin. Only the light changes.</p>
+    <button id="motionBtn" type="button">Enable motion</button>
+  </div>
+
+  <section class="opt opt--a">
+    <div class="opt__head"><span class="opt__k">A</span><h2>Studio specular</h2></div>
+    <p>One soft key light. The highlight follows the tilt, the shadow leans away. The classic "held under a lamp" look.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-a" data-tilt><div class="face"></div><i class="lite lite--shade"></i><i class="lite lite--spec"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <section class="opt opt--b">
+    <div class="opt__head"><span class="opt__k">B</span><h2>Brushed sheen</h2></div>
+    <p>A fine metal grain with one bright band that sweeps as you tilt. The platinum feel, on every skin.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-b" data-tilt><div class="face"></div><i class="lite lite--grain"></i><i class="lite lite--band"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <section class="opt opt--c">
+    <div class="opt__head"><span class="opt__k">C</span><h2>Rim light</h2></div>
+    <p>The light lives on the edges. Tilt back and the top edge catches it, tilt forward and the bottom does. The glow behind breathes slowly.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-c" data-tilt><div class="face"></div><i class="lite lite--rimtop"></i><i class="lite lite--rimbot"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <section class="opt opt--d">
+    <div class="opt__head"><span class="opt__k">D</span><h2>Depth parallax</h2></div>
+    <p>No highlight at all. Three layers of the material slide at different speeds, so the card reads as deep instead of shiny.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-d" data-tilt><div class="face"></div><i class="lite lite--deep"></i><i class="lite lite--mid"></i><i class="lite lite--near"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <section class="opt opt--e">
+    <div class="opt__head"><span class="opt__k">E</span><h2>Liquid light</h2></div>
+    <p>Light moves inside the material on its own, slow as water. A small bright point still answers your tilt.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-e" data-tilt><div class="face"></div><i class="lite lite--blob1"></i><i class="lite lite--blob2"></i><i class="lite lite--dot"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <section class="opt opt--f">
+    <div class="opt__head"><span class="opt__k">F</span><h2>Foil shift</h2></div>
+    <p>A foil sheen that rotates around the card as you tilt. Kept strictly silver, never rainbow.</p>
+    <div class="stage"><div class="cardw"><span class="glow"></span>
+      <div class="card c-f" data-tilt><div class="face"></div><i class="lite lite--foil"></i><i class="lite lite--foilspec"></i>
+        <svg class="m" viewBox="0 0 512 512"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>
+      </div></div></div>
+  </section>
+
+  <p class="foot">Every option carries its exact recipe in this page's source. The pick gets ported verbatim onto the real card, on every skin, with the tilt driven by device motion the way this page does it.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var cards = [].slice.call(document.querySelectorAll('[data-tilt]'));
+  var tx = 0, ty = 0;             // the shared, device-driven tilt
+  var lastInput = 0;
+
+  function write(card, x, y) {
+    card.style.setProperty('--tx', x.toFixed(3));
+    card.style.setProperty('--ty', y.toFixed(3));
+  }
+
+  // Per-card finger override: dragging one card steers just that card.
+  cards.forEach(function (card) {
+    var dragging = false;
+    card.addEventListener('pointerdown', function (e) { dragging = true; card.setPointerCapture(e.pointerId); });
+    card.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var r = card.getBoundingClientRect();
+      var x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      var y = ((e.clientY - r.top) / r.height) * 2 - 1;
+      card._own = { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, -y)) };
+      lastInput = Date.now();
+    });
+    function drop() { dragging = false; card._own = null; }
+    card.addEventListener('pointerup', drop);
+    card.addEventListener('pointercancel', drop);
+  });
+
+  // Device tilt. iOS needs a user-gesture permission request once.
+  var btn = document.getElementById('motionBtn');
+  function bindOrientation() {
+    window.addEventListener('deviceorientation', function (e) {
+      if (e.beta == null && e.gamma == null) return;
+      // neutral hold is ~40deg beta (phone in hand), gamma 0
+      ty = Math.max(-1, Math.min(1, (40 - e.beta) / 28));
+      tx = Math.max(-1, Math.min(1, e.gamma / 24));
+      lastInput = Date.now();
+    });
+  }
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    btn.classList.add('show');
+    btn.addEventListener('click', function () {
+      DeviceOrientationEvent.requestPermission().then(function (res) {
+        if (res === 'granted') { bindOrientation(); btn.remove(); }
+      }).catch(function () {});
+    });
+  } else {
+    bindOrientation();
+  }
+
+  // The idle sweep: with no input for 2.5s, a slow lissajous shows each
+  // option's character on its own (reduced motion holds still instead).
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var t0 = Date.now();
+  (function loop() {
+    var idle = Date.now() - lastInput > 2500;
+    var gx = tx, gy = ty;
+    if (idle && !reduce) {
+      var t = (Date.now() - t0) / 1000;
+      gx = Math.sin(t * 0.42) * 0.55;
+      gy = Math.sin(t * 0.31 + 1.2) * 0.4;
+    } else if (idle && reduce) { gx = 0.25; gy = 0.2; }
+    cards.forEach(function (card) {
+      var o = card._own;
+      write(card, o ? o.x : gx, o ? o.y : gy);
+    });
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
