@@ -131,7 +131,8 @@ const WelcomeIntro = {
   },
 
   open() {
-    if (state.meta.welcomeSeen) {
+    const finalePending = this._wcHasFinaleProgress();
+    if (state.meta.welcomeSeen && !finalePending) {
       renderAll();
       TabBar.show();
       document.getElementById('ambientBg')?.classList.add('loaded');
@@ -144,6 +145,10 @@ const WelcomeIntro = {
     this._ensureProgressBar();
     this._ensureStage(); this._setStage([]);
     this._summaryStarted = false; this._summary = null; this._summaryFailed = false; this._onSummaryReady = null; this._helpStart = null; this._afterPhilosophy = null;
+    // The interview answers are already durable. If the app was killed during
+    // the final celebration / recap / style / handoff, resume that exact tail
+    // instead of sending the person back through the questions.
+    if (this._wcTryResumeFinale()) return;
     // Straight into the conversation (name first). The philosophy is now
     // taught personally at the end via the AI summary stepper. v25: the
     // question phase is an Opal-style flowing typewriter conversation.
@@ -583,7 +588,6 @@ const WelcomeIntro = {
       this._wcSaveProgress();
     }
     if (gen !== this._wcGen) return;
-    this._wcClearProgress();   // question phase done; resume no longer applies
     this._wcHandoff();
   },
 
@@ -611,6 +615,64 @@ const WelcomeIntro = {
   },
   _wcClearProgress() {
     try { if (state.meta && state.meta.onbProgress) { state.meta.onbProgress = null; persistNow(); } } catch (e) {}
+  },
+  // The question marker used to be cleared before the cinematic onboarding
+  // tail had any durable position of its own. Closing at Congrats therefore
+  // restarted the interview. Keep a tiny phase marker until home has actually
+  // rendered once; the answers themselves remain in their normal profile keys.
+  _wcFinalePhases: ['congrats', 'summary', 'style', 'handoff'],
+  _wcReadFinaleProgress() {
+    try {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return null;
+      const p = state.meta && state.meta.onbFinale;
+      if (!p || p.v !== 1 || this._wcFinalePhases.indexOf(p.phase) < 0) return null;
+      return p;
+    } catch (e) { return null; }
+  },
+  _wcHasFinaleProgress() { return !!this._wcReadFinaleProgress(); },
+  _wcSaveFinaleProgress(phase, detail) {
+    try {
+      if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return;
+      if (this._wcFinalePhases.indexOf(phase) < 0) return;
+      if (!state.meta) state.meta = {};
+      state.meta.onbFinale = Object.assign({ v: 1, phase: phase, savedAt: Date.now() }, detail || {});
+      persistNow();
+    } catch (e) {}
+  },
+  _wcClearFinaleProgress() {
+    try {
+      if (state.meta && state.meta.onbFinale) {
+        state.meta.onbFinale = null;
+        persistNow();
+      }
+    } catch (e) {}
+  },
+  _wcTryResumeFinale() {
+    const p = this._wcReadFinaleProgress();
+    if (!p) return false;
+    const sumIdx = this.identitySteps.findIndex(s => s.type === 'summaryStepper');
+    const fallbackStep = sumIdx >= 0 ? sumIdx : Math.max(0, this.identitySteps.length - 1);
+    const stepIndex = Number.isFinite(p.stepIndex) ? p.stepIndex : fallbackStep;
+    setTimeout(() => {
+      if (p.phase === 'congrats') {
+        this._showFirstWin(stepIndex);
+        return;
+      }
+      if (p.phase === 'summary') {
+        const count = this._solBeats(state.profile || {}).length;
+        // A changed flow may make an old index invalid. Resume at the first
+        // recap in that case, never beyond what the person had already seen.
+        const beatIndex = Number.isFinite(p.beatIndex) && p.beatIndex >= 0 && p.beatIndex < count ? p.beatIndex : 0;
+        this._showSolution(stepIndex, beatIndex);
+        return;
+      }
+      if (p.phase === 'style') {
+        this._finishWithName(undefined, true);
+        return;
+      }
+      this._revealAfterOnboarding();
+    }, 220);
+    return true;
   },
   _wcTryResume() {
     try {
@@ -1021,6 +1083,10 @@ const WelcomeIntro = {
     if (col) { col.style.transition = 'opacity 0.4s ease, transform 0.4s ease'; requestAnimationFrame(() => { col.style.opacity = '0'; col.style.transform = 'translateY(-12px)'; }); }
     let sumIdx = this.identitySteps.findIndex(s => s.type === 'summaryStepper');
     if (sumIdx < 0) sumIdx = this.identitySteps.findIndex(s => s.type !== 'choices' && s.type !== 'text');
+    // Establish the finale marker before clearing the interview marker. There
+    // is never a frame where a completed interview has no safe resume point.
+    this._wcSaveFinaleProgress('congrats', { stepIndex: sumIdx });
+    this._wcClearProgress();
     setTimeout(() => this._showIdentityStep(sumIdx), 320);
   },
 
@@ -2032,6 +2098,7 @@ const WelcomeIntro = {
   // showing up honestly IS the first win (proof they want to change). Then it
   // flows into the personalized summary stepper.
   _showFirstWin(stepIndex) {
+    this._wcSaveFinaleProgress('congrats', { stepIndex: stepIndex });
     if (!this._summaryStarted) { this._summaryStarted = true; try { this.generateSummary(); } catch (e) { this._summaryFailed = true; } }
     this._phiSeen = false;   // the pillar reveal plays once per onboarding run
     this._phiSeqToken = (this._phiSeqToken || 0) + 1;
@@ -2156,6 +2223,7 @@ const WelcomeIntro = {
     const n = beats.length;
     if (beatIdx >= n) { this.el.classList.remove('welcome-intro--cine', 'welcome-intro--preenter'); this._showIdentityStep(stepIndex + 1); return; }
     const b = beats[beatIdx];
+    this._wcSaveFinaleProgress('summary', { stepIndex: stepIndex, beatIndex: beatIdx });
     const isLast = beatIdx === n - 1;
     const kind = b.kind || 'stage';
     // The recap ("here's what you said") sits on plain black (pre-Memento): --preenter hides
@@ -3226,8 +3294,9 @@ const WelcomeIntro = {
     });
   },
 
-  _finishWithName(name) {
-    try { if (typeof Analytics !== 'undefined') Analytics.track('onboarding_done'); } catch (e) {} // Funnel
+  _finishWithName(name, resumed) {
+    if (!resumed) { try { if (typeof Analytics !== 'undefined') Analytics.track('onboarding_done'); } catch (e) {} } // Funnel
+    this._wcSaveFinaleProgress('style');
     // The look is picked here, as the final step of onboarding, right before the
     // blank Memento is revealed, so the very first card they see already wears it.
     // Apply runs live + persists inside the picker (applyPrefs), so when the reveal
@@ -3243,6 +3312,9 @@ const WelcomeIntro = {
   },
 
   _revealAfterOnboarding(name) {
+    // Persist the handoff before any visual work. It is cleared only after
+    // renderAll returns, so a crash before the home exists resumes here.
+    this._wcSaveFinaleProgress('handoff');
     // Theme classes are stripped AFTER the fade-out below (v718): removing them
     // while the intro is still visible repaints the last beat bright (Malik's
     // "evolved page popped up again" flash on Enter Memento).
@@ -3259,6 +3331,7 @@ const WelcomeIntro = {
     state.profile.onboardedAt = Date.now();
     persistNow();
     renderAll();
+    this._wcClearFinaleProgress();
 
     // Show the app blurred behind a welcome overlay
     const app = document.getElementById('app');

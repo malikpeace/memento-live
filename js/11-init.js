@@ -321,6 +321,22 @@ document.addEventListener('keydown', (e) => {
 // "Memento" flashing on every reload.
 (function autoDismissSplashForReturningUsers() {
   try {
+    // A completed interview can still be inside its celebration / recap /
+    // style / handoff tail. That durable marker outranks the normal returning
+    // user shortcut, which would otherwise skip straight to home and strand
+    // the unfinished finale. WelcomeIntro owns the exact resume beat.
+    const hasOnboardingFinale = !!(typeof WelcomeIntro !== 'undefined'
+      && WelcomeIntro._wcHasFinaleProgress && WelcomeIntro._wcHasFinaleProgress());
+    if (hasOnboardingFinale) {
+      const pendingSplash = document.getElementById('splash');
+      if (pendingSplash) {
+        pendingSplash.style.transition = 'none';
+        pendingSplash.classList.add('dismissed');
+      }
+      try { Splash.stopBeams && Splash.stopBeams(); } catch (_) {}
+      setTimeout(() => { try { WelcomeIntro.open(); } catch (_) {} }, 0);
+      return;
+    }
     const isReturning = state && state.meta && state.meta.welcomeSeen;
     // Restorable = ANY remembered place: the two experiences, an open module
     // sheet ('sheet:streak'), or a non-home tab ('tab:profile').
