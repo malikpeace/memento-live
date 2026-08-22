@@ -3427,6 +3427,305 @@
     // ===================================================================
   }
 
+  // ======================= THE ASK, AT MODULE SCOPE ========================
+  // (WO-2 correction, Codex's review + Malik's "identical everywhere" call.)
+  // The close question used to live inside openDay's closure, so only the
+  // flow's own door could ask it. Both doors now run the SAME due check and
+  // the SAME question: `plan` and the mount host are parameters, openDay
+  // passes its own, the home door passes the live plan and a borrowed room.
+  // The bodies are the closure's, moved verbatim; openDay keeps thin
+  // delegates so its call sites never changed.
+  var askLive = null;
+  function dayDateOf(k) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(k || ''));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
+  }
+  // THE WEEKLY DAY the plan names ('weekly:sunday'), Sunday when it names
+  // none. A person's "Once a week" answer inherits it, so their week lands on
+  // the day their own bucket was built around.
+  function askWeeklyDow(plan) {
+    var cad = String((plan.close && plan.close.cadence) || '');
+    var want = (cad.indexOf('weekly') === 0) ? (cad.split(':')[1] || 'sunday') : 'sunday';
+    var idx = WEEK.indexOf(String(want).slice(0, 3));
+    return idx < 0 ? 0 : idx;
+  }
+  // EVERY OTHER DAY is arithmetic, never a memory: days since the plan landed,
+  // even asks, odd stays quiet. Deterministic, so a missed day cannot shift
+  // the rhythm and a reinstall cannot restart it.
+  // The anchor, in the order of how solid it is: the day this plan landed,
+  // then the day the LIVE plan landed (a fixture or a preview build has no
+  // landing of its own), then the first day they ever closed for this goal.
+  // All three are facts already in the store, so the rhythm is the same on
+  // every device and cannot drift with a reinstall.
+  function askEveryOtherAnchor(plan) {
+    var a = null;
+    try { if (plan.landedAt) a = dayKey(new Date(plan.landedAt)); } catch (e) {}
+    if (!a) {
+      try {
+        var lp = (S() || {}).actionPlan;
+        if (lp && lp.landedAt) a = dayKey(new Date(lp.landedAt));
+      } catch (e) {}
+    }
+    if (!a) {
+      try {
+        var recs = (S() || {}).dayRecords || {}, mine = plan.starHash || liveStarHash(), keys = [];
+        Object.keys(recs).forEach(function (k) {
+          var r = recs[k];
+          if (r && (!mine || !r.starHash || r.starHash === mine)) keys.push(k);
+        });
+        keys.sort();
+        if (keys.length) a = keys[0];
+      } catch (e) {}
+    }
+    return a;
+  }
+  function askEveryOtherDue(plan, d) {
+    var anchor = askEveryOtherAnchor(plan);
+    if (!anchor) return true;                 // nothing to count from: ask
+    var diff = Math.round((d - dayDateOf(anchor)) / 86400000);
+    return Math.abs(diff) % 2 === 0;
+  }
+  function askPrefDue(plan, pref, rec) {
+    var d = dayDateOf(rec.day), dow = d.getDay();
+    if (pref.kind === 'daily') return true;
+    if (pref.kind === 'every-other') return askEveryOtherDue(plan, d);
+    if (pref.kind === 'twice-week') return dow === 1 || dow === 4;   // Mon + Thu
+    if (pref.kind === 'weekly') return dow === askWeeklyDow(plan);
+    if (pref.kind === 'custom') return (pref.days || []).indexOf(dow) > -1;
+    return true;
+  }
+  function closeAskDueFor(plan, rec) {
+    var c = plan.close;
+    var pref = null;
+    try { pref = livePref(); } catch (e) { pref = null; }
+    // v3.2: THE MANUFACTURED ASK. Deep work hours are a real number nothing
+    // else in the app records, and the plan's close block for that bucket
+    // often says none. Where the person has chosen a rhythm and the bucket
+    // has an ask of its own, the rhythm brings the ask with it.
+    if ((!c || !c.prompt) && pref) {
+      var made = MANUFACTURED_ASK[(livePlan() && livePlan().bucket) || plan.bucket || ''];
+      if (made) c = made;
+    }
+    if (!c || !c.prompt) return null;
+    var cad = String(c.cadence || 'none');
+    // 'none' and 'on-results' on a plan that HAS a question of its own are
+    // not rhythms, and a preference cannot turn them into one. A
+    // manufactured ask arrives with its own cadence, so it is unaffected.
+    if (c !== plan.close) cad = String(c.cadence || 'daily');
+    else if (cad === 'none' || cad === 'on-results') return null;
+    var due = false;
+    // THE PERSON'S ANSWER FIRST (v3.1), the plan's own line second.
+    if (pref) {
+      due = askPrefDue(plan, pref, rec);
+    } else if (cad === 'daily' || cad === 'nightly') due = true;
+    else if (cad.indexOf('weekly') === 0) {
+      due = dayDateOf(rec.day).getDay() === askWeeklyDow(plan);
+    } else if (cad === 'per-session') due = !rec.off;
+    if (!due) return null;
+    // ONCE A DAY. gp.askedDay is the app's own throttle for asking a person
+    // where they are; the same stamp keeps Clarity's ask off the same day.
+    try {
+      var gp = S().goalProgress;
+      if (gp && gp.askedDay === rec.day) return null;
+    } catch (e) {}
+    return c;
+  }
+
+  // The number rules are the refine screen's, to the character (clean +
+  // shownNum + fitNum there): same typing behaviour, same big centred
+  // readout, so the two number moments in Action are one control.
+  function askClean(raw, dec) {
+    var t = String(raw).replace(dec ? /[^0-9.]/g : /[^0-9]/g, '');
+    if (!dec) return t.replace(/^0+(?=\d)/, '');
+    var s = t.split('.');
+    return s.length > 1 ? s[0] + '.' + s.slice(1).join('').slice(0, 1) : t;
+  }
+  function askShown(v, dec) {
+    if (dec) return v;
+    return v ? v.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+  }
+
+  function openCloseAskOn(host, c, rec, done) {
+    if (askLive) return;
+    var kind = (c.kind === 'choice' && (c.choices || []).length) ? 'choice' : 'num';
+    var raw = '', pick = null;
+
+    var lay = el('div', 'afl-ask');
+    lay.setAttribute('role', 'dialog');
+    lay.setAttribute('aria-modal', 'true');
+    lay.setAttribute('aria-label', c.prompt);
+    var wrap = el('div', 'afl-q afl-q--ask');
+    // the same reserved top row the refine questions have, so this question
+    // lands on their baseline and clears the close chip's corner (law 3a2).
+    var top = el('div', 'afl-q__top');
+    top.setAttribute('aria-hidden', 'true');
+    top.appendChild(el('span', 'afl-q__sp'));
+    wrap.appendChild(top);
+    wrap.appendChild(el('div', 'afl-q__q', c.prompt));
+    // their plan's own line about why this is asked. No source, no line: the
+    // slot is reserved either way, so the question never moves.
+    wrap.appendChild(el('p', 'afl-q__unit', c.source || ''));
+    var body = el('div', 'afl-q__as');
+    wrap.appendChild(body);
+
+    var nav = navRow();
+    nav.classList.add('afl-nav--ask');
+    var skip = btn('afl-ask__skip', 'Not now');
+    var go = cta('Save');
+    go.disabled = true;
+    nav.appendChild(skip);
+    nav.appendChild(go);
+    wrap.appendChild(nav);
+    var askCol = el('div', 'afl-ask__col');
+    askCol.appendChild(wrap);
+    lay.appendChild(askCol);
+
+    function live(on) {
+      go.disabled = !on;
+      go.classList.toggle('is-live', !!on);
+    }
+
+    if (kind === 'num') {
+      body.classList.add('afl-q__as--num');
+      var f = el('div', 'afl-q__field');
+      var set = el('div', 'afl-q__set');
+      if (c.prefix) set.appendChild(el('span', 'afl-q__pre', c.prefix));
+      var inp = document.createElement('input');
+      inp.className = 'afl-q__num';
+      inp.type = 'text';
+      inp.setAttribute('inputmode', c.decimals ? 'decimal' : 'numeric');
+      inp.autocomplete = 'off';
+      inp.placeholder = '0';
+      inp.setAttribute('aria-label', c.prompt);
+      set.appendChild(inp);
+      if (c.unit) set.appendChild(el('span', 'afl-q__suf', c.unit));
+      f.appendChild(set);
+      f.appendChild(el('div', 'afl-q__rule'));
+      body.appendChild(f);
+      var mirror = el('span', 'afl-q__mirror');
+      f.appendChild(mirror);
+      var fit = function () {
+        var t = inp.value || inp.placeholder, L = t.length;
+        var px = L <= 3 ? 130 : L === 4 ? 114 : L === 5 ? 99 : L === 6 ? 83 : 70;
+        inp.style.fontSize = px + 'px';
+        mirror.style.fontSize = px + 'px';
+        mirror.textContent = t;
+        inp.style.width = Math.max(83, Math.ceil(mirror.getBoundingClientRect().width) + 13) + 'px';
+      };
+      inp.addEventListener('input', function () {
+        raw = askClean(inp.value, c.decimals);
+        inp.value = askShown(raw, c.decimals);
+        fit();
+        live(parseFloat(raw) > 0);
+      });
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+      });
+      fit();
+    } else {
+      (c.choices || []).forEach(function (t, k) {
+        var b = btn('afl-q__a', t);
+        b.addEventListener('click', function () {
+          pick = (pick === k) ? null : k;
+          [].forEach.call(body.querySelectorAll('.afl-q__a'), function (x, j) {
+            x.classList.toggle('is-on', pick === j);
+            x.setAttribute('aria-pressed', pick === j ? 'true' : 'false');
+          });
+          live(pick !== null);
+        });
+        body.appendChild(b);
+      });
+    }
+
+    function shut() {
+      if (!askLive) return;
+      askLive = null;
+      if (reduced()) { if (lay.parentNode) lay.parentNode.removeChild(lay); return; }
+      lay.classList.add('is-out');
+      setTimeout(function () { if (lay.parentNode) lay.parentNode.removeChild(lay); }, 200);
+    }
+
+    function answer() {
+      var val = (kind === 'num') ? parseFloat(raw) : (c.choices[pick] || '');
+      if (kind === 'num' && !isFinite(val)) return;
+      if (kind === 'choice' && !val) return;
+      // 1. THE RECORD HOLDS WHAT THEY SAID. The day row is the receipt, so
+      //    the answer lives with the day it belongs to (the v1002 law), even
+      //    for a choice, which the standing store has no shape for yet.
+      try {
+        var r0 = (S().dayRecords || {})[rec.day];
+        if (r0) {
+          r0.close = {
+            kind: kind, value: val, prompt: c.prompt,
+            unit: c.unit || '', prefix: c.prefix || '', at: Date.now()
+          };
+        }
+      } catch (e) {}
+      // 2. THE STANDING STORE, through the app's one writer. js/03's pulse
+      //    path carries its OWN ceremony renderers, for a number typed
+      //    anywhere else in the app. Here the close owns the moment
+      //    (resolution B: exactly one referee call, right below), so the two
+      //    renderers stand down for this one synchronous write and the
+      //    decision is made once, by closeReward.
+      if (kind === 'num') {
+        var mR = window.MilestoneReward, gF = window.GrandFinale;
+        try {
+          window.MilestoneReward = null;
+          window.GrandFinale = null;
+          var upd = G('goalProgressUpdate');
+          if (upd) upd(val);
+        } catch (e) {
+        } finally {
+          window.MilestoneReward = mR;
+          window.GrandFinale = gF;
+        }
+      }
+      // 3. asked today, so nothing asks again today.
+      try { var gp = S().goalProgress; if (gp) gp.askedDay = rec.day; } catch (e) {}
+      try { var p = G('persistNow'); if (p) p(); } catch (e) {}
+      shut();
+      try { done(); } catch (e) {}
+    }
+
+    go.addEventListener('click', function () { if (!go.disabled) answer(); });
+    // "Not now" is a real answer to a question about a number they may not
+    // have. It costs nothing and it is never asked about again today.
+    skip.addEventListener('click', function () { shut(); try { done(); } catch (e) {} });
+
+    askLive = { close: shut };
+    host.appendChild(lay);
+    if (!reduced()) { void lay.offsetWidth; lay.classList.add('is-in'); }
+  }
+
+  // THE HOME DOOR'S ASK ROOM. The home has no flow room, so the ask borrows
+  // one: a real shell(), so the question stands on the exact surface, column
+  // and background the flow's own ask stands on, with the standing X in its
+  // corner. Every way out (Save, Not now, the X, Escape) settles the SAME
+  // way, exactly once: the room closes, then the one reward ceremony runs.
+  // The X and Escape count as "Not now": the day is already written, the ask
+  // stays merely unanswered, never lost.
+  function openHomeAsk(c, rec, prevGp) {
+    var fired = false;
+    function settle() {
+      if (fired) return;
+      fired = true;
+      if (askLive) { try { askLive.close(); } catch (e) {} askLive = null; }
+      closeRewardCeremony(rec, prevGp);
+    }
+    try {
+      shell('close-ask', { label: c.prompt });
+      if (current) current.teardown = function () { setTimeout(settle, 0); };
+      openCloseAskOn(root, c, rec, function () {
+        // the room leaves first, so the ceremony renders over the home the
+        // same way the flow's own settled day hands over to it.
+        try { destroy(); } catch (e) { settle(); }
+      });
+    } catch (e) {
+      settle();
+    }
+  }
+  // =========================================================================
+
   var _homeCloseBusy = false;
   function completeFromHome() {
     var st = S();
@@ -3449,8 +3748,7 @@
       } catch (e) {}
       // The home door closes the STAR act only: the box shows one move and one
       // hold. Supports live in the day view; an empty list is the honest record
-      // of what this door showed. The pulse ask stays a flow moment (its screen
-      // lives there); skipping it leaves the ask due, never skipped-forever.
+      // of what this door showed.
       var rec = {
         day: dk,
         starHash: (plan && plan.starHash) || liveStarHash() || '',
@@ -3463,8 +3761,14 @@
       };
       var res = writeDayClose(rec, plan);
       setTimeout(function () { try { var ra = G('renderAll'); if (ra) ra(); } catch (e) {} }, 0);
-      closeRewardCeremony(rec, prevGp);
-      return { ok: !!(res && res.ok), rec: rec };
+      // THE ASK IS DUE AT EVERY DOOR (Malik: identical everywhere). The same
+      // due check the flow's day view runs; when it says today, the home door
+      // asks the same question on the same surface before the ceremony.
+      var askC = null;
+      if (plan) { try { askC = closeAskDueFor(plan, rec); } catch (e) { askC = null; } }
+      if (askC) openHomeAsk(askC, rec, prevGp);
+      else closeRewardCeremony(rec, prevGp);
+      return { ok: !!(res && res.ok), rec: rec, asked: !!askC };
     } finally {
       _homeCloseBusy = false;
     }
@@ -4037,267 +4341,12 @@
     //                     be Memento inventing an occasion.
     //   none              never, for anyone
     // =========================================================================
-    var askLive = null;
-    function dayDateOf(k) {
-      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(k || ''));
-      return m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date();
-    }
-    // THE WEEKLY DAY the plan names ('weekly:sunday'), Sunday when it names
-    // none. A person's "Once a week" answer inherits it, so their week lands on
-    // the day their own bucket was built around.
-    function weeklyDow() {
-      var cad = String((plan.close && plan.close.cadence) || '');
-      var want = (cad.indexOf('weekly') === 0) ? (cad.split(':')[1] || 'sunday') : 'sunday';
-      var idx = WEEK.indexOf(String(want).slice(0, 3));
-      return idx < 0 ? 0 : idx;
-    }
-    // EVERY OTHER DAY is arithmetic, never a memory: days since the plan landed,
-    // even asks, odd stays quiet. Deterministic, so a missed day cannot shift
-    // the rhythm and a reinstall cannot restart it.
-    // The anchor, in the order of how solid it is: the day this plan landed,
-    // then the day the LIVE plan landed (a fixture or a preview build has no
-    // landing of its own), then the first day they ever closed for this goal.
-    // All three are facts already in the store, so the rhythm is the same on
-    // every device and cannot drift with a reinstall.
-    function everyOtherAnchor() {
-      var a = null;
-      try { if (plan.landedAt) a = dayKey(new Date(plan.landedAt)); } catch (e) {}
-      if (!a) {
-        try {
-          var lp = (S() || {}).actionPlan;
-          if (lp && lp.landedAt) a = dayKey(new Date(lp.landedAt));
-        } catch (e) {}
-      }
-      if (!a) {
-        try {
-          var recs = (S() || {}).dayRecords || {}, mine = plan.starHash || liveStarHash(), keys = [];
-          Object.keys(recs).forEach(function (k) {
-            var r = recs[k];
-            if (r && (!mine || !r.starHash || r.starHash === mine)) keys.push(k);
-          });
-          keys.sort();
-          if (keys.length) a = keys[0];
-        } catch (e) {}
-      }
-      return a;
-    }
-    function everyOtherDue(d) {
-      var anchor = everyOtherAnchor();
-      if (!anchor) return true;                 // nothing to count from: ask
-      var diff = Math.round((d - dayDateOf(anchor)) / 86400000);
-      return Math.abs(diff) % 2 === 0;
-    }
-    function prefDue(pref, rec) {
-      var d = dayDateOf(rec.day), dow = d.getDay();
-      if (pref.kind === 'daily') return true;
-      if (pref.kind === 'every-other') return everyOtherDue(d);
-      if (pref.kind === 'twice-week') return dow === 1 || dow === 4;   // Mon + Thu
-      if (pref.kind === 'weekly') return dow === weeklyDow();
-      if (pref.kind === 'custom') return (pref.days || []).indexOf(dow) > -1;
-      return true;
-    }
-    function closeAskDue(rec) {
-      var c = plan.close;
-      var pref = null;
-      try { pref = livePref(); } catch (e) { pref = null; }
-      // v3.2: THE MANUFACTURED ASK. Deep work hours are a real number nothing
-      // else in the app records, and the plan's close block for that bucket
-      // often says none. Where the person has chosen a rhythm and the bucket
-      // has an ask of its own, the rhythm brings the ask with it.
-      if ((!c || !c.prompt) && pref) {
-        var made = MANUFACTURED_ASK[(livePlan() && livePlan().bucket) || plan.bucket || ''];
-        if (made) c = made;
-      }
-      if (!c || !c.prompt) return null;
-      var cad = String(c.cadence || 'none');
-      // 'none' and 'on-results' on a plan that HAS a question of its own are
-      // not rhythms, and a preference cannot turn them into one. A
-      // manufactured ask arrives with its own cadence, so it is unaffected.
-      if (c !== plan.close) cad = String(c.cadence || 'daily');
-      else if (cad === 'none' || cad === 'on-results') return null;
-      var due = false;
-      // THE PERSON'S ANSWER FIRST (v3.1), the plan's own line second.
-      if (pref) {
-        due = prefDue(pref, rec);
-      } else if (cad === 'daily' || cad === 'nightly') due = true;
-      else if (cad.indexOf('weekly') === 0) {
-        due = dayDateOf(rec.day).getDay() === weeklyDow();
-      } else if (cad === 'per-session') due = !rec.off;
-      if (!due) return null;
-      // ONCE A DAY. gp.askedDay is the app's own throttle for asking a person
-      // where they are; the same stamp keeps Clarity's ask off the same day.
-      try {
-        var gp = S().goalProgress;
-        if (gp && gp.askedDay === rec.day) return null;
-      } catch (e) {}
-      return c;
-    }
-
-    // The number rules are the refine screen's, to the character (clean +
-    // shownNum + fitNum there): same typing behaviour, same big centred
-    // readout, so the two number moments in Action are one control.
-    function askClean(raw, dec) {
-      var t = String(raw).replace(dec ? /[^0-9.]/g : /[^0-9]/g, '');
-      if (!dec) return t.replace(/^0+(?=\d)/, '');
-      var s = t.split('.');
-      return s.length > 1 ? s[0] + '.' + s.slice(1).join('').slice(0, 1) : t;
-    }
-    function askShown(v, dec) {
-      if (dec) return v;
-      return v ? v.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
-    }
-
-    function openCloseAsk(c, rec, done) {
-      if (askLive) return;
-      var kind = (c.kind === 'choice' && (c.choices || []).length) ? 'choice' : 'num';
-      var raw = '', pick = null;
-
-      var lay = el('div', 'afl-ask');
-      lay.setAttribute('role', 'dialog');
-      lay.setAttribute('aria-modal', 'true');
-      lay.setAttribute('aria-label', c.prompt);
-      var wrap = el('div', 'afl-q afl-q--ask');
-      // the same reserved top row the refine questions have, so this question
-      // lands on their baseline and clears the close chip's corner (law 3a2).
-      var top = el('div', 'afl-q__top');
-      top.setAttribute('aria-hidden', 'true');
-      top.appendChild(el('span', 'afl-q__sp'));
-      wrap.appendChild(top);
-      wrap.appendChild(el('div', 'afl-q__q', c.prompt));
-      // their plan's own line about why this is asked. No source, no line: the
-      // slot is reserved either way, so the question never moves.
-      wrap.appendChild(el('p', 'afl-q__unit', c.source || ''));
-      var body = el('div', 'afl-q__as');
-      wrap.appendChild(body);
-
-      var nav = navRow();
-      nav.classList.add('afl-nav--ask');
-      var skip = btn('afl-ask__skip', 'Not now');
-      var go = cta('Save');
-      go.disabled = true;
-      nav.appendChild(skip);
-      nav.appendChild(go);
-      wrap.appendChild(nav);
-      var askCol = el('div', 'afl-ask__col');
-      askCol.appendChild(wrap);
-      lay.appendChild(askCol);
-
-      function live(on) {
-        go.disabled = !on;
-        go.classList.toggle('is-live', !!on);
-      }
-
-      if (kind === 'num') {
-        body.classList.add('afl-q__as--num');
-        var f = el('div', 'afl-q__field');
-        var set = el('div', 'afl-q__set');
-        if (c.prefix) set.appendChild(el('span', 'afl-q__pre', c.prefix));
-        var inp = document.createElement('input');
-        inp.className = 'afl-q__num';
-        inp.type = 'text';
-        inp.setAttribute('inputmode', c.decimals ? 'decimal' : 'numeric');
-        inp.autocomplete = 'off';
-        inp.placeholder = '0';
-        inp.setAttribute('aria-label', c.prompt);
-        set.appendChild(inp);
-        if (c.unit) set.appendChild(el('span', 'afl-q__suf', c.unit));
-        f.appendChild(set);
-        f.appendChild(el('div', 'afl-q__rule'));
-        body.appendChild(f);
-        var mirror = el('span', 'afl-q__mirror');
-        f.appendChild(mirror);
-        var fit = function () {
-          var t = inp.value || inp.placeholder, L = t.length;
-          var px = L <= 3 ? 130 : L === 4 ? 114 : L === 5 ? 99 : L === 6 ? 83 : 70;
-          inp.style.fontSize = px + 'px';
-          mirror.style.fontSize = px + 'px';
-          mirror.textContent = t;
-          inp.style.width = Math.max(83, Math.ceil(mirror.getBoundingClientRect().width) + 13) + 'px';
-        };
-        inp.addEventListener('input', function () {
-          raw = askClean(inp.value, c.decimals);
-          inp.value = askShown(raw, c.decimals);
-          fit();
-          live(parseFloat(raw) > 0);
-        });
-        inp.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
-        });
-        fit();
-      } else {
-        (c.choices || []).forEach(function (t, k) {
-          var b = btn('afl-q__a', t);
-          b.addEventListener('click', function () {
-            pick = (pick === k) ? null : k;
-            [].forEach.call(body.querySelectorAll('.afl-q__a'), function (x, j) {
-              x.classList.toggle('is-on', pick === j);
-              x.setAttribute('aria-pressed', pick === j ? 'true' : 'false');
-            });
-            live(pick !== null);
-          });
-          body.appendChild(b);
-        });
-      }
-
-      function shut() {
-        if (!askLive) return;
-        askLive = null;
-        if (reduced()) { if (lay.parentNode) lay.parentNode.removeChild(lay); return; }
-        lay.classList.add('is-out');
-        setTimeout(function () { if (lay.parentNode) lay.parentNode.removeChild(lay); }, 200);
-      }
-
-      function answer() {
-        var val = (kind === 'num') ? parseFloat(raw) : (c.choices[pick] || '');
-        if (kind === 'num' && !isFinite(val)) return;
-        if (kind === 'choice' && !val) return;
-        // 1. THE RECORD HOLDS WHAT THEY SAID. The day row is the receipt, so
-        //    the answer lives with the day it belongs to (the v1002 law), even
-        //    for a choice, which the standing store has no shape for yet.
-        try {
-          var r0 = (S().dayRecords || {})[rec.day];
-          if (r0) {
-            r0.close = {
-              kind: kind, value: val, prompt: c.prompt,
-              unit: c.unit || '', prefix: c.prefix || '', at: Date.now()
-            };
-          }
-        } catch (e) {}
-        // 2. THE STANDING STORE, through the app's one writer. js/03's pulse
-        //    path carries its OWN ceremony renderers, for a number typed
-        //    anywhere else in the app. Here the close owns the moment
-        //    (resolution B: exactly one referee call, right below), so the two
-        //    renderers stand down for this one synchronous write and the
-        //    decision is made once, by closeReward.
-        if (kind === 'num') {
-          var mR = window.MilestoneReward, gF = window.GrandFinale;
-          try {
-            window.MilestoneReward = null;
-            window.GrandFinale = null;
-            var upd = G('goalProgressUpdate');
-            if (upd) upd(val);
-          } catch (e) {
-          } finally {
-            window.MilestoneReward = mR;
-            window.GrandFinale = gF;
-          }
-        }
-        // 3. asked today, so nothing asks again today.
-        try { var gp = S().goalProgress; if (gp) gp.askedDay = rec.day; } catch (e) {}
-        try { var p = G('persistNow'); if (p) p(); } catch (e) {}
-        shut();
-        try { done(); } catch (e) {}
-      }
-
-      go.addEventListener('click', function () { if (!go.disabled) answer(); });
-      // "Not now" is a real answer to a question about a number they may not
-      // have. It costs nothing and it is never asked about again today.
-      skip.addEventListener('click', function () { shut(); try { done(); } catch (e) {} });
-
-      askLive = { close: shut };
-      home.appendChild(lay);
-      if (!reduced()) { void lay.offsetWidth; lay.classList.add('is-in'); }
-    }
+    // THE ASK LIVES AT MODULE SCOPE NOW (WO-2 correction): the due check,
+    // the question and its singleton moved up so the home door can run the
+    // identical moment. These delegates keep this room's call sites as they
+    // were; `plan` and this room's own element are the only things it adds.
+    function closeAskDue(rec) { return closeAskDueFor(plan, rec); }
+    function openCloseAsk(c, rec, done) { openCloseAskOn(home, c, rec, done); }
 
     // =========================================================================
     // THE STANDING UNDO (v1207, Malik). The old 1.5 second window was the only

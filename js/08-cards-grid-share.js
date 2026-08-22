@@ -3860,38 +3860,18 @@ function completeTodayActionFromHome() {
   // the identical ceremony, Malik's explicit call), and its undo is the same
   // tombstoned reversal, so the cloud can never resurrect an undone day. The
   // old wash is gone on this path: the ceremony IS the moment now.
-  if (window.ActionFlow && ActionFlow.completeFromHome) {
-    const res = ActionFlow.completeFromHome();
-    if (res && res.ok) {
-      if (typeof showUndoToast === 'function') {
-        try { showUndoToast('Today is closed. You showed up.', function () {
-          try { ActionFlow.undoTodayData(res.rec ? res.rec.starHash : null); } catch (e) {}
-        }); } catch (e) {}
-      }
-      return res.rec ? res.rec.day : true;
-    }
-    if (res && (res.reason === 'already-closed' || res.reason === 'busy')) return null;
-    // any other refusal falls through to the legacy spine below, so a customer
-    // can never be left with a dead button.
-  }
-  showHomeCompletionWash();
-  const creditedId = creditTodayAction();
-  try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
-  if (creditedId && typeof showUndoToast === 'function') {
+  // NO LEGACY SPINE (Codex's review): a second write path is a split brain
+  // waiting to double-count a day. If the engine refuses, nothing is written;
+  // failing safe beats failing loud with two truths.
+  if (!(window.ActionFlow && ActionFlow.completeFromHome)) return null;
+  const res = ActionFlow.completeFromHome();
+  if (!res || !res.ok) return null;
+  if (typeof showUndoToast === 'function') {
     try { showUndoToast('Today is closed. You showed up.', function () {
-      try {
-        const history = state.action && state.action.completionHistory;
-        if (!Array.isArray(history)) return;
-        const index = history.findIndex((entry) => entry && entry.id === creditedId);
-        if (index === -1) return;
-        history.splice(index, 1);
-        if (typeof recalculateStreak === 'function') recalculateStreak();
-        persistNow();
-        if (typeof renderAll === 'function') renderAll();
-      } catch (e) {}
+      try { ActionFlow.undoTodayData(res.rec ? res.rec.starHash : null); } catch (e) {}
     }); } catch (e) {}
   }
-  return creditedId;
+  return res.rec ? res.rec.day : true;
 }
 
 function bindHomeActionHold(button) {
