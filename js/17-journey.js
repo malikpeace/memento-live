@@ -317,6 +317,11 @@ function renderPathTab() {
     }, 50);
   } catch (e) {}
 }
+// step 9 (v1270): the in-progress close-the-day text survives a tab detour.
+// renderReflectTab rebuilds its DOM on every activation, which silently ate
+// the draft (the audit: phones invite exactly this detour mid-thought).
+let _rfDraft = '';
+
 function renderReflectTab() {
   try {
     const body = document.getElementById('reflectBody');
@@ -413,6 +418,7 @@ function renderReflectTab() {
     if (input && save) {
       const grow = () => { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; };
       input.addEventListener('input', () => {
+        _rfDraft = input.value;
         save.disabled = !input.value.trim();
         if (count) {
           const n = input.value.trim() ? input.value.trim().split(/\s+/).length : 0;
@@ -420,13 +426,23 @@ function renderReflectTab() {
         }
         grow();
       });
+      // the detour comes home: restore the draft the rebuild would have eaten
+      if (_rfDraft && !input.value) {
+        input.value = _rfDraft;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
       grow();
       save.addEventListener('click', () => {
         const v = input.value.trim();
-        if (!v) return;
+        if (!v || save.disabled) return;
+        // the double-tap guard (the audit's finding 13): the first tap owns
+        // the day; a second tap, double-fire, or re-entry writes nothing.
+        save.disabled = true;
         try {
           if (!state.reflection) state.reflection = {};
           if (!Array.isArray(state.reflection.entries)) state.reflection.entries = [];
+          const already = state.reflection.entries.some(e => e && e.iso === todayISO && e.closedDay);
+          if (already) { _rfDraft = ''; renderReflectTab(); return; }
           state.reflection.entries.push({
             date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
             iso: todayISO,
@@ -436,6 +452,7 @@ function renderReflectTab() {
           try { writeProofEvent('reflection-save', { title: 'Closed the day', text: v.slice(0, 140), module: 'reflection', dedupeKey: 'close-' + todayISO }); } catch (e) {}
           persistNow();
         } catch (e) {}
+        _rfDraft = '';
         renderReflectTab();
       });
     }
