@@ -557,14 +557,45 @@
     }
     bindHeat(root.querySelector('#cspHonHeat'), function (v) { HONEST = v; });
     bindHeat(root.querySelector('#cspOnbHeat'), function (v) { ONBT = v; });
-    var tr = root.querySelector('#cspOnbTrack'), sx = null;
+    // v1275 (Malik: "i want the pages to move with my fingers... it doesn't
+    // feel apple like"): the track follows the finger 1:1, rubber-bands at
+    // the ends, and settles on release by distance OR a flick, per the
+    // Momentum gesture law (MOTION-SYSTEM.md: threshold 0.30, velocity
+    // 0.30 px/ms, rubber band c=0.85).
+    var tr = root.querySelector('#cspOnbTrack');
     if (tr) {
-      tr.addEventListener('pointerdown', function (e) { sx = e.clientX; });
-      tr.addEventListener('pointerup', function (e) {
-        if (sx == null) return; var dx = e.clientX - sx; sx = null;
-        if (dx < -45 && ONB_PG < ONB_MAX) { ONB_PG++; renderOnb(); }
-        else if (dx > 45 && ONB_PG > 0) { ONB_PG--; renderOnb(); }
+      var drag = null;
+      var band = function (over, w) { var c = 0.85; return (over * w * c) / (w + c * Math.abs(over)); };
+      tr.addEventListener('pointerdown', function (e) {
+        if (e.target.closest('.onb__heat')) return;   // the heatmaps own their drag
+        drag = { x0: e.clientX, x: e.clientX, t: performance.now(), v: 0, w: tr.getBoundingClientRect().width || 1 };
+        tr.style.transition = 'none';
+        try { tr.setPointerCapture(e.pointerId); } catch (err) {}
       });
+      tr.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var now = performance.now(), dt = now - drag.t;
+        if (dt > 0) drag.v = drag.v * 0.6 + ((e.clientX - drag.x) / dt) * 0.4;
+        drag.x = e.clientX; drag.t = now;
+        var dx = e.clientX - drag.x0;
+        // at the ends there is nothing to reveal, so the pull resists
+        if ((ONB_PG === 0 && dx > 0) || (ONB_PG === ONB_MAX && dx < 0)) dx = band(dx, drag.w);
+        tr.style.transform = 'translateX(calc(-' + (ONB_PG * 100) + '% + ' + dx.toFixed(1) + 'px))';
+        e.preventDefault();
+      });
+      var release = function (e) {
+        if (!drag) return;
+        var dx = (e && e.clientX != null ? e.clientX : drag.x) - drag.x0;
+        var v = drag.v, w = drag.w;
+        drag = null;
+        tr.style.transition = '';
+        var flungLeft = v < -0.30, flungRight = v > 0.30;
+        if ((dx < -w * 0.30 || flungLeft) && ONB_PG < ONB_MAX) ONB_PG++;
+        else if ((dx > w * 0.30 || flungRight) && ONB_PG > 0) ONB_PG--;
+        renderOnb();
+      };
+      tr.addEventListener('pointerup', release);
+      tr.addEventListener('pointercancel', release);
     }
     var go = root.querySelector('#cspOnbGo');
     if (go) go.addEventListener('click', function () {

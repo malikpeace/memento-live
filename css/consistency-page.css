@@ -7,8 +7,12 @@
    The score slab is the INVERSE of the theme via the --score-* tokens.
    ========================================================================== */
 #consistencyPage {
-  --acc: var(--accent, #3fd94e);
-  --acc-rgb: var(--accent-rgb, 63, 217, 78);
+  /* v1275 (Malik): on the DEFAULT skin the module keeps its own identity
+     colour: Consistency is green, the way Clarity is cyan. The accent takes
+     over only when the person actually chose one, or a material is driving
+     the app's colour (both stamp body[data-accent]). */
+  --acc: var(--color-consistency);
+  --acc-rgb: var(--success-rgb);
   --score-bg: rgba(250, 252, 249, 0.86);
   --score-fg: #08130a;
   --score-sub: rgba(8, 19, 10, 0.55);
@@ -23,6 +27,7 @@
   font-variant-numeric: tabular-nums;
 }
 #consistencyPage.is-open { opacity: 1; }
+body[data-accent] #consistencyPage { --acc: var(--accent); --acc-rgb: var(--accent-rgb); }
 html.theme-light #consistencyPage {
   --score-bg: linear-gradient(180deg, #131513 0%, #060807 100%);
   --score-fg: #f4fff7;
@@ -291,7 +296,7 @@ html.theme-light #consistencyPage .onb__warn { color: rgba(10, 14, 10, 0.72); }
 #consistencyPage .onb__hint { font-size: 13px; color: var(--text-lo); margin: 4px 0 0; }
 #consistencyPage .onb__foot { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; padding: 0 30px calc(var(--safe-b, 0px) + 42px); }
 #consistencyPage .onb__foot > * { width: 100%; max-width: 420px; }
-#consistencyPage .onb__dots { display: flex; gap: 8px; }
+#consistencyPage .onb__dots { display: flex; gap: 8px; justify-content: center; }
 #consistencyPage .onb__dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(var(--ink), 0.22); transition: all 0.3s ease; }
 #consistencyPage .onb__dots i.on { background: var(--acc); width: 20px; border-radius: 4px; }
 #consistencyPage .onb__go { font: inherit; font-size: 16px; font-weight: 650; color: #06140a; background: var(--acc); border: 0; border-radius: 14px; padding: 17px 34px; cursor: pointer; width: 100%; }
