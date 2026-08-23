@@ -836,6 +836,23 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
   opacity: 0 !important; background: none !important;
 }
 
+/* ── THE ROOM IS AN ACCENT, NOT A FLOOD (v1261, Malik: "if somebody has a
+   red memento, it looks like damn near the entire screen is red"). With a
+   material on, the card KEEPS its full saturation (it IS the skin), but the
+   room behind it stands down: the screen-filling wrap aura drops to a quiet,
+   desaturated tint, and the top-left god rays take the material's colour
+   LIFTED toward white, so the theme reads as an accent in the light instead
+   of drowning the background. js/08 sets html.skin-room + --beam-rgb
+   (space-separated, lifted 55% toward white) alongside --skin-rgb.
+   The aura never 3D-rotates, so its filter is legal (the v1256 law). */
+html.skin-room .daycard-wrap[data-skin] .daycard-wrap__aura {
+  opacity: 0.26;
+  filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 0))) hue-rotate(var(--mm-hue, 0deg)) saturate(0.4);
+}
+/* !important so it outranks each beam's inline --c (author !important beats
+   the style attribute); the fallback keeps plain white if JS never set it. */
+html.skin-room .ambient__rays-beam { --c: var(--beam-rgb, 255 255 255) !important; }
+
 /* the two riders: colour-matched ring, tinted mark */
 .daycard-wrap[data-skin][data-skin-ring="1"] .daycard-ns__rim {
   box-shadow: inset 0 0 0 1.4px var(--edge, rgba(255,255,255,0.85)),

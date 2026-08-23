@@ -9328,10 +9328,18 @@ function applyCardSkin(wrap) {
       const lift = String(tint).split(',').map(n => { const v = parseFloat(n) || 0; return Math.round(v + (255 - v) * 0.45); });
       document.documentElement.style.setProperty('--rim-c', 'rgb(' + lift.join(',') + ')');
       document.documentElement.style.setProperty('--rim-rgb', lift.join(','));
+      // v1261 (Malik): the room is an accent, not a flood. The god rays take
+      // the material lifted 55% toward white (space-separated for rgb()/a),
+      // and html.skin-room lets the CSS stand the wrap aura down.
+      const beam = String(tint).split(',').map(n => { const v = parseFloat(n) || 0; return Math.round(v + (255 - v) * 0.55); });
+      document.documentElement.style.setProperty('--beam-rgb', beam.join(' '));
+      document.documentElement.classList.add('skin-room');
     } else {
       document.documentElement.style.removeProperty('--skin-rgb');
       document.documentElement.style.removeProperty('--rim-c');
       document.documentElement.style.removeProperty('--rim-rgb');
+      document.documentElement.style.removeProperty('--beam-rgb');
+      document.documentElement.classList.remove('skin-room');
     }
   } catch (e) {}
   syncAppAccentToSkin(sk);
