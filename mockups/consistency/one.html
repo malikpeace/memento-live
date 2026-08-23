@@ -513,26 +513,31 @@
   .onb__stage { flex: 1; overflow: hidden; position: relative; }
   .onb__track { display: flex; height: 100%; transition: transform 0.4s cubic-bezier(.4,.0,.2,1); }
   .onb__page { flex: 0 0 100%; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center; padding: 40px 34px; overflow-y: auto; }
-  .onb__m { color: var(--acc); width: 28px; margin: 0 auto 26px; line-height: 0; }
-  .onb__h { font-size: 29px; font-weight: 760; letter-spacing: -0.02em; margin: 0 0 18px; line-height: 1.12; max-width: 380px; }
-  .onb__p { font-size: 15.5px; line-height: 1.62; color: rgba(235,238,248,0.66); margin: 0 auto 20px; max-width: 400px; }
+    align-items: stretch; justify-content: center; text-align: left; padding: 40px 30px; overflow-y: auto; }
+  .onb__page > * { width: 100%; max-width: 420px; margin-left: 0; margin-right: auto; }
+  .onb__m { color: var(--acc); width: 28px; margin: 0 0 26px; line-height: 0; }
+  .onb__h { font-size: 29px; font-weight: 760; letter-spacing: -0.02em; margin: 0 0 18px; line-height: 1.12; }
+  .onb__p { font-size: 15.5px; line-height: 1.62; color: rgba(235,238,248,0.66); margin: 0 0 20px; }
   .onb__p--lead { font-weight: 650; font-size: 17px; color: rgba(235,238,248,0.94); margin-top: 6px; }
   .onb__page--heat .onb__p { margin-bottom: 26px; }
-  .onb__heat { display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px; width: 100%; max-width: 380px; margin: 0 0 18px; cursor: ew-resize; touch-action: none; }
+  .onb__heat { display: grid; grid-template-columns: repeat(13, 1fr); gap: 5px; width: 100%; margin: 0 0 18px; cursor: ew-resize; touch-action: none; }
   .onb__heat b { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.06); transition: background 0.1s ease; }
   .onb__heat b.on { background: var(--acc); }
-  .onb__read { display: flex; align-items: baseline; justify-content: center; gap: 7px; margin: 0 0 10px; }
+  /* the honest-so-far map is dimmer; the goal map is the bright one */
+  #honHeat b.on { background: rgba(var(--acc-rgb),0.4); }
+  html.light #honHeat b.on { background: rgba(var(--acc-rgb),0.45); }
+  .onb__read { display: flex; align-items: baseline; justify-content: flex-start; gap: 7px; margin: 0 0 10px; }
   .onb__read b { font-size: 50px; font-weight: 790; letter-spacing: -0.03em; color: #fff; font-variant-numeric: tabular-nums; }
   .onb__read span { font-size: 16px; color: rgba(235,238,248,0.6); }
-  .onb__warn { font-size: 13.5px; line-height: 1.5; margin: 0 auto 4px; max-width: 380px; min-height: 40px; color: rgba(235,238,248,0.92); font-weight: 550; }
-  .onb__hint { font-size: 13px; color: rgba(235,238,248,0.45); margin: 4px auto 0; }
-  .onb__foot { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 0 30px 42px; }
+  .onb__warn { font-size: 13.5px; line-height: 1.5; margin: 0 0 4px; min-height: 40px; color: rgba(235,238,248,0.92); font-weight: 550; }
+  .onb__hint { font-size: 13px; color: rgba(235,238,248,0.45); margin: 4px 0 0; }
+  .onb__foot { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; padding: 0 30px 42px; }
+  .onb__foot > * { width: 100%; max-width: 420px; }
   .onb__dots { display: flex; gap: 8px; }
   .onb__dots i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.22); transition: all 0.3s ease; }
   .onb__dots i.on { background: var(--acc); width: 20px; border-radius: 4px; }
   .onb__go { font: inherit; font-size: 16px; font-weight: 650; color: #06140a; background: var(--acc); border: 0;
-    border-radius: 14px; padding: 17px 34px; cursor: pointer; width: 100%; max-width: 340px; }
+    border-radius: 14px; padding: 17px 34px; cursor: pointer; width: 100%; }
   .onb__go:active { transform: scale(0.99); }
   html.light .onb { background: radial-gradient(120% 70% at 50% -6%, rgba(var(--acc-rgb),0.12), transparent 56%), #eceeea; color: #0c0e0c; }
   html.light .onb__h { color: #0c0e0c; }
