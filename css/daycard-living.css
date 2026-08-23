@@ -227,11 +227,15 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
   100% { transform: translate(0, 0) scale(1);              opacity: var(--bb, 0); }
 }
 
-/* stillness where stillness is asked for */
+/* stillness where stillness is ASKED for. reduced-motion only: lowfx does
+   NOT stop the roam (v1259, Malik's phone showed a dead card and he was
+   right). lowfx exists for graphics MEMORY (blur, backdrop-filter, canvas,
+   layer count); the roam is transform+opacity on layers that already exist
+   and are already composited, so animating them costs compositor time, not
+   memory. The living card moves on every device. */
 @media (prefers-reduced-motion: reduce) {
   .daycard-theme-living .blob { animation: none !important; }
 }
-html.lowfx .daycard-theme-living .blob { animation: none !important; }
 
 /* ── Color bloom: a blurred echo behind the card that bleeds the hue out ─────
    EDGE-SAFE BY CONSTRUCTION (Malik v682, the recurring "purple box outside the
