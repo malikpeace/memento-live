@@ -224,6 +224,11 @@ const ClarityPaywall = {
             '<span><b>The Locked-In Guarantee.</b> Try Memento for 30 days. If it is not for you, request a full refund in the app during your first 30 days. Complete your primary Action on all 30 days and that window stays open 7 more days. A full refund ends your paid access.</span>' +
           '</div>' +
           '<button type="button" class="cpw__skip" id="cpwSkip">Maybe later</button>' +
+          /* step 9 (v1269, the audit's launch item): a returning buyer on a
+             new phone must never have to guess that Settings holds the way
+             in. Same quiet weight as Maybe later; stores treat a restore
+             path on the paywall as mandatory for a reason. */
+          '<button type="button" class="cpw__skip" id="cpwRestore" style="margin-top:2px;">Already bought? Sign in</button>' +
 
           '<div class="cpw__trust cpw__trust--v2">' +
             '<div class="cpw__founder">' +
@@ -271,6 +276,10 @@ const ClarityPaywall = {
 
       const buy = ov.querySelector('#cpwBuy');
       if (buy) buy.addEventListener('click', () => this._unlock());
+      const restoreBtn = ov.querySelector('#cpwRestore');
+      if (restoreBtn) restoreBtn.addEventListener('click', () => {
+        try { if (window.CloudSync && CloudSync.openDialog) CloudSync.openDialog(); } catch (e) {}
+      });
       const skip = ov.querySelector('#cpwSkip');
       if (skip) skip.addEventListener('click', () => this.hide());
       this._wireDevBypass(ov); // DEV BYPASS - delete before launch

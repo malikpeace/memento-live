@@ -616,6 +616,16 @@
   window.MementoPush = {
     sync: sync,
     disableForSignOut: disableForSignOut,
+    // v1269 (step 9): the Settings Notifications row. enable() must run from
+    // a user gesture (Safari's rule); status() is the row's whole truth.
+    enable: enable,
+    disable: disableForSignOut,
+    status: function () {
+      var out = { supported: supported(), standalone: isStandalone(), permission: 'default', on: false };
+      try { out.permission = Notification.permission; } catch (e) {}
+      try { out.on = out.permission === 'granted' && localStorage.getItem(ON_KEY) === '1'; } catch (e) {}
+      return out;
+    },
     maybePromptAfterFirstWin: maybePromptAfterFirstWin,
     // js/13 calls this the moment a purchase verifies (notifications phase C).
     armPostPayment: armPostPayment,

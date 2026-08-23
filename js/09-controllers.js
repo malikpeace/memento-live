@@ -4938,19 +4938,55 @@ const TabBar = {
         ((window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) ? '' :
           toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt)) +
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
-        // The sidebar only exists on desktop (>=860px); on the phone these pin
-        // toggles control nothing, so they don't render there (v705, Malik).
-        (function () {
-          if (window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) return '';
-          const sbp = (state.prefs && state.prefs.sidebarSections) || {};
-          return '<div class="you-sub">Sidebar</div>' +
-            toggleRow('prefSbNeutron', 'Neutron Star', 'Pin your goal in the menu.', !!sbp.neutron) +
-            toggleRow('prefSbAction', "Today's action", 'Pin the day\u2019s one move.', !!sbp.action) +
-            toggleRow('prefSbTimeleft', 'Time left', 'Days remaining to your goal.', !!sbp.timeleft) +
-            toggleRow('prefSbStreak', 'Consistency', 'Your streak count.', !!sbp.streak) +
-            toggleRow('prefSbDeepwork', 'Deep work today', 'Sessions logged today.', !!sbp.deepwork);
-        })() +
-      '</div>';
+        // (The five Sidebar pin toggles died in step 9, v1269: they wrote
+        // state.prefs.sidebarSections, which nothing ever read. A settings row
+        // that controls nothing is a broken promise; the audit called it and
+        // it was the last one standing.)
+      '</div>' +
+      '<div class="you-h">Notifications</div>' +
+      '<div class="you-card" id="notifSection">' + this.renderNotifSection() + '</div>';
+  },
+
+  // ── Notifications (step 9, v1269): the row a daily-practice app is
+  // expected to have. One honest row: what reminders are, whether they are
+  // on, and the one action that fits the current state. ──
+  renderNotifSection() {
+    const P = window.MementoPush;
+    const line = (txt) => '<div class="you-note" style="font-size:0.8125rem;color:var(--text-2);line-height:1.5;padding:4px 0 6px;">' + txt + '</div>';
+    if (!P || !P.supported || !P.supported()) {
+      return line('Reminders need the installed app. Add Memento to your Home Screen and this switches on.');
+    }
+    const st = P.status();
+    if (!st.standalone && !st.on) {
+      return line('Reminders need the installed app. Add Memento to your Home Screen and this switches on.');
+    }
+    if (st.permission === 'denied') {
+      return line('Notifications are blocked for Memento in your phone\u2019s Settings. Turn them on there and this comes alive.');
+    }
+    if (st.on) {
+      return '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Reminders</div>' +
+        '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">A quiet check-in when your goal\u2019s number has gone still. Nothing else.</div></div>' +
+        '<button type="button" id="notifOff" class="sheet-btn" style="flex:none;padding:9px 14px;background:var(--kfill-04);color:var(--text-2);">Turn off</button></div>';
+    }
+    return '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Reminders</div>' +
+      '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">A quiet check-in when your goal\u2019s number has gone still. Nothing else.</div></div>' +
+      '<button type="button" id="notifOn" class="sheet-btn" style="flex:none;padding:9px 14px;background:rgba(var(--accent-rgb),0.14);color:var(--accent);">Turn on</button></div>';
+  },
+
+  bindNotifSection() {
+    const sec = document.getElementById('notifSection');
+    if (!sec) return;
+    const rerender = () => { sec.innerHTML = this.renderNotifSection(); this.bindNotifSection(); };
+    const on = document.getElementById('notifOn');
+    if (on) on.addEventListener('click', () => {
+      on.textContent = 'Turning on\u2026';
+      window.MementoPush.enable().then(rerender).catch(rerender);
+    });
+    const off = document.getElementById('notifOff');
+    if (off) off.addEventListener('click', () => {
+      off.textContent = 'Turning off\u2026';
+      window.MementoPush.disable().then(rerender).catch(rerender);
+    });
   },
 
   // Re-render the Preferences block in place (active swatches, the conditional
@@ -5104,6 +5140,7 @@ const TabBar = {
     };
     wireToggle('prefMatchMemento', (on) => { state.prefs.matchMemento = on; });
     wireToggle('prefReduceMotion', (on) => { state.prefs.reduceMotion = on; });
+    try { this.bindNotifSection(); } catch (e) {}
     wireToggle('prefCardTilt', (on) => { state.prefs.cardTilt = on; try { if (typeof renderDayCard === 'function') renderDayCard(); } catch (e) {} });
     wireToggle('prefCompact', (on) => { state.prefs.density = on ? 'compact' : 'comfortable'; });
     wireToggle('prefWeekMonday', (on) => {
@@ -5647,6 +5684,17 @@ const TabBar = {
         })()}` : ''}
       </div>` : ''}
       ${this.renderPlanSection()}
+      <div class="you-h">Journey</div>
+      <div class="you-card">
+        <button type="button" id="profPathOpen" class="you-vrow" aria-label="The Path: where you are on the road to your goal.">
+          <span class="you-vrow__label">The Path</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </button>
+        <button type="button" id="profStoryOpen" class="you-vrow" aria-label="Your Story: everything you have done, as one record.">
+          <span class="you-vrow__label">Your Story</span>
+          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
+        </button>
+      </div>
       <div id="prefsSection">${this.renderPreferencesSection()}</div>
       <div class="you-h">Identity</div>
       <div class="you-card">
@@ -5937,18 +5985,27 @@ const TabBar = {
         if (ok) setTimeout(() => location.reload(), 800);
       });
     });
-    // Reset binding
+    // Reset binding. Step 9 (v1269): the browser's native confirm()/prompt()
+    // dialogs are gone (they rendered as origin-titled system boxes inside a
+    // glassy app); this is the house destructive sheet. The optional exit
+    // note goes to the REAL feedback endpoint (the old /api/feedback never
+    // existed; messages died silently), keepalive so it survives the wipe.
     document.getElementById('profileReset').addEventListener('click', () => {
-      if (confirm('Reset everything? This cannot be undone.')) {
-        // One optional, skippable question on the way out (no interview, no gate).
-        // sendBeacon survives the wipe + reload so it actually reaches Malik.
+      const doReset = (reason) => {
         try {
-          const reason = prompt('Optional: what made you want to leave? This goes straight to Malik. Leave blank to skip.');
           if (reason && reason.trim()) {
-            const payload = JSON.stringify({ kind: 'leaving', text: reason.trim().slice(0, 2000), ts: Date.now() });
-            let sent = false;
-            try { if (navigator.sendBeacon) sent = navigator.sendBeacon('/api/feedback', new Blob([payload], { type: 'application/json' })); } catch (e) {}
-            if (!sent) { try { fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload, keepalive: true }); } catch (e) {} }
+            const _fbUrl = (window.MEMENTO_SUPABASE_URL || 'https://lipuxymlsowdrbummqxw.supabase.co') + '/functions/v1/submit-feedback';
+            fetch(_fbUrl, {
+              method: 'POST',
+              keepalive: true,
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': window.MEMENTO_SUPABASE_ANON || '',
+                'Authorization': 'Bearer ' + (window.MEMENTO_SUPABASE_ANON || ''),
+                'x-memento-device': (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : 'unknown'
+              },
+              body: JSON.stringify({ kind: 'leaving', text: reason.trim().slice(0, 2000), appVersion: String(window.MEMENTO_VERSION || '') })
+            }).catch(() => {});
           }
         } catch (e) {}
         // True clean slate: wipe ALL Memento data on this origin (state,
@@ -5966,7 +6023,33 @@ const TabBar = {
         // persona and silently undoes the reset. pathname-only lands on the
         // real splash + onboarding from the very beginning.
         location.href = location.pathname;
-      }
+      };
+
+      // the sheet: dark glass, one destructive action, one way back
+      const ov = document.createElement('div');
+      ov.setAttribute('role', 'dialog');
+      ov.setAttribute('aria-modal', 'true');
+      ov.setAttribute('aria-label', 'Reset everything');
+      ov.style.cssText = 'position:fixed;inset:0;z-index:1300;display:flex;align-items:flex-end;justify-content:center;background:rgba(4,6,9,0.62);opacity:0;transition:opacity 0.2s ease-out;';
+      ov.innerHTML =
+        '<div style="width:100%;max-width:430px;margin:0 14px calc(14px + var(--safe-b,0px));padding:22px 20px calc(16px);border-radius:16px;background:rgba(18,20,25,0.97);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07), 0 24px 60px rgba(0,0,0,0.55);transform:translateY(16px);transition:transform 0.24s cubic-bezier(0.32,0.72,0,1);" id="rsSheet">' +
+          '<h3 style="margin:0 0 6px;font-size:18px;font-weight:700;color:var(--text-hi);">Reset everything?</h3>' +
+          '<p style="margin:0 0 14px;font-size:14px;line-height:1.5;color:var(--text-2);">Your goal, your days, your notes, everything on this device. This cannot be undone.</p>' +
+          '<textarea id="rsWhy" placeholder="Optional: what made you want to leave? This goes straight to Malik." style="width:100%;min-height:64px;resize:none;font:inherit;font-size:14px;color:var(--text-hi);background:rgba(255,255,255,0.05);border:0;border-radius:10px;padding:11px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);outline:none;"></textarea>' +
+          '<div style="display:flex;gap:10px;margin-top:14px;">' +
+            '<button type="button" id="rsCancel" style="flex:1;font:inherit;font-size:15.5px;font-weight:650;padding:13px;border:0;border-radius:14px;cursor:pointer;background:rgba(255,255,255,0.07);color:var(--text-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);">Keep my Memento</button>' +
+            '<button type="button" id="rsGo" style="flex:1;font:inherit;font-size:15.5px;font-weight:650;padding:13px;border:0;border-radius:14px;cursor:pointer;background:rgba(255,72,86,0.16);color:#ff6b7a;">Reset everything</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      requestAnimationFrame(() => { ov.style.opacity = '1'; const sh = ov.querySelector('#rsSheet'); if (sh) sh.style.transform = 'none'; });
+      const shut = () => { ov.style.opacity = '0'; setTimeout(() => { try { ov.remove(); } catch (e) {} }, 220); };
+      ov.addEventListener('click', (e) => { if (e.target === ov) shut(); });
+      ov.querySelector('#rsCancel').addEventListener('click', shut);
+      ov.querySelector('#rsGo').addEventListener('click', () => {
+        const why = (ov.querySelector('#rsWhy') || {}).value || '';
+        doReset(why);
+      });
     });
   }
 };
