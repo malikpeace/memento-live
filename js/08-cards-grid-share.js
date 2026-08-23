@@ -9584,9 +9584,31 @@ function _mfSkinsInit(ov, wrap, sig) {
   const origin = scroll.querySelector('.mf-origin');
   if (origin) origin.parentElement.insertBefore(hint, origin); else scroll.appendChild(hint);
 
-  const _sk = _mfBuildSkinSheet(ov, wrap, sig, null);
-  const sheet = _sk.sheet, openSheet = _sk.openSheet, closeSheet = _sk.closeSheet;
-  hint.addEventListener('click', openSheet);
+  // v1267 (Malik: "why are there two different looks... just fix this"):
+  // ONE customizer. The record no longer builds the old bottom sheet; the
+  // hint and the hold both leave the record and open the Memento editor.
+  const goEditor = () => {
+    try {
+      if (typeof MementoEditor === 'undefined') return;
+      if (typeof MementoView !== 'undefined' && MementoView.isActive()) {
+        MementoView.close();
+        let waited = 0;
+        const t = setInterval(() => {
+          waited += 60;
+          let active = false;
+          try { active = MementoView.isActive(); } catch (e) {}
+          if (!active || waited > 1600) {
+            clearInterval(t);
+            try { MementoEditor.open(); } catch (e) {}
+          }
+        }, 60);
+      } else {
+        MementoEditor.open();
+      }
+    } catch (e) {}
+  };
+  const openSheet = goEditor;
+  hint.addEventListener('click', goEditor);
 
   /* HOLD the card. iOS kills a long press three ways (callout, selection,
      jitter-cancel), so: cancel on 12px of MOVEMENT not on pointerleave,

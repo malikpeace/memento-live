@@ -6655,3 +6655,24 @@ body.mfe-open #dayCard, body.mfe-open .app.dash-v2 #dayCard {
 .daycard-living-stage {
   filter: none !important;
 }
+
+/* ── v1267: ONE customizer, in the pill language Malik picked between the two
+   generations (the old mfsk sheet is no longer reachable; its look won, its
+   code lost). Rows read brighter, the toggles are true pills with a solid
+   white ON state, and Done anchors the bottom like the sheet's did. */
+#mfEditor .mfe__row-k { font-size: 15px; color: var(--mfe-hi); }
+#mfEditor .mfe__seg { border-radius: 999px; padding: 4px; }
+#mfEditor .mfe__seg button {
+  font-size: 14.5px; padding: 9px 16px; border-radius: 999px;
+  color: var(--mfe-mid);
+}
+#mfEditor .mfe__seg button.on { background: rgba(245, 246, 250, 0.94); color: #0a0c0f; }
+#mfEditor .mfe__close {
+  top: auto; left: 20px; right: 20px;
+  bottom: calc(var(--safe-b, 0px) + 16px);
+  padding: 15px; font-size: 16.5px; font-weight: 700; text-align: center;
+  border-radius: 14px;
+  background: rgba(245, 246, 250, 0.94); color: #0a0c0f;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
+}
+#mfEditor .mfe__plane { padding-bottom: calc(var(--safe-b, 0px) + 92px); }
