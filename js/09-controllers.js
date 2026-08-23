@@ -4933,9 +4933,8 @@ const TabBar = {
       '<div class="you-h">Behavior</div>' +
       '<div class="you-card">' +
         toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
-        // Tilt follows the mouse cursor, so it does nothing on the phone (v706).
-        ((window.matchMedia && window.matchMedia('(max-width: 859.98px)').matches) ? '' :
-          toggleRow('prefCardTilt', 'Memento tilt', 'The Memento leans toward your cursor as you move the mouse.', !!prefs.cardTilt)) +
+        // (Memento tilt died in v1278: the cursor lean is gone, so the toggle
+        // controlled nothing. The phone's gyroscope lean has its own pref.)
         toggleRow('prefWeekMonday', 'Weeks start Monday', 'Aligns the heatmap and calendars to Monday columns.', (state.prefs && state.prefs.weekStart === 'mon')) +
         // (The five Sidebar pin toggles died in step 9, v1269: they wrote
         // state.prefs.sidebarSections, which nothing ever read. A settings row

@@ -8857,6 +8857,22 @@ function stopLivingWander() {
 // its own). Resets flat the moment the pointer leaves. Skipped under
 // reduced-motion and lowfx.
 function bindDayCardTilt(card) {
+  // v1278 (Malik, after the seam survived two root-cause fixes): THE MOUSE
+  // TILT IS REMOVED. Rotating the card on desktop kept opening a dark seam
+  // between the glass and the light behind it, and no amount of layer
+  // re-parenting closed it for good. The card now sits still under a cursor;
+  // the phone's real gyroscope lean (bindDayCardMotion) is untouched, because
+  // that is a physical object moving, not a hover trick. Any rotation vars
+  // left on the host are cleared so nothing can strand a tilted frame.
+  try {
+    if (card) {
+      var host0 = card.closest ? (card.closest('.daycard-living-stage') || card) : card;
+      host0.style.removeProperty('--dc-rx');
+      host0.style.removeProperty('--dc-ry');
+    }
+  } catch (e) {}
+  return;
+  /* eslint-disable no-unreachable */
   if (!card) return;
   try {
     // On by default for new profiles; Settings still lets anyone turn it off.
