@@ -6460,7 +6460,7 @@ Return ONLY the sentence text. No quotes, no labels.`;
             '<h1 class="a5-task a5-task--left">' + esc2(doneText) + '</h1>' +
             '<div class="a5-bars-row">' + barsHtml(true) + '<span class="a5-banked">banked</span></div>' +
             '<div class="a5-receipt">' +
-              '<div class="a5-rrow"><span class="a5-rlabel">Streak</span><span class="a5-rval apl-num">' + streakCount + (streakCount === 1 ? ' day' : ' days') + '</span></div>' +
+              '<div class="a5-rrow"><span class="a5-rlabel">Shown up</span><span class="a5-rval apl-num">' + streakCount + (streakCount === 1 ? ' day' : ' days') + '</span></div>' +
               '<div class="a5-rrow"><span class="a5-rlabel">Proof</span><span class="a5-rval apl-num">#' + doneCount + '</span></div>' +
               '<div class="a5-rrow"><span class="a5-rlabel">Toward</span><span class="a5-rval">' + esc2(String(nextMilestone).slice(0, 60)) + '</span></div>' +
             '</div>' +

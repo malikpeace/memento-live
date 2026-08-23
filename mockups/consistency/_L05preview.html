@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L05 preview</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  .gal{padding:20px}
+  .row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .lab{font-size:12px;color:var(--text-lo);margin:0 0 8px}
+  .ph{height:1180px}
+</style>
+</head>
+<body data-accent="green">
+<div class="gal">
+  <div class="row" id="row"></div>
+</div>
+<script src="_kit.js"></script>
+<script src="L05.js"></script>
+<script>
+(function(){
+  var K = window.CKit, V = window.CLAY.L05;
+  var combos = [[1,'open'],[7,'maintenance'],[14,'open'],[30,'quantity_down'],[60,'milestone'],[90,'frequency'],[168,'quantity_up'],[365,'open']];
+  document.getElementById('row').innerHTML = combos.map(function(c,ix){
+    var N=c[0], shape=c[1];
+    var log=K.buildLog(N,shape), s=K.stats(log,shape,4), sh=K.shapeLine(shape,s);
+    var html='';
+    try{ html=V.render({K:K,log:log,s:s,sh:sh,shape:shape}); }catch(e){ html='<pre style="color:red">'+e.message+'</pre>'; }
+    return '<div><p class="lab">'+shape+', day '+N+'</p><div class="ph"><div class="ph__s" id="s'+ix+'">'+html+'</div></div></div>';
+  }).join('');
+  // hostile case: an unbreakable 44-character goal unit, at 390
+  var hn=90, hl=K.buildLog(hn,'quantity_up'), hs=K.stats(hl,'quantity_up',4);
+  var hsh={lead:'412', sub:'of 1,000 supercalifragilisticexpialidociousunits', ctx:{v:'41%',l:'towards the supercalifragilisticexpialidocious mark'}};
+  var hh=V.render({K:K,log:hl,s:hs,sh:hsh,shape:'quantity_up'});
+  document.getElementById('row').insertAdjacentHTML('beforeend',
+    '<div><p class="lab">long-word stress, day 90</p><div class="ph"><div class="ph__s" id="sX">'+hh+'</div></div></div>');
+
+  var probe = [];
+  [].forEach.call(document.querySelectorAll('.ph__s'), function(el){
+    probe.push(el.id+': '+(el.scrollWidth>el.clientWidth ? 'OVERFLOW '+el.scrollWidth+'>'+el.clientWidth : 'ok'));
+  });
+  document.querySelector('.gal').insertAdjacentHTML('afterbegin',
+    '<p style="font-size:15px;color:#3fd94e;margin:0 0 14px">390 OVERFLOW PROBE, '+probe.join(' | ')+'</p>');
+})();
+</script>
+</body>
+</html>

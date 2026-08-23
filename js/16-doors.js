@@ -355,7 +355,7 @@
       },
       forceClose: function () { internal(raw.tabSwitch, TabBar, ['home']); }
     });
-    ['path', 'reflect'].forEach(function (tabId) {
+    ['reflect'].forEach(function (tabId) {
       register(tabId, {
         gesture: 'back',
         el: function () { return document.getElementById('panel' + tabId.charAt(0).toUpperCase() + tabId.slice(1)); },
@@ -402,7 +402,7 @@
     };
     TabBar.switchTo = function (tabId) {
       if (internalDepth || !routingEnabled()) return raw.tabSwitch.apply(TabBar, arguments);
-      if (tabId === 'profile' || tabId === 'path' || tabId === 'reflect') return go(tabId);
+      if (tabId === 'profile' || tabId === 'reflect') return go(tabId);
       if (tabId === 'home' && current() !== 'home') return go('home', { history: 'replace' });
       return raw.tabSwitch.apply(TabBar, arguments);
     };

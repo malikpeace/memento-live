@@ -3361,6 +3361,9 @@
   // decider; receipts land before render (v1149).
   // ===========================================================================
   function closeRewardCeremony(rec, prevGp) {
+    // v1273: Consistency's live moment. If the full page is open, its M pops
+    // and the number counts up; closed, the lit state shows on next open.
+    try { if (window.ConsistencyPage) ConsistencyPage.notifyCompletion(); } catch (e) {}
     // ======================= THE CLOSE SEAM ============================
     // THE ONE REWARD CALL (THE-MERGE resolution B, Rewards phase 1).
     // The day is written and the pulse has had its ask, so this is the

@@ -69,8 +69,8 @@ const RENDERERS = {
       const today = new Date();
       const dayNamesAll = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
       let html = `<div class="widget__top-row"><div class="widget__label-group"><div class="widget__icon" style="color:var(--color-consistency)">${ICONS.streak}</div><div class="widget__label" style="color:var(--color-consistency)">Consistency</div></div><div class="widget__arrow">›</div></div>`;
-      html += `<div class="widget__big-num" style="font-size:2rem;color:var(--color-consistency);text-shadow:0 0 15px rgba(var(--success-rgb),0.3)">${state.streak.count}</div>`;
-      html += '<div class="widget__big-unit">day streak</div>';
+      html += `<div class="widget__big-num" style="font-size:2rem;color:var(--color-consistency);text-shadow:0 0 15px rgba(var(--success-rgb),0.3)">${(window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0)}</div>`;
+      html += '<div class="widget__big-unit">days shown up</div>';
       html += '<div class="widget__week-strip">';
       // Center today (index 3), show 3 days before and 3 days after
       for (let offset = -3; offset <= 3; offset++) {
@@ -3063,7 +3063,7 @@ const ProofTrail = {
 
     let html = '';
     html += `<div style="font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:${PUR};font-weight:700;margin-bottom:12px;">This week</div>`;
-    html += `<div style="display:flex;gap:8px;margin-bottom:8px;">${stat(w.actionsThisWeek, 'actions done')}${stat(w.streak, 'day streak')}${stat(deepLabel, 'deep work')}</div>`;
+    html += `<div style="display:flex;gap:8px;margin-bottom:8px;">${stat(w.actionsThisWeek, 'actions done')}${stat((window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0), 'days shown up')}${stat(deepLabel, 'deep work')}</div>`;
     if (w.topDistraction) {
       html += `<div style="font-size:0.8rem;color:var(--text-2);margin:2px 0 4px;"><span style="color:var(--text-3);">Most common pull: </span>${esc(w.topDistraction)}</div>`;
     }
@@ -3296,7 +3296,7 @@ const ShareStudio = {
     }
     const w = this._weekly();
     const deep = w.deepMin >= 60 ? (Math.round(w.deepMin / 6) / 10) + 'h' : w.deepMin + 'm';
-    return 'My week of proof\n\n' + w.actions + ' actions done\n' + w.streak + ' day streak\n' + deep + ' of deep work' + tag;
+    return 'My week of proof\n\n' + w.actions + ' actions done\n' + (window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0) + ' days shown up\n' + deep + ' of deep work' + tag;
   },
 
   // ---- Canvas text helper: wrap into <=maxLines lines within maxWidth ----
@@ -3495,7 +3495,7 @@ const ShareStudio = {
     const deep = w.deepMin >= 60 ? (Math.round(w.deepMin / 6) / 10) + 'h' : w.deepMin + 'm';
     const stats = [
       [String(w.actions), 'ACTIONS DONE'],
-      [String(w.streak), 'DAY STREAK'],
+      [String((window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0)), 'Days shown up'],
       [deep, 'DEEP WORK']
     ];
 
@@ -5177,7 +5177,7 @@ function renderCommandCenter() {
       } catch (e) {}
       row += '<div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:16px;">' +
         '<div id="ccStreakNum" style="font-size:4rem;font-weight:800;line-height:0.85;letter-spacing:-0.03em;color:var(--text-hi);font-variant-numeric:tabular-nums;">' + streak + '</div>' +
-        '<div style="padding-bottom:6px;"><div style="font-size:1.05rem;font-weight:650;color:var(--text-hi);line-height:1.1;display:flex;align-items:center;gap:6px;">' + (streak > 0 ? (function () { const fl = streakFlameTier(streak); return '<svg width="' + fl.s + '" height="' + fl.s + '" viewBox="0 0 24 24" fill="' + fl.c + '" style="flex:none;filter:drop-shadow(0 0 ' + fl.g + 'px ' + fl.c + ') brightness(1.15) saturate(1.2);">'; })() + '<path fill-rule="evenodd" clip-rule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177A7.547 7.547 0 0 1 6.648 6.61a.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.989 5.989 0 0 1 1.925-3.547 3.75 3.75 0 0 1 3.255 3.719Z"/></svg>' : '') + 'day streak</div>' +
+        '<div style="padding-bottom:6px;"><div style="font-size:1.05rem;font-weight:650;color:var(--text-hi);line-height:1.1;display:flex;align-items:center;gap:6px;">' + (streak > 0 ? (function () { const fl = streakFlameTier(streak); return '<svg width="' + fl.s + '" height="' + fl.s + '" viewBox="0 0 24 24" fill="' + fl.c + '" style="flex:none;filter:drop-shadow(0 0 ' + fl.g + 'px ' + fl.c + ') brightness(1.15) saturate(1.2);">'; })() + '<path fill-rule="evenodd" clip-rule="evenodd" d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.177A7.547 7.547 0 0 1 6.648 6.61a.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.989 5.989 0 0 1 1.925-3.547 3.75 3.75 0 0 1 3.255 3.719Z"/></svg>' : '') + 'days shown up</div>' +
         '<div style="font-size:0.8rem;color:var(--text-lo);margin-top:3px;">Best ' + best + '  &middot;  ' + cs.totalActiveDays + ' active days</div></div>' +
         '</div>';
       // Last night's named action follows the user to the default hero too,
@@ -5366,7 +5366,7 @@ function renderDeskMission() {
           '<div class="dkm__streak-top">' +
             '<span class="dkm__streak-n">' + streak.toLocaleString() + '</span>' +
             (streak > 0 ? flameSvg(streak) : '') +
-            '<span class="dkm__streak-l">day streak</span>' +
+            '<span class="dkm__streak-l">days shown up</span>' +
           '</div>' +
           (_best || _active
             ? '<div class="dkm__streak-sub">Best ' + _best.toLocaleString() +
@@ -9026,7 +9026,7 @@ function renderDashConsistency() {
     })();
     el.innerHTML =
       '<div class="dash-cgram__head">' +
-        '<div class="dash-cgram__meta"><b>' + streak + '</b> day streak</div>' +
+        '<div class="dash-cgram__meta"><b>' + (window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0) + '</b> days shown up</div>' +
       '</div>' +
       (_rangeLbl ? '<div class="dash-cgram__range">' + _rangeLbl + '</div>' : '') +
       '<div class="dash-cgram__graph">' + graph + '</div>';

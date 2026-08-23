@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>L07 check</title>
+<link rel="stylesheet" href="_kit.css">
+<style>body{background:#0a0b0d;margin:0;padding:16px;display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.ph{width:390px;background:#040405;border-radius:22px;overflow:hidden}
+.pad{padding:18px 0 40px}
+.cap{color:#8b8f9c;font:12px system-ui;margin:0 0 6px}</style></head><body data-accent="green">
+<div><p class="cap">N=1 open</p><div class="ph"><div class="pad" id="a"></div></div></div>
+<div><p class="cap">N=8 quantity_up</p><div class="ph"><div class="pad" id="b"></div></div></div>
+<div><p class="cap">N=21 quantity_down</p><div class="ph"><div class="pad" id="c"></div></div></div>
+<div><p class="cap">N=168 quantity_up</p><div class="ph"><div class="pad" id="d"></div></div></div>
+<div><p class="cap">N=365 maintenance</p><div class="ph"><div class="pad" id="e"></div></div></div>
+<div><p class="cap">N=168 frequency</p><div class="ph"><div class="pad" id="f"></div></div></div>
+<div><p class="cap">N=45 milestone</p><div class="ph"><div class="pad" id="g"></div></div></div>
+<div><p class="cap">N=3 open</p><div class="ph"><div class="pad" id="h"></div></div></div>
+<script src="_kit.js"></script><script src="L07.js"></script>
+<script>
+var K=window.CKit,V=window.CLAY.L07;
+function go(el,N,shape){var log=K.buildLog(N,shape),s=K.stats(log,shape,shape==='frequency'?4:7);
+document.getElementById(el).innerHTML=V.render({K:K,log:log,s:s,sh:K.shapeLine(shape,s),shape:shape});}
+go('a',1,'open');go('b',8,'quantity_up');go('c',21,'quantity_down');
+go('d',168,'quantity_up');go('e',365,'maintenance');go('f',168,'frequency');
+go('g',45,'milestone');go('h',3,'open');
+</script></body></html>

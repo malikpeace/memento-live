@@ -2042,11 +2042,11 @@ const WelcomeIntro = {
       cS1 = 'Putting it off is the habit Memento breaks, by making showing up the easy default.';
       cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
     } else if (inconsistent) {
-      cS1 = 'Staying consistent is the part that keeps slipping, so Memento makes the streak the thing you protect day to day.';
+      cS1 = 'Staying consistent is the part that keeps slipping, so Memento makes showing up the thing you protect day to day.';
       cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
     } else if (lowMot) {
       cS1 = 'Motivation comes and goes, so Memento builds the days you show up even when you do not feel it.';
-      cS2 = 'You cannot feel like it every day, and the streak carries you when the feeling does not. That is where it compounds, one day stacked on the last.';
+      cS2 = 'You cannot feel like it every day, and the record carries you when the feeling does not. That is where it compounds, one day stacked on the last.';
     } else if (fearFail || selfDoubt) {
       cS1 = 'Fear keeps you from starting, so Memento makes showing up small and repeatable until it stops feeling scary.';
       cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
@@ -2054,7 +2054,7 @@ const WelcomeIntro = {
       cS1 = 'Time feels tight, so Memento keeps the daily move small enough to actually fit.';
       cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
     } else if (fromLost) {
-      cS1 = 'Not knowing what to do is what keeps stalling you, so Memento turns showing up into a streak you protect.';
+      cS1 = 'Not knowing what to do is what keeps stalling you, so Memento turns showing up into a record you protect.';
       cS2 = 'A skipped day looks harmless, but stacked up, skipped days are how the years go missing. That is where it compounds, one day stacked on the last.';
     } else {
       cS1 = 'Memento builds the days you show up, even the ones you do not feel like it.';
@@ -2068,7 +2068,7 @@ const WelcomeIntro = {
     var together;
     var aim = towardPhrase ? towardPhrase : (towardUnsure ? 'the thing you came here for' : 'what you want');
     if (weakest === 'clarity') {
-      together = 'Once the one thing is clear, the next move and the daily streak turn ' + aim + ' from a wish into work that ships.';
+      together = 'Once the one thing is clear, the next move and the daily record turn ' + aim + ' from a wish into work that ships.';
     } else if (weakest === 'consistency') {
       together = 'When the what is sharp, the next move is obvious, and the days actually stack, ' + aim + ' goes from someday to underway.';
     } else if (weakest === 'action') {
@@ -2080,7 +2080,7 @@ const WelcomeIntro = {
     // ====================================================================
     // 7) plus  (ONE line, mostly fixed)
     // ====================================================================
-    var plus = 'Around all of it sit the quiet tools, reflections, deep-work sessions, streaks, and reminders of why you started, the things that make showing up easier.';
+    var plus = 'Around all of it sit the quiet tools, reflections, deep-work sessions, your record, and reminders of why you started, the things that make showing up easier.';
 
     return {
       whatYouWant: whatYouWant,
@@ -3248,7 +3248,7 @@ const WelcomeIntro = {
       { eyebrow: 'THE WHY', title: 'Anchor your why', aiKey: 'why', fallback: whyFall },
       { eyebrow: 'THE HOW', title: 'Always know the next move', aiKey: 'action', fallback: 'Every day Memento hands you the single move that matters most. No more staring at a list guessing where to start.' },
       { eyebrow: 'THE CONSISTENCY', title: 'Keep showing up', aiKey: 'consistency', fallback: 'This is where it compounds. You show up, it stacks, and the thing you keep putting off slowly becomes inevitable.' },
-      { eyebrow: 'AND MORE', title: 'The tools around you', aiKey: 'plus', fallback: 'Reflections, deep-work sessions, streaks, and reminders of why you started. Quiet tools that make showing up easier.' }
+      { eyebrow: 'AND MORE', title: 'The tools around you', aiKey: 'plus', fallback: 'Reflections, deep-work sessions, your record, and reminders of why you started. Quiet tools that make showing up easier.' }
     ];
     cardIdx = Math.max(0, Math.min(cardIdx, cards.length - 1));
     this._sumCard = cardIdx;
@@ -4266,7 +4266,7 @@ const Sidebar = {
       const streakSection = document.getElementById('sidebarStreakSection');
       const streakCount = document.getElementById('sidebarStreakCount');
       if (streakSection && streakCount) {
-        const count = (state.streak && state.streak.count) || 0;
+        const count = (window.ConsistencyPage ? ConsistencyPage.shownUpCount() : 0) || ((state.streak && state.streak.count) || 0);
         if (count > 0 && sb('streak')) {
           streakCount.textContent = count;
           streakSection.style.display = '';
@@ -4689,7 +4689,7 @@ const TabBar = {
     if (welcomeOverlay) welcomeOverlay.remove();
 
     const app = document.getElementById('app');
-    const panels = ['path', 'reflect', 'profile'];
+    const panels = ['reflect', 'profile'];
     const getPanel = (p) => document.getElementById('panel' + p.charAt(0).toUpperCase() + p.slice(1));
 
     if (tabId === 'home') {
@@ -4749,7 +4749,6 @@ const TabBar = {
 
   renderPanel(panelId) {
     switch (panelId) {
-      case 'path': if (typeof renderPathTab === 'function') renderPathTab(); break;
       case 'reflect': if (typeof renderReflectTab === 'function') renderReflectTab(); break;
       case 'profile': this.renderProfile(); break;
     }

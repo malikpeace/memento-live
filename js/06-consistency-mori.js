@@ -449,7 +449,7 @@ function renderConsistencyStats() {
   // Three clean tiles. Current streak lives in the hero above, so it is not
   // repeated here (best ever and longest streak were also near-duplicates).
   return `<div class="cstats">
-    ${cell(best, 'best ever', 'Your longest streak ever. The number to beat.')}
+    ${cell(best, 'best ever', 'Your longest run ever.')}
     ${cell(st.totalActiveDays, 'active days', 'Total days you have shown up.')}
     ${cell(tw + '/7', 'this week', 'Active days in the last 7 days.')}
   </div>`;

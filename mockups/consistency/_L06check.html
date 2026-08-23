@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L06 check</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  body{margin:0;padding:16px;background:#0a0b0d}
+  .row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+  .cap{color:#8b8f9c;font:12px/1.4 system-ui;margin:0 0 6px}
+  .ph{width:390px;background:#08090b;border-radius:20px;overflow:hidden}
+</style>
+</head>
+<body data-accent="green">
+<div class="row" id="row"></div>
+<script src="_kit.js"></script>
+<script src="L06.js"></script>
+<script>
+(function(){
+  var K=window.CKit, V=window.CLAY.L06;
+  var combos=[];
+  ['quantity_up','quantity_down','frequency','maintenance','milestone','open'].forEach(function(sh){
+    [1,6,30,365].forEach(function(N){ combos.push([N,sh]); });
+  });
+  document.getElementById('row').innerHTML = combos.map(function(c,i){
+    var N=c[0], shape=c[1];
+    var log=K.buildLog(N,shape), s=K.stats(log,shape,shape==='frequency'?4:7);
+    var html='';
+    try{ html=V.render({K:K,log:log,s:s,sh:K.shapeLine(shape,s),shape:shape}); }
+    catch(e){ html='<pre style="color:#ff6b6b">'+e.message+'</pre>'; }
+    return '<div><p class="cap">'+shape+' &middot; day '+N+'</p>'+
+      '<div class="ph"><div class="ph__s" id="c'+i+'">'+html+'</div></div></div>';
+  }).join('');
+  window.__probe=function(){
+    var out=[];
+    [].forEach.call(document.querySelectorAll('.ph__s'),function(el){
+      var over=[];
+      [].forEach.call(el.querySelectorAll('*'),function(n){
+        if(n.scrollWidth>n.clientWidth+1) over.push(n.className+':'+n.scrollWidth+'/'+n.clientWidth);
+      });
+      out.push({id:el.id, sw:el.scrollWidth, cw:el.clientWidth, over:over.slice(0,4)});
+    });
+    return JSON.stringify(out.filter(function(o){return o.sw>o.cw+1||o.over.length;}));
+  };
+})();
+</script>
+</body>
+</html>

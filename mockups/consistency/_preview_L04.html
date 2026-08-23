@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>L04 preview</title>
+<link rel="stylesheet" href="_kit.css"></head>
+<body data-accent="green">
+<div class="gal"><div class="grid" id="g"></div></div>
+<script src="_kit.js"></script>
+<script src="L04.js"></script>
+<script>
+var K = window.CKit, V = window.CLAY.L04;
+var cells = [[1,'open'],[7,'quantity_up'],[30,'maintenance'],[90,'quantity_down'],[168,'frequency'],[365,'milestone'],[168,'open'],[365,'quantity_up']];
+document.getElementById('g').innerHTML = cells.map(function(c){
+  var log=K.buildLog(c[0],c[1]), s=K.stats(log,c[1],4), sh=K.shapeLine(c[1],s);
+  var html=V.render({K:K,log:log,s:s,sh:sh,shape:c[1]});
+  return '<div class="item"><div class="item__label"><span class="item__n">'+c[0]+'</span><span class="item__name">'+c[1]+'</span></div>'+
+    '<div class="ph"><div class="ph__s">'+html+'</div></div></div>';
+}).join('');
+</script>
+</body></html>

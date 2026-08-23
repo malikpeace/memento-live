@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>L01 check</title>
+<link rel="stylesheet" href="_kit.css"></head>
+<body data-accent="green">
+<div class="gal" style="padding-top:8px"><div class="grid" id="g"></div></div>
+<script src="_kit.js"></script>
+<script src="L01.js"></script>
+<script>
+var K=window.CKit,V=window.CLAY.L01;
+var q=new URLSearchParams(location.search);
+var mode=q.get('m')||'a';
+var SETS={
+  a:[['quantity_up',168],['open',7],['frequency',90]],
+  b:[['maintenance',365],['milestone',30],['quantity_down',3]],
+  c:[['open',1],['open',2],['open',14]]
+};
+var cases=SETS[mode];
+document.getElementById('g').innerHTML=cases.map(function(c){
+  var log=K.buildLog(c[1],c[0]),s=K.stats(log,c[0],4),sh=K.shapeLine(c[0],s);
+  return '<div class="item"><div class="item__label"><span class="item__n">'+c[0]+'</span><span class="item__name">N='+c[1]+'</span></div>'+
+  '<div class="ph"><div class="ph__s">'+V.render({K:K,log:log,s:s,sh:sh,shape:c[0]})+'</div></div></div>';
+}).join('');
+if(q.get('bottom')==='1'){[].forEach.call(document.querySelectorAll('.ph__s'),function(e){e.scrollTop=e.scrollHeight;});}
+</script>
+</body></html>

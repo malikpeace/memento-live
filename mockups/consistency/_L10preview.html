@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L10 preview</title>
+<link rel="stylesheet" href="_kit.css">
+<style>
+  .gal{padding:20px}
+  .row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+  .lab{font-size:12px;color:var(--text-lo);margin:0 0 8px}
+  .ph{height:1500px}
+</style>
+</head>
+<body data-accent="green">
+<div class="gal">
+  <div class="row" id="row"></div>
+</div>
+<script src="_kit.js"></script>
+<script src="L10.js"></script>
+<script>
+(function(){
+  var K = window.CKit, V = window.CLAY.L10;
+  var q = new URLSearchParams(location.search);
+  var set = q.get('set') || 'a';
+  var SETS = {
+    a: [[1,'open',''],[7,'quantity_up',''],[30,'maintenance',''],[168,'quantity_up','']],
+    b: [[365,'quantity_down',''],[365,'milestone',''],[126,'frequency',''],[45,'frequency','openSup']],
+    c: [[1,'open','openToday'],[1,'maintenance','openToday'],[90,'maintenance','gone'],[8,'open','']]
+  };
+  function mut(log, mode){
+    var n=log.length;
+    if(mode==='openToday'){var d=log[n-1];d.on=false;d.minutes=0;d.sup={};}
+    if(mode==='openSup'){var d2=log[n-1];d2.on=false;d2.minutes=0;d2.sup={checkin:1};}
+    if(mode==='gone'){for(var i=Math.max(0,n-12);i<n;i++){log[i].on=false;log[i].minutes=0;log[i].sup={};}}
+    return log;
+  }
+  document.getElementById('row').innerHTML = SETS[set].map(function(c,i){
+    var N=c[0], shape=c[1];
+    var log=mut(K.buildLog(N,shape),c[2]), s=K.stats(log,shape,4), sh=K.shapeLine(shape,s);
+    var html='';
+    try{ html=V.render({K:K,log:log,s:s,sh:sh,shape:shape}); }catch(e){ html='<pre style="color:red">'+e.message+'</pre>'; }
+    return '<div><p class="lab">'+shape+' &middot; day '+N+(c[2]?' &middot; '+c[2]:'')+'</p><div class="ph"><div class="ph__s" id="s'+i+'">'+html+'</div></div></div>';
+  }).join('');
+  window.__probe = function(){
+    var out=[];
+    [].forEach.call(document.querySelectorAll('.ph__s'), function(el){
+      out.push({id:el.id, sw:el.scrollWidth, cw:el.clientWidth, sh:el.scrollHeight});
+    });
+    return out;
+  };
+})();
+</script>
+</body>
+</html>

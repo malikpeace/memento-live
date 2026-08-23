@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1272';
+window.MEMENTO_JS_BUILD = 'v1273';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1723,7 +1723,7 @@ function migrateState() {
     const _clone = (v) => JSON.parse(JSON.stringify(v));
     const _isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
     if (!_isObj(state)) state = _clone(DEFAULT_STATE);
-    const objKeys = ['profile', 'dev', 'entitlements', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache'];
+    const objKeys = ['profile', 'dev', 'entitlements', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache', 'consistency'];
     objKeys.forEach(k => { if (!_isObj(state[k])) state[k] = _clone(DEFAULT_STATE[k] || {}); });
     if (!_isObj(state.clarity.answers)) state.clarity.answers = _clone(DEFAULT_STATE.clarity.answers);
     if (!Array.isArray(state.widgetOrder)) state.widgetOrder = _clone(DEFAULT_STATE.widgetOrder);
@@ -1900,6 +1900,10 @@ function migrateState() {
     state.streak.milestonesShown = [7, 14, 30, 60, 100, 180, 365].filter(t => (state.streak.count || 0) >= t);
   }
   if (!state.reflection) state.reflection = { entries: [] };
+  // v1273: the Consistency target (the personal bar the score is measured
+  // against). 0.6 default so the module never shows a broken score before
+  // the first-open onboarding sets it; setAt marks that it was truly chosen.
+  if (!state.consistency) state.consistency = { target: 0.6, selfReported: null, setAt: 0 };
   if (!state.deepwork) state.deepwork = { sessions: [] };
   if (!state.clarity.answers.whatSpecifically) state.clarity.answers.whatSpecifically = '';
   if (!state.clarity.answers.whyMatters) state.clarity.answers.whyMatters = '';
