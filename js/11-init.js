@@ -1996,48 +1996,6 @@ void main(){
   if (exp.classList.contains('open') || exp.classList.contains('open-bg')) start();
 })();
 
-// Force background video play (Safari compatibility)
-(function() {
-  const vid = document.getElementById('bgVideo');
-  if (!vid) return;
-  // The video is display:none (never shown). A hidden autoplay+loop video still
-  // decodes continuously on iOS and is a major memory hog -> tab-killing crashes
-  // (the "reloads every ~15s" symptom). If it's hidden, tear it down and bail.
-  if (getComputedStyle(vid).display === 'none') {
-    try { vid.pause(); vid.removeAttribute('autoplay'); vid.querySelectorAll('source').forEach(s => s.remove()); vid.removeAttribute('src'); if (vid.load) vid.load(); } catch (e) {}
-    return;
-  }
-  // Safari trusts the JS property more than the HTML attribute
-  vid.muted = true;
-  vid.playsInline = true;
-  vid.setAttribute('playsinline', '');
-  vid.setAttribute('webkit-playsinline', '');
-  vid.defaultMuted = true;
-  vid.volume = 0;
-
-  function tryPlay() {
-    const p = vid.play();
-    if (p && p.catch) p.catch(function(){});
-  }
-
-  // Try immediately
-  tryPlay();
-  // Try when data is loaded
-  vid.addEventListener('loadeddata', tryPlay);
-  vid.addEventListener('canplay', tryPlay);
-  // Try on first user interaction (iOS Safari fallback)
-  ['click','touchstart','touchend','pointerdown'].forEach(function(evt) {
-    document.addEventListener(evt, function handler() {
-      tryPlay();
-      document.removeEventListener(evt, handler);
-    }, { once: true, passive: true });
-  });
-  // Re-play when returning to the app
-  document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) tryPlay();
-  });
-})();
-
 /* ============================================
    AUTO-SAVE DRAFT ON PAGE UNLOAD
    ============================================ */
