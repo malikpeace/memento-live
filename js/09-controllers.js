@@ -5684,17 +5684,6 @@ const TabBar = {
         })()}` : ''}
       </div>` : ''}
       ${this.renderPlanSection()}
-      <div class="you-h">Journey</div>
-      <div class="you-card">
-        <button type="button" id="profPathOpen" class="you-vrow" aria-label="The Path: where you are on the road to your goal.">
-          <span class="you-vrow__label">The Path</span>
-          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
-        </button>
-        <button type="button" id="profStoryOpen" class="you-vrow" aria-label="Your Story: everything you have done, as one record.">
-          <span class="you-vrow__label">Your Story</span>
-          <span class="you-chev" aria-hidden="true">&rsaquo;</span>
-        </button>
-      </div>
       <div id="prefsSection">${this.renderPreferencesSection()}</div>
       <div class="you-h">Identity</div>
       <div class="you-card">
@@ -5852,8 +5841,9 @@ const TabBar = {
     };
     bindProfileField('profName', 'name', 'profNameVal');
     bindProfileField('profFullName', 'fullName', 'profFullNameVal');
-    try { const _pathBtn = document.getElementById('profPathOpen'); if (_pathBtn) _pathBtn.addEventListener('click', () => { try { if (typeof MementoPath !== 'undefined') MementoPath.open(); } catch (e) {} }); } catch (e) {}
-    try { const _storyBtn = document.getElementById('profStoryOpen'); if (_storyBtn) _storyBtn.addEventListener('click', () => { try { if (typeof MementoStory !== 'undefined') MementoStory.open(); } catch (e) {} }); } catch (e) {}
+    // (The Path / Your Story Settings rows are DEAD, v1272, Malik's call:
+    // the Memento view + the Reflect story face cover this ground. The
+    // MementoPath/MementoStory modules stay for the surfaces that use them.)
     try { const _instBtn = document.getElementById('profInstallApp'); if (_instBtn) _instBtn.addEventListener('click', () => { try { if (window.MementoInstall) window.MementoInstall.show(); } catch (e) {} }); } catch (e) {}
     // The way OUT of a demo (v1096, Malik: "I want a way to return to the actual
     // flow of memento"). The only exit used to live inside the dev cheat bar,

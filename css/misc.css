@@ -175,7 +175,14 @@ html.theme-light .tab-bar__do-check { color: rgba(22, 140, 32, 0.95); }
 .tab-panel {
   position: fixed; inset: 0; z-index: 1;
   background: var(--bg-deep);
-  overflow-y: auto; overscroll-behavior: contain;
+  /* v1272 (Malik: 'I'm able to swipe left and right inside the settings
+     area'): overflow-y:auto silently computes overflow-x to auto as well,
+     so any over-wide row (a long email, a wide value) let iOS pan the whole
+     panel sideways. Locked to vertical, in the scroll AND the gesture, the
+     same way v1125 locked the Memento view. */
+  overflow-y: auto; overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   opacity: 0; pointer-events: none;
 }
