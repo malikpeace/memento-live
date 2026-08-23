@@ -8293,6 +8293,13 @@ const MementoEditor = (function () {
               '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Tinted</button>' +
             '</span>' +
           '</div>' +
+          '<div class="mfe__row" data-tog="minimal">' +
+            '<span class="mfe__row-k">The glow</span>' +
+            '<span class="mfe__seg">' +
+              '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.minimal) ? ' class="on"' : '') + '>Full</button>' +
+              '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.minimal) ? ' class="on"' : '') + '>Minimal</button>' +
+            '</span>' +
+          '</div>' +
           '<div class="mfe__row mfe__row--acc">' +
             '<span class="mfe__row-k">Accent</span>' +
             '<span class="mfe__acc" id="mfeAcc">' +
