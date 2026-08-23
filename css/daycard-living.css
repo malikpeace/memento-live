@@ -1131,3 +1131,60 @@ body.mfe-open #dayCard .daycard-wrap[data-skin][data-skin-ring="1"].daycard-them
    under the card may never be tighter than 60px of blur.
    Depth on this card comes from LIGHT. */
 
+
+/* ════════════════════════════════════════════════════════════════════════
+   MINIMAL (v1265, Malik's toggle, studied off the Apple Card): flat,
+   luminous, bare. A near-white matte face, the colours washed onto it as
+   pastel tints (multiply, quiet), the mark in muted gray, ONE soft neutral
+   shadow, and NOTHING else: no glass ring, no rim, no sheen, no iridescence,
+   no platinum, no aura, no bloom, no floor reflection, no tilt halo. The
+   card is the one bright object in the room; the emptiness is the luxury.
+   A rider like the ring: state.cardSkin.minimal -> data-skin-minimal, works
+   with or without a material. The roam keeps moving, softly, in the tints.
+   ════════════════════════════════════════════════════════════════════════ */
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns::before,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__rim,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__burn,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__sheen,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__iri,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__plat,
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__tint {
+  opacity: 0 !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-wrap__aura,
+.daycard-wrap[data-skin-minimal="1"] .daycard-bloom,
+.daycard-wrap[data-skin-minimal="1"] .daycard-floor {
+  opacity: 0 !important;
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-living-stage::after {
+  opacity: 0 !important;
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns {
+  background: linear-gradient(168deg, #fdfdfe 0%, #f5f6f8 60%, #eef0f3 100%) !important;
+  box-shadow: 0 0 36px rgba(255, 255, 255, 0.10), 0 16px 40px rgba(0, 0, 0, 0.32) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* the tints: the same liquid, washed pastel onto the white (screen light
+   disappears over white; multiply is how ink sits on paper) */
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__liquid {
+  opacity: 0.34;
+  filter: blur(52px) saturate(0.85) hue-rotate(var(--mm-hue, 0deg));
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__liquid .blob {
+  mix-blend-mode: multiply !important;
+}
+/* the mark: quiet gray, the way their apple sits on the titanium */
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__emblem path {
+  fill: #b9bec6 !important;
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__emblem {
+  filter: none !important;
+}
+.daycard-wrap[data-skin-minimal="1"] .daycard-ns__name { color: rgba(90, 96, 106, 0.7); }
+/* light room: the white card needs a touch less shadow weight */
+html.theme-light .daycard-wrap[data-skin-minimal="1"] .daycard-ns {
+  box-shadow: 0 14px 34px rgba(22, 28, 38, 0.16) !important;
+}

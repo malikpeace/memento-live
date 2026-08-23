@@ -9361,6 +9361,9 @@ function applyCardSkin(wrap) {
     // carries the ring choice too, so the Memento view's ring honours White vs
     // Matched even with no material (Matched falls back to the app accent).
     wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
+    // v1265 (Malik, from the Apple Card): Minimal is a rider like the ring,
+    // and it works with or without a material.
+    wrap.dataset.skinMinimal = (state.cardSkin && state.cardSkin.minimal) ? '1' : '0';
     return;
   }
   const S = wrap.style;
@@ -9394,6 +9397,7 @@ function applyCardSkin(wrap) {
   wrap.dataset.skin = sk.n;
   wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
   wrap.dataset.skinMark = (state.cardSkin && state.cardSkin.mark) ? '1' : '0';
+  wrap.dataset.skinMinimal = (state.cardSkin && state.cardSkin.minimal) ? '1' : '0';
   const cls = String(sk.cls || '');
   wrap.classList.toggle('sk-flat', cls.indexOf('flat') !== -1);
   wrap.classList.toggle('sk-void', cls.indexOf('void') !== -1);
@@ -9481,6 +9485,10 @@ function _mfBuildSkinSheet(host, wrap, sig, onClose) {
         '<div class="mfsk-tog__g" data-tog="mark">' +
           '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Plain M</button>' +
           '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Tinted M</button>' +
+        '</div>' +
+        '<div class="mfsk-tog__g" data-tog="minimal">' +
+          '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.minimal) ? ' class="on"' : '') + '>Full glow</button>' +
+          '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.minimal) ? ' class="on"' : '') + '>Minimal</button>' +
         '</div>' +
       '</div>' +
       '<button class="mfsk-done" type="button">Done</button>' +
