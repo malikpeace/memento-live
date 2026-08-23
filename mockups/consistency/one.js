@@ -41,7 +41,7 @@
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null, FILLOVR = null, ONBT = 0.6;
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null, FILLOVR = null, ONBT = 0.6, HONEST = 0.4;
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -189,7 +189,7 @@
     return '<div class="sec sec--score">' +
       '<div class="glance glance--score">' +
       '<div class="score__head"><div class="score__lbl">Score</div>' +
-      '<div class="score__n">' + score + '<em class="score__pct">%</em>' + deltaHTML + '</div></div>' +
+      '<div class="score__n">' + score + deltaHTML + '</div></div>' +
       '<div class="score__basis">based on your ' + Math.round(tgt * 100) + '% goal</div>' +
       scoreViz(A, log) +
       '<div class="score__note">Remember: the goal is to be better, not perfect.</div>' +
@@ -501,9 +501,19 @@
   window.addEventListener('scroll', closeDaypop, true);
 
   /* ---------- onboarding: pick your consistency target ---------- */
-  // a fixed scattered order so the fill looks like a heatmap but the COUNT matches the %
-  var ONB_ORDER = (function () { var a = []; for (var i = 0; i < 91; i++) a.push(i);
-    a.sort(function (x, y) { return (Math.sin((x + 1) * 12.9898) - Math.sin((y + 1) * 12.9898)); }); return a; })();
+  // a truly random (but stable) scatter, so the heatmap fills organically 0->100%
+  var ONB_ORDER = (function () {
+    var a = []; for (var i = 0; i < 91; i++) a.push(i);
+    var seed = 1734021;
+    function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+    for (var i = a.length - 1; i > 0; i--) { var jx = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[jx]; a[jx] = t; }
+    return a;
+  })();
+  function onbWarn(t) {
+    if (t <= 0.05) return 'At 0 to 5%, you will never reach your goal. This is the same as never starting.';
+    if (t >= 0.95) return '95% and up is a fantasy unless you are a Navy SEAL. Real life has sick days, travel, and chaos. Pick a bar you can actually hold.';
+    return '';
+  }
   function renderOnb() {
     var pct = Math.round(ONBT * 100), n = Math.round(ONBT * 91);
     var mEl = document.querySelector('.onb__m'); if (mEl && !mEl.firstChild) mEl.innerHTML = mMark('', 26);
@@ -512,22 +522,27 @@
     var onSet = {}; for (var k = 0; k < n; k++) onSet[ONB_ORDER[k]] = 1;
     [].forEach.call(heat.children, function (b, i) { b.classList.toggle('on', !!onSet[i]); });
     el('onbPct').textContent = pct;
+    var w = el('onbWarn'); if (w) w.textContent = onbWarn(ONBT);
   }
-  function openOnb() { renderOnb(); el('onb').hidden = false; }
+  function openOnb() { renderOnb(); if (el('honSlider')) { el('honSlider').value = Math.round(HONEST * 100); el('honPct').textContent = el('honSlider').value; } el('onb').hidden = false; }
   function bindOnb() {
     var heat = el('onbHeat'); if (!heat) return;
     var dragging = false;
     function setFromX(clientX) {
       var r = heat.getBoundingClientRect();
+      if (!r.width) return;
       ONBT = Math.max(0.05, Math.min(1, (clientX - r.left) / r.width));
       renderOnb();
     }
-    heat.addEventListener('pointerdown', function (e) { dragging = true; heat.setPointerCapture(e.pointerId); setFromX(e.clientX); });
+    heat.addEventListener('pointerdown', function (e) { dragging = true; try { heat.setPointerCapture(e.pointerId); } catch (x) {} setFromX(e.clientX); });
     heat.addEventListener('pointermove', function (e) { if (dragging) setFromX(e.clientX); });
     heat.addEventListener('pointerup', function () { dragging = false; });
+    var hon = el('honSlider');
+    if (hon) hon.addEventListener('input', function () { HONEST = +this.value / 100; el('honPct').textContent = this.value; });
     el('onbGo').addEventListener('click', function () {
-      TARGETOVR = ONBT;
+      TARGETOVR = ONBT; FILLOVR = HONEST;
       var t = el('tgtSlider'); if (t) { t.value = Math.round(ONBT * 100); el('tgtLbl').textContent = 'Target ' + t.value + '%'; }
+      var c = el('conSlider'); if (c) { c.value = Math.round(HONEST * 100); el('conLbl').textContent = 'Consistency ' + c.value + '%'; }
       el('onb').hidden = true; render();
     });
     var sb = el('setupBtn'); if (sb) sb.addEventListener('click', openOnb);

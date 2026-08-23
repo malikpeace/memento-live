@@ -481,12 +481,15 @@
   html.vm-desk .evcol--side { flex: 1; display: flex; flex-direction: column; }
   html.vm-desk .evcol .sec { margin: 0 0 22px; }
   html.vm-desk .evcol .sec:last-child { margin-bottom: 0; }
-  html.vm-desk .glance--score { display: grid; grid-template-columns: auto 1fr; align-items: center;
-    gap: 30px; padding: 22px 48px 22px 26px; }
+  html.vm-desk .glance--score { display: grid; grid-template-columns: minmax(200px, 260px) 1fr; align-items: center;
+    gap: 44px; padding: 26px 48px 26px 30px; }
   html.vm-desk .score__m { top: 16px; right: 18px; }
-  html.vm-desk .score__head { display: flex; align-items: baseline; gap: 14px; }
+  html.vm-desk .score__head { display: flex; align-items: baseline; gap: 14px; grid-column: 1; grid-row: 1; }
+  html.vm-desk .score__basis { grid-column: 1; grid-row: 2; margin-top: 0; align-self: start; }
   html.vm-desk .score__n { font-size: 66px; }
-  html.vm-desk .score__viz { margin-top: 0; }
+  html.vm-desk .score__viz { margin-top: 0; grid-column: 2; grid-row: 1 / 3; align-self: center; }
+  html.vm-desk .fillbar { height: 18px; }
+  html.vm-desk .fillbar__key { margin-top: 13px; font-size: 13.5px; }
   html.vm-desk .score__note { grid-column: 1 / -1; margin-top: 4px; }
 
   /* ============ phone view forced on a wide screen ============ */
@@ -528,6 +531,16 @@
   html.light .onb__read b { color: #0c0e0c; }
   html.light .onb__read span, html.light .onb__hint { color: rgba(10,14,10,0.55); }
   html.light .onb__heat b { background: rgba(10,14,10,0.08); }
+  .onb__p--lead { font-weight: 650; color: rgba(235,238,248,0.92); }
+  html.light .onb__p--lead { color: #0c0e0c; }
+  .onb__sec { margin-top: 38px; padding-top: 34px; border-top: 1px solid rgba(255,255,255,0.1); }
+  html.light .onb__sec { border-top-color: rgba(10,14,10,0.1); }
+  .onb__h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 12px; }
+  html.light .onb__h2 { color: #0c0e0c; }
+  .onb__warn { font-size: 13.5px; line-height: 1.5; margin: 0 auto 6px; max-width: 380px; min-height: 20px;
+    color: rgba(235,238,248,0.92); font-weight: 550; }
+  html.light .onb__warn { color: rgba(10,14,10,0.82); }
+  .onb__slider { width: 100%; max-width: 340px; accent-color: var(--acc); height: 5px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -545,11 +558,26 @@
 <div id="onb" class="onb" hidden>
   <div class="onb__in">
     <div class="onb__m"></div>
-    <h1 class="onb__h">How consistent do you want to be?</h1>
-    <p class="onb__p">The goal was never perfection. Showing up 100% of days is a fantasy, and chasing it is how people quit. Consistency is the long game: showing up more often than not, month after month. Pick a level you can actually hold, then beat it.</p>
-    <div class="onb__heat" id="onbHeat"></div>
-    <div class="onb__read"><b id="onbPct">60</b><span>% of days</span></div>
-    <p class="onb__hint">Drag to set your bar. Aim high, but real, most people hold 50 to 70%.</p>
+    <h1 class="onb__h">The Consistency Law</h1>
+    <p class="onb__p">To achieve anything useful in this life, it requires consistency. You can mess up almost every other step, but if you are consistent in anything, you still have a very good chance of making it.</p>
+    <p class="onb__p onb__p--lead">Simply put: consistency does not guarantee you will make it. But being inconsistent guarantees you will not.</p>
+
+    <div class="onb__sec">
+      <h2 class="onb__h2">Do not chase perfection</h2>
+      <p class="onb__p">You will never be perfect, and you do not need to be. The goal is to show up more often than not, over a long stretch. Set a bar you can actually hold, then beat it.</p>
+      <div class="onb__heat" id="onbHeat"></div>
+      <div class="onb__read"><b id="onbPct">60</b><span>% of days</span></div>
+      <p class="onb__warn" id="onbWarn"></p>
+      <p class="onb__hint">Drag to set your bar. Pick something ambitious but real.</p>
+    </div>
+
+    <div class="onb__sec">
+      <h2 class="onb__h2">Be honest</h2>
+      <p class="onb__p">How consistent have you actually been so far? No judgment, this is just your starting point.</p>
+      <div class="onb__read"><b id="honPct">40</b><span>% of days</span></div>
+      <input type="range" id="honSlider" class="onb__slider" min="0" max="100" step="5" value="40">
+    </div>
+
     <button class="onb__go" id="onbGo">Enter Consistency</button>
   </div>
 </div>
