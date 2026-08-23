@@ -43,7 +43,8 @@
       var t = state.consistency && state.consistency.target;
       if (typeof t === 'number' && t > 0 && t <= 1) return t;
     } catch (e) {}
-    return 0.6;
+    // never chosen yet: the plan's own rhythm beats a generic 60% (v1277)
+    try { return suggestedTarget(); } catch (e) { return 0.6; }
   }
   function targetSet() {
     try { return !!(state.consistency && state.consistency.setAt); } catch (e) { return false; }
@@ -56,6 +57,38 @@
       state.consistency.setAt = Date.now();
       persistNow();
     } catch (e) {}
+  }
+
+  /* ---------------- the plan's own rhythm -> the suggested bar ------------
+     v1277 (audit F5, Malik's correction of the finding): the MODEL does not
+     change. Rest days stay in the denominator; a personal target IS the
+     cadence. What was missing is that nothing told a 3x/week person which bar
+     matches their plan, so they could set 80% by hand and feel punished for
+     following the plan exactly. So the onboarding STARTS at the plan's own
+     rhythm (3 sessions a week -> 43%), says so in one line, and they can
+     still drag it anywhere. Read-only from state; the plan is another
+     agent's file. */
+  function planPerWeek() {
+    try {
+      var p = state.actionPlan || {};
+      var spw = Number(p.sessionsPerWeek);
+      if (spw > 0 && spw <= 7) return spw;
+      var days = p.offDays && Array.isArray(p.offDays.trainingDays) ? p.offDays.trainingDays.length : 0;
+      if (days > 0 && days <= 7) return days;
+    } catch (e) {}
+    return 0;
+  }
+  function suggestedTarget() {
+    var n = planPerWeek();
+    if (!n) return 0.6;
+    // round to the nearest 5% so the heatmap lands on a clean-looking bar
+    return Math.max(0.05, Math.min(1, Math.round((n / 7) * 20) / 20));
+  }
+  function planLine() {
+    var n = planPerWeek();
+    if (!n) return '';
+    return 'Your plan asks for ' + n + (n === 1 ? ' day' : ' days') + ' a week, which is about ' +
+      Math.round(suggestedTarget() * 100) + '% of days. Start there, or pick your own.';
   }
 
   /* ---------------- the goal's shape -> the hero wording ------------------ */
@@ -86,6 +119,33 @@
     if (keys.length) return keys[0];
     try { return getTodayISO(); } catch (e) { return isoOf(todayDate()); }
   }
+  // v1277 (audit F2, the same-day half): a goal that changes TODAY must not
+  // inherit this morning's completion from the retired goal. The reset wipes
+  // completionHistory, but proof events are permanent history by design, so
+  // the boundary DAY itself is only current when a main completion was
+  // recorded after the new plan landed. Every earlier day is a past chapter.
+  function landedAt() {
+    try {
+      var t = Number(state.actionPlan && state.actionPlan.landedAt);
+      return isFinite(t) && t > 0 ? t : 0;
+    } catch (e) { return 0; }
+  }
+  function keptAfterLanding(iso) {
+    var t = landedAt();
+    if (!t) return true;                       // no landing stamp: trust the date
+    try {
+      var ev = (state.proofEvents || []).some(function (e) {
+        return e && e.type === 'action-complete' && e.iso === iso && Number(e.ts) >= t;
+      });
+      if (ev) return true;
+      return (state.action && Array.isArray(state.action.completionHistory) ? state.action.completionHistory : [])
+        .some(function (h) {
+          if (!h || !h.date) return false;
+          var d = new Date(h.date);
+          return isFinite(d.getTime()) && d.getTime() >= t && isoOf(new Date(d.getFullYear(), d.getMonth(), d.getDate())) === iso;
+        });
+    } catch (e) { return true; }
+  }
   function buildLog() {
     var model = (typeof buildConsistencyModel === 'function') ? buildConsistencyModel() : { mainDays: {}, supportByDay: {} };
     var minutesByDay = {};
@@ -110,17 +170,30 @@
       var sup = {};
       var sb = model.supportByDay[iso];
       if (sb) Object.keys(sb).forEach(function (k) { sup[k] = 1; });
+      var isPast = cursor < startDate;
+      // the boundary day belongs to the new goal only from the moment it landed
+      if (!isPast && iso === start && on && !keptAfterLanding(iso)) isPast = true;
       log.push({
         date: cursor, iso: iso, on: on, sup: sup,
         minutes: on ? (minutesByDay[iso] || 0) : 0,
-        past: cursor < startDate
+        past: isPast
       });
       cursor = addDays(cursor, 1);
     }
     if (!log.length) log.push({ date: today, iso: isoOf(today), on: false, sup: {}, minutes: 0, past: false });
     return log;
   }
-  function currentLog(log) { return log.filter(function (d) { return !d.past; }); }
+  function currentLog(log) {
+    var cur = log.filter(function (d) { return !d.past; });
+    // A BRAND NEW CHAPTER IS NOT AN ERROR (v1277): right after a goal change
+    // every recorded day belongs to the past goal, so the current log can be
+    // empty. Day one of the new goal is today, pending, count zero.
+    if (!cur.length) {
+      var t = todayDate();
+      cur = [{ date: t, iso: isoOf(t), on: false, sup: {}, minutes: 0, past: false }];
+    }
+    return cur;
+  }
 
   /* ---------------- the statistics engine (ported from _kit.stats) ------- */
   function stats(log) {
@@ -527,6 +600,7 @@
           '<p class="onb__hint">Drag to set where you are.</p></div>' +
         '<div class="onb__page onb__page--heat"><h1 class="onb__h">Now set your bar</h1>' +
           '<p class="onb__p">Pick the level you are aiming for. Ambitious, but real.</p>' +
+          (planLine() ? '<p class="onb__plan">' + planLine() + '</p>' : '') +
           '<div class="onb__heat" id="cspOnbHeat"></div>' +
           '<div class="onb__read"><b id="cspOnbPct">60</b><span>% of days</span></div>' +
           '<p class="onb__warn" id="cspOnbWarn"></p>' +
@@ -665,7 +739,8 @@
 
     if (!targetSet()) {
       ONB_PG = 0;
-      try { ONBT = curTarget(); } catch (e) {}
+      // start at the plan's own rhythm (v1277), not a generic 60%
+      try { ONBT = suggestedTarget(); } catch (e) { ONBT = 0.6; }
       root.insertAdjacentHTML('beforeend', onbHtml());
       renderOnb();
       bindOnb(root);

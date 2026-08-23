@@ -2508,7 +2508,28 @@
         }
         // SUCCESS. The plan lands BEFORE the screen says it is ready: the
         // receipt writes before the render, always.
+        //
+        // A NEW GOAL STARTS A CLEAN SLATE (v1277, audit F2). goalStateReset
+        // existed since THE MERGE and nothing ever called it, so a new star
+        // inherited the old goal's completions, progress and day records.
+        // It runs HERE, awaited, because it flushes queued guarantee receipts
+        // first (their proof ids point into completionHistory) and the wipe
+        // must not race that flush. Only on a genuine star change: a re-run
+        // or refine for the SAME star must never wipe a person's progress.
         var landFn = G('actionPlanLand');
+        var _newHash = '';
+        try { _newHash = String((report.inputs && report.inputs.starHash) || liveStarHash() || ''); } catch (e) {}
+        var _oldHash = '';
+        try { _oldHash = String((S() && S().actionPlan && S().actionPlan.starHash) || ''); } catch (e) {}
+        var _goalChanged = !!(_oldHash && _newHash && _oldHash !== _newHash);
+        var _pre = Promise.resolve();
+        if (_goalChanged) {
+          try {
+            var rs = G('goalStateReset');
+            if (rs) _pre = Promise.resolve(rs()).catch(function () {});
+          } catch (e) {}
+        }
+        return _pre.then(function () {
         var res = null;
         try { res = landFn ? landFn(report.plan, report.inputs) : null; } catch (e) {}
         if (landFn && (!res || !res.ok)) {
@@ -2522,6 +2543,7 @@
         ActionFlow._lastReport = report;
         if (typeof opts.onLanded === 'function') { try { opts.onLanded((res && res.plan) || report.plan, report); } catch (e) {} }
         at(0, land);
+        });
       }, function (err) {
         running = false;
         var e2 = errorLine(err && err.message);

@@ -316,3 +316,9 @@ html.theme-light #consistencyPage .onb__warn { color: rgba(10, 14, 10, 0.72); }
   #consistencyPage .onb__track { transition: none; }
   #consistencyPage { transition: none; }
 }
+
+/* v1277 (F5): the line that tells them which bar matches their plan. */
+#consistencyPage .onb__plan {
+  font-size: 13.5px; line-height: 1.5; margin: -6px 0 20px;
+  color: rgba(var(--acc-rgb), 0.92); font-weight: 550;
+}
