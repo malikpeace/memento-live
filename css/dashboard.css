@@ -3170,7 +3170,11 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
    barely above the card's own film; the deboss reads from the light edge
    under it and the shadow above it, like CNC'd metal under raking light. */
 .daycard-ns__emblem {
-  width: 124px; height: 124px;
+  /* step 9 (v1271): the mark scales WITH the card. Fixed 124px overflowed
+     the card on short viewports (iPhone SE: an 80px-wide card wearing a
+     124px M poking out of its face). min() keeps the exact 124px everywhere
+     the card is full-size and shrinks proportionally when the card does. */
+  width: min(124px, 42%); height: auto; aspect-ratio: 1 / 1;
   fill: rgba(255, 255, 255, 0.20);
   filter:
     drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.32))
@@ -6676,3 +6680,15 @@ body.mfe-open #dayCard, body.mfe-open .app.dash-v2 #dayCard {
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.45);
 }
 #mfEditor .mfe__plane { padding-bottom: calc(var(--safe-b, 0px) + 92px); }
+
+/* ── step 9 (v1271): SHORT VIEWPORTS (iPhone SE class, <=620px tall). The
+   action box compacts so the Memento keeps real presence instead of
+   collapsing to a sliver: tighter paddings and type in the box, the hint
+   trimmed, the card band guaranteed its share. Same skeleton, same order,
+   nothing hidden. */
+@media (max-width: 859.98px) and (max-height: 620px) {
+  #commandCenter .cc-card { padding: 14px 16px 14px; }
+  #commandCenter .a-move { font-size: 1.19rem; line-height: 1.3; }
+  #commandCenter .v-nf > * + * { margin-top: 8px; }
+  #commandCenter .cc-hold-complete { padding: 12px; }
+}
