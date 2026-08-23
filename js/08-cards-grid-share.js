@@ -8515,8 +8515,22 @@ try {
 // built, and cannot be reached by accident. Inside the record the same sheet
 // is reached by its own hint, and that path is untouched.
 let _mfHomeSkin = null;
+// v1276 (Malik): THE CARD IS NOT CUSTOMISABLE UNTIL IT IS EARNED. Before the
+// Neutron Star exists there is nothing to dress up, so holding the Memento
+// must do NOTHING: no editor, no sheet, no menu. (The paid check below was
+// unreachable: the editor opened before any gate ran.)
+function _customizeUnlocked() {
+  try {
+    var c = state.clarity || {};
+    var star = String((c.answers && c.answers.neutronStar) || '').trim();
+    if (!c.completed || !star) return false;
+    if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return false;
+    return true;
+  } catch (e) { return false; }
+}
 function _mfOpenCustomize() {
   try {
+    if (!_customizeUnlocked()) return;
     // v1164: the home hold opens the full-screen EDITOR (the card lifts, the
     // materials live on a plane under it and repaint it live). The old
     // bottom sheet stays for the record's own hint path.
@@ -9568,7 +9582,8 @@ function _mfBuildSkinSheet(host, wrap, sig, onClose) {
 }
 
 function _mfSkinsInit(ov, wrap, sig) {
-  if (typeof ClarityPaywall !== 'undefined' && !ClarityPaywall.isPaid()) return;
+  // v1276: no hint, no hold, nothing to find until the card is earned.
+  if (!_customizeUnlocked()) return;
   if (!ov || !wrap) return;
   const scroll = ov.querySelector('.mf__scroll');
   if (!scroll) return;
@@ -9590,6 +9605,7 @@ function _mfSkinsInit(ov, wrap, sig) {
   const goEditor = () => {
     try {
       if (typeof MementoEditor === 'undefined') return;
+      if (!_customizeUnlocked()) return;              // v1276: earned first
       if (typeof MementoView !== 'undefined' && MementoView.isActive()) {
         MementoView.close();
         let waited = 0;
