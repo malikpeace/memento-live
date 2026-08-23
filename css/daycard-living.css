@@ -256,9 +256,11 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
   position: absolute; inset: 0; z-index: -1;
   border-radius: var(--r-card);
   pointer-events: none;
-  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-  transition: transform 0.18s ease-out;
-  will-change: transform;
+  /* v1279: NO 3D CONTEXT AT ALL. The tilt is gone (v1278), but this
+     perspective() still created a 3D rendering layer at zero rotation, and
+     that context is what let a dark seam print between the glass and the
+     light behind it. Flat layers cannot separate. */
+  transform: none;
   opacity: var(--lit, 0);
   /* v1262 (Malik: "the rim glow still has white in it... make it color
      matched"): the halo takes --halo-rgb (js/08 sets it to the material's

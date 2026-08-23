@@ -3089,9 +3089,11 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
   backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
   -webkit-backdrop-filter: blur(calc(5px * var(--bx, 1))) saturate(1.25);
   overflow: hidden;
-  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-  transition: transform 0.18s ease-out;
-  will-change: transform;
+  /* v1279: NO 3D CONTEXT AT ALL. The tilt is gone (v1278), but this
+     perspective() still created a 3D rendering layer at zero rotation, and
+     that context is what let a dark seam print between the glass and the
+     light behind it. Flat layers cannot separate. */
+  transform: none;
   -webkit-tap-highlight-color: transparent;
 }
 /* v1056 -> v1062. v1056 rotated the whole STAGE so the bloom stopped
@@ -3104,14 +3106,16 @@ body.lite .daycard-motion-cta, html.lowfx .daycard-motion-cta { backdrop-filter:
    never rotates: the ground does not lean when the object above it does.
    The vars still live on the stage (bindDayCardTilt), inherited by both. */
 .daycard-living-stage .daycard-ns {
-  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-  transition: transform 0.18s ease-out;
-  will-change: transform;
+  /* v1279: NO 3D CONTEXT AT ALL. The tilt is gone (v1278), but this
+     perspective() still created a 3D rendering layer at zero rotation, and
+     that context is what let a dark seam print between the glass and the
+     light behind it. Flat layers cannot separate. */
+  transform: none;
 }
 .daycard-theme-living .daycard-bloom {
-  transform: perspective(900px) rotateX(var(--dc-rx, 0deg)) rotateY(var(--dc-ry, 0deg));
-  transition: opacity 0.9s ease, transform 0.18s ease-out;
-  will-change: transform;
+  /* v1279: flat with the card (see the note above). */
+  transform: none;
+  transition: opacity 0.9s ease;
 }
 /* Liquid-glass rim: a 1.5px ring of caught light drawn with a gradient and
    a mask (NOT a border, so it reads as the edge of glass catching the room,
