@@ -260,10 +260,14 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
   transition: transform 0.18s ease-out;
   will-change: transform;
   opacity: var(--lit, 0);
+  /* v1262 (Malik: "the rim glow still has white in it... make it color
+     matched"): the halo takes --halo-rgb (js/08 sets it to the material's
+     tint lifted 25% toward white, space-separated); the house card keeps
+     its cool platinum light via the fallbacks. */
   box-shadow:
-    0 0 18px rgba(225, 238, 250, 0.50),
-    0 0 44px rgba(205, 226, 248, 0.28),
-    0 0 96px rgba(185, 214, 245, 0.15);
+    0 0 18px rgb(var(--halo-rgb, 225 238 250) / 0.50),
+    0 0 44px rgb(var(--halo-rgb, 205 226 248) / 0.28),
+    0 0 96px rgb(var(--halo-rgb, 185 214 245) / 0.15);
 }
 
 /* ── Color bloom: a blurred echo behind the card that bleeds the hue out ─────
@@ -846,12 +850,78 @@ body:not(.ns-bloom) .daycard-theme-living .daycard-ns__rim {
    (space-separated, lifted 55% toward white) alongside --skin-rgb.
    The aura never 3D-rotates, so its filter is legal (the v1256 law). */
 html.skin-room .daycard-wrap[data-skin] .daycard-wrap__aura {
-  opacity: 0.26;
-  filter: blur(28px) brightness(calc((0.7 + 1.7 * var(--glow, 0.4)) * var(--lit, 0))) hue-rotate(var(--mm-hue, 0deg)) saturate(0.4);
+  /* v1262 (Malik): the room is PURE black or white; the top-left rays are
+     the one thing that carries the material's colour. The wash is gone
+     entirely with a skin on; the card's own bloom + halo remain its light. */
+  opacity: 0;
 }
 /* !important so it outranks each beam's inline --c (author !important beats
    the style attribute); the fallback keeps plain white if JS never set it. */
 html.skin-room .ambient__rays-beam { --c: var(--beam-rgb, 255 255 255) !important; }
+
+/* Light mode with a material: the same law from the other side. The room is
+   WHITE; the card's bloom + halo are dialed back so its colour stays a glow
+   around the glass instead of an amber flood across the page (screen-blend
+   light lands much harder on a near-white ground). Dark keeps full strength. */
+html.theme-light.skin-room .daycard-wrap[data-skin] .daycard-bloom {
+  opacity: calc(var(--emit, 0.55) * var(--lit, 0) * 0.15);
+}
+html.theme-light.skin-room .daycard-wrap[data-skin] .daycard-living-stage::after {
+  /* on white, any coloured glow floods the narrow phone margins, and the
+     halo's anti-seam job does not exist here (an exposed seam shows the
+     white room). A whisper remains so the glass still sits IN the room. */
+  opacity: calc(var(--lit, 0) * 0.22);
+  box-shadow:
+    0 0 12px rgb(var(--halo-rgb, 225 238 250) / 0.30),
+    0 0 28px rgb(var(--halo-rgb, 205 226 248) / 0.14);
+}
+
+/* The light ROOM under a material: white, with the accent living only in the
+   rays. base.css tints the whole light canvas with the app accent (which the
+   skin now drives) and dashboard.css hard-sets the light beams to cyan on
+   the SHAFT (a child, so it bypasses the beam-level override). Both stand
+   down here; this file loads after them, so equal specificity resolves to
+   these. */
+/* THE actual screen-flooder (found by elimination, v1262): base.css repaints
+   .ambient__ns-bloom with the ACCENT at up to 0.62 alpha across the whole
+   viewport, and the skin drives the accent, so a red material soaked the
+   entire room red in both themes. Under a material, the bloom stands down to
+   the v687 shape: ONLY the beams' tight top-left source halo, in the
+   material's lifted light. The room stays black (or white); the rays carry
+   the theme. */
+html.skin-room body[data-accent]:not([data-accent="mono"]) .ambient__ns-bloom {
+  background:
+    radial-gradient(1300px 1000px at 7% 0%,
+      rgb(var(--beam-rgb, 180 205 255) / 0.34) 0%,
+      rgb(var(--beam-rgb, 135 165 255) / 0.18) 18%,
+      rgb(var(--beam-rgb, 90 122 225) / 0.08) 38%,
+      transparent 60%);
+}
+html.theme-light.skin-room body[data-accent]:not([data-accent="mono"]) .ambient__ns-bloom {
+  background:
+    radial-gradient(1300px 1000px at 7% 0%,
+      rgb(var(--beam-rgb, 180 205 255) / 0.20) 0%,
+      rgb(var(--beam-rgb, 135 165 255) / 0.10) 18%,
+      transparent 52%);
+}
+
+html.theme-light.skin-room .ambient {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 0%, rgb(var(--beam-rgb, 255 255 255) / 0.06), transparent 62%),
+    radial-gradient(ellipse 75% 65% at 50% 45%, #ffffff 0%, #eef0f3 55%, #e6e8ec 100%);
+}
+html.theme-light.skin-room body .ambient .ambient__rays-beam-shaft,
+html.theme-light.skin-room body .apl-rays .ambient__rays-beam-shaft {
+  --c: var(--beam-rgb, 95 214 235);
+}
+html.theme-light.skin-room .ambient .ambient__rays-source,
+html.theme-light.skin-room .apl-rays .ambient__rays-source {
+  background: radial-gradient(circle at 22% 22%,
+    rgb(var(--beam-rgb, 95 214 235) / 0.40) 0%,
+    rgb(var(--beam-rgb, 95 214 235) / 0.22) 16%,
+    rgb(var(--beam-rgb, 95 214 235) / 0.10) 34%,
+    transparent 64%);
+}
 
 /* the two riders: colour-matched ring, tinted mark */
 .daycard-wrap[data-skin][data-skin-ring="1"] .daycard-ns__rim {

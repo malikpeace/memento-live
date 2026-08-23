@@ -9333,12 +9333,18 @@ function applyCardSkin(wrap) {
       // and html.skin-room lets the CSS stand the wrap aura down.
       const beam = String(tint).split(',').map(n => { const v = parseFloat(n) || 0; return Math.round(v + (255 - v) * 0.55); });
       document.documentElement.style.setProperty('--beam-rgb', beam.join(' '));
+      // v1262: the card's surrounding halo is colour-matched too (Malik:
+      // no white in the glow around a material). Lifted 25% so it stays
+      // luminous, but unmistakably the skin's own colour.
+      const halo = String(tint).split(',').map(n => { const v = parseFloat(n) || 0; return Math.round(v + (255 - v) * 0.25); });
+      document.documentElement.style.setProperty('--halo-rgb', halo.join(' '));
       document.documentElement.classList.add('skin-room');
     } else {
       document.documentElement.style.removeProperty('--skin-rgb');
       document.documentElement.style.removeProperty('--rim-c');
       document.documentElement.style.removeProperty('--rim-rgb');
       document.documentElement.style.removeProperty('--beam-rgb');
+      document.documentElement.style.removeProperty('--halo-rgb');
       document.documentElement.classList.remove('skin-room');
     }
   } catch (e) {}
