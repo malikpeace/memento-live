@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1273';
+window.MEMENTO_JS_BUILD = 'v1274';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -818,17 +818,14 @@ function _accentDriftTick() {
   b.style.setProperty('--accent-rgb', rgb.join(', '));
   b.style.setProperty('--accent-strong', 'rgb(' + rgb.map(v => Math.round(v * 0.72)).join(',') + ')');
 }
+// v1274 (Malik: "just have one color as the accent... not a rotation of
+// colours, it feels cheap"): THE ACCENT NEVER MOVES. The v576 dynamic accent
+// repainted --accent every 400ms through a palette, so every accent element
+// in the app (the Consistency M, buttons, chips) cycled colours forever. One
+// static accent is the law now; the timer is cleared for any session that
+// already started one.
 function applyAccentDrift(p) {
-  const active = (!p.accent || p.accent === 'default') && !p.reduceMotion;
-  if (!active) {
-    if (_accentDriftTimer) { clearInterval(_accentDriftTimer); _accentDriftTimer = null; }
-    return; // applyPrefs already stripped the inline vars for non-custom accents
-  }
-  if (!_accentDriftTimer) {
-    _accentDriftStart = Date.now();
-    _accentDriftTimer = setInterval(_accentDriftTick, 400);
-  }
-  _accentDriftTick(); // repaint now (applyPrefs just cleared the inline vars)
+  if (_accentDriftTimer) { clearInterval(_accentDriftTimer); _accentDriftTimer = null; }
 }
 
 function applyPrefs() {

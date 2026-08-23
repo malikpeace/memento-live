@@ -2033,6 +2033,16 @@ function smartCloseClarity() {
 
 function exitToModules(source = '') {
   if (typeof FullscreenClose !== 'undefined') FullscreenClose.hide();
+  // v1274 (Malik, on-device): the Consistency page owns this chip while it
+  // is open. Without this branch the X hid itself and left the page
+  // stranded with no way out. Handled first: a root surface, not a sheet.
+  try {
+    if ((source === 'consistency' || (!source && window.ConsistencyPage && ConsistencyPage.isActive()))
+        && window.ConsistencyPage) {
+      ConsistencyPage.close();
+      return;
+    }
+  } catch (e) {}
   if (source === 'clarity' || (!source && ClarityExperience.isOpen)) {
     ClarityExperience.close();
   } else if (source === 'action' || (!source && ActionExperience.isOpen)) {

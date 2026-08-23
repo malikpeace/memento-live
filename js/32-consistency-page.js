@@ -649,14 +649,10 @@
     build();
     render();
     try { if (typeof rememberView === 'function') rememberView('consistency'); } catch (e) {}
-    try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
+    // the chip routes through exitToModules('consistency') -> close() (js/01)
+    try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show('consistency'); } catch (e) {}
     try { if (typeof TabBar !== 'undefined' && TabBar.hide) TabBar.hide(); } catch (e) {}
     document.body.style.overflow = 'hidden';
-    var x = document.getElementById('fullscreenCloseGlobal');
-    if (x) {
-      escBound = escBound || function () { close(); };
-      x.addEventListener('click', escBound);
-    }
     var esc = function (e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } };
     document.addEventListener('keydown', esc);
     requestAnimationFrame(function () { if (root) root.classList.add('is-open'); });
@@ -666,8 +662,6 @@
     if (!isOpen) return;
     isOpen = false;
     try { if (typeof rememberView === 'function') rememberView(null); } catch (e) {}
-    var x = document.getElementById('fullscreenCloseGlobal');
-    if (x && escBound) x.removeEventListener('click', escBound);
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide(); } catch (e) {}
     document.body.style.overflow = '';
     var r = root; root = null;
