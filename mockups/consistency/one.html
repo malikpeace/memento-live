@@ -548,6 +548,15 @@
   html.light .onb__hint { color: rgba(10,14,10,0.45); }
   html.light .onb__heat b { background: rgba(10,14,10,0.08); }
   html.light .onb__dots i { background: rgba(10,14,10,0.2); }
+  /* desktop centers the onboarding; the phone keeps it left aligned */
+  html.vm-desk .onb__page, .onb--wide .onb__page { align-items: center; text-align: center; }
+  html.vm-desk .onb__page > *, .onb--wide .onb__page > * { margin-left: auto; margin-right: auto; }
+  html.vm-desk .onb__m, .onb--wide .onb__m { margin-left: auto; margin-right: auto; }
+  html.vm-desk .onb__read, .onb--wide .onb__read { justify-content: center; }
+  html.vm-desk .onb__foot, .onb--wide .onb__foot { align-items: center; }
+  html.vm-desk .onb__foot > *, .onb--wide .onb__foot > * { margin-left: auto; margin-right: auto; }
+  html.vm-desk .onb__dots, .onb--wide .onb__dots { justify-content: center; }
+  @media (min-width: 760px) { html:not(.vm-framed) .onb { --onb-wide: 1; } }
 </style>
 </head>
 <body>

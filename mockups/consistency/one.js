@@ -538,7 +538,13 @@
     el('onb').hidden = true; render();
   }
   function onbGoNext() { if (ONB_PG < ONB_MAX) { ONB_PG++; renderOnb(); } else onbEnter(); }
-  function openOnb() { ONB_PG = 0; renderOnb(); el('onb').hidden = false; }
+  function syncOnbWidth() {
+    var o = el('onb'); if (!o) return;
+    // real desktop browsers center it too; the framed phone preview never does
+    var wide = window.innerWidth >= 760 && !document.documentElement.classList.contains('vm-framed');
+    o.classList.toggle('onb--wide', wide);
+  }
+  function openOnb() { ONB_PG = 0; syncOnbWidth(); renderOnb(); el('onb').hidden = false; }
   function bindOnb() {
     function bindHeat(heat, set) {
       if (!heat) return; var dragging = false;
@@ -690,7 +696,7 @@
   measureBar();
   bindOnb();
   if (window.ResizeObserver) new ResizeObserver(measureBar).observe(barEl);
-  window.addEventListener('resize', function () { measureBar(); applyView(); });
+  window.addEventListener('resize', function () { measureBar(); applyView(); syncOnbWidth(); });
   applyView();
   render();
 })();
