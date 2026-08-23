@@ -41,7 +41,7 @@
   ];
   var PERSONA = PERSONAS[0];
   var DAY = 168, SHAPE = PERSONA.shape, SCALE = 'month';
-  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null, FILLOVR = null, ONBT = 0.6, HONEST = 0.4;
+  var MOFF = 0, WOFF = 0, YOFF = 0, YRMODE = 'cal', TODAYDONE = true, TARGETOVR = null, FILLOVR = null, ONBT = 0.6, HONEST = 0.4, ONB_PG = 0;
   var DAYS = [1, 7, 30, 90, 168, 365];
   var WD = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   var WDM = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -501,50 +501,64 @@
   window.addEventListener('scroll', closeDaypop, true);
 
   /* ---------- onboarding: pick your consistency target ---------- */
-  // a truly random (but stable) scatter, so the heatmap fills organically 0->100%
-  var ONB_ORDER = (function () {
+  // two independent random (but stable) scatters, one per heatmap
+  function shuffle(seed) {
     var a = []; for (var i = 0; i < 91; i++) a.push(i);
-    var seed = 1734021;
     function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
     for (var i = a.length - 1; i > 0; i--) { var jx = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[jx]; a[jx] = t; }
     return a;
-  })();
+  }
+  var ONB_ORDER = shuffle(1734021), HON_ORDER = shuffle(90210), ONB_MAX = 3;
   function onbWarn(t) {
     if (t <= 0.05) return 'At 0 to 5%, you will never reach your goal. This is the same as never starting.';
     if (t >= 0.95) return '95% and up is a fantasy unless you are a Navy SEAL. Real life has sick days, travel, and chaos. Pick a bar you can actually hold.';
     return '';
   }
-  function renderOnb() {
-    var pct = Math.round(ONBT * 100), n = Math.round(ONBT * 91);
-    var mEl = document.querySelector('.onb__m'); if (mEl && !mEl.firstChild) mEl.innerHTML = mMark('', 26);
-    var heat = el('onbHeat'); if (!heat) return;
+  function fillHeat(heat, order, frac) {
+    if (!heat) return;
     if (heat.children.length !== 91) { var s = ''; for (var i = 0; i < 91; i++) s += '<b></b>'; heat.innerHTML = s; }
-    var onSet = {}; for (var k = 0; k < n; k++) onSet[ONB_ORDER[k]] = 1;
+    var n = Math.round(frac * 91), onSet = {}; for (var k = 0; k < n; k++) onSet[order[k]] = 1;
     [].forEach.call(heat.children, function (b, i) { b.classList.toggle('on', !!onSet[i]); });
-    el('onbPct').textContent = pct;
-    var w = el('onbWarn'); if (w) w.textContent = onbWarn(ONBT);
   }
-  function openOnb() { renderOnb(); if (el('honSlider')) { el('honSlider').value = Math.round(HONEST * 100); el('honPct').textContent = el('honSlider').value; } el('onb').hidden = false; }
+  function renderOnb() {
+    var mEl = document.querySelector('.onb__m'); if (mEl && !mEl.firstChild) mEl.innerHTML = mMark('', 28);
+    fillHeat(el('honHeat'), HON_ORDER, HONEST);
+    fillHeat(el('onbHeat'), ONB_ORDER, ONBT);
+    if (el('honPct')) el('honPct').textContent = Math.round(HONEST * 100);
+    if (el('onbPct')) el('onbPct').textContent = Math.round(ONBT * 100);
+    if (el('onbWarn')) el('onbWarn').textContent = onbWarn(ONBT);
+    var dots = el('onbDots'); if (dots) { var s = ''; for (var i = 0; i <= ONB_MAX; i++) s += '<i class="' + (i === ONB_PG ? 'on' : '') + '"></i>'; dots.innerHTML = s; }
+    if (el('onbGo')) el('onbGo').textContent = ONB_PG === ONB_MAX ? 'Enter Consistency' : 'Continue';
+    var tr = el('onbTrack'); if (tr) tr.style.transform = 'translateX(-' + (ONB_PG * 100) + '%)';
+  }
+  function onbEnter() {
+    TARGETOVR = ONBT; FILLOVR = HONEST;
+    var t = el('tgtSlider'); if (t) { t.value = Math.round(ONBT * 100); el('tgtLbl').textContent = 'Target ' + t.value + '%'; }
+    var c = el('conSlider'); if (c) { c.value = Math.round(HONEST * 100); el('conLbl').textContent = 'Consistency ' + c.value + '%'; }
+    el('onb').hidden = true; render();
+  }
+  function onbGoNext() { if (ONB_PG < ONB_MAX) { ONB_PG++; renderOnb(); } else onbEnter(); }
+  function openOnb() { ONB_PG = 0; renderOnb(); el('onb').hidden = false; }
   function bindOnb() {
-    var heat = el('onbHeat'); if (!heat) return;
-    var dragging = false;
-    function setFromX(clientX) {
-      var r = heat.getBoundingClientRect();
-      if (!r.width) return;
-      ONBT = Math.max(0.05, Math.min(1, (clientX - r.left) / r.width));
-      renderOnb();
+    function bindHeat(heat, set) {
+      if (!heat) return; var dragging = false;
+      function fromX(x) { var r = heat.getBoundingClientRect(); if (!r.width) return; set(Math.max(0.05, Math.min(1, (x - r.left) / r.width))); renderOnb(); }
+      heat.addEventListener('pointerdown', function (e) { e.stopPropagation(); dragging = true; try { heat.setPointerCapture(e.pointerId); } catch (x) {} fromX(e.clientX); });
+      heat.addEventListener('pointermove', function (e) { if (dragging) fromX(e.clientX); });
+      heat.addEventListener('pointerup', function () { dragging = false; });
     }
-    heat.addEventListener('pointerdown', function (e) { dragging = true; try { heat.setPointerCapture(e.pointerId); } catch (x) {} setFromX(e.clientX); });
-    heat.addEventListener('pointermove', function (e) { if (dragging) setFromX(e.clientX); });
-    heat.addEventListener('pointerup', function () { dragging = false; });
-    var hon = el('honSlider');
-    if (hon) hon.addEventListener('input', function () { HONEST = +this.value / 100; el('honPct').textContent = this.value; });
-    el('onbGo').addEventListener('click', function () {
-      TARGETOVR = ONBT; FILLOVR = HONEST;
-      var t = el('tgtSlider'); if (t) { t.value = Math.round(ONBT * 100); el('tgtLbl').textContent = 'Target ' + t.value + '%'; }
-      var c = el('conSlider'); if (c) { c.value = Math.round(HONEST * 100); el('conLbl').textContent = 'Consistency ' + c.value + '%'; }
-      el('onb').hidden = true; render();
-    });
+    bindHeat(el('honHeat'), function (v) { HONEST = v; });
+    bindHeat(el('onbHeat'), function (v) { ONBT = v; });
+    var tr = el('onbTrack'), sx = null;
+    if (tr) {
+      tr.addEventListener('pointerdown', function (e) { sx = e.clientX; });
+      tr.addEventListener('pointerup', function (e) {
+        if (sx == null) return; var dx = e.clientX - sx; sx = null;
+        if (dx < -45 && ONB_PG < ONB_MAX) { ONB_PG++; renderOnb(); }
+        else if (dx > 45 && ONB_PG > 0) { ONB_PG--; renderOnb(); }
+      });
+    }
+    if (el('onbGo')) el('onbGo').addEventListener('click', onbGoNext);
     var sb = el('setupBtn'); if (sb) sb.addEventListener('click', openOnb);
   }
 
