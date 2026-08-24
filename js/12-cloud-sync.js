@@ -740,6 +740,7 @@ const CloudSync = (function () {
       if (result && result.adopting) { dnote('first sync: adopting + reloading'); return !!result.ok; }
       if (!result || !result.ok) {
         dnote('first sync: FAILED, app stays on local data, focus retries');
+        try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('sync_restore_failure'); } catch (e) {}
         firstSyncState = FIRST_SYNC_FAILED;
         pushQueued = true;
         hideRestoreScreen();
@@ -750,6 +751,9 @@ const CloudSync = (function () {
       firstSyncState = FIRST_SYNC_READY;
       clearAdoptGuard();
       clearUrlBrake(); // a settled sync ends the reload chain
+      if (restoreReloadPending()) {
+        try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('sync_restore_success'); } catch (e) {}
+      }
       clearRestoreReload();
       hideRestoreScreen();
       const shouldPush = !!result.shouldPush || pushQueued;

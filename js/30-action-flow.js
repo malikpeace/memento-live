@@ -2488,6 +2488,17 @@
       }
       p.then(function (report) {
         running = false;
+        if (report && report.safetyStop) {
+          return openSafetyStop();
+        }
+        if (report && report.safetyConfirm) {
+          var safeOpts = Object.assign({}, opts);
+          safeOpts.generateOptions = Object.assign({}, opts.generateOptions, { safetyConfirmedSafe: true });
+          return openSafetyConfirm({
+            onYes: function () { openSafetyStop(); },
+            onNo: function () { openLoading(key, safeOpts); }
+          });
+        }
         if (!report || (!report.ok && !report.needsClarity)) {
           var e1 = errorLine((report && report.error) || '');
           return endState(e1.line, e1.sub, 'Try again', retry);
@@ -2540,6 +2551,7 @@
         // the land, so it survives actionPlanNormalize (which owns the shape of
         // everything the model wrote and would drop a field it does not know).
         try { applyCadencePref(); } catch (e) {}
+        try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('plan_landed'); } catch (e) {}
         ActionFlow._lastReport = report;
         if (typeof opts.onLanded === 'function') { try { opts.onLanded((res && res.plan) || report.plan, report); } catch (e) {} }
         at(0, land);
@@ -2605,6 +2617,67 @@
     st.actionRefine.updatedAt = new Date().toISOString();
     try { var p = G('persistNow'); if (p) p(); } catch (e) {}
   }
+  function openSafetyConfirm(opts) {
+    opts = opts || {};
+    var col = shell('safety-confirm', { label: 'Safety check' });
+    var wrap = el('div', 'afl-safe afl-safe--confirm');
+    wrap.appendChild(el('h2', 'afl-safe__question',
+      'I want to make sure I read that right. Are you thinking about hurting yourself or someone else?'));
+
+    var choices = el('div', 'afl-safe__choices');
+    var yes = el('button', 'afl-safe__choice', 'Yes');
+    yes.type = 'button';
+    var no = el('button', 'afl-safe__choice', "No, I'm okay");
+    no.type = 'button';
+    choices.appendChild(yes);
+    choices.appendChild(no);
+    wrap.appendChild(choices);
+    col.appendChild(wrap);
+
+    yes.addEventListener('click', function () {
+      if (typeof opts.onYes === 'function') opts.onYes();
+    });
+    no.addEventListener('click', function () {
+      if (typeof opts.onNo === 'function') opts.onNo();
+    });
+    enterFade(wrap);
+    return root;
+  }
+
+  function openSafetyStop() {
+    var col = shell('safety-stop', { label: 'Immediate support' });
+    var wrap = el('div', 'afl-safe afl-safe--stop');
+    wrap.appendChild(el('h2', 'afl-safe__title', 'First, right now.'));
+
+    var lines = [
+      'What you just said matters more than anything else in this app.',
+      'Memento is not emergency help, and I am not a person. Please talk to someone who is, right now.',
+      'If you are in immediate danger, call your local emergency number.',
+      'United States: call or text 988 (Suicide & Crisis Lifeline), any time.',
+      'United Kingdom: 999 for emergencies, or Samaritans 116 123.',
+      'Elsewhere: findahelpline.com lists the number for your country.',
+      'If you can, tell one person you trust today. Not the perfect person. Any person.',
+      'Your goal will still be here. It can wait. You cannot be replaced.'
+    ];
+    var body = el('div', 'afl-safe__body');
+    lines.forEach(function (line) { body.appendChild(el('p', '', line)); });
+    wrap.appendChild(body);
+
+    var done = el('button', 'afl-safe__done', "I'm okay");
+    done.type = 'button';
+    done.addEventListener('click', function () { destroy(); });
+    wrap.appendChild(done);
+    col.appendChild(wrap);
+
+    // Bare event only: no words, answers, goal, or user details. Confirmed
+    // danger quiets reminders for exactly one day, then they resume normally.
+    try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('safety_screen_shown'); } catch (e) {}
+    try { if (window.MementoPush && MementoPush.pauseForSafety) MementoPush.pauseForSafety(24); } catch (e) {}
+
+    enterFade(wrap);
+    return root;
+  }
+
   function openClarityAsk(questions, opts) {
     opts = opts || {};
     var qs = (questions || []).map(function (q) { return String(q || '').trim(); }).filter(Boolean).slice(0, 3);
@@ -4770,6 +4843,7 @@
     })) return null;
     var star = liveStar();
     if (!star) return null;                 // no star, no plan: Clarity comes first
+    try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('action_start'); } catch (e) {}
     // Where they ARE, remembered the way every other module remembers it, so a
     // refresh reopens the flow and resumePoint decides the screen again.
     try { var rv2 = G('rememberView'); if (rv2) rv2('action'); } catch (e) {}

@@ -2956,12 +2956,12 @@ function refreshActionSurface() {
 // refuse to invent. Every insight has to cite a concrete count, date, or
 // repeated phrase from the data, or it returns nothing. Generic motivation is
 // a failure, not a fallback.
-const AI_INSIGHTS_SYSTEM_PROMPT = `You are the pattern-surfacing engine inside Memento, a personal-development app. You receive a user's own logged data: past Neutron Star (goal) versions, completed actions, written reflections, logged distractions, and deep-work sessions. Your job is to reflect back patterns they cannot easily see in themselves.
+const AI_INSIGHTS_SYSTEM_PROMPT = `You are the pattern-surfacing engine inside Memento, a personal-development app. You receive a user's own logged data: past Neutron Star (goal) versions, completed actions, logged distractions, and deep-work sessions. Private Notes and journal reflections are never included. Your job is to reflect back patterns they cannot easily see in themselves.
 
 ABSOLUTE RULE: state an insight ONLY if you can back it with a specific count, date, or repeated phrase taken directly from the data. Every insight must point at concrete logged evidence. Acceptable form, and the ONLY acceptable form:
 - "You logged 'social media' as a distraction 7 times, more than any other category."
 - "You completed 4 actions in early May and none in the three weeks since."
-- "Your last 3 reflections all mention feeling behind."
+- "You completed 3 deep-work sessions this month, each longer than the one before."
 - "You have rewritten your Neutron Star twice, each time making it more specific."
 
 The data starts with a one-line momentum snapshot (current streak, actions completed in the last 7 days, days since the last completion). Treat those numbers as concrete, citable facts: when one of them is notable (a streak worth naming, a recent surge, or a gap since the last completion), you may ground an insight in it, stated as plainly as the examples above. Do not restate the snapshot verbatim and do not pad with it when nothing about it is notable.
@@ -3040,8 +3040,6 @@ function buildInsightContext() {
     if (ch.length) lines.push('Neutron Star versions over time:\n' + ch.map(h => `- ${new Date(h.completedAt).toLocaleDateString()}: ${h.neutronStar}`).join('\n'));
     const comp = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
     if (comp.length) lines.push('Completed actions (date, intensity, what):\n' + comp.slice(-30).map(c => `- ${new Date(c.date).toLocaleDateString()} [${c.tier}] ${c.actionText}`).join('\n'));
-    const refs = (state.reflection && Array.isArray(state.reflection.entries)) ? state.reflection.entries : [];
-    if (refs.length) lines.push('Reflections (date, text):\n' + refs.slice(-20).map(r => `- ${r.date}: ${r.text}`).join('\n'));
     const dis = (state.distraction && Array.isArray(state.distraction.logs)) ? state.distraction.logs : [];
     if (dis.length) { const cat = {}; dis.forEach(l => { cat[l.category] = (cat[l.category] || 0) + 1; }); lines.push('Distraction counts by category:\n' + Object.entries(cat).sort((a, b) => b[1] - a[1]).map(([k, v]) => `- ${k}: ${v}`).join('\n')); }
     const dw = (state.deepwork && Array.isArray(state.deepwork.sessions)) ? state.deepwork.sessions : [];
@@ -3102,7 +3100,7 @@ function parseModelJson(text) {
 }
 
 function hasEnoughInsightData() {
-  const n = ['action.completionHistory', 'reflection.entries', 'distraction.logs', 'deepwork.sessions', 'clarity.history']
+  const n = ['action.completionHistory', 'distraction.logs', 'deepwork.sessions', 'clarity.history']
     .reduce((sum, path) => { const [a, b] = path.split('.'); const arr = state[a] && state[a][b]; return sum + (Array.isArray(arr) ? arr.length : 0); }, 0);
   return n >= 4;
 }
@@ -5388,6 +5386,108 @@ function actionBrainInputs() {
   };
 }
 
+/* A deliberately narrow, local safety gate. It only recognizes language
+   about suicide, self-harm, or harming another person. Dark, philosophical,
+   or figurative language is not enough. Ambiguous language gets one quiet
+   confirmation in the Action flow; explicit present intent stops before any
+   model call. */
+function actionSafetyClassify(value) {
+  const lines = String(value || '').replace(/[’]/g, "'").split(/\n+/).map((line) => {
+    const raw = line.replace(/\s+/g, ' ').trim();
+    return { raw: raw, text: raw.toLowerCase() };
+  }).filter((line) => line.raw);
+  if (!lines.length) return 'none';
+
+  let ambiguous = false;
+  for (const line of lines) {
+    const text = line.text;
+    // Common figurative and philosophical language is not a danger claim.
+    // Keep these exclusions narrow so honesty is not punished, while an
+    // explicit first-person intent in another answer still stops the flow.
+    if (/^(?:i feel dead inside|my life has no meaning|this is killing me|this (?:job|project|deadline) is killing me|i'd rather die than do another sales call|i'd rather die than .+|i'm dying to .+|i could kill for .+|i need to kill time|i want to disappear for a week|i'm so done|my old self needs to die|i need to cut myself off from .+|i(?:\x27m| am) going to cut myself off from .+|i want to end (?:this|the) (?:project|job|relationship))[.!?]*$/.test(text)) {
+      continue;
+    }
+
+    const intent = "(?:i am going to|i'm going to|i'm gonna|i will|i want to|i wanna|i plan to|i have a plan to|i intend to|i am about to|i'm about to|i am ready to|i'm ready to)";
+    const person = "(?:myself|him|her|them|someone|somebody|people|my (?:boss|manager|coworker|employee|roommate|friend|ex|partner|wife|husband|girlfriend|boyfriend|brother|sister|mother|father|mom|dad|son|daughter|child|kid|kids|cousin|uncle|aunt|grandmother|grandfather|family|neighbor|teacher|student))";
+    const immediatePatterns = [
+      new RegExp("\\b" + intent + " (?:kill|hurt|harm|cut|shoot|stab|attack|choke|poison) " + person + "\\b"),
+      new RegExp("\\b" + intent + " (?:die|commit suicide|end my life|take my (?:own )?life|end it all|overdose|jump off (?:a|the) [a-z'-]+)\\b"),
+      /\bi (?:just|already|have|have just|recently) (?:cut|burned|starved|hurt|harmed|shot|stabbed|poisoned) (?:myself|him|her|them|someone|somebody)\b/,
+      /\bi(?:'ve| have) been (?:cutting|burning|starving|hurting|harming) myself(?:[.!?]*$|\s+(?:again|on purpose|as punishment|physically|recently|lately|today|tonight|right now)\b)/,
+      /\bi(?:'ve| have) (?:cut|burned|starved|hurt|harmed) myself(?:[.!?]*$|\s+(?:again|on purpose|as punishment|physically|recently|lately|today|tonight|right now)\b)/,
+      /\bi have (?:the )?(?:gun|knife|pills|means) (?:ready|with me|right here)\b.*\b(?:kill|hurt|harm|suicide|overdose)\b/,
+      /\bthere(?:'s| is) someone i (?:am going to|want to|plan to|intend to) (?:kill|hurt|harm|shoot|stab|attack)\b/,
+      /\bi(?:'m| am) going to end it (?:now|today|tonight|tomorrow)\b/,
+      /\bi (?:will not|won't) be alive (?:tomorrow|tonight|much longer)\b/,
+      /\bi(?:'m| am) going to (?:sleep and )?never wake up\b/
+    ];
+    if (immediatePatterns.some((re) => re.test(text))) return 'immediate';
+
+    // A specific person's name is also a real target. Keep the match strict:
+    // the name must be capitalized in the person's original sentence and end
+    // the threat, so ordinary phrases such as "kill John in Fortnite" remain
+    // outside the safety route.
+    if (/\b(?:I|i)(?: am going to|'m going to|'m gonna| will| want to| wanna| plan to| have a plan to| intend to| am about to|'m about to| am ready to|'m ready to) (?:kill|hurt|harm|shoot|stab|attack|choke|poison) [A-Z][A-Za-z'-]*(?: [A-Z][A-Za-z'-]*)*[.!?]*$/.test(line.raw)) {
+      return 'immediate';
+    }
+
+    const ambiguousPatterns = [
+      /\bi (?:am|'m|feel|have been|was) suicidal\b/,
+      /\bmy suicidal thoughts?\b/,
+      /\bi (?:do not|don't) want to be alive(?: anymore)?\b/,
+      /\bi wish i (?:were|was) dead\b/,
+      /\b(?:everyone|they|you|my (?:family|kids|children|friends|partner|wife|husband)) would be better off without me\b/,
+      /\bi (?:want to|might|may|could) end it(?: all)?\b/,
+      /\b(?:sometimes )?i(?:'ve been| have been| keep| am|'m)? (?:thinking|think|thought) about (?:suicide|killing myself|hurting myself|harming myself|cutting myself|hurting someone|harming someone|killing someone|shooting someone|stabbing someone)\b/,
+      /\bi (?:have|feel) (?:an? )?(?:urge|urges) to (?:kill|hurt|harm|cut|shoot|stab) (?:myself|someone|somebody|him|her|them)\b/,
+      /\bi(?:'m| am) (?:tempted|wondering whether|fantasi[sz]ing about) (?:to )?(?:kill|hurt|harm|cut|shoot|stab) (?:myself|someone|somebody|him|her|them)\b/,
+      /\bi (?:should|deserve to) (?:die|kill myself|hurt myself|harm myself)\b/,
+      /\bi feel like (?:killing|hurting|harming|cutting|burning|starving) (?:myself|someone|somebody|him|her|them)\b/,
+      /\bi (?:keep wanting to|cannot stop wanting to|can't stop wanting to) (?:kill|hurt|harm|cut|burn|starve) (?:myself|someone|somebody|him|her|them)\b/,
+      /\bi(?:'m| am| keep) (?:thinking|thinking a lot) (?:of|about) (?:suicide|killing myself|hurting myself|harming myself|cutting myself|burning myself|starving myself|hurting someone|harming someone|killing someone)\b/,
+      /\bi (?:do not|don't) know if i can keep (?:myself|someone|somebody|him|her|them) safe\b/,
+      /\bi (?:hope|wish) i (?:do not|don't) wake up\b/,
+      /\bi want to (?:go to sleep and )?never wake up\b/,
+      /\bi have (?:a |the )?(?:gun|knife|pills|means) (?:and )?i(?:'m| am) ready\b/,
+      /\bi(?:'m| am) (?:cutting|burning|starving|hurting|harming) myself(?:[.!?]*$|\s+(?:on purpose|as punishment|right now|again)\b)/,
+      new RegExp("\\bi (?:think i (?:might|may|could)|might|may|could) (?:kill|hurt|harm|cut|burn|shoot|stab|attack) " + person + "\\b")
+    ];
+    if (ambiguousPatterns.some((re) => re.test(text))) ambiguous = true;
+  }
+
+  return ambiguous ? 'ambiguous' : 'none';
+}
+
+function actionSafetyUserText(inputs) {
+  const source = inputs || {};
+  const parts = [];
+  const add = (value) => {
+    const text = String(value || '').trim();
+    if (text) parts.push(text);
+  };
+  add(source.star);
+  add(source.coreWhy);
+
+  // actionTranscriptAssemble labels authors. Only the person's lines count;
+  // Memento's own questions and summaries can never trip the safety gate.
+  String(source.transcript && source.transcript.text || '').split(/\n/).forEach((line) => {
+    const match = /^Them:\s*(.*)$/i.exec(line);
+    if (match) add(match[1]);
+  });
+
+  const answers = source.refine && Array.isArray(source.refine.raw) ? source.refine.raw : [];
+  answers.forEach((answer) => {
+    if (!answer) return;
+    const picked = Array.isArray(answer.chips) ? answer.chips
+      : (Array.isArray(answer.chipList) ? answer.chipList : []);
+    picked.forEach(add);
+    add(answer.text);
+    if (answer.num === 0 || answer.num) add(answer.num);
+  });
+  return parts.join('\n');
+}
+
 /* ---- 3. THE PROMPTS -------------------------------------------------------
    ACTION_PLAN_CREED_PROMPT is the canonical system text from
    ACTION-GENERATION-PROMPT.md, verbatim. Do not edit one without the other. */
@@ -6259,6 +6359,19 @@ async function actionPlanGenerate(options) {
     report.error = 'Memento needs a Neutron Star before it can build a plan.';
     return report;
   }
+  const safety = actionSafetyClassify(actionSafetyUserText(inputs));
+  if (safety === 'immediate') {
+    report.safetyStop = true;
+    report.reason = 'safety';
+    report.ms = Date.now() - started;
+    return report;
+  }
+  if (safety === 'ambiguous' && opts.safetyConfirmedSafe !== true) {
+    report.safetyConfirm = true;
+    report.reason = 'safety-confirm';
+    report.ms = Date.now() - started;
+    return report;
+  }
   const sys = actionPlanSystemPrompt(inputs.bucket);
   // ONE ask, ever (Malik's law): after the clarity-ask screen has run once,
   // the caller sets forcePlan and the model may not refuse again; whatever is
@@ -6551,6 +6664,7 @@ try {
   window.actionBucketRouter = actionBucketRouter;
   window.actionBrainInputs = actionBrainInputs;
   window.actionPlanGenerate = actionPlanGenerate;
+  window.actionSafetyClassify = actionSafetyClassify;
   window.actionPlanLand = actionPlanLand;
   window.actionPlanParse = actionPlanParse;
   window.actionPlanClientCheck = actionPlanClientCheck;

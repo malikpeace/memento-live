@@ -6205,3 +6205,90 @@ body:has(.afl) #appSidebar { box-shadow: none; }
 #actionExp[aria-hidden="true"] *::after {
   animation-play-state: paused !important;
 }
+
+/* ── ACTION SAFETY ROOM ────────────────────────────────────────────────────
+   Quiet and plain by design: the Action room without reward or plan
+   furniture. The stop screen can scroll on the shortest supported phones. */
+.afl-safe {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(18px, 4vh, 38px) 0;
+  color: var(--text-hi);
+}
+.afl-safe--stop {
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding-top: clamp(28px, 7vh, 72px);
+  padding-bottom: calc(22px + env(safe-area-inset-bottom));
+}
+.afl-safe__eyebrow {
+  margin: 0 0 13px;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  color: rgba(var(--ink), 0.52);
+}
+.afl-safe__title,
+.afl-safe__question {
+  margin: 0;
+  max-width: 690px;
+  font-size: clamp(28px, 6.5vw, 46px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+  color: var(--text-hi);
+}
+.afl-safe__question { font-size: clamp(25px, 5.8vw, 40px); }
+.afl-safe__body {
+  margin-top: clamp(24px, 4vh, 38px);
+  max-width: 670px;
+  color: rgba(var(--ink), 0.76);
+}
+.afl-safe__body p {
+  margin: 0 0 15px;
+  font-size: clamp(15px, 2.2vw, 18px);
+  line-height: 1.52;
+}
+.afl-safe__body p:nth-child(3),
+.afl-safe__body p:nth-child(4),
+.afl-safe__body p:nth-child(5),
+.afl-safe__body p:nth-child(6),
+.afl-safe__body p:last-child { color: rgba(var(--ink), 0.94); }
+.afl-safe__choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: clamp(34px, 7vh, 68px);
+}
+.afl-safe__choice,
+.afl-safe__done {
+  min-height: 58px;
+  border: 1px solid rgba(var(--ink), 0.18);
+  border-radius: 999px;
+  background: rgba(var(--ink), 0.07);
+  color: var(--text-hi);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.afl-safe__choice:active,
+.afl-safe__done:active { transform: scale(0.985); }
+.afl-safe__done {
+  width: 100%;
+  flex: none;
+  margin-top: clamp(18px, 3vh, 28px);
+  background: rgba(var(--ink), 0.94);
+  /* Invert against the foreground-filled button in both themes. --paper was
+     never a real app token, so browsers discarded that declaration and left
+     white-on-white in dark mode / black-on-black in light mode. */
+  color: var(--surface-0);
+}
+@media (max-width: 420px) {
+  .afl-safe__choices { grid-template-columns: 1fr; }
+  .afl-safe--stop { padding-top: 22px; }
+  .afl-safe__body p { margin-bottom: 12px; }
+}

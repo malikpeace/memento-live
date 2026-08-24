@@ -17,7 +17,7 @@ function _demoISO(daysAgo) { const d = new Date(); d.setDate(d.getDate() - daysA
 function _demoHuman(daysAgo, opts) { const d = new Date(); d.setDate(d.getDate() - daysAgo); return d.toLocaleDateString('en-US', opts || { month: 'short', day: 'numeric' }); }
 const DEMO_PERSONAS = {
   creator: {
-    name: 'Jordan', birthYear: 2002,
+    name: 'Jordan', birthYear: 2002, pattern: 'streaky',
     neutronStar: 'Grow my channel to 100k subscribers by shipping one video a week I am proud of',
     coreWhy: 'I want to build something that is mine and reach the people who needed to hear it, the way other creators did for me.',
     antiVision: 'Another year of half finished drafts while everyone else posts and I keep overthinking.',
@@ -63,7 +63,7 @@ const DEMO_PERSONAS = {
     }
   },
   founder: {
-    name: 'Sam', birthYear: 1998,
+    name: 'Sam', pattern: 'machine', birthYear: 1998,
     neutronStar: 'Get my product to 100 paying users who would be genuinely upset if it disappeared',
     coreWhy: 'I want to build something people need and own my time instead of renting it out to someone else\'s dream.',
     antiVision: 'Another year of building in the dark, polishing features nobody asked for, calling it progress.',
@@ -108,7 +108,7 @@ const DEMO_PERSONAS = {
     }
   },
   student: {
-    name: 'Alex', birthYear: 2005,
+    name: 'Alex', birthYear: 2005, pattern: 'comeback',
     neutronStar: 'Finish this semester with a 3.8 and a body I am proud of',
     coreWhy: 'I am tired of being the person who knows what to do and does none of it. I want to prove I can keep a promise to myself.',
     antiVision: 'Another semester of cramming, all nighters, and swearing next time will be different.',
@@ -158,7 +158,7 @@ const DEMO_PERSONAS = {
   //    `pattern` drives the activity shape in buildDemoState. No vivere:
   //    the vision board is deprioritized; the builder defaults it empty.
   runner: {
-    name: 'Maya', birthYear: 1996, pattern: 'machine',
+    name: 'Maya', birthYear: 1996, pattern: 'training',
     neutronStar: 'Run the Chicago Marathon in under 4 hours this October',
     coreWhy: 'I spent my twenties saying I was not a runner. I want to find out who I am when I stop saying that.',
     antiVision: 'Another year of January gym memberships that die by March.',
@@ -183,7 +183,7 @@ const DEMO_PERSONAS = {
     distractions: [['Snooze', 'Reset the alarm twice and lost the morning window'], ['Weather app', 'Spent ten minutes deciding if it was too cold instead of running']]
   },
   writer: {
-    name: 'June', birthYear: 1988, pattern: 'streaky',
+    name: 'June', birthYear: 1988, pattern: 'comeback',
     neutronStar: 'Finish the 80,000 word first draft of my novel by New Year\'s Eve',
     coreWhy: 'I have told people I am writing a book for six years. I want it to stop being a lie.',
     antiVision: 'Being seventy with the same three chapters in a drawer.',
@@ -208,7 +208,7 @@ const DEMO_PERSONAS = {
     distractions: [['Research hole', 'Ninety minutes on 1920s train schedules for one sentence'], ['Rereading', 'Polished chapter two again instead of drafting chapter nine']]
   },
   barber: {
-    name: 'Marcus', birthYear: 1991, pattern: 'steady',
+    name: 'Marcus', birthYear: 1991, pattern: 'weekend',
     neutronStar: 'Get the shop to $10k a month so I can hire a second chair',
     coreWhy: 'My name is on the window. I want the business to feed my family, not just my pride.',
     antiVision: 'Grinding alone in the chair for ten more years with nothing that runs without me.',
@@ -309,6 +309,158 @@ const DEMO_PERSONAS = {
   },
 };
 
+
+/* ── v1280: PERSONA DEPTH (Malik: "make sure they have their own fake clarity
+   session the AI can pull from, progress toward a goal, and different levels
+   of consistency"). Three things per person, kept in one table so the persona
+   objects above stay readable:
+     voice     the diagnostic answers in THEIR words. buildProfileContext
+               (js/03) reads exactly these fields, so the AI writes for this
+               person instead of a generic user.
+     progress  where they actually stand: baseline -> current -> target, in
+               their own unit. Feeds goalProgress, the distance chip, the
+               pace line and the finale.
+     target    the Consistency bar they set for themselves, matched to how
+               they really live (a 3x-a-week runner aims at ~45%, not 90%).
+   Every value is fiction, written to be believable, never scraped. */
+const DEMO_DEPTH = {
+  creator: {
+    voice: {
+      runningToward: 'Making videos people actually watch, and making it my job',
+      clarityLevel: 'I know the goal, not the path', actionKnow: 'Roughly, but I second-guess it',
+      runningFrom: 'Being invisible after three years of trying',
+      distraction: 'YouTube analytics', commitLevel: 'All in, if I stop stalling',
+      timeBudget: '2 hours a night after work',
+      costOfInaction: 'Turning 26 with a folder of drafts nobody has seen',
+      momentumWin: 'Fifty videos published and a real audience that expects me',
+      letterToFutureSelf: 'I am scared that I am not talented, so I keep polishing instead of posting. If a year passes and the folder is still private, that is the answer I was avoiding.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'subscribers', baseline: 1200, current: 8400, target: 100000, shape: 'quantity_up' },
+    target: 0.55
+  },
+  founder: {
+    voice: {
+      runningToward: 'A product people pay for and would miss if it vanished',
+      clarityLevel: 'Very clear', actionKnow: 'Yes, I just avoid the scary half',
+      runningFrom: 'Building things nobody asked for',
+      distraction: 'Refactoring instead of selling', commitLevel: 'This is the year',
+      timeBudget: '4 hours of real focus',
+      costOfInaction: 'Another beautiful product with zero customers',
+      momentumWin: 'Revenue that replaces my salary and proof I can do this',
+      letterToFutureSelf: 'I hide in code because code cannot reject me. The work that matters is the work where someone can say no.',
+      weakestPillar: 'action'
+    },
+    progress: { unit: 'paying users', baseline: 0, current: 62, target: 100, shape: 'quantity_up' },
+    target: 0.7
+  },
+  student: {
+    voice: {
+      runningToward: 'Finishing strong without falling apart',
+      clarityLevel: 'Clear on grades, foggy on the body part', actionKnow: 'I know what to do, I just run out of day',
+      runningFrom: 'Repeating last semester, where I panicked in April',
+      distraction: 'Group chats', commitLevel: 'Serious, but I am tired',
+      timeBudget: '90 minutes on a normal day',
+      costOfInaction: 'Another semester of surviving instead of learning',
+      momentumWin: 'A 3.8, a body I trust, and proof I can hold two things at once',
+      letterToFutureSelf: 'I do everything last minute and call it my personality. I want one semester where I am not afraid to open my email.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'GPA', baseline: 3.1, current: 3.55, target: 3.8, shape: 'quantity_up' },
+    target: 0.6
+  },
+  runner: {
+    voice: {
+      runningToward: 'Becoming someone who finishes what she starts',
+      clarityLevel: 'Very clear', actionKnow: 'The plan is written, I follow it',
+      runningFrom: 'A decade of saying I am not a runner',
+      distraction: 'The snooze button', commitLevel: 'Locked in',
+      timeBudget: '60 to 90 minutes, mornings',
+      costOfInaction: 'Turning 30 with the same story about myself',
+      momentumWin: 'A finish line photo and a body that trusts me',
+      letterToFutureSelf: 'I quit things right before they get good. This time the training plan decides, not my mood at 5am.',
+      weakestPillar: 'clarity'
+    },
+    progress: { unit: 'minutes', baseline: 300, current: 252, target: 240, shape: 'quantity_down' },
+    target: 0.4
+  },
+  writer: {
+    voice: {
+      runningToward: 'Finishing the book instead of describing it at parties',
+      clarityLevel: 'Clear', actionKnow: 'Yes, when I am not avoiding it',
+      runningFrom: 'Being someone who talks about writing',
+      distraction: 'Research that looks like work', commitLevel: 'Fully, in bursts',
+      timeBudget: 'An hour before the house wakes up',
+      costOfInaction: 'Another draft that dies at 30,000 words',
+      momentumWin: 'A finished manuscript, however rough, that actually exists',
+      letterToFutureSelf: 'I write beautifully for two weeks and then vanish for a month. I do not need more talent. I need to come back sooner.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'words', baseline: 0, current: 41200, target: 80000, shape: 'quantity_up' },
+    target: 0.35
+  },
+  barber: {
+    voice: {
+      runningToward: 'A shop that runs without me bleeding for it',
+      clarityLevel: 'Clear on the number', actionKnow: 'Mostly, the marketing part is guesswork',
+      runningFrom: 'Good months followed by scary months',
+      distraction: 'Walk-ins and admin', commitLevel: 'My family depends on it',
+      timeBudget: 'An hour between clients',
+      costOfInaction: 'Cutting hair alone at 45 with no chair to hand off',
+      momentumWin: 'A second chair, a waitlist, and a Sunday off',
+      letterToFutureSelf: 'I am good with the clippers and bad at asking for money. The shop grows the day I stop being shy about that.',
+      weakestPillar: 'action'
+    },
+    progress: { unit: 'dollars a month', baseline: 4200, current: 7350, target: 10000, shape: 'quantity_up' },
+    target: 0.25
+  },
+  coder: {
+    voice: {
+      runningToward: 'A job offer that changes my family life',
+      clarityLevel: 'Clear on the goal, lost on the path', actionKnow: 'Not really, I bounce between tutorials',
+      runningFrom: 'Two years of almost applying',
+      distraction: 'New frameworks', commitLevel: 'I want it badly, I am inconsistent',
+      timeBudget: '45 minutes, some nights',
+      costOfInaction: 'Another year of preparing to be ready',
+      momentumWin: 'An offer, a first paycheck, and a family that stops worrying',
+      letterToFutureSelf: 'I keep learning instead of applying because a tutorial cannot reject me. The rejection is the price of the door.',
+      weakestPillar: 'action'
+    },
+    progress: { unit: 'applications sent', baseline: 0, current: 11, target: 60, shape: 'quantity_up' },
+    target: 0.35
+  },
+  musician: {
+    voice: {
+      runningToward: 'Finally putting my own music into the world',
+      clarityLevel: 'Getting clearer', actionKnow: 'I am learning as I go',
+      runningFrom: 'Playing other people\'s songs forever',
+      distraction: 'Buying gear', commitLevel: 'Starting today, honestly',
+      timeBudget: 'An hour most evenings',
+      costOfInaction: 'Being the guy who could have',
+      momentumWin: 'Five songs finished and one night where people came to hear them',
+      letterToFutureSelf: 'I have started this EP three times. Day one again, but this time I am counting the days.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'tracks finished', baseline: 0, current: 0, target: 5, shape: 'quantity_up' },
+    target: 0.55
+  },
+  teacher: {
+    voice: {
+      runningToward: 'Being healthy enough to keep up with my life',
+      clarityLevel: 'Clear', actionKnow: 'Yes, I have done it before',
+      runningFrom: 'Losing and regaining the same 30 pounds',
+      distraction: 'The staff room snacks', commitLevel: 'For real this time, quietly',
+      timeBudget: '40 minutes after school',
+      costOfInaction: 'Watching my daughter\'s wedding photos and not recognising myself',
+      momentumWin: 'Thirty-five pounds down and the energy I had at 30',
+      letterToFutureSelf: 'I have lost this weight twice already. The losing is not my problem. Staying is.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'pounds', baseline: 212, current: 194, target: 177, shape: 'quantity_down' },
+    target: 0.55
+  }
+};
+
 function buildDemoState(personaKey) {
   const p = DEMO_PERSONAS[personaKey] || DEMO_PERSONAS.creator;
   // v774 (Malik): each persona carries its own activity SHAPE, so the previews
@@ -352,6 +504,65 @@ function buildDemoState(personaKey) {
   // daily intensity built from real sources, so heatmap cells span level 1-4.
   // (Daily heat = how many sources land on a day: streak=1, action=2, deep
   // work=3, reflection=4. See buildConsistencyData.)
+  // ── v1280 (Malik): EVERY persona gets a real life, not a month of dots.
+  // Each carries a SHAPE that says how their year actually went, so tapping a
+  // persona shows what Memento looks like for that kind of person: the machine,
+  // the honest 3-days-a-week, the one who fell off and came back, the one who
+  // is barely holding on, and day one. Deterministic (seeded), so the same
+  // persona always reads the same. The founder keeps its own hand-tuned year
+  // below; every other persona is built here.
+  const LIFE = {
+    // base = odds on a day the plan ASKS for; dowOnly names those days.
+    // slump = a multiplier for the hard weeks; recent = the last three weeks,
+    // which is what the score actually reads.
+    machine:  { days: 210, base: 0.94, sundayOff: 0.12, slumps: [], recent: 0.95 },
+    steady:   { days: 180, base: 0.78, sundayOff: 0.3, slumps: [[120, 132]], recent: 0.76 },
+    training: { days: 150, base: 0.94, sundayOff: 0, slumps: [[88, 96]], recent: 0.95, dowOnly: [1, 3, 5] },
+    streaky:  { days: 165, base: 0.66, sundayOff: 0.25, slumps: [[70, 92], [130, 140]], recent: 0.7 },
+    comeback: { days: 185, base: 0.52, sundayOff: 0.25, slumps: [[45, 125]], recent: 0.9 },
+    sparse:   { days: 120, base: 0.3, sundayOff: 0.35, slumps: [[30, 60]], recent: 0.22 },
+    weekend:  { days: 140, base: 0.92, sundayOff: 0, slumps: [], recent: 0.95, dowOnly: [0, 6] },
+    fresh:    { days: 3, base: 1, sundayOff: 0, slumps: [], recent: 1 }
+  };
+  if (personaKey !== 'founder' && LIFE[p.pattern]) {
+    const L = LIFE[p.pattern];
+    const rnd2 = (seed) => { const x = Math.sin(seed * 91.7 + 47.3) * 21358.5453; return x - Math.floor(x); };
+    const tierPool = ['moderate', 'light', 'moderate', 'heavy', 'tiny', 'moderate', 'light', 'moderate'];
+    const refl = (p.reflections && p.reflections.length) ? p.reflections : ['Showed up. That is the whole game.'];
+    const gStreak = [], gComp = [], gDeep = [], gRefl = [];
+    for (let d = L.days - 1; d >= 0; d--) {
+      const dt = new Date(Date.now() - d * 86400000);
+      const iso = localISO(dt);
+      const dow = dt.getDay();
+      // A day the plan never asked for is simply not a day they show up: it is
+      // rest, not a miss (the Consistency law). So it is skipped outright.
+      if (L.dowOnly && L.dowOnly.indexOf(dow) === -1) continue;
+      let prob = (d < 21) ? L.recent : L.base;
+      if (!L.dowOnly && dow === 0) prob -= L.sundayOff;
+      if (d >= 21) L.slumps.forEach((r) => { if (d >= r[0] && d <= r[1]) prob *= 0.18; });
+      if (rnd2(d + 11) > prob) continue;
+      if (d === 0) continue;                    // today waits for a real hold
+      gStreak.push(iso);
+      const r2 = rnd2(d * 13 + 5);
+      const lvl = r2 < 0.2 ? 1 : r2 < 0.6 ? 2 : r2 < 0.86 ? 3 : 4;
+      if (lvl >= 2) {
+        const tier = tierPool[d % tierPool.length];
+        gComp.push({ date: dt.toISOString(), tier, actionText: p.action.tiers[tier] || p.action.title, planTitle: p.action.title });
+      }
+      if (lvl >= 3) gDeep.push({ date: _demoHuman(d), iso, minutes: 25 + ((d * 7) % 70) });
+      if (lvl >= 4) gRefl.push({ date: _demoHuman(d, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }), iso, text: refl[d % refl.length] });
+    }
+    streakHistory = gStreak.slice().sort();
+    completionHistory = gComp;
+    deepwork = gDeep;
+    reflections = gRefl.slice().reverse();
+    _demoBest = (function () {
+      const nums = gStreak.map(x => Math.floor(Date.parse(x + 'T00:00:00Z') / 86400000)).sort((a, b) => a - b);
+      let lo = 0, run = 0, prev = null;
+      nums.forEach(n => { if (prev !== null && n - prev === 1) run += 1; else run = 1; if (run > lo) lo = run; prev = n; });
+      return lo;
+    })();
+  }
   if (personaKey === 'founder') {
     const yStreak = [], yComp = [], yDeep = [], yRefl = [];
     const reflPool = [
@@ -460,7 +671,13 @@ function buildDemoState(personaKey) {
     note: ''
   }));
   const overrides = {
-    profile: { name: p.name, onboarded: true, onboardedAt: new Date().toISOString() },
+    profile: Object.assign(
+      { name: p.name, onboarded: true, onboardedAt: new Date().toISOString() },
+      // v1280: the diagnostic answers in this person's own words. js/03's
+      // buildProfileContext reads exactly these keys, so every AI surface in a
+      // demo writes for THEM, not for a blank user.
+      (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].voice) || {}
+    ),
     dev: { previewAll: true }, // unlock every module so the demo dashboard looks full
     prefs: { unlockAll: true }, // demos always bypass the unlock ladder
     // Demos simulate someone who already bought: mark them paid so the post-Clarity
@@ -470,6 +687,30 @@ function buildDemoState(personaKey) {
     clarity: { completed: true, completedAt: new Date().toISOString(), answers: { neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
     action: { viewMode: 'vine', introSeen: true, intake: { completed: true }, planGenerated: true, planSourceNeutronStar: p.neutronStar, selectedTier: 'moderate', lastGeneratedAt: new Date().toISOString(), primaryAction: { title: p.action.title, why: p.action.why, howToStart: p.action.howToStart, recommendedTier: 'moderate', recommendedWhy: p.action.recommendedWhy, tiers: p.action.tiers, path: p.action.path, linkedProjectId: p.action.linkedProjectId || '', linkedMilestoneId: p.action.linkedMilestoneId || '' }, projects: p.action.projects || [], completionHistory: completionHistory },
     streak: { history: streakHistory, bestEver: _demoBest, bestEverShown: _demoBest },
+    // v1280: where this person actually stands, so the distance chip, the pace
+    // line, milestones and the finale all have something true to read.
+    goalProgress: (function () {
+      const g = (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress) || null;
+      if (!g) return { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [], shape: '', customMarks: [] };
+      const hist = [];
+      const steps = 6;
+      for (let i = 1; i <= steps; i++) {
+        const v = g.baseline + ((g.current - g.baseline) * (i / steps));
+        hist.push({ v: Math.round(v * 100) / 100, iso: _demoISO((steps - i) * 12 + 4) });
+      }
+      return {
+        starHash: '', target: g.target, unit: g.unit, baseline: g.baseline,
+        current: g.current, updatedAt: new Date(Date.now() - 86400000).toISOString(),
+        askedDay: '', history: hist, shape: g.shape, customMarks: []
+      };
+    })(),
+    // v1280: the Consistency bar this person set for themselves, matched to how
+    // they really live. setAt is stamped so a demo never opens the onboarding.
+    consistency: {
+      target: (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].target) || 0.6,
+      selfReported: null,
+      setAt: Date.now() - 86400000 * 30
+    },
     deepwork: { sessions: deepwork },
     reflection: { entries: reflections, trash: [], folders: [], activeFolder: null, disp: { font: 'system', surface: 'glass' } },
     distraction: { logs: distractions },

@@ -39,6 +39,7 @@
   var ON_KEY = 'memento_push_on';          // a subscription was created
   var ARM_KEY = 'memento_push_armed';      // payment verified: the pre-prompt is due
   var FALLBACK_KEY = 'memento_progress_ask';  // "<updatedAt>|<day>" of the last in-app ask
+  var SAFETY_PAUSE_KEY = 'memento_safety_pause_pending_v1'; // account id + deadline only; never words/reason
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var FORCE = /[?&]dev=push/.test(location.search); // preview: force the card
   var cardEl = null;
@@ -163,6 +164,16 @@
     return window.MEMENTO_SUPABASE_ANON || '';
   }
 
+  function tokenSubject(token) {
+    try {
+      var middle = String(token || '').split('.')[1] || '';
+      var pad = '='.repeat((4 - middle.length % 4) % 4);
+      var body = JSON.parse(atob((middle + pad).replace(/-/g, '+').replace(/_/g, '/')));
+      var sub = String(body && body.sub || '');
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sub) ? sub : '';
+    } catch (e) { return ''; }
+  }
+
   function rpcSync(sub) {
     try {
       var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
@@ -237,22 +248,73 @@
     });
   }
 
+  // A confirmed safety stop pauses the user's reminders on the server. The
+  // original deadline is kept locally until acknowledged so an offline phone
+  // retries without extending the 24-hour clock. Only a timestamp is stored;
+  // no conversation text or reason leaves the app.
+  function flushSafetyPause() {
+    var raw = lsGet(SAFETY_PAUSE_KEY);
+    if (!raw) return Promise.resolve(true);
+    var pending = null;
+    try { pending = JSON.parse(raw); } catch (e) {}
+    var target = String(pending && pending.until || '');
+    var pendingUser = String(pending && pending.user || '');
+    var targetMs = Date.parse(target);
+    if (!Number.isFinite(targetMs) || targetMs <= Date.now()) {
+      lsDel(SAFETY_PAUSE_KEY);
+      return Promise.resolve(true);
+    }
+    if (isDemo()) return Promise.resolve(false);
+    var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
+    var token = remoteToken();
+    var currentUser = tokenSubject(token);
+    if (!url || !anon || !token || token === anon || !pendingUser || currentUser !== pendingUser) return Promise.resolve(false);
+    var device = '';
+    try { device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : ''; } catch (e) {}
+    return fetch(fnUrl(), {
+      method: 'PATCH',
+      headers: {
+        apikey: anon,
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'x-memento-device': device
+      },
+      body: JSON.stringify({ pause_until: target })
+    }).then(function (response) {
+      if (response.ok && lsGet(SAFETY_PAUSE_KEY) === raw) lsDel(SAFETY_PAUSE_KEY);
+      return response.ok;
+    }).catch(function () {
+      return false;
+    });
+  }
+
+  function pauseForSafety(hours) {
+    if (Number(hours) !== 24 || isDemo()) return Promise.resolve(false);
+    var user = tokenSubject(remoteToken());
+    if (!user) return Promise.resolve(false); // no signed-in account has reminders to pause
+    var target = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    lsSet(SAFETY_PAUSE_KEY, JSON.stringify({ user: user, until: target }));
+    return flushSafetyPause();
+  }
+
   // Refresh the server's picture of this device (open date, move, day done).
   // No-op unless the user already subscribed.
   function sync() {
-    try {
-      if (!supported() || localStorage.getItem(ON_KEY) !== '1') { MementoPush._lastSync = { skipped: 'off-or-unsupported' }; return Promise.resolve(); }
-      if (Notification.permission !== 'granted') { MementoPush._lastSync = { skipped: 'permission' }; return Promise.resolve(); }
-      // Returns the real chain so callers (the dev status sheet) can await it.
-      return navigator.serviceWorker.ready.then(function (reg) {
-        return reg.pushManager.getSubscription();
-      }).then(function (sub) {
-        if (!sub) { try { localStorage.removeItem(ON_KEY); } catch (e) {} MementoPush._lastSync = { skipped: 'no-subscription' }; return; }
-        return rpcSync(sub);
-      }).catch(function (err) {
-        try { MementoPush._lastSync = { error: 'chain: ' + String(err && err.message || err) }; } catch (e2) {}
-      });
-    } catch (e) { return Promise.resolve(); }
+    return flushSafetyPause().then(function () {
+      try {
+        if (!supported() || localStorage.getItem(ON_KEY) !== '1') { MementoPush._lastSync = { skipped: 'off-or-unsupported' }; return; }
+        if (Notification.permission !== 'granted') { MementoPush._lastSync = { skipped: 'permission' }; return; }
+        // Returns the real chain so callers (the dev status sheet) can await it.
+        return navigator.serviceWorker.ready.then(function (reg) {
+          return reg.pushManager.getSubscription();
+        }).then(function (sub) {
+          if (!sub) { try { localStorage.removeItem(ON_KEY); } catch (e) {} MementoPush._lastSync = { skipped: 'no-subscription' }; return; }
+          return rpcSync(sub);
+        }).catch(function (err) {
+          try { MementoPush._lastSync = { error: 'chain: ' + String(err && err.message || err) }; } catch (e2) {}
+        });
+      } catch (e) { return; }
+    });
   }
 
   // Full subscribe flow. Must run from a user gesture (Safari requires it).
@@ -607,6 +669,16 @@
     }, 8000);
   }
 
+  // The pause retry is independent of push permission or subscription state.
+  // A confirmed stop therefore reaches the account after an offline moment.
+  try {
+    window.addEventListener('online', flushSafetyPause);
+    window.addEventListener('focus', flushSafetyPause);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) flushSafetyPause();
+    });
+  } catch (e) {}
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {
@@ -615,6 +687,7 @@
 
   window.MementoPush = {
     sync: sync,
+    pauseForSafety: pauseForSafety,
     disableForSignOut: disableForSignOut,
     // v1269 (step 9): the Settings Notifications row. enable() must run from
     // a user gesture (Safari's rule); status() is the row's whole truth.

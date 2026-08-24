@@ -6,6 +6,7 @@ const PolarBilling = (function () {
   'use strict';
 
   const PENDING_KEY = 'memento_polar_pending_plan';
+  const CHECKOUT_ATTEMPT_KEY = 'memento_polar_checkout_attempt_v1';
   const ACCESS_CACHE_KEY = 'memento_polar_access_receipt_v1';
   const ACTION_QUEUE_KEY = 'memento_action_receipt_queue_v1';
   const VALID_PLANS = ['founder', 'monthly', 'yearly'];
@@ -415,9 +416,12 @@ const PolarBilling = (function () {
         throw new Error('checkout_unavailable');
       }
       clearPending();
+      try { sessionStorage.setItem(CHECKOUT_ATTEMPT_KEY, '1'); } catch (e) {}
       location.assign(result.checkout_url);
     } catch (error) {
       busy = false;
+      try { sessionStorage.removeItem(CHECKOUT_ATTEMPT_KEY); } catch (e) {}
+      try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('checkout_failure'); } catch (e) {}
       explainError(error, plan);
     }
   }
@@ -441,6 +445,7 @@ const PolarBilling = (function () {
 
   function startCheckout(plan) {
     plan = validPlan(plan);
+    try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('checkout_start'); } catch (e) {}
     if (!loggedIn()) {
       savePending(plan);
       setButton('Create your account', 'Your progress and purchase stay together.', false);
@@ -809,6 +814,23 @@ const PolarBilling = (function () {
     const checkoutId = params.get('checkout_id') || '';
     const returned = params.get('polar') === 'success';
     const environment = billingEnvironment();
+
+    function settleCheckoutAttempt(succeeded) {
+      let attempted = false;
+      try { attempted = sessionStorage.getItem(CHECKOUT_ATTEMPT_KEY) === '1'; } catch (e) {}
+      if (!attempted) return;
+      try { sessionStorage.removeItem(CHECKOUT_ATTEMPT_KEY); } catch (e) {}
+      if (!succeeded) {
+        try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('checkout_cancel'); } catch (e) {}
+      }
+    }
+
+    settleCheckoutAttempt(returned);
+    window.addEventListener('pageshow', function () {
+      let succeeded = false;
+      try { succeeded = new URLSearchParams(location.search).get('polar') === 'success'; } catch (e) {}
+      settleCheckoutAttempt(succeeded);
+    });
 
     if (returned) {
       setTimeout(async function () {

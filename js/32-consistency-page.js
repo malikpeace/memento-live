@@ -205,13 +205,22 @@
         supMinutes += (Number(x && (x.minutes || x.min) || 0) || 0);
       });
     } catch (e) {}
+    // A COMEBACK IS A RETURN, NOT A RHYTHM (v1280). Counting every gap made a
+    // 3x-a-week person read "you have come back 54 times", which turns their
+    // normal rest days into 54 failures. A comeback is only a return after a
+    // real absence: three or more days with nothing at all.
+    var gap = 0;
     log.forEach(function (d, i) {
       Object.keys(d.sup).forEach(function (k) { if (supTot[k] != null) supTot[k] += 1; });
       if (d.on) {
         total++; run++; if (run > best) best = run;
         minutes += d.minutes;
-        if (!prevOn && i > 0) comebacks++;
-      } else { run = 0; }
+        if (gap >= 3 && i > 0) comebacks++;
+        gap = 0;
+      } else {
+        run = 0;
+        if (!Object.keys(d.sup).length) gap++;   // a support day is still showing up
+      }
       prevOn = d.on;
     });
     for (var i = N - 1; i >= 0 && log[i].on; i--) cur++;
@@ -751,6 +760,7 @@
   function open() {
     if (isOpen) return;
     isOpen = true;
+    try { if (typeof Analytics !== 'undefined' && Analytics.track) Analytics.track('consistency_first_open'); } catch (e) {}
     SCALE = 'month'; MOFF = 0; WOFF = 0; YOFF = 0;
     build();
     render();
