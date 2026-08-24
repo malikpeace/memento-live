@@ -14,6 +14,14 @@
    and the applyDemoModeIfRequested() call in INIT.
    ============================================ */
 function _demoISO(daysAgo) { const d = new Date(); d.setDate(d.getDate() - daysAgo); return localISO(d); }
+// The app's OWN star hash (js/30 liveStarHash, FNV-1a). The persona's plan,
+// goal progress and day records must all key to the same value or the new
+// Action flow treats the plan as belonging to a retired goal and hides it.
+function _demoStarHash(star) {
+  var h = 2166136261, t = String(star || '');
+  for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(16);
+}
 function _demoHuman(daysAgo, opts) { const d = new Date(); d.setDate(d.getDate() - daysAgo); return d.toLocaleDateString('en-US', opts || { month: 'short', day: 'numeric' }); }
 const DEMO_PERSONAS = {
   creator: {
@@ -751,6 +759,36 @@ function buildDemoState(personaKey) {
     entitlements: { isPaid: true, paidAt: new Date().toISOString(), plan: 'demo' },
     checkins: demoCheckins,
     clarity: { completed: true, completedAt: new Date().toISOString(), tutorialSeen: true, ignitedAt: Date.now() - 86400000, seenSummary: true, answers: { goalShape: { type: ((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress || {}).shape || 'quantity_up'), source: 'demo' }, neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
+    // v1285 (Malik: "for the personas it should be as if I've already had
+    // Memento for a while"). The NEW Action flow (js/30) reads state.actionPlan,
+    // not the legacy primaryAction, so without a landed plan every persona
+    // opened Action on the intake confirm screen instead of their day. This is
+    // that plan, built from the persona's own action + progress, agreed and
+    // dated back to the goal's start so the day view opens directly.
+    actionPlan: (function () {
+      const g = (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress) || {};
+      const tiers = p.action.tiers || {};
+      const started = Date.now() - 86400000 * 45;
+      return {
+        v: 1,
+        bucket: p.action.bucket || 'generic',
+        star: p.neutronStar,
+        starHash: _demoStarHash(p.neutronStar),
+        acts: [
+          { role: 'star', text: tiers.moderate || p.action.title, doneWhen: p.action.doneWhen || 'the move actually happened', starter: true },
+          { role: 'support', text: tiers.light || p.action.howToStart, doneWhen: 'a smaller version happened' }
+        ],
+        noList: [], reasoning: [], qas: [],
+        close: { cadence: 'daily', kind: 'num', prompt: '', unit: g.unit || '', prefix: '', decimals: false, source: '', choices: null },
+        targets: { target: g.target != null ? g.target : null, unit: g.unit || '', baseline: g.baseline != null ? g.baseline : null, countTarget: null, daysTarget: null },
+        sizes: { unit: 'min', ladder: [15, 30, 60], named: [], estMinPerUnit: null, fmt: 'min' },
+        parts: null, verb: 'do', sendWindow: 'morning', deadline: null, offDays: null,
+        sessionsPerWeek: Math.max(1, Math.round(((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].target) || 0.6) * 7)),
+        createdAt: _demoISO(45),
+        landedAt: started,
+        agreedAt: started + 60000
+      };
+    })(),
     action: { viewMode: 'vine', introSeen: true, intake: { completed: true }, planGenerated: true, planSourceNeutronStar: p.neutronStar, selectedTier: 'moderate', lastGeneratedAt: new Date().toISOString(), primaryAction: { title: p.action.title, why: p.action.why, howToStart: p.action.howToStart, recommendedTier: 'moderate', recommendedWhy: p.action.recommendedWhy, tiers: p.action.tiers, path: p.action.path, linkedProjectId: p.action.linkedProjectId || '', linkedMilestoneId: p.action.linkedMilestoneId || '' }, projects: p.action.projects || [], completionHistory: completionHistory },
     streak: { history: streakHistory, bestEver: _demoBest, bestEverShown: _demoBest },
     // v1280: where this person actually stands, so the distance chip, the pace
@@ -765,7 +803,7 @@ function buildDemoState(personaKey) {
         hist.push({ v: Math.round(v * 100) / 100, iso: _demoISO((steps - i) * 12 + 4) });
       }
       return {
-        starHash: '', target: g.target, unit: g.unit, baseline: g.baseline,
+        starHash: _demoStarHash(p.neutronStar), target: g.target, unit: g.unit, baseline: g.baseline,
         current: g.current, updatedAt: new Date(Date.now() - 86400000).toISOString(),
         askedDay: '', history: hist, shape: g.shape, customMarks: []
       };
@@ -827,7 +865,15 @@ function buildDemoState(personaKey) {
       }
     },
     lifestats: { sleep: 4, diet: 3, exercise: 4, mood: 4, stress: 3, focus: 4, history: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((d, i) => { const dt = new Date(Date.now() - d * 86400000); const w = [3, 4, 2, 4, 5, 3, 4, 5, 4, 3, 4]; return { date: localISO(dt), sleep: w[i], exercise: ((i * 3) % 5) + 1, diet: ((i * 2) % 4) + 1, mood: ((i + 2) % 5) + 1, stress: ((i * 2 + 1) % 5) + 1, focus: ((i + 1) % 5) + 1 }; }) },
-    meta: { onboarded: true, welcomeSeen: true, firstActionDone: completionHistory.length > 0, lastVisit: _demoISO(0) },
+    // v1285 (Malik: "it should be as if i've already had Memento for a while").
+    // Every once-ever first-run beat is already spent for a persona: the
+    // First 7 Days future-pace, the card + action evolution reveals, the
+    // unlock ceremony, the plan reveal. A persona opens into the everyday
+    // app, never into a welcome.
+    meta: { onboarded: true, welcomeSeen: true, firstActionDone: completionHistory.length > 0, lastVisit: _demoISO(0),
+      next7DaysSeen: true, cardEvolutionSeen: true, actionEvolutionSeen: true, planRevealSeen: true,
+      unlockBeatSeen: true, unlockCeremonySeen: true, clarityMsgBeatSeen: true, firstWhiteShown: true,
+      cardSeenISO: _demoISO(0) },
     ui: { lastView: null },
     // Seed Vivere proof events so the Proof Trail and Momentum reflect lived
     // moments (the demo path does not run the derive migration, so set directly).

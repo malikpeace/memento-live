@@ -6696,3 +6696,17 @@ body.mfe-open #dayCard, body.mfe-open .app.dash-v2 #dayCard {
   #commandCenter .v-nf > * + * { margin-top: 8px; }
   #commandCenter .cc-hold-complete { padding: 12px; }
 }
+
+/* NO VERTICAL DRIFT ON THE PHONE HOME (v1285, Malik on-device: "I'm able to
+   swipe up on the main page and it kinda awkwardly pushes everything up").
+   The home is ONE page by law: measured at 320/375/390/430 wide, with real
+   safe-area insets applied, the document has ZERO scrollable height. So every
+   upward drag was iOS rubber-banding the root, not scrolling content, which
+   reads as the whole app sliding and snapping back. overscroll-behavior alone
+   does not stop the ROOT bounce in WebKit; only a non-scrollable root does.
+   Phone widths only: the tablet/desktop home can legitimately exceed a short
+   window and must keep its scroll. Modules are fixed overlays that scroll
+   inside themselves, so nothing else loses a scroller here. */
+@media (max-width: 767.98px) {
+  html, body { height: 100%; overflow-y: hidden; overscroll-behavior-y: none; }
+}
