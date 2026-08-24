@@ -179,6 +179,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_r1b', title: 'First 30-mile week', horizon: 'Month 1', done: false },
           { id: 'ms_r1c', title: 'Half marathon under 1:55', horizon: 'Month 3', done: false } ] } ]
     },
+    vivere: {
+      memories: [
+        { text: 'Ran through the park at 6am and the fog was sitting on the water. Nobody else out there.', category: 'beauty', mood: 'calm', age: 3 },
+        { text: 'Dad texted a photo of his old race bib. Said he kept it for thirty years.', category: 'connection', mood: 'warm', person: 'Dad', age: 9 },
+        { text: 'Finished the long run and sat on the curb laughing at nothing.', category: 'body', mood: 'joy', age: 16 }
+      ],
+      alive: [['Run a race in a city I have never been to', 'season'], ['Swim in open water once', 'year'], ['Watch a sunrise from the top of something', 'life']]
+    },
     reflections: ['Legs said no, calendar said yes. Calendar won.', 'Slow run today but I was out there. That is the whole game.', 'Skipped Friday, felt it all weekend. The streak protects me.'],
     distractions: [['Snooze', 'Reset the alarm twice and lost the morning window'], ['Weather app', 'Spent ten minutes deciding if it was too cold instead of running']]
   },
@@ -203,6 +211,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_w1a', title: 'Act one complete', horizon: 'Month 1', done: false },
           { id: 'ms_w1b', title: '50,000 words', horizon: 'Month 3', done: false },
           { id: 'ms_w1c', title: 'Full draft, 80,000 words', horizon: 'Dec 31', done: false } ] } ]
+    },
+    vivere: {
+      memories: [
+        { text: 'Wrote in the cafe until they turned the chairs up. Forgot to check my phone once.', category: 'meaning', mood: 'absorbed', age: 4 },
+        { text: 'Read a paragraph out loud to Nadia and she went quiet. That quiet was the whole afternoon.', category: 'connection', mood: 'moved', person: 'Nadia', age: 11 },
+        { text: 'Walked home in the rain with no umbrella and did not mind at all.', category: 'beauty', mood: 'calm', age: 22 }
+      ],
+      alive: [['Finish a draft and print it, just to hold it', 'season'], ['Write a week somewhere with no wifi', 'year'], ['See my name on a spine', 'life']]
     },
     reflections: ['Wrote garbage today. Wrote, though.', 'Two weeks off and the book felt like a stranger. Never again.', 'The scene finally cracked open at word 400. It always cracks after 400.'],
     distractions: [['Research hole', 'Ninety minutes on 1920s train schedules for one sentence'], ['Rereading', 'Polished chapter two again instead of drafting chapter nine']]
@@ -229,6 +245,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_b1b', title: 'First $10k month', horizon: 'Month 3', done: false },
           { id: 'ms_b1c', title: 'Second chair hired and booked', horizon: 'Month 6', done: false } ] } ]
     },
+    vivere: {
+      memories: [
+        { text: 'Kid sat in my chair terrified and left grinning at himself in the mirror.', category: 'meaning', mood: 'proud', age: 2 },
+        { text: 'Closed early, drove out with Elena, ate on the hood of the car.', category: 'connection', mood: 'warm', person: 'Elena', age: 13 },
+        { text: 'Shop was full and the music was right and nobody was in a hurry.', category: 'peace', mood: 'content', age: 20 }
+      ],
+      alive: [['Take a Sunday off with no guilt', 'week'], ['Teach someone the fade properly', 'season'], ['Own the building one day', 'life']]
+    },
     reflections: ['Slow Tuesday but every client left with a next appointment. That is the system working.', 'Raised prices $5 and nobody blinked. I waited two years for nothing.', 'The page brought in three new heads this week. Content is a chair that never sleeps.'],
     distractions: [['Shop talk', 'Forty-five minutes debating the game instead of posting the cut'], ['Supplier rabbit hole', 'Comparing clipper brands I am not buying this month']]
   },
@@ -253,6 +277,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_p1a', title: 'First phone screen', horizon: 'Month 1', done: false },
           { id: 'ms_p1b', title: 'Three onsites in one month', horizon: 'Month 2', done: false },
           { id: 'ms_p1c', title: 'Signed offer', horizon: 'March', done: false } ] } ]
+    },
+    vivere: {
+      memories: [
+        { text: 'Fixed the bug at 1am and actually said yes out loud to an empty room.', category: 'play', mood: 'triumphant', age: 5 },
+        { text: 'Amma told her whole prayer group I build apps. I did not correct her.', category: 'connection', mood: 'warm', person: 'Amma', age: 12 },
+        { text: 'Walked to the store just to move and the air was cold and good.', category: 'body', mood: 'calm', age: 25 }
+      ],
+      alive: [['Send one application without rewriting it five times', 'week'], ['Build something a stranger uses', 'season'], ['Move my parents somewhere quieter', 'life']]
     },
     reflections: ['Skipped four days and the fear got loud again. Doing the thing is the only thing that quiets it.', 'Recruiter replied to the tailored one. Never the sprayed ones. Noted.', 'One rejection stung all afternoon. Sent two more anyway.'],
     distractions: [['Doomscroll', 'An hour of layoff threads that helped nobody'], ['Tutorial trap', 'Started a new course instead of applying with what I know']]
@@ -279,6 +311,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_t1b', title: 'Two tracks fully mixed', horizon: 'Month 1', done: false },
           { id: 'ms_t1c', title: 'EP mastered and scheduled', horizon: 'Month 3', done: false } ] } ]
     },
+    vivere: {
+      memories: [
+        { text: 'Played the riff back and it sounded like a real song for the first time.', category: 'meaning', mood: 'stunned', age: 1 },
+        { text: 'Marco came over and we played badly for three hours and it was perfect.', category: 'play', mood: 'joy', person: 'Marco', age: 8 },
+        { text: 'Sat on the fire escape with the guitar and did not record any of it.', category: 'peace', mood: 'calm', age: 18 }
+      ],
+      alive: [['Play one song in front of strangers', 'season'], ['Record with someone better than me', 'year'], ['Hear my music somewhere I did not put it', 'life']]
+    },
     reflections: ['Day two. The loop finally became a first verse.', 'Almost started a new idea tonight. Closed the tab. The EP is the idea.'],
     distractions: [['Plugin store', 'Browsed synths for an hour instead of arranging'], ['New loop', 'Made a fresh 8 bars instead of finishing track one']]
   },
@@ -304,6 +344,14 @@ const DEMO_PERSONAS = {
           { id: 'ms_ro1b', title: 'Halfway point, 18 pounds', horizon: 'Month 3', done: false },
           { id: 'ms_ro1c', title: '35 pounds by graduation', horizon: 'May', done: false } ] } ]
     },
+    vivere: {
+      memories: [
+        { text: 'Walked the whole lunch hour and came back to class actually awake.', category: 'body', mood: 'clear', age: 2 },
+        { text: 'Maya sent the dress photo and I cried in the supply closet.', category: 'connection', mood: 'moved', person: 'Maya', age: 10 },
+        { text: 'A student came back years later to say I mattered. Sat in my car after.', category: 'meaning', mood: 'humbled', age: 34 }
+      ],
+      alive: [['Dance at the wedding without sitting down', 'year'], ['Hike with Maya somewhere steep', 'season'], ['Grow old loud, not quiet', 'life']]
+    },
     reflections: ['Faculty potluck and I logged it anyway. Honesty is the diet.', 'Walked the track while the kids ran drills. Steps are everywhere when you look.', 'Down a size. Bought nothing. The graduation dress is the prize.'],
     distractions: [['Grading spiral', 'Graded until ten and skipped the walk'], ['Snack drawer', 'The break room donuts won round one, not round two']]
   },
@@ -325,6 +373,8 @@ const DEMO_PERSONAS = {
    Every value is fiction, written to be believable, never scraped. */
 const DEMO_DEPTH = {
   creator: {
+    inbox: ['Thumbnail idea: just my face and three words', 'Ask Dev how he batches four videos in a weekend', 'Stop opening analytics before noon'],
+    people: [['Mom', 7, 9, 'Loves the channel updates. Call Sundays.'], ['Dev (creator friend)', 14, 5, 'Owes me a collab date.'], ['Chris (old roommate)', 60, 26, '']],
     voice: {
       runningToward: 'Making videos people actually watch, and making it my job',
       clarityLevel: 'I know the goal, not the path', actionKnow: 'Roughly, but I second-guess it',
@@ -340,6 +390,8 @@ const DEMO_DEPTH = {
     target: 0.55
   },
   founder: {
+    inbox: ['That churned user said onboarding, not price', 'Write the pricing page like a human', 'Stop refactoring the admin panel'],
+    people: [['Sam, my mentor', 30, 41, 'Owes him an update on the 100 users.'], ['Dad', 14, 11, 'Asks how it is going every time.'], ['Priya (first customer)', 21, 4, 'The one who would be upset if it vanished.']],
     voice: {
       runningToward: 'A product people pay for and would miss if it vanished',
       clarityLevel: 'Very clear', actionKnow: 'Yes, I just avoid the scary half',
@@ -355,6 +407,8 @@ const DEMO_DEPTH = {
     target: 0.7
   },
   student: {
+    inbox: ['Office hours Thursday, actually go this time', 'Meal prep Sunday or Wednesday falls apart', 'Stop studying in bed'],
+    people: [['Mom', 7, 4, 'Worries when I go quiet.'], ['Jess (study partner)', 7, 2, 'Library at 6, keeps me honest.'], ['Coach Ramos', 30, 22, '']],
     voice: {
       runningToward: 'Finishing strong without falling apart',
       clarityLevel: 'Clear on grades, foggy on the body part', actionKnow: 'I know what to do, I just run out of day',
@@ -370,6 +424,8 @@ const DEMO_DEPTH = {
     target: 0.6
   },
   runner: {
+    inbox: ['New shoes at 400 miles, not before', 'Long run Saturday, not Sunday, this week', 'Foam roll before bed, not never'],
+    people: [['Dad', 7, 3, 'He is flying in for the marathon.'], ['Lena (running club)', 7, 1, 'Tuesday intervals.'], ['Dr. Okafor (PT)', 45, 30, 'Check the knee before the volume jumps.']],
     voice: {
       runningToward: 'Becoming someone who finishes what she starts',
       clarityLevel: 'Very clear', actionKnow: 'The plan is written, I follow it',
@@ -385,6 +441,8 @@ const DEMO_DEPTH = {
     target: 0.4
   },
   writer: {
+    inbox: ['Chapter 11 is the one that scares me. Start there', 'Cut the flashback, it is procrastination in prose', 'Read it aloud before deciding it is bad'],
+    people: [['Nadia (writing group)', 14, 6, 'Sends pages every other Sunday.'], ['Mom', 21, 12, ''], ['Tom (agent, someday)', 90, 74, 'Not until the draft exists.']],
     voice: {
       runningToward: 'Finishing the book instead of describing it at parties',
       clarityLevel: 'Clear', actionKnow: 'Yes, when I am not avoiding it',
@@ -400,6 +458,8 @@ const DEMO_DEPTH = {
     target: 0.35
   },
   barber: {
+    inbox: ['Raise the fade to $35, nobody will leave', 'Post the before-and-after from Friday', 'Second chair costs less than the lost walk-ins'],
+    people: [['Elena (wife)', 3, 1, 'The one keeping the books.'], ['Ray (barber, mentor)', 30, 24, 'Ask how he priced the second chair.'], ['Mike (regular, every 2 weeks)', 14, 9, '']],
     voice: {
       runningToward: 'A shop that runs without me bleeding for it',
       clarityLevel: 'Clear on the number', actionKnow: 'Mostly, the marketing part is guesswork',
@@ -415,6 +475,8 @@ const DEMO_DEPTH = {
     target: 0.25
   },
   coder: {
+    inbox: ['Apply to five, even the scary ones', 'Finish the project instead of starting the tutorial', 'Ask Arjun for a referral, worst case he says no'],
+    people: [['Amma', 7, 6, 'Tells everyone I am a programmer already.'], ['Arjun (works at the company)', 30, 38, 'The referral I keep not asking for.'], ['Sara (bootcamp friend)', 21, 15, 'She got hers in March.']],
     voice: {
       runningToward: 'A job offer that changes my family life',
       clarityLevel: 'Clear on the goal, lost on the path', actionKnow: 'Not really, I bounce between tutorials',
@@ -430,6 +492,8 @@ const DEMO_DEPTH = {
     target: 0.35
   },
   musician: {
+    inbox: ['Track one is done enough. Move on', 'Book the open mic before the songs are ready', 'Stop buying pedals'],
+    people: [['Marco (drummer)', 14, 3, 'Ready whenever I am.'], ['Mom', 21, 17, ''], ['Kai (runs the open mic)', 30, 44, 'Said just show up.']],
     voice: {
       runningToward: 'Finally putting my own music into the world',
       clarityLevel: 'Getting clearer', actionKnow: 'I am learning as I go',
@@ -445,6 +509,8 @@ const DEMO_DEPTH = {
     target: 0.55
   },
   teacher: {
+    inbox: ['Walk at lunch, the staff room is a trap', 'Buy the dress a size down, hang it up', 'Weigh once a week, not every morning'],
+    people: [['Maya (my daughter)', 3, 0, 'The wedding is the whole why.'], ['Dee (walking partner)', 7, 2, 'Tuesdays and Thursdays.'], ['Dr. Bell', 90, 61, 'Bloodwork in the spring.']],
     voice: {
       runningToward: 'Being healthy enough to keep up with my life',
       clarityLevel: 'Clear', actionKnow: 'Yes, I have done it before',
@@ -684,7 +750,7 @@ function buildDemoState(personaKey) {
     // paywall never appears (a persona is supposed to be a full, owned account).
     entitlements: { isPaid: true, paidAt: new Date().toISOString(), plan: 'demo' },
     checkins: demoCheckins,
-    clarity: { completed: true, completedAt: new Date().toISOString(), answers: { neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
+    clarity: { completed: true, completedAt: new Date().toISOString(), answers: { goalShape: { type: ((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress || {}).shape || 'quantity_up'), source: 'demo' }, neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
     action: { viewMode: 'vine', introSeen: true, intake: { completed: true }, planGenerated: true, planSourceNeutronStar: p.neutronStar, selectedTier: 'moderate', lastGeneratedAt: new Date().toISOString(), primaryAction: { title: p.action.title, why: p.action.why, howToStart: p.action.howToStart, recommendedTier: 'moderate', recommendedWhy: p.action.recommendedWhy, tiers: p.action.tiers, path: p.action.path, linkedProjectId: p.action.linkedProjectId || '', linkedMilestoneId: p.action.linkedMilestoneId || '' }, projects: p.action.projects || [], completionHistory: completionHistory },
     streak: { history: streakHistory, bestEver: _demoBest, bestEverShown: _demoBest },
     // v1280: where this person actually stands, so the distance chip, the pace
@@ -714,17 +780,26 @@ function buildDemoState(personaKey) {
     deepwork: { sessions: deepwork },
     reflection: { entries: reflections, trash: [], folders: [], activeFolder: null, disp: { font: 'system', surface: 'glass' } },
     distraction: { logs: distractions },
-    inbox: [
+    inbox: (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].inbox
+      ? DEMO_DEPTH[personaKey].inbox.map(function (t, i) {
+          return { id: 'ib_' + personaKey + i, text: t, ts: Date.now() - (i + 1) * 2400000, iso: getTodayISO() };
+        })
+      : [
       { id: 'ib_demo1', text: 'Realized I think best on long walks, protect that time', ts: Date.now() - 9000000, iso: getTodayISO() },
       { id: 'ib_demo2', text: 'Call an old friend this weekend', ts: Date.now() - 5400000, iso: getTodayISO() },
       { id: 'ib_demo3', text: 'Got distracted by the group chat for 40 minutes again', ts: Date.now() - 3600000, iso: getTodayISO() },
       { id: 'ib_demo4', text: 'Shipped the first rough draft today', ts: Date.now() - 1200000, iso: getTodayISO() }
-    ],
-    people: [
+    ]),
+    people: (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].people
+      ? DEMO_DEPTH[personaKey].people.map(function (x, i) {
+          return { id: 'pp_' + personaKey + i, name: x[0], cadenceDays: x[1],
+            lastContactISO: localISO(new Date(Date.now() - x[2] * 86400000)), notes: x[3] || '' };
+        })
+      : [
       { id: 'pp_demo1', name: 'Mom', cadenceDays: 7, lastContactISO: localISO(new Date(Date.now() - 9 * 86400000)), notes: 'Call on Sundays. She loves the channel updates.' },
       { id: 'pp_demo2', name: 'Sam, my mentor', cadenceDays: 30, lastContactISO: localISO(new Date(Date.now() - 41 * 86400000)), notes: 'Owe him an update on the 100k goal.' },
       { id: 'pp_demo3', name: 'Chris (old roommate)', cadenceDays: 60, lastContactISO: localISO(new Date(Date.now() - 18 * 86400000)), notes: '' }
-    ],
+    ]),
     mori: { birthYear: p.birthYear, lifeExpectancy: 80, screenTimeHours: 3, reminderText: 'Make it count.' },
     vivere: {
       today: vivToday,
