@@ -1020,6 +1020,18 @@ body.density-compact .sidebar__inner { gap: 8px; }
 }
 .feel-preview__caption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 6px; }
 
+/* THE APP IS ASLEEP (v1288). Set by js/11 whenever the document is hidden (the
+   user swiped to another app) and cleared a beat after it comes back. Every
+   animation stops instead of running unseen, so iOS is not rebuilding dozens of
+   full-screen animated layers in the same frame it restores the tab. That spike
+   is what was killing the web process on resume. */
+html.app-asleep *,
+html.app-asleep *::before,
+html.app-asleep *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
 /* --- Reset --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {

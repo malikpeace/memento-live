@@ -233,6 +233,12 @@ body.look-dark-glass.ns-bloom .ambient__rays {
   animation-delay: var(--del, 0s);
   will-change: transform, opacity;
 }
+/* v1288: the phone's own beam treatment lives further down this file (the
+   pointer:coarse block): static blur, opacity-only glimmer, tuned on-device.
+   It is deliberately left alone here. What the resume crash needed was for
+   nothing to be ANIMATING while the app is in the background, which is the
+   app-asleep rule in css/base.css and the sleep override at the end of this
+   file. */
 @keyframes ambientBeamFlicker {
   0%, 100% { opacity: var(--omin, 0.05); transform: scaleY(var(--smin, 0.7)); }
   35%      { opacity: calc((var(--omin) * 0.4) + (var(--omax) * 0.6)); transform: scaleY(calc((var(--smin) + var(--smax)) / 2 + 0.08)); }
@@ -3757,7 +3763,10 @@ body.pre-clarity .capture-fab { display: none !important; }
        (a fresh boot is exactly when the evolution cinema arms) laid the
        column out a header too tall, which is where the cinema's stale
        measurements came from. */
-    height: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
+    /* v1288: the column's height is a value now, not an expression repeated in
+       two places, so the card below can be sized against the same number. */
+    --p1-h: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
+    height: var(--p1-h);
     box-sizing: border-box;
     padding-bottom: calc(15px + var(--safe-b, 0px));
     scroll-snap-align: start;
@@ -3767,6 +3776,18 @@ body.pre-clarity .capture-fab { display: none !important; }
      construction, so no per-mode unit override is needed.) */
   body .app.dash-v2 #homePage1 > #dayCard {
     flex: 1 1 auto; min-height: 0;
+    /* v1288 (Malik, screen recording: the Memento is "a bit smaller and higher
+       up and takes a second to come down"). The card's size used to depend on
+       its own CONTENT, which mounts a few hundred milliseconds after the first
+       paint, so an empty card rendered 16px taller and then dropped under his
+       eyes. Its ceiling is now pure arithmetic on the column, the reserved box
+       and the gap: the same number before and after the content exists, on
+       every screen size, so the first painted frame is already the final one.
+       It stays a MAX (not a fixed height) so a box taller than its reservation
+       can still push the card down instead of overflowing the screen. */
+    max-height: min(
+      calc(var(--p1-h) - max(212px, var(--cc-h, 212px)) - 16px - 15px - var(--safe-b, 0px)),
+      var(--dc-h, 100lvh));
   }
   body .app.dash-v2 #homePage1 > #commandCenter {
     /* v1104, THE CLIPPING FIX (his First-step screenshot: the card painted
@@ -3780,7 +3801,11 @@ body.pre-clarity .capture-fab { display: none !important; }
        The SWIPE deck stays visually fixed because .cc-card--pillars itself
        is hard-fixed at 212px; this row simply inherits that. */
     flex: 0 0 auto;
-    min-height: 212px;
+    /* v1288: --cc-h is this device's REAL box height, remembered from the last
+       render and applied before the first paint (index.html). Until it exists
+       (the very first launch ever) the 212 floor stands, which is the only
+       launch that can still show the old settle. */
+    min-height: max(212px, var(--cc-h, 212px));
     /* The face fills the slot even when its content is shorter than the 212
        floor, so every state's box bottom lands on the same line (the
        Next-step card is 206px of content and sat 6px high without this). */
@@ -6709,4 +6734,26 @@ body.mfe-open #dayCard, body.mfe-open .app.dash-v2 #dayCard {
    inside themselves, so nothing else loses a scroller here. */
 @media (max-width: 767.98px) {
   html, body { height: 100%; overflow-y: hidden; overscroll-behavior-y: none; }
+}
+
+
+/* ==========================================================================
+   ASLEEP: the last word on animation (v1288, the resume crash).
+   css/base.css pauses everything under html.app-asleep, but a handful of
+   ambient rules set the animation SHORTHAND with !important, and a shorthand
+   re-asserts animation-play-state along with it. These are those rules, by
+   name, at the end of the last stylesheet, so a backgrounded Memento really
+   is still. Nothing here changes a single visible frame while the app is in
+   front of the person.
+   ========================================================================== */
+html.app-asleep .ambient__rays-beam-shaft,
+html.app-asleep .ambient__rays-source,
+html.app-asleep .ambient__rays-beam,
+html.app-asleep .blob,
+html.app-asleep .daycard-ns__iri,
+html.app-asleep .daycard-ns__sheen,
+html.app-asleep .daycard-bloom,
+html.app-asleep .daycard-wrap__aura,
+html.app-asleep .crays__shaft {
+  animation-play-state: paused !important;
 }

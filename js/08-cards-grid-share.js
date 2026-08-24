@@ -5525,7 +5525,64 @@ function renderDeskMission() {
   } catch (e) {}
 }
 
+// v1288 (Malik, screen recording): the box's real height, remembered so the
+// NEXT launch reserves it before the first paint and the Memento never has to
+// shrink to make room (see the early script in index.html). Measured from the
+// CONTENT, never from the rendered box: the box is flex-stretched to whatever
+// was reserved, so measuring the box itself would ratchet the number upward
+// forever and slowly starve the card.
+function _ccRememberHeight(cc) {
+  try {
+    const w = Math.round(window.innerWidth || 0);
+    if (!w || w >= 1024) return;
+    const card = cc && cc.querySelector('.cc-card');
+    if (!card) return;
+    // Measure the WHOLE SLOT, not just the card: the swipe dots live under it
+    // and are part of what has to be reserved. The slot is flex-stretched to
+    // whatever was reserved and the card stretches inside it, so both stretches
+    // come off for the read (measuring the rendered height would ratchet the
+    // reservation upward forever and slowly starve the Memento). Set, read,
+    // restore, all inside one frame: nothing paints in between, nothing moves.
+    const prevFlex = card.style.flex;
+    const prevMin = cc.style.minHeight;
+    card.style.flex = '0 0 auto';
+    cc.style.minHeight = '0px';
+    const natural = Math.ceil(cc.getBoundingClientRect().height);
+    if (prevFlex) card.style.flex = prevFlex; else card.style.removeProperty('flex');
+    if (prevMin) cc.style.minHeight = prevMin; else cc.style.removeProperty('min-height');
+    if (!isFinite(natural) || natural < 120) return;
+    const vh = Math.round(window.innerHeight || 0) || 800;
+    const val = Math.max(212, Math.min(natural, Math.round(vh * 0.45)));
+    const key = 'memento_cc_h_' + w;
+    const prev = parseInt(localStorage.getItem(key) || '', 10);
+    if (!isFinite(prev) || Math.abs(prev - val) > 1) {
+      try { localStorage.setItem(key, String(val)); } catch (e) {}
+    }
+    const cur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cc-h')) || 0;
+    if (Math.abs(cur - val) > 1) document.documentElement.style.setProperty('--cc-h', val + 'px');
+    // ...and the Memento's own settled height. Its ceiling is arithmetic (see
+    // the max-height in css/dashboard.css), but the FILLED card lands a little
+    // under that ceiling because its inner stage owns the ratio, and an empty
+    // card has no stage to be limited by. Remembering the settled number means
+    // the empty first frame is already the size the filled card will be.
+    const dc = document.getElementById('dayCard');
+    if (dc && dc.children.length) {
+      const dh = Math.round(dc.getBoundingClientRect().height);
+      if (isFinite(dh) && dh > 160 && dh < vh) {
+        const dkey = 'memento_dc_h_' + w;
+        const dprev = parseInt(localStorage.getItem(dkey) || '', 10);
+        if (!isFinite(dprev) || Math.abs(dprev - dh) > 1) {
+          try { localStorage.setItem(dkey, String(dh)); } catch (e) {}
+        }
+        const dcur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dc-h')) || 0;
+        if (Math.abs(dcur - dh) > 1) document.documentElement.style.setProperty('--dc-h', dh + 'px');
+      }
+    }
+  } catch (e) {}
+}
+
 function bindCommandCenter(cc) {
+  try { requestAnimationFrame(() => _ccRememberHeight(cc)); } catch (e) {}
   // v812: the desktop editorial hero mirrors every command-center re-render
   // through this single chokepoint (guarded against self-recursion).
   try { if (cc && cc.id === 'commandCenter') renderDeskMission(); } catch (e) {}

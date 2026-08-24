@@ -1143,6 +1143,10 @@
     }
     node.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     node.addEventListener('pointerdown', start);
+    // v1288: rule 5 above still stands, no movement threshold lives here: a
+    // real finger trembles through three seconds and must not lose the ring.
+    // The page swipe cancels this hold explicitly the moment it RECOGNISES a
+    // sideways pull (see bindPageSnap's axis lock), which tremor never is.
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
       node.addEventListener(ev, end);
     });
@@ -1275,11 +1279,18 @@
     pagerHandover = true;
     try { go(); } finally { pagerHandover = false; }
   }
-  var SNAP_AT = 0.4;        // of the width: the point of no return
-  var FLICK_V = 0.65;       // px per ms, a throw rather than a drag
-  var FLICK_MIN = 28;       // ...that still has to have travelled
-  var AXIS_LOCK = 10;       // px before the direction is decided
-  var AXIS_DOM = 1.6;       // how sideways a pull has to be to be a pull
+  // v1288 (Malik on-device: "the swiping to go from the 1 action to the logic
+  // page is very very sticky and tough... make sure it's much easier to swipe").
+  // These are the MOMENTUM numbers he picked in the door lab (threshold 0.30,
+  // velocity 0.30 px/ms), which is the feel the rest of the app already uses.
+  // The old values asked for a 40% drag OR a 0.65px/ms throw with the pull
+  // 1.6x more sideways than vertical: a deliberate, ordinary thumb swipe
+  // failed all three and snapped back, which is exactly what "sticky" is.
+  var SNAP_AT = 0.30;       // of the width: the point of no return
+  var FLICK_V = 0.30;       // px per ms, a throw rather than a drag
+  var FLICK_MIN = 24;       // ...that still has to have travelled
+  var AXIS_LOCK = 8;        // px before the direction is decided
+  var AXIS_DOM = 1.15;      // how sideways a pull has to be to be a pull
   var SNAP_MS = 280;
 
   function bindPageSnap(cfg) {
@@ -1336,7 +1347,7 @@
       if (settling) return;                              // the snap owns it now
       if (start || live) { settle(false); return; }      // second finger
       if (cfg.blocked && cfg.blocked(e.target)) return;
-      start = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0 };
+      start = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0, target: e.target };
       dx = 0; vx = 0; lastX = e.clientX; lastT = Date.now();
       buildPager();
     };
@@ -1351,10 +1362,28 @@
         if (Math.max(Math.abs(mx), my) < AXIS_LOCK) return;
         // not sideways enough, or sideways the wrong way: this is the page's
         // gesture, not ours, and we let go of it completely.
-        if (Math.abs(mx) < my * AXIS_DOM || mx * dir <= 0) { start = null; clear(); return; }
+        // v1288: a thumb arcs. A pull that is not yet sideways ENOUGH keeps
+        // waiting instead of being thrown away, and only a decisive move the
+        // wrong way (or a real vertical scroll) hands the gesture back. The
+        // old rule abandoned the swipe permanently on a single stray pixel,
+        // which is why a second attempt from the same finger did nothing.
+        if (my >= AXIS_LOCK && Math.abs(mx) < my * AXIS_DOM) { start = null; clear(); return; }
+        if (mx * dir <= -AXIS_LOCK) { start = null; clear(); return; }
+        if (Math.abs(mx) < my * AXIS_DOM || mx * dir <= 0) return;
         start.x = e.clientX;              // travel is measured from the lock
         start.axis = 1;
         live = true;
+        // v1288: the pull is now a fact, so whatever the finger landed on lets
+        // go of it. A press-and-hold started on the CTA cancels here instead of
+        // quietly filling underneath the drag, and it costs the hold nothing on
+        // a still finger: only a recognised sideways pull ever reaches this.
+        try {
+          if (start.target && start.target.dispatchEvent) {
+            start.target.dispatchEvent(new PointerEvent('pointercancel', {
+              bubbles: true, cancelable: false, pointerId: start.id
+            }));
+          }
+        } catch (e2) {}
         if (!reduced()) host.classList.add('is-drag');
         return;
       }
@@ -4606,7 +4635,17 @@
     // row is that control's gesture and this never sees it.
     function swipeBlocked(t) {
       if (!t || !t.closest) return true;
-      return !!t.closest('.afl-day__rail, .afl-day__sup, .afl-day__hold, .afl-day__m, .afl-day__dw, .afl-day__done, .afl-day__nnt, .afl-nav');
+      // v1288: the blocked list was most of the screen (the supports, the M,
+      // the deep-work door, the signed row, the non-negotiables row and the
+      // WHOLE nav), so there was barely anywhere left to start a swipe from.
+      // Only two controls own a gesture of their own and keep it: the size
+      // rail (a vertical slider) and the hold-to-complete button. Everything
+      // else is a tap, and a tap is unaffected: this gesture does not take
+      // over until the finger has travelled 8px sideways.
+      // Only the size rail keeps the gesture now: it is a vertical slider with
+      // touch-action:none, so a drag there is unambiguously its own. The hold
+      // button releases on movement (see bindHold), so a swipe may start on it.
+      return !!t.closest('.afl-day__rail');
     }
     if (!opts.into) {
       daySnap = bindPageSnap({

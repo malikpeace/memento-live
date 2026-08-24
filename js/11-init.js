@@ -150,6 +150,36 @@ try {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') setTimeout(syncHomeViewport, 120);
   });
+  /* v1288 THE RESUME CRASH (Malik's screen recording: leave Memento for
+     another app, come back, watch it glitch and then die on Safari's "a
+     problem repeatedly occurred" page, which is WebKit killing the tab).
+     Measured on a phone-sized render: 51 layers the size of the screen or
+     bigger, 31 of them blurred, 44 animating forever. iOS throws those GPU
+     buffers away when the app goes to the background and has to rebuild every
+     one of them at once on the way back, which is the spike that kills the
+     process. Nothing animates while nobody is looking: the class pauses every
+     running animation instead of leaving 44 of them racing in a hidden tab,
+     and the first frames back are spent painting rather than re-arming
+     everything at once. Pure CSS, reversible, and invisible on a healthy
+     resume. */
+  (function () {
+    var root = document.documentElement;
+    var wake = null;
+    var apply = function () {
+      if (document.visibilityState === 'hidden') {
+        if (wake) { clearTimeout(wake); wake = null; }
+        root.classList.add('app-asleep');
+      } else {
+        // one settled frame of stillness before the ambient starts moving again
+        if (wake) clearTimeout(wake);
+        wake = setTimeout(function () { root.classList.remove('app-asleep'); wake = null; }, 260);
+      }
+    };
+    document.addEventListener('visibilitychange', apply);
+    window.addEventListener('pagehide', function () { root.classList.add('app-asleep'); });
+    window.addEventListener('pageshow', apply);
+    apply();
+  })();
   // Orientation. (Foreground and settle re-runs above, width changes below.)
   window.addEventListener('orientationchange', () => setTimeout(syncHomeViewport, 250));
   // v1106: recompute when the viewport WIDTH changes, and only then. A width
