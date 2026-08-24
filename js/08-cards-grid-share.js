@@ -4189,7 +4189,12 @@ function ccSyncDayOne() {
 }
 
 function ccSyncFmtDate(d) {
-  try { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+  // never print "Invalid Date": a bad or out-of-range Date returns nothing and
+  // every caller already treats an empty string as "no date to show" (v1287).
+  try {
+    if (!(d instanceof Date) || !isFinite(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch (e) { return ''; }
 }
 
 // days since the star was signed (day 1 = the signing day). Accounts from
@@ -4222,7 +4227,15 @@ function ccSyncPace(shape) {
     const perDay = moved / span;
     const remaining = Math.max(0, Math.abs(shape.target - last.value));
     const days = Math.ceil(remaining / perDay);
-    const arrival = new Date(Date.now() + days * 86400000);
+    // v1287 (Malik on-device: "a lot of them also have an Invalid Date").
+    // A crawling pace projects an arrival thousands of years out, and a Date
+    // past the platform's range renders the literal string "Invalid Date" in
+    // the sync box. A projection nobody could act on is not worth printing
+    // either, so anything beyond ten years reports no arrival at all and the
+    // face falls back to its honest day line.
+    const arrival = (isFinite(days) && days >= 0 && days <= 3650)
+      ? new Date(Date.now() + days * 86400000)
+      : null;
     // the same projection computed a week ago, for "sooner than a week ago"
     let shiftDays = 0;
     const wk = new Date(Date.now() - 7 * 86400000);
@@ -4410,7 +4423,8 @@ function ccSyncFaceClarity(shape, sit, d1) {
     const pace = ccSyncPace(shape);
     const delta = pace && pace.weekDelta > 0 ? '+' + pace.weekDelta.toLocaleString() + ' this week' : '';
     let foot = 'Day ' + ccSyncDayN() + '.';
-    if (pace && pace.arrival) foot = 'Day ' + ccSyncDayN() + '. At this pace you arrive <b>' + ccSyncFmtDate(pace.arrival) + '</b>.';
+    const arrivalTxt = pace && pace.arrival ? ccSyncFmtDate(pace.arrival) : '';
+    if (arrivalTxt) foot = 'Day ' + ccSyncDayN() + '. At this pace you arrive <b>' + arrivalTxt + '</b>.';
     return '<div class="v v-star-star-distance">' +
       '<p class="sd-star">' + esc(star) + '</p>' +
       '<div class="sd-row"><span class="sd-big">' + cur.toLocaleString() + '</span>' +
@@ -4421,11 +4435,21 @@ function ccSyncFaceClarity(shape, sit, d1) {
   }
   if (sit === 'rule') {
     // The rule, signed: the rule, their why, and what breaking it costs
-    let daysHeld = 0;
-    try { daysHeld = consistencyStats().current || 0; } catch (e) {}
-    const cost = d1 || daysHeld === 0
+    // v1287: the RUN is the headline, but a run of zero is not proof of
+    // nothing. Someone 165 days in who has not marked today yet was being told
+    // the cost "grows from here", which reads as day one to a person with half
+    // a year behind them. The whole record answers when the current run cannot
+    // (Malik's own law: it matters less about a streak and more about the
+    // whole picture).
+    let daysHeld = 0, everHeld = 0;
+    try { const cs = consistencyStats(); daysHeld = cs.current || 0; everHeld = cs.totalActiveDays || 0; } catch (e) {}
+    const cost = d1
       ? 'Day ' + ccSyncDayN() + '. The cost of breaking it grows from here.'
-      : 'Breaking it costs ' + daysHeld.toLocaleString() + ' day' + (daysHeld === 1 ? '' : 's') + ' and the person who held them.';
+      : (daysHeld > 0
+        ? 'Breaking it costs ' + daysHeld.toLocaleString() + ' day' + (daysHeld === 1 ? '' : 's') + ' and the person who held them.'
+        : (everHeld > 0
+          ? everHeld.toLocaleString() + ' day' + (everHeld === 1 ? '' : 's') + ' held so far. Today is the next one.'
+          : 'Day ' + ccSyncDayN() + '. The cost of breaking it grows from here.'));
     return '<div class="v v-nf"><p class="c-star">' + esc(star) + '</p>' +
       (why ? '<p class="c-why">' + esc(why) + '</p>' : '') +
       '<p class="c-cost">' + esc(cost) + '</p></div>';

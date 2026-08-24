@@ -147,11 +147,22 @@
     return adapter;
   }
 
+  // NO BACK STACK (v1287, Malik on-device, second report: "I'm still able to
+  // swipe left to right and move backwards, plz actually remove the feature").
+  // v1286 swallowed the popstate, which stopped the app from CHANGING screens,
+  // but iOS owns the gesture itself: WebKit still unwound its own back list and
+  // still played the native slide of the previous entry's snapshot, so the
+  // person still saw the home slide in over Clarity. The only way to make the
+  // gesture inert is to leave nothing behind it, so in-app navigation replaces
+  // the entry instead of pushing one. The hash still tracks the open surface,
+  // so a refresh and a deep link both still land where they should; what is
+  // gone is the stack the swipe was unwinding.
+  var NO_BACK_STACK = true;
   function writeHistory(slug, mode) {
     if (!routingEnabled() || mode === 'none') return;
     var stateObj = { slug: slug, door: true, depth: frames.length };
     try {
-      if (mode === 'replace') history.replaceState(stateObj, '', hashFor(slug));
+      if (mode === 'replace' || NO_BACK_STACK) history.replaceState(stateObj, '', hashFor(slug));
       else history.pushState(stateObj, '', hashFor(slug));
     } catch (e) {}
   }
@@ -161,8 +172,9 @@
     if (now === 'home') return;
     try {
       if (history.state && history.state.door === true) return;
-      history.replaceState({ slug: 'home', door: true, depth: 1 }, '', hashFor('home'));
-      history.pushState({ slug: now, door: true, depth: frames.length || 2 }, '', hashFor(now));
+      // v1287: with no back stack there is no entry to own. The surface simply
+      // stamps itself, and its Close button is the only way back.
+      history.replaceState({ slug: now, door: true, depth: frames.length || 2 }, '', hashFor(now));
     } catch (e) {}
   }
   function seed() {
@@ -282,10 +294,9 @@
       var target = frames.length > 1 ? frames[frames.length - 2] : 'home';
       if (frames.length > 1) frames.pop();
       return transition(target, { history: 'none', keepFrames: true }).then(function (slug) {
-        if (!opts.fromPop && routingEnabled()) {
-          suppressPop++;
-          try { history.back(); } catch (e) { suppressPop--; writeHistory(slug, 'replace'); }
-        } else if (opts.replace) writeHistory(slug, 'replace');
+        // v1287: closing stamps the surface it landed on. It never unwinds the
+        // browser, because nothing was ever pushed onto it.
+        if (routingEnabled()) writeHistory(slug, 'replace');
         return slug;
       });
     });
@@ -301,10 +312,7 @@
     var below = frames.length > 1 ? frames[frames.length - 2] : 'home';
     if (now === below || (now === 'home' && top !== 'home')) {
       if (frames.length > 1) frames.pop();
-      if (routingEnabled()) {
-        suppressPop++;
-        try { history.back(); } catch (e) { suppressPop--; writeHistory(now, 'replace'); }
-      }
+      if (routingEnabled()) writeHistory(now, 'replace');
       return;
     }
     if (TAB_SLUGS[now] && TAB_SLUGS[top]) {

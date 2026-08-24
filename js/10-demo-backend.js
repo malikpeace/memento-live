@@ -861,6 +861,7 @@ DEMO_LOGIC.weight = {
 
 const DEMO_DEPTH = {
   screentime: {
+    sync: { type: 'maintenance' },
     inbox: ['Buy an actual alarm clock', 'Ask Rachel what she reads on the train', 'Delete the app off the phone, keep it on the laptop'],
     people: [['Rachel', 5, 12, 'The phone-free dinner rule was her idea.'], ['Mom', 11, 8, 'Calls on Sundays, deserves my attention.'], ['Book club', 21, 3, 'Stopped going when I stopped finishing books.']],
     voice: {
@@ -878,6 +879,7 @@ const DEMO_DEPTH = {
     target: 0.65
   },
   weight: {
+    sync: { type: 'quantity_down' },
     inbox: ['Pack lunch tonight, not at 6am', 'Ask Dr. Alvarez about the knee before adding running', 'Sign Eli up for the spring league'],
     people: [['Ava (daughter)', 2, 41, 'Asks me to bike to the park now.'], ['Eli (son)', 2, 38, ''], ['Dad', 30, 6, 'Same body, same story. That is the warning.']],
     voice: {
@@ -895,6 +897,9 @@ const DEMO_DEPTH = {
     target: 0.7
   },
   creator: {
+    // v1287: the sync box has five faces and every persona used to land on
+    // the same one. This is the face this person's goal actually is.
+    sync: { type: 'frequency', cadence: 1 },
     inbox: ['Thumbnail idea: just my face and three words', 'Ask Dev how he batches four videos in a weekend', 'Stop opening analytics before noon'],
     people: [['Mom', 7, 9, 'Loves the channel updates. Call Sundays.'], ['Dev (creator friend)', 14, 5, 'Owes me a collab date.'], ['Chris (old roommate)', 60, 26, '']],
     voice: {
@@ -912,6 +917,7 @@ const DEMO_DEPTH = {
     target: 0.55
   },
   founder: {
+    sync: { type: 'quantity_up' },
     inbox: ['That churned user said onboarding, not price', 'Write the pricing page like a human', 'Stop refactoring the admin panel'],
     people: [['Sam, my mentor', 30, 41, 'Owes him an update on the 100 users.'], ['Dad', 14, 11, 'Asks how it is going every time.'], ['Priya (first customer)', 21, 4, 'The one who would be upset if it vanished.']],
     voice: {
@@ -929,6 +935,7 @@ const DEMO_DEPTH = {
     target: 0.7
   },
   student: {
+    sync: { type: 'milestone' },
     inbox: ['Office hours Thursday, actually go this time', 'Meal prep Sunday or Wednesday falls apart', 'Stop studying in bed'],
     people: [['Mom', 7, 4, 'Worries when I go quiet.'], ['Jess (study partner)', 7, 2, 'Library at 6, keeps me honest.'], ['Coach Ramos', 30, 22, '']],
     voice: {
@@ -946,6 +953,7 @@ const DEMO_DEPTH = {
     target: 0.6
   },
   runner: {
+    sync: { type: 'quantity_down', deadline: '2026-10-11', deadlineText: 'race day' },
     inbox: ['New shoes at 400 miles, not before', 'Long run Saturday, not Sunday, this week', 'Foam roll before bed, not never'],
     people: [['Dad', 7, 3, 'He is flying in for the marathon.'], ['Lena (running club)', 7, 1, 'Tuesday intervals.'], ['Dr. Okafor (PT)', 45, 30, 'Check the knee before the volume jumps.']],
     voice: {
@@ -963,6 +971,7 @@ const DEMO_DEPTH = {
     target: 0.4
   },
   writer: {
+    sync: { type: 'quantity_up', deadline: '2026-12-31', deadlineText: 'New Year\u2019s Eve' },
     inbox: ['Chapter 11 is the one that scares me. Start there', 'Cut the flashback, it is procrastination in prose', 'Read it aloud before deciding it is bad'],
     people: [['Nadia (writing group)', 14, 6, 'Sends pages every other Sunday.'], ['Mom', 21, 12, ''], ['Tom (agent, someday)', 90, 74, 'Not until the draft exists.']],
     voice: {
@@ -980,6 +989,7 @@ const DEMO_DEPTH = {
     target: 0.35
   },
   barber: {
+    sync: { type: 'quantity_up' },
     inbox: ['Raise the fade to $35, nobody will leave', 'Post the before-and-after from Friday', 'Second chair costs less than the lost walk-ins'],
     people: [['Elena (wife)', 3, 1, 'The one keeping the books.'], ['Ray (barber, mentor)', 30, 24, 'Ask how he priced the second chair.'], ['Mike (regular, every 2 weeks)', 14, 9, '']],
     voice: {
@@ -997,6 +1007,7 @@ const DEMO_DEPTH = {
     target: 0.25
   },
   coder: {
+    sync: { type: 'milestone' },
     inbox: ['Apply to five, even the scary ones', 'Finish the project instead of starting the tutorial', 'Ask Arjun for a referral, worst case he says no'],
     people: [['Amma', 7, 6, 'Tells everyone I am a programmer already.'], ['Arjun (works at the company)', 30, 38, 'The referral I keep not asking for.'], ['Sara (bootcamp friend)', 21, 15, 'She got hers in March.']],
     voice: {
@@ -1014,6 +1025,7 @@ const DEMO_DEPTH = {
     target: 0.35
   },
   musician: {
+    sync: { type: 'milestone' },
     inbox: ['Track one is done enough. Move on', 'Book the open mic before the songs are ready', 'Stop buying pedals'],
     people: [['Marco (drummer)', 14, 3, 'Ready whenever I am.'], ['Mom', 21, 17, ''], ['Kai (runs the open mic)', 30, 44, 'Said just show up.']],
     voice: {
@@ -1031,6 +1043,7 @@ const DEMO_DEPTH = {
     target: 0.55
   },
   teacher: {
+    sync: { type: 'quantity_down', deadline: '2027-05-22', deadlineText: 'graduation' },
     inbox: ['Walk at lunch, the staff room is a trap', 'Buy the dress a size down, hang it up', 'Weigh once a week, not every morning'],
     people: [['Maya (my daughter)', 3, 0, 'The wedding is the whole why.'], ['Dee (walking partner)', 7, 2, 'Tuesdays and Thursdays.'], ['Dr. Bell', 90, 61, 'Bloodwork in the spring.']],
     voice: {
@@ -1272,7 +1285,17 @@ function buildDemoState(personaKey) {
     // paywall never appears (a persona is supposed to be a full, owned account).
     entitlements: { isPaid: true, paidAt: new Date().toISOString(), plan: 'demo' },
     checkins: demoCheckins,
-    clarity: { completed: true, completedAt: new Date().toISOString(), tutorialSeen: true, ignitedAt: Date.now() - 86400000, seenSummary: true, answers: { goalShape: { type: ((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress || {}).shape || 'quantity_up'), source: 'demo' }, neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
+    clarity: { completed: true, completedAt: new Date(Date.now() - 86400000 * 45).toISOString(), tutorialSeen: true, ignitedAt: Date.now() - 86400000 * 45, seenSummary: true, answers: { goalShape: (function () {
+      // v1287: the sync box picks its face from this. `sync` says which of the
+      // five this person's goal really is (a rate, a distance, a deadline, a
+      // rule, a set of milestones); progress.shape is the fallback.
+      var y = (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].sync) || {};
+      var g = { type: y.type || ((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress || {}).shape || 'quantity_up'), source: 'demo' };
+      if (y.deadline) g.deadline = y.deadline;
+      if (y.deadlineText) g.deadlineText = y.deadlineText;
+      if (y.cadence) g.cadence = y.cadence;
+      return g;
+    })(), neutronStar: p.neutronStar, coreWhy: p.coreWhy, whyItMatters: p.coreWhy, antiVision: p.antiVision, futureVision: p.futureVision, identityLine: p.identityLine, tensionLine: p.tensionLine || '', timeHorizon: '12 months', dailyTime: 90, intensity: 'heavy' } },
     // v1285 (Malik: "for the personas it should be as if I've already had
     // Memento for a while"). The NEW Action flow (js/30) reads state.actionPlan,
     // not the legacy primaryAction, so without a landed plan every persona
