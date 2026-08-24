@@ -5953,10 +5953,19 @@ function bindCommandCenter(cc) {
         setTimeout(() => { try { newBody.style.height = 'auto'; newBody.style.overflow = ''; newBody.style.transition = ''; newBody.style.opacity = ''; } catch (e) {} }, CC_RISE_MS + 40);
       }
     }));
+    // v1283 (Malik: tapping the star card opened Clarity's tutorial instead of
+    // his own star). A finished star always opens on the summary, never on the
+    // beginning of the module.
+    function _openClarityWhereTheyAre() {
+      try {
+        if (state.clarity && state.clarity.completed && ClarityExperience.openSummary) { ClarityExperience.openSummary(); return; }
+      } catch (e) {}
+      ClarityExperience.open();
+    }
     cc.querySelectorAll('[data-cc-action="didit"]').forEach(bindHomeActionHold);
     cc.querySelectorAll('[data-cc-action]').forEach(b => b.addEventListener('click', () => {
       const a = b.getAttribute('data-cc-action');
-      if (a === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
+      if (a === 'clarity' && typeof ClarityExperience !== 'undefined') _openClarityWhereTheyAre();
       else if (a === 'didit') return;
       else if (a === 'comeback') ComebackPicker.open();
       else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
@@ -5988,7 +5997,8 @@ function bindCommandCenter(cc) {
           // Star face -> Clarity, consistency face -> the Consistency module,
           // action face -> Action. One gesture, one meaning, per pillar.
           try {
-            if (_ccPillar === 'clarity' && typeof ClarityExperience !== 'undefined') ClarityExperience.open();
+            if (_ccPillar === 'clarity' && typeof ClarityExperience !== 'undefined') _openClarityWhereTheyAre();
+            else if (_ccPillar === 'consistency' && typeof ConsistencyPage !== 'undefined') ConsistencyPage.open();
             else if (_ccPillar === 'consistency' && typeof Sheet !== 'undefined') Sheet.open('streak');
             else if (typeof ActionExperience !== 'undefined') ActionExperience.open();
           } catch (e) {}
