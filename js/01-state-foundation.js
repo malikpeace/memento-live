@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1283';
+window.MEMENTO_JS_BUILD = 'v1284';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -129,6 +129,12 @@ const DEFAULT_STATE = {
   actionPlan: null,
   actionParts: { starHash: '', items: [] },
   actionRefine: { bucket: '', variant: '', updatedAt: '', answers: [] },
+  // Goal-retirement receipts are permanent merge tombstones. A stale device
+  // may still hold active-day rows from a goal that another device replaced;
+  // cloud sync uses these timestamps to reject only artifacts written before
+  // retirement. A later return to the same goal hash remains possible because
+  // newly written artifacts have newer timestamps.
+  goalRetirements: {},
   // Clarity notes (CLARITY-MERGE Phase 2 store, added in the foundation solo
   // window because js/01 is SHARED). One store, two windows: written in
   // Clarity page 3, latest shown read-only on the Memento card. Entries:
@@ -1721,7 +1727,7 @@ function migrateState() {
     const _clone = (v) => JSON.parse(JSON.stringify(v));
     const _isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
     if (!_isObj(state)) state = _clone(DEFAULT_STATE);
-    const objKeys = ['profile', 'dev', 'entitlements', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache', 'consistency'];
+    const objKeys = ['profile', 'dev', 'entitlements', 'clarity', 'action', 'streak', 'flow', 'mori', 'lifestats', 'reflection', 'deepwork', 'distraction', 'vivere', 'support', 'meta', 'ui', 'prefs', 'aiCache', 'consistency', 'goalRetirements'];
     objKeys.forEach(k => { if (!_isObj(state[k])) state[k] = _clone(DEFAULT_STATE[k] || {}); });
     if (!_isObj(state.clarity.answers)) state.clarity.answers = _clone(DEFAULT_STATE.clarity.answers);
     if (!Array.isArray(state.widgetOrder)) state.widgetOrder = _clone(DEFAULT_STATE.widgetOrder);
@@ -3141,16 +3147,32 @@ async function goalStateReset() {
         ]);
       }
     } catch (e) {}
-    // 2) Reset the goal-state fields, by name, from the defaults.
+    // 2) Seal the old goal before clearing it. This receipt is what lets a
+    //    different, stale device prove that its old active-day rows must not
+    //    come back during a later union merge.
+    try {
+      var retiredHash = String(
+        (state.actionPlan && state.actionPlan.starHash)
+        || (state.goalProgress && state.goalProgress.starHash)
+        || ''
+      );
+      if (retiredHash) {
+        if (!state.goalRetirements || typeof state.goalRetirements !== 'object' || Array.isArray(state.goalRetirements)) {
+          state.goalRetirements = {};
+        }
+        state.goalRetirements[retiredHash] = Math.max(Number(state.goalRetirements[retiredHash]) || 0, Date.now());
+      }
+    } catch (e) {}
+    // 3) Reset the goal-state fields, by name, from the defaults.
     state.action = JSON.parse(JSON.stringify(DEFAULT_STATE.action));
     state.goalProgress = { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [], shape: '', customMarks: [] };
     state.dayRecords = {};
     state.actionPlan = null;
     state.actionParts = { starHash: '', items: [] };
     state.actionRefine = { bucket: '', variant: '', updatedAt: '', answers: [] };
-    // 3) Derived structures recompute from the now-empty history.
+    // 4) Derived structures recompute from the now-empty history.
     try { if (typeof recalculateStreak === 'function') recalculateStreak(); } catch (e) {}
-    // 4) Persist: stamps bump, cloud adopts.
+    // 5) Persist: stamps bump, cloud adopts.
     try { persistNow(); } catch (e) {}
     try { console.info('[goalStateReset] goal state reset; accounts, payments, notes, and history untouched.'); } catch (e) {}
     return true;

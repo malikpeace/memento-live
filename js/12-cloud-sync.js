@@ -386,6 +386,108 @@ const CloudSync = (function () {
     return out;
   }
 
+  // Module clocks are intentionally independent. A reflection written at
+  // noon cannot make an unstamped, year-old Action plan beat a plan written
+  // on another device at 11:59. Missing stamps stay missing instead of
+  // borrowing meta.lastEditAt from an unrelated edit.
+  function moduleStamp(stamps, key) {
+    const n = Number(stamps && stamps[key]);
+    return isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function isPlainObject(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  // A tied clock normally prefers local. The only exception is observable
+  // storage damage: a healthy object/array repairs a null or wrong-shaped
+  // twin. Legitimate empty values, including a null Action plan after reset,
+  // remain valid and are never "repaired" back into old work.
+  const ARRAY_MODULES = new Set(['checkins', 'widgetOrder', 'hiddenWidgets', 'layoutPresets', 'inbox', 'updates', 'proofEvents']);
+  const NULLABLE_OBJECT_MODULES = new Set(['actionPlan']);
+  function moduleHealth(key, value) {
+    if (ARRAY_MODULES.has(key)) return Array.isArray(value) ? 2 : 0;
+    if (NULLABLE_OBJECT_MODULES.has(key) && value === null) return 2;
+    if (value === null || value === undefined) return 0;
+    if (typeof value === 'object') return isPlainObject(value) ? 2 : 0;
+    return 1;
+  }
+
+  function localModuleWins(key, localValue, cloudValue, lm, cm) {
+    const lt = moduleStamp(lm, key);
+    const ct = moduleStamp(cm, key);
+    if (lt !== ct) return lt > ct;
+    const lh = moduleHealth(key, localValue);
+    const ch = moduleHealth(key, cloudValue);
+    if (lh !== ch) return lh > ch;
+    return true;
+  }
+
+  function artifactTime(value, fallback) {
+    if (!value) return Number(fallback) || 0;
+    const candidates = [value.completedAt, value.at, value.ts, value.updatedAt, value.updated, value.date, value.day, value.iso];
+    for (let i = 0; i < candidates.length; i++) {
+      const raw = candidates[i];
+      const direct = Number(raw);
+      if (isFinite(direct) && direct > 0) return direct;
+      const parsed = typeof raw === 'string' ? Date.parse(raw) : NaN;
+      if (isFinite(parsed) && parsed > 0) return parsed;
+    }
+    return Number(fallback) || 0;
+  }
+
+  function mergeGoalRetirements(local, cloud) {
+    const out = {};
+    const add = (source) => {
+      Object.keys(isPlainObject(source) ? source : {}).forEach((hash) => {
+        const stamp = Number(source[hash]) || 0;
+        if (hash && stamp > (out[hash] || 0)) out[hash] = stamp;
+      });
+    };
+    add(local && local.goalRetirements);
+    add(cloud && cloud.goalRetirements);
+    return out;
+  }
+
+  function goalHashFromCompletion(entry, knownGoalHashes) {
+    if (!entry) return '';
+    const direct = String(entry.starHash || entry.goalHash || '');
+    if (direct) return direct;
+    const missionId = String(entry.missionId || '');
+    if (!missionId) return '';
+    const hashes = Object.keys(knownGoalHashes || {});
+    for (let i = 0; i < hashes.length; i++) {
+      if (missionId === hashes[i] || missionId === 'plan_' + hashes[i]) return hashes[i];
+    }
+    return '';
+  }
+
+  function activeGoalHash(state) {
+    return String(
+      (state && state.actionPlan && state.actionPlan.starHash)
+      || (state && state.goalProgress && state.goalProgress.starHash)
+      || ''
+    );
+  }
+
+  function retiredArtifact(hash, value, retirements, fallbackStamp) {
+    if (!retirements || typeof retirements !== 'object') return false;
+    let retiredAt = hash ? Number(retirements[hash]) || 0 : 0;
+    // Pre-Action-v2 completion rows did not always carry a goal hash. Once a
+    // chapter has been retired, any such legacy row written before the most
+    // recent retirement belongs to old active state and must not resurrect.
+    // Permanent history still lives in proofEvents, which is never filtered
+    // by this rule. A genuinely new legacy-shaped row has a later timestamp
+    // and therefore survives.
+    // Unknown legacy rows can never be assigned safely once any chapter has
+    // retired. Drop them regardless of their client timestamp: an old device
+    // with a clock set in the future must not bypass the chapter tombstone.
+    // Current clients always write a goal-identifying mission id, so genuinely
+    // new work remains attributable and is handled by the hash path above.
+    if (!hash && Object.keys(retirements).some((key) => (Number(retirements[key]) || 0) > 0)) return true;
+    return retiredAt > 0 && artifactTime(value, fallbackStamp) <= retiredAt;
+  }
+
   function buildMergedState(local, cloud) {
     const lm = (local.meta && local.meta.moduleEditAt) || {};
     const cm = (cloud.meta && cloud.meta.moduleEditAt) || {};
@@ -399,9 +501,7 @@ const CloudSync = (function () {
       const inC = Object.prototype.hasOwnProperty.call(cloud, k);
       if (!inL) { merged[k] = cloud[k]; return; }
       if (!inC) { merged[k] = local[k]; return; }
-      const lt = lm[k] || lGlobal;
-      const ct = cm[k] || cGlobal;
-      merged[k] = (ct > lt) ? cloud[k] : local[k]; // ties prefer local
+      merged[k] = localModuleWins(k, local[k], cloud[k], lm, cm) ? local[k] : cloud[k];
     });
     // meta: the newer side wholesale, then per-key stamp maxima so the next
     // device to merge sees the combined history.
@@ -414,16 +514,16 @@ const CloudSync = (function () {
     merged.meta.lastEditAt = Math.max(lGlobal, cGlobal);
     // Append-only data unions, so newest-module-wins can never drop the other
     // device's notes, proof, check-ins, or streak history.
-    try { merged.reflection = mergeReflection(local.reflection, cloud.reflection, (lm.reflection || lGlobal) >= (cm.reflection || cGlobal)); } catch (e) {}
+    try { merged.reflection = mergeReflection(local.reflection, cloud.reflection, moduleStamp(lm, 'reflection') >= moduleStamp(cm, 'reflection')); } catch (e) {}
     try {
-      const lNewer = (lm.proofEvents || lGlobal) >= (cm.proofEvents || cGlobal);
+      const lNewer = moduleStamp(lm, 'proofEvents') >= moduleStamp(cm, 'proofEvents');
       merged.proofEvents = unionByKey(lNewer ? local.proofEvents : cloud.proofEvents, lNewer ? cloud.proofEvents : local.proofEvents, (ev) => ev && (ev.id || (String(ev.ts) + '|' + (ev.type || ''))), 1000);
     } catch (e) {}
     try {
-      const lNewer = (lm.checkins || lGlobal) >= (cm.checkins || cGlobal);
+      const lNewer = moduleStamp(lm, 'checkins') >= moduleStamp(cm, 'checkins');
       merged.checkins = unionByKey(lNewer ? local.checkins : cloud.checkins, lNewer ? cloud.checkins : local.checkins, (x) => x && x.iso, 800);
     } catch (e) {}
-    try { merged.streak = mergeStreak(local.streak, cloud.streak, (lm.streak || lGlobal) >= (cm.streak || cGlobal)); } catch (e) {}
+    try { merged.streak = mergeStreak(local.streak, cloud.streak, moduleStamp(lm, 'streak') >= moduleStamp(cm, 'streak')); } catch (e) {}
     // THE MERGE foundation (2026-08-19): unions for the new stores.
     // Clarity notes: union entries by id, union tombstones, and a tombstoned
     // id NEVER re-enters entries on any device (the zombie-note rule).
@@ -492,15 +592,37 @@ const CloudSync = (function () {
         });
       }
     } catch (e) {}
+    // Goal retirement is a broader tombstone than a single completion undo.
+    // It prevents a stale device from unioning an old goal's active records
+    // back after another device started a new chapter. Permanent proof events
+    // are deliberately not filtered: history remains history.
+    const _retirements = mergeGoalRetirements(local, cloud);
+    merged.goalRetirements = _retirements;
+    try {
+      merged.meta.moduleEditAt.goalRetirements = Math.max(
+        moduleStamp(lm, 'goalRetirements'),
+        moduleStamp(cm, 'goalRetirements')
+      );
+    } catch (e) {}
+    const _activeHash = activeGoalHash(merged);
+    const _knownGoalHashes = Object.assign({}, _retirements);
+    [activeGoalHash(local), activeGoalHash(cloud), _activeHash].forEach((hash) => {
+      if (hash) _knownGoalHashes[hash] = _knownGoalHashes[hash] || 0;
+    });
     // Day records: union by day key; a day both devices wrote keeps the copy
     // from the side whose action module edited more recently. An undone day
     // ('day:<key>' tombstoned) is dropped from the union entirely.
     try {
-      const lNewer = (lm.action || lGlobal) >= (cm.action || cGlobal);
+      const lNewer = moduleStamp(lm, 'dayRecords') >= moduleStamp(cm, 'dayRecords');
       const base = lNewer ? (local.dayRecords || {}) : (cloud.dayRecords || {});
       const other = lNewer ? (cloud.dayRecords || {}) : (local.dayRecords || {});
       const dr = Object.assign({}, other, base);
-      Object.keys(dr).forEach((k) => { if (_tombs['day:' + k]) delete dr[k]; });
+      Object.keys(dr).forEach((k) => {
+        const row = dr[k];
+        const hash = String((row && (row.starHash || row.goalHash)) || '');
+        const staleChapter = _activeHash && hash && hash !== _activeHash;
+        if (_tombs['day:' + k] || staleChapter || retiredArtifact(hash, row, _retirements, 0)) delete dr[k];
+      });
       merged.dayRecords = dr;
     } catch (e) {}
     // completionHistory is the app's activity spine (12 external readers):
@@ -510,13 +632,18 @@ const CloudSync = (function () {
       if (merged.action && (local.action || cloud.action)) {
         const la = (local.action && local.action.completionHistory) || [];
         const ca = (cloud.action && cloud.action.completionHistory) || [];
-        const lNewer = (lm.action || lGlobal) >= (cm.action || cGlobal);
+        const lNewer = moduleStamp(lm, 'action') >= moduleStamp(cm, 'action');
         merged.action.completionHistory = unionByKey(
           lNewer ? la : ca, lNewer ? ca : la,
           (h) => h && (h.id || h.missionId ? String(h.id || '') + '|' + String(h.missionId || '') + '|' + String(h.completedAt || h.date || '') : null),
           1200
         // v1210: ...minus anything an undo removed on either device.
-        ).filter((h) => !(h && h.id && _tombs[h.id]));
+        ).filter((h) => {
+          if (h && h.id && _tombs[h.id]) return false;
+          const hash = goalHashFromCompletion(h, _knownGoalHashes);
+          const staleChapter = _activeHash && hash && hash !== _activeHash;
+          return !staleChapter && !retiredArtifact(hash, h, _retirements, 0);
+        });
       }
     } catch (e) {}
     return merged;
