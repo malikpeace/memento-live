@@ -4685,15 +4685,22 @@ html.theme-light .n7d-day--dip.is-in .n7d-node {
   display: flex; gap: 8px; justify-content: center;
   pointer-events: none; z-index: 3;
 }
+/* v1286 (Malik): the SAME position, in Action's shape. The page you are on
+   wears a short pill instead of a lit circle, which reads as position rather
+   than decoration. Geometry matches .afl-dots in css/action.css (5px tall,
+   5 -> 14 wide) so the two modules speak one language. The accent stays: this
+   is Clarity's own colour, and only the shape was borrowed. */
 .clarity-pager__dots i {
-  width: 7px; height: 7px; border-radius: 50%;
+  width: 5px; height: 5px; border-radius: 999px;
   background: rgba(255, 255, 255, 0.22);
-  transition: background 0.25s ease, box-shadow 0.25s ease;
+  transition: width 0.28s var(--ease-out, cubic-bezier(0.16,1,0.3,1)), background 0.25s ease, box-shadow 0.25s ease;
 }
 .clarity-pager__dots i.is-on {
+  width: 14px;
   background: var(--cp-acc);
   box-shadow: 0 0 10px var(--cp-acc-ring);
 }
+@media (prefers-reduced-motion: reduce) { .clarity-pager__dots i { transition: none; } }
 
 /* the nebula: the SHIPPED .clarity-exp__neb1/2 classes by reference, never a
    copy. This is only their positioning host. */

@@ -1052,6 +1052,21 @@
     d.appendChild(el('i'));
     return d;
   }
+  // THE DOTS DO NOT TRAVEL (v1286, Malik on-device: "make sure they stay there
+  // locked but just show their position, like the way the clarity module dots
+  // are locked in place"). They used to sit inside the nav, which lives in the
+  // column that translates with the finger, so they slid off the screen with
+  // the page they belonged to. Mounted on the ROOM instead (the .afl root, the
+  // one element the drag never transforms), one pair for both pages: the shape
+  // still tracks --afl-pg, the position never moves.
+  // Preview builds get none: the page being dragged in must not carry a second,
+  // mirrored pair underneath the real one.
+  function mountDots(col, into, active) {
+    if (into) return;
+    var d = pageDots(active);
+    var room = col && col.parentNode;
+    if (room) room.appendChild(d);
+  }
   function cta(label) {
     var b = btn('afl-cta');
     b.appendChild(el('span', 'afl-cta__fill'));
@@ -3121,7 +3136,7 @@
     // pager does: the reference view (from the M, from the swipe, from a
     // resume) and the preview build that is literally being dragged. The
     // first-visit page has no second page and gets no dots.
-    if (refOnly) nav.appendChild(pageDots(0));
+    if (refOnly) mountDots(col, opts.into, 0);
     col.appendChild(nav);
 
     if (refOnly) {
@@ -4097,7 +4112,7 @@
     // the dots sit UNDER the button, in the nav's own bottom padding, so the
     // standing button geometry is untouched. The day is the SECOND page (logic
     // is to its left), so the second dot is home.
-    nav.appendChild(pageDots(1));
+    mountDots(col, opts.into, 1);
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------

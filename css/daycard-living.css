@@ -1163,3 +1163,36 @@ body.mfe-open #dayCard .daycard-wrap[data-skin][data-skin-ring="1"].daycard-them
 .daycard-wrap[data-skin-minimal="1"] .daycard-ns {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26) !important;
 }
+/* WHAT THE PICKER SHOWS IS WHAT THEY LEAVE WITH (v1286, Malik: "inside that
+   viewer... it looks EXACTLY like how their memento is going to look").
+   The two view surfaces force the ring visible through an ID selector above,
+   which outranks every rule in this block, so Minimal kept its ring in the
+   editor and lost it the moment the person tapped Done. The preview is not a
+   picture of the card, it IS the card, so the rider has to win on both
+   surfaces. Same selector weight as the rules it corrects, and only ever when
+   Minimal is actually on. */
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns__rim,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns__rim,
+body.mf-open #dayCard .daycard-wrap[data-skin][data-skin-minimal="1"] .daycard-ns__rim,
+body.mfe-open #dayCard .daycard-wrap[data-skin][data-skin-minimal="1"] .daycard-ns__rim {
+  opacity: 0 !important;
+  box-shadow: none !important;
+}
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns::before,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns::before,
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns__burn,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns__burn,
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-wrap__aura,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-wrap__aura,
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-bloom,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-bloom,
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-floor,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-floor {
+  opacity: 0 !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+body.mf-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns,
+body.mfe-open #dayCard .daycard-wrap[data-skin-minimal="1"] .daycard-ns {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.26) !important;
+}

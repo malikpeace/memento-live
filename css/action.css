@@ -4957,9 +4957,12 @@ html.theme-light .afl--cine {
    other page), which the page snap writes every frame. No second animation to
    keep in step with the pages, and no accent colour: ink only. */
 .afl-dots {
+  /* v1286: mounted on the ROOM, not the column, so the drag cannot carry them
+     off screen (see mountDots in js/30). Above the incoming page (.afl-pg is
+     z-index 6) because the pair is shared by both pages now. */
   position: absolute; left: 0; right: 0; bottom: calc(var(--safe-b, 0px) + 9px);
   display: flex; gap: 6px; align-items: center; justify-content: center;
-  pointer-events: none; z-index: 2;
+  pointer-events: none; z-index: 7;
 }
 .afl-dots i {
   --w: 0;

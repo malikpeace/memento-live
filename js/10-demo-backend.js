@@ -363,6 +363,88 @@ const DEMO_PERSONAS = {
     reflections: ['Faculty potluck and I logged it anyway. Honesty is the diet.', 'Walked the track while the kids ran drills. Steps are everywhere when you look.', 'Down a size. Bought nothing. The graduation dress is the prize.'],
     distractions: [['Grading spiral', 'Graded until ten and skipped the walk'], ['Snack drawer', 'The break room donuts won round one, not round two']]
   },
+  screentime: {
+    name: 'Nia', birthYear: 1997, pattern: 'streaky',
+    neutronStar: 'Cut my screen time under 2 hours a day and get my evenings back',
+    coreWhy: 'I am losing hours I will never see again to a machine I am not even enjoying, and I want my own attention back.',
+    antiVision: 'Another year where every evening dissolves and I could not tell you into what.',
+    futureVision: 'Evenings that feel long again. Finishing books. Being somewhere without checking anything.',
+    identityLine: 'I decide what has my attention.',
+    tensionLine: 'This was never about the phone. It is about being present for your own life.',
+    action: {
+      title: 'Put the phone on the kitchen charger for the night',
+      why: 'The bedroom hour is the biggest single block, and it is the easiest one to end.',
+      howToStart: 'Plug it in now, in the kitchen, before you sit down for the evening.',
+      recommendedWhy: 'One protected hour is enough to feel the evening get longer, without white-knuckling the whole day.',
+      tiers: { tiny: 'Phone face down for fifteen minutes', light: 'Thirty minutes in another room', moderate: 'Put the phone on the kitchen charger for the night', heavy: 'A phone-free evening from dinner onward', extreme: 'A full phone-free evening and morning' },
+      path: [{ horizon: 'This week', milestone: 'The phone sleeps in the kitchen' }, { horizon: 'Month 1', milestone: 'Under three hours a day' }, { horizon: 'Month 3', milestone: 'Under two hours, most days' }, { horizon: 'Month 6', milestone: 'Evenings that feel long again' }],
+      linkedProjectId: 'pj_st1', linkedMilestoneId: 'ms_st1b',
+      projects: [
+        { id: 'pj_st1', title: 'Take the evenings back', why: 'The evening is where the hours actually go.', goalLinked: true, milestones: [
+          { id: 'ms_st1a', title: 'The phone charges outside the bedroom', horizon: 'This week', done: true },
+          { id: 'ms_st1b', title: 'One phone-free hour every evening', horizon: 'Month 1', done: false },
+          { id: 'ms_st1c', title: 'A whole weekend under two hours', horizon: 'Month 3', done: false },
+          { id: 'ms_st1d', title: 'Under two hours as the normal day', horizon: 'Month 6', done: false } ] },
+        { id: 'pj_st2', title: 'Fill the space with something real', why: '', goalLinked: true, milestones: [
+          { id: 'ms_st2a', title: 'Finish one book', horizon: 'Month 1', done: true },
+          { id: 'ms_st2b', title: 'One evening a week out of the house', horizon: 'Month 1', done: false },
+          { id: 'ms_st2c', title: 'A hobby that needs both hands', horizon: 'Month 3', done: false },
+          { id: 'ms_st2d', title: 'A weekend away with the phone in a drawer', horizon: 'Month 6', done: false } ] } ]
+    },
+    reflections: ['Left it in the kitchen and read for an hour. The evening was so much longer than I remembered.', 'Picked it up out of habit, put it down without unlocking. That is new.', 'Four hours today. Wrote it down anyway. Hiding the number is how the last attempt died.'],
+    distractions: [['Instagram', 'Opened it in the middle of a conversation'], ['Bed scroll', 'Forty minutes I had already decided not to spend']],
+    vivere: {
+      memories: [
+        { text: 'Read on the balcony until it got too dark to see the page. Did not check anything once.', category: 'peace', mood: 'calm', age: 3 },
+        { text: 'Dinner with Rachel where neither of us touched a phone. Talked for three hours.', category: 'connection', mood: 'warm', person: 'Rachel', age: 9 },
+        { text: 'Walked home the long way with no headphones. The city sounded different.', category: 'novelty', mood: 'awake', age: 17 },
+        { text: 'Noticed I had not thought about my phone all afternoon. That used to be normal.', category: 'meaning', mood: 'moved', age: 24 }
+      ],
+      alive: [['Read twelve books this year', 'year'], ['One evening a week with no screen at all', 'week'], ['Learn to develop film', 'season'], ['A week somewhere with no signal', 'life']],
+      categories: { connection: 4, beauty: 3, play: 2, awe: 1, peace: 5, body: 2, meaning: 3, novelty: 2 }
+    }
+  },
+  weight: {
+    name: 'Marcus', birthYear: 1988, pattern: 'steady',
+    neutronStar: 'Lose 60 pounds and keep it off this time',
+    coreWhy: 'I have three kids and I want to be the dad who plays, not the one who watches from the bench and says maybe later.',
+    antiVision: 'Losing it again, gaining it again, and being fifty before I stop starting over.',
+    futureVision: 'Keeping up with my kids without thinking about it, and clothes I do not have to plan around.',
+    identityLine: 'I keep what I earn.',
+    tensionLine: 'This was never about the weight. It is about being there for the parts you cannot get back.',
+    action: {
+      title: 'Walk for forty minutes after dinner',
+      why: 'Evening is where every previous attempt fell apart, so that is where the plan lives.',
+      howToStart: 'Shoes on and out the door before you sit down. The first two minutes are the whole fight.',
+      recommendedWhy: 'Forty minutes clears the daily gap without needing a gym or a single free hour you do not have.',
+      tiers: { tiny: 'Walk to the corner and back', light: 'A fifteen minute walk', moderate: 'Walk for forty minutes after dinner', heavy: 'Forty minutes plus the meal log done before eating', extreme: 'A full hour, logged, plus tomorrow’s lunch packed' },
+      path: [{ horizon: 'This week', milestone: 'Five walks and every meal logged' }, { horizon: 'Month 1', milestone: 'Down 5 more, no diet started' }, { horizon: 'Month 3', milestone: 'Under 260 and still walking' }, { horizon: 'Month 12', milestone: '236 and it holds' }],
+      linkedProjectId: 'pj_w1', linkedMilestoneId: 'ms_w1b',
+      projects: [
+        { id: 'pj_w1', title: 'A gap I can keep', why: 'The losing was never the problem. The keeping was.', goalLinked: true, milestones: [
+          { id: 'ms_w1a', title: 'Thirty days of the walk, no exceptions', horizon: 'This week', done: true },
+          { id: 'ms_w1b', title: 'Guess a day within 200 calories', horizon: 'Month 1', done: false },
+          { id: 'ms_w1c', title: 'Under 260 pounds', horizon: 'Month 3', done: false },
+          { id: 'ms_w1d', title: 'A full year without regaining', horizon: 'Month 12', done: false } ] },
+        { id: 'pj_w2', title: 'Be in it with the kids', why: '', goalLinked: true, milestones: [
+          { id: 'ms_w2a', title: 'Play a full game without sitting down', horizon: 'This week', done: true },
+          { id: 'ms_w2b', title: 'Bike ride with all three, no stops', horizon: 'Month 1', done: true },
+          { id: 'ms_w2c', title: 'Coach one season', horizon: 'Month 3', done: false },
+          { id: 'ms_w2d', title: 'Hike the state park trail together', horizon: 'Month 12', done: false } ] } ]
+    },
+    reflections: ['Birthday party, ate the cake, logged the cake. Nothing to make up for tomorrow.', 'Twenty-five down and it has stayed down ten months. That has never happened before.', 'Skipped the walk twice this week. Not a spiral, just a fact. Back out tomorrow.'],
+    distractions: [['Late night kitchen', 'Ate standing up without deciding to'], ['Drive-thru', 'Kids had practice, I had a burger I did not want']],
+    vivere: {
+      memories: [
+        { text: 'Ran the whole soccer field with Eli and did not have to stop. He did not even notice. I did.', category: 'body', mood: 'proud', person: 'Eli', age: 5 },
+        { text: 'Sat on the porch after the walk and watched it get dark. Nobody needed anything.', category: 'peace', mood: 'calm', age: 11 },
+        { text: 'My daughter asked if I wanted to bike to the park instead of drive. I said yes without doing the math first.', category: 'connection', mood: 'warm', person: 'Ava', age: 19 },
+        { text: 'Old jacket fit. Stood in the closet like an idiot for a minute.', category: 'meaning', mood: 'moved', age: 30 }
+      ],
+      alive: [['Coach one of their teams', 'year'], ['Bike to the park every Saturday', 'week'], ['Hike the state park trail with all three', 'season'], ['Dance at their weddings', 'life']],
+      categories: { connection: 5, beauty: 2, play: 4, awe: 1, peace: 3, body: 5, meaning: 3, novelty: 1 }
+    }
+  },
 };
 
 
@@ -379,7 +461,439 @@ const DEMO_PERSONAS = {
      target    the Consistency bar they set for themselves, matched to how
                they really live (a 3x-a-week runner aims at ~45%, not 90%).
    Every value is fiction, written to be believable, never scraped. */
+/* ── PER-PERSON LOGIC (v1286, Malik: "their own custom very in depth logic
+   page inside of action as well as different weights of actions").
+   This is what the Action logic page renders: the commitment, the arrow, the
+   acts with their reasons, the refusals, the math, and the questions. Every
+   number here is arithmetic on that persona's own progress numbers, so the
+   page holds up when you read it. `sizes` is the weight ladder: a runner
+   measures miles, a writer words, a barber cuts. Fiction, written to be
+   believable, never scraped. */
+const DEMO_LOGIC = {
+  creator: {
+    commitment: 'You said the week dies at the script, not the camera. So the plan aims there and nowhere else. One script gets written before anything else is touched.',
+    arrow: { from: '8,400 subscribers', to: '100,000' },
+    acts: [
+      { role: 'star', text: 'Write the first draft of this week’s video script', reason: 'you said the script is the bottleneck and everything downstream waits on it', doneWhen: 'a full rough draft exists, bad is fine', starter: 'open a blank doc and write the worst opening line you can.' },
+      { role: 'support', text: 'Draft the thumbnail while the script is still warm', reason: 'you said thumbnails get skipped when you are tired at the end' },
+      { role: 'support', text: 'Analytics stay closed until the video is up', reason: 'you named opening analytics before noon as the thing that eats the morning' }
+    ],
+    noList: ['analytics before the work', 'buying gear you do not need yet', 'a new format every week'],
+    nonNegotiables: { candidates: ['The script gets written before anything else', 'One video goes up every week, ready or not', 'Analytics stay closed until it is posted', 'Twenty minutes minimum on the worst days', 'No new gear until fifty videos are live', 'The upload day never moves'], chosen: [] },
+    eq: {
+      rows: [
+        { label: 'Subscribers today', value: '8,400', source: 'said' },
+        { label: 'Videos you shipped in 90 days', value: '11', source: 'said' },
+        { label: 'Weeks in the year ahead', value: '52', source: 'fact' }
+      ],
+      compute: [{ expr: '(100000 - 8400) / 52', label: '91,600 more, spread over 52 videos', approx: 1761, shown: '≈ 1,760 each' }],
+      result: { label: 'What one video has to earn', value: '≈ 1,760 subscribers' }
+    },
+    reasoning: [
+      'That number is the honest one, and it is bigger than your average video today. It is not a verdict. It is the reason the plan is one video a week instead of one when it feels ready: you cannot find the format that earns 1,760 without shipping enough tries to learn what works.',
+      'So the week has one job. The script exists by Wednesday, the thumbnail rides on its back while you still care, and the analytics tab stays shut until the thing is public. Do that fifty-two times and the format finds you. Skip the script and the whole week quietly disappears, which is exactly what the last three years looked like.'
+    ],
+    qas: [
+      { q: 'Why the script and not the editing?', a: 'Editing is work you can always do. A script is the only part that cannot be borrowed, faked, or rushed at midnight. When it exists, the rest of the week is labour instead of a decision.' },
+      { q: 'What if the video flops?', a: 'Then you learn something for 1,760 next time. A flop with a published link teaches more than a perfect draft in a private folder.' },
+      { q: 'What does a normal day look like?', a: 'One move on the screen and a hold when it is done. Script days are heavier than thumbnail days, which is why the size ladder exists.' }
+    ],
+    sizes: { unit: 'min', ladder: [15, 30, 45, 60, 90], named: [30, 45, 60], estMinPerUnit: null, fmt: 'min' },
+    close: { cadence: 'weekly', kind: 'num', prompt: 'Subscribers', unit: '', prefix: '', decimals: false, source: 'Asked once a week, after the upload.', choices: null, tail: 'today.' },
+    checkpoint: 'four videos',
+    sendWindow: 'morning',
+    restLine: 'The script can wait until tomorrow. The week cannot.'
+  },
+
+  founder: {
+    commitment: 'You said the product is fine and nobody knows it exists. So the plan is attention and conversations, not code. The scary half is the half that moves the number.',
+    arrow: { from: '62 paying users', to: '100' },
+    acts: [
+      { role: 'star', text: 'Talk to three users about why they signed up', reason: 'you said you guess at what people want instead of asking', doneWhen: 'three real replies exist, not three sent messages', starter: 'send one message to the last person who signed up.' },
+      { role: 'support', text: 'Rewrite one line of the pricing page like a human', reason: 'you said the churned user blamed onboarding, not price' },
+      { role: 'support', text: 'No refactoring until the selling is done', reason: 'you named refactoring the admin panel as the avoidance' }
+    ],
+    noList: ['refactoring before selling', 'building for a user who has not asked', 'checking Stripe instead of talking to people'],
+    nonNegotiables: { candidates: ['Three user conversations every week', 'Selling happens before building, every day', 'No new feature without a person who asked for it', 'One message minimum on the worst days', 'No refactoring the admin panel this quarter', 'The churn reason gets written down every time'], chosen: [] },
+    eq: {
+      rows: [
+        { label: 'Paying users today', value: '62', source: 'said' },
+        { label: 'Trials starting each week', value: '18', source: 'said' },
+        { label: 'Trials that convert', value: '22%', source: 'estimate' }
+      ],
+      compute: [{ expr: '(100 - 62) / (18 * 0.22)', label: '38 more, at about 4 conversions a week', approx: 9.6, shown: '≈ 10 weeks' }],
+      result: { label: 'Weeks to 100 at today’s rate', value: '≈ 10' }
+    },
+    reasoning: [
+      'Ten weeks assumes nothing improves. It is the floor, not the forecast. Every conversation you have moves the 22% because you stop guessing what the onboarding breaks and start knowing it.',
+      'That is why the daily move is talking to people and not shipping. Shipping feels like progress and produces a changelog. Conversations feel uncomfortable and produce the sentence that fixes the funnel. You already know which one you avoid.'
+    ],
+    qas: [
+      { q: 'Why conversations instead of features?', a: 'Sixty-two people already paid you. They know exactly why they stayed and what nearly stopped them. That is the most valuable data you will ever get, and it costs a message.' },
+      { q: 'What if nobody replies?', a: 'Then the message is the problem and you have learned something on day one. Rewrite it and send it to the next three.' },
+      { q: 'When do I get to build again?', a: 'After the selling. Not instead of it. The plan does not ban building, it just refuses to let it go first.' }
+    ],
+    sizes: { unit: 'conversations', ladder: [1, 2, 3, 5], named: [1, 3, 5], estMinPerUnit: 20, fmt: 'plain' },
+    close: { cadence: 'daily', kind: 'num', prompt: 'Paying users', unit: '', prefix: '', decimals: false, source: 'Asked once a day, whenever you check.', choices: null, tail: 'today.' },
+    checkpoint: 'two weeks',
+    sendWindow: 'morning',
+    restLine: 'Nothing is on fire. See you tomorrow.'
+  },
+
+  student: {
+    commitment: 'You said you know what to do and do none of it. So the plan does not teach you studying. It moves the work one day earlier, which is the only change that kills the panic.',
+    arrow: { from: '3.55 GPA', to: '3.8 by finals' },
+    acts: [
+      { role: 'star', text: 'Do tomorrow’s reading before tonight', reason: 'you said the panic comes from being one day behind, every day', doneWhen: 'tomorrow’s pages are read, notes optional', starter: 'put the textbook on the desk and read one page.' },
+      { role: 'support', text: 'Phone in the other room while you read', reason: 'you said you lose the hour without noticing' },
+      { role: 'support', text: 'Same sleep and wake time, weekends included', reason: 'you said the all-nighters are what break the following week' }
+    ],
+    noList: ['all-nighters', 'starting an assignment the night it is due', 'studying with the phone on the desk'],
+    nonNegotiables: { candidates: ['Tomorrow’s reading happens tonight', 'The phone is in another room while studying', 'Lights out at the same time, weekends included', 'Ten minutes minimum on dead days', 'No assignment started the night before', 'Sunday plans the week'], chosen: [] },
+    eq: {
+      rows: [
+        { label: 'Your GPA right now', value: '3.55', source: 'said' },
+        { label: 'Credits already banked', value: '48', source: 'said' },
+        { label: 'Credits left this year', value: '30', source: 'said' }
+      ],
+      compute: [{ expr: '(3.8 * 78 - 3.55 * 48) / 30', label: 'What the remaining 30 credits must average', approx: 4.2, shown: '≈ 4.2' }],
+      result: { label: 'The honest read', value: '3.8 needs a perfect year' }
+    },
+    reasoning: [
+      'The math says something you did not want to hear: from 3.55 with 48 credits banked, a 3.8 overall needs better than a 4.0 on everything left. It is not reachable this year. It is reachable the year after, and the number that gets you there is the same number that gets you through this one.',
+      'So Memento holds the real target and the real path at once. Be one day ahead in every class, sleep on a schedule, and let the grade be the result instead of the plan. The goal moves to a date the arithmetic allows, and nothing about today changes.'
+    ],
+    qas: [
+      { q: 'So the goal is impossible?', a: 'This year, at 3.8 overall, yes. Memento will not pretend otherwise. The work is identical either way, which is why the daily move did not change.' },
+      { q: 'Why reading and not practice problems?', a: 'Because reading is what you skip, and skipping it is what makes the problems take three hours instead of one.' },
+      { q: 'What about the body half of the goal?', a: 'It is on the same clock. The sleep rule is doing double duty: it is the study plan and the training plan at the same time.' }
+    ],
+    sizes: { unit: 'min', ladder: [10, 25, 50, 75], named: [25, 50], estMinPerUnit: null, fmt: 'min' },
+    close: { cadence: 'weekly', kind: 'num', prompt: 'GPA', unit: '', prefix: '', decimals: true, source: 'Asked when grades post.', choices: null, tail: 'right now.' },
+    checkpoint: 'midterms',
+    sendWindow: 'evening',
+    restLine: 'Sleep is the assignment tonight.'
+  },
+
+  runner: {
+    commitment: 'You said you run hard on good days and nothing on bad ones. A marathon does not care about good days. The plan trades intensity for a rhythm that survives a bad week.',
+    arrow: { from: '5:00 marathon', to: 'under 4:00 in October' },
+    acts: [
+      { role: 'star', text: 'Run today’s prescribed miles at conversation pace', reason: 'you said every run turns into a race and then you need three days off', doneWhen: 'the distance happened, slow counts', starter: 'shoes on, out the door, first half mile easy.' },
+      { role: 'support', text: 'Lay tomorrow’s kit out tonight', reason: 'you said the morning decision is where the run dies' },
+      { role: 'support', text: 'Long run gets its own day, protected', reason: 'you said weekends disappear and the long run goes first' }
+    ],
+    noList: ['racing your easy runs', 'adding miles because you feel good', 'skipping the long run to catch up on sleep'],
+    nonNegotiables: { candidates: ['Easy runs stay easy, no exceptions', 'The long run owns Sunday', 'Kit is out the night before', 'One mile minimum on a dead day', 'No new mileage jumps over 10% a week', 'Every run gets logged the same day'], chosen: [] },
+    eq: {
+      rows: [
+        { label: 'Marathon distance', value: '26.2 mi', source: 'fact' },
+        { label: 'Your goal time', value: '4:00:00', source: 'said' },
+        { label: 'Your easy pace now', value: '10:30 / mi', source: 'said' }
+      ],
+      compute: [{ expr: '240 / 26.2', label: '240 minutes over 26.2 miles', approx: 9.16, shown: '≈ 9:09 / mi' }],
+      result: { label: 'Race pace you are training toward', value: '9:09 per mile' }
+    },
+    reasoning: [
+      'Nine minutes nine seconds, for twenty-six straight miles. You get there by running most of your weeks slower than that, not faster. The easy pace builds the engine; the race pace only shows up on race day and in a handful of workouts.',
+      'That is why the plan puts four days on the calendar instead of six, and why the star act says conversation pace. Your pattern is a hard run, three days sore, one missed week. Four honest days beats six ambitious ones every single time in October.'
+    ],
+    qas: [
+      { q: 'Four days is not enough, is it?', a: 'It is, at your history. Six days is enough for someone who has never had to take three days off. Memento plans for the runner you are, and moves the number when the evidence moves.' },
+      { q: 'What if I miss the long run?', a: 'The week still counts. One missed long run is a data point, four in a row is a different plan. Memento is watching for the second one, not the first.' },
+      { q: 'When does the pace work start?', a: 'After eight weeks of the boring version. That is the checkpoint on this plan.' }
+    ],
+    sizes: { unit: 'mi', ladder: [2, 4, 6, 10, 16], named: [4, 6, 10], estMinPerUnit: 10, fmt: 'plain' },
+    close: { cadence: 'daily', kind: 'num', prompt: 'Miles', unit: 'mi', prefix: '', decimals: true, source: 'Asked after every run.', choices: null, tail: 'today.' },
+    checkpoint: 'eight weeks',
+    sendWindow: 'morning',
+    restLine: 'Rest is the training today.'
+  },
+
+  writer: {
+    commitment: 'You said you rewrite chapter one instead of writing chapter twelve. So the plan measures words added, never words polished. The draft gets finished ugly.',
+    arrow: { from: '41,200 words', to: '80,000 by New Year’s Eve' },
+    acts: [
+      { role: 'star', text: 'Add new words to the draft, forward only', reason: 'you said editing the opening is how you avoid the middle', doneWhen: 'the word count is higher than it was this morning', starter: 'open the file, go to the very end, write one sentence.' },
+      { role: 'support', text: 'Leave a note for tomorrow before you close the file', reason: 'you said starting cold is the hardest part of the day' },
+      { role: 'support', text: 'No reading back further than yesterday', reason: 'you said one reread turns into a week of rewriting' }
+    ],
+    noList: ['rewriting chapter one', 'reading it back from the start', 'researching instead of drafting'],
+    nonNegotiables: { candidates: ['New words before edited words', 'The file opens at the end, never the start', 'A note for tomorrow before closing', 'Fifty words minimum on the worst day', 'No rereading past yesterday', 'The count gets logged the same night'], chosen: [] },
+    eq: {
+      rows: [
+        { label: 'Words written', value: '41,200', source: 'said' },
+        { label: 'The draft you promised', value: '80,000', source: 'said' },
+        { label: 'Days until New Year’s Eve', value: '129', source: 'fact' }
+      ],
+      compute: [{ expr: '(80000 - 41200) / 129', label: '38,800 words over 129 days', approx: 300.8, shown: '≈ 300 a day' }],
+      result: { label: 'Words a day from here', value: '≈ 300' }
+    },
+    reasoning: [
+      'Three hundred words is a page. It is twenty minutes on a good day and forty on a bad one, and it is the whole plan. The number is small on purpose: a target you can hit while tired is the only kind that survives December.',
+      'The rest of the plan exists to protect those three hundred. The note for tomorrow removes the cold start. The no-rereading rule removes the trapdoor. If you write 300 ugly words a day from here, the draft is done before the year is.'
+    ],
+    qas: [
+      { q: 'What if the words are bad?', a: 'They will be. A finished bad draft can be fixed in February. An unfinished good one cannot be fixed at all.' },
+      { q: 'Can I edit at all?', a: 'After the draft is done, freely. Before then, only the paragraph you are standing in.' },
+      { q: 'What if I miss a day?', a: 'The number recalculates and Memento tells you the truth. Nothing gets hidden and nothing gets punished.' }
+    ],
+    sizes: { unit: 'words', ladder: [100, 300, 600, 1000, 2000], named: [300, 600, 1000], estMinPerUnit: null, fmt: 'plain' },
+    close: { cadence: 'daily', kind: 'num', prompt: 'Total words', unit: '', prefix: '', decimals: false, source: 'Asked every night.', choices: null, tail: 'in the draft.' },
+    checkpoint: 'two weeks',
+    sendWindow: 'evening',
+    restLine: 'The draft keeps. See you tomorrow.'
+  }
+};
+
+DEMO_LOGIC.barber = {
+  commitment: 'You said the chair is full some weeks and empty others. The plan does not chase more customers. It makes the ones you already cut come back on a date instead of whenever they remember.',
+  arrow: { from: '$7,350 a month', to: '$10,000' },
+  acts: [
+    { role: 'star', text: 'Book the next appointment before the client leaves the chair', reason: 'you said the empty weeks are people who meant to come back and did not', doneWhen: 'every client today left with a date', starter: 'ask the person in the chair right now: same time in three weeks?' },
+    { role: 'support', text: 'Post one finished cut before you close', reason: 'you said new faces come from the page and the page goes quiet' },
+    { role: 'support', text: 'Write down every no-show', reason: 'you said you cannot tell a bad week from a bad month' }
+  ],
+  noList: ['discounting to fill a slot', 'staying open late for a walk-in that may not come', 'a new price list every month'],
+  nonNegotiables: { candidates: ['Nobody leaves the chair without a next date', 'One post before closing, every day open', 'No discounting to fill a gap', 'The books get closed out the same night', 'One protected day off a week', 'Every no-show gets written down'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Last month', value: '$7,350', source: 'said' },
+      { label: 'Your average cut', value: '$45', source: 'said' },
+      { label: 'Days you open', value: '24 a month', source: 'said' }
+    ],
+    compute: [{ expr: '(10000 - 7350) / 45 / 24', label: '$2,650 more, at $45 a cut, over 24 days', approx: 2.45, shown: '≈ 2.5 a day' }],
+    result: { label: 'Extra cuts a day to clear $10k', value: 'about 3' }
+  },
+  reasoning: [
+    'Three cuts a day. Not a rebrand, not a new location, not a price rise. Three. That is what stands between the shop today and the second chair you want to hire for.',
+    'Rebooking in the chair is where those three come from, because a booked client is worth more than a new follower and costs you one sentence. The post keeps new faces arriving; the no-show log tells you in a month whether the problem is demand or the calendar.'
+  ],
+  qas: [
+    { q: 'Why not just raise prices?', a: 'You can, and it is faster. But a price rise on an unsteady book makes the empty weeks emptier. Steady the book first, then the number is yours to set.' },
+    { q: 'What if they say no to rebooking?', a: 'Some will. Asking every single person is still the highest-paid sentence in the shop.' },
+    { q: 'When do I hire?', a: 'When $10k holds for three straight months, not the first time it happens. Memento is counting.' }
+  ],
+  sizes: { unit: 'cuts', ladder: [2, 4, 6, 8, 12], named: [4, 6, 8], estMinPerUnit: 40, fmt: 'plain' },
+  close: { cadence: 'daily', kind: 'num', prompt: 'Cuts today', unit: '', prefix: '', decimals: false, source: 'Asked at close.', choices: null, tail: '' },
+  checkpoint: 'one month',
+  sendWindow: 'evening',
+  restLine: 'Shop is closed. Nothing is owed today.'
+};
+
+DEMO_LOGIC.coder = {
+  commitment: 'You said you bounce between tutorials. Tutorials are not the job hunt. The plan is applications and one project deep enough to talk about for thirty minutes.',
+  arrow: { from: '11 applications', to: 'an offer by March' },
+  acts: [
+    { role: 'star', text: 'Send one real application, tailored', reason: 'you said you rewrite the résumé instead of sending it', doneWhen: 'submitted, with a cover line written for that company', starter: 'open the last job you bookmarked and write the first sentence.' },
+    { role: 'support', text: 'Thirty minutes on the portfolio project, not a new one', reason: 'you said every new tutorial restarts the clock' },
+    { role: 'support', text: 'One message to a human who works there', reason: 'you said the callbacks came from people, not portals' }
+  ],
+  noList: ['starting a new tutorial', 'rewriting the résumé instead of sending it', 'a fourth side project'],
+  nonNegotiables: { candidates: ['One application sent every weekday', 'No new project until this one ships', 'A human gets messaged with every application', 'Fifteen minutes minimum on a dead day', 'No tutorials before the application goes out', 'Every rejection gets logged, not deleted'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Applications sent', value: '11', source: 'said' },
+      { label: 'Callbacks so far', value: '1', source: 'said' },
+      { label: 'Interviews an offer usually takes', value: '8', source: 'estimate' }
+    ],
+    compute: [{ expr: '8 / (1 / 11)', label: '8 interviews at a 1-in-11 callback rate', approx: 88, shown: '≈ 88' }],
+    result: { label: 'Applications the math needs', value: 'about 90' }
+  },
+  reasoning: [
+    'Ninety applications sounds brutal until you divide it: one a weekday is ninety by March. The number is not a punishment, it is the reason a daily move exists instead of a weekly sprint that never happens.',
+    'The callback rate is the other half. One in eleven improves the moment a human sees your name before the portal does, which is what the message act is for. Send ninety cold and you are guessing. Send ninety with a person attached and the rate moves.'
+  ],
+  qas: [
+    { q: 'Should I not be studying more?', a: 'You have studied for a year. The gap between you and an offer is not knowledge, it is the number of times a company has considered you.' },
+    { q: 'What about the project?', a: 'One project, finished, that you can explain end to end. Thirty minutes a day, no restarts. A finished small thing beats three impressive folders.' },
+    { q: 'What if I get rejected ninety times?', a: 'Then Memento has ninety logged rejections and the pattern in them, which is the most useful thing you could own in March.' }
+  ],
+  sizes: { unit: 'applications', ladder: [1, 2, 3, 5], named: [1, 2, 3], estMinPerUnit: 25, fmt: 'plain' },
+  close: { cadence: 'daily', kind: 'num', prompt: 'Applications sent', unit: '', prefix: '', decimals: false, source: 'Asked every evening.', choices: null, tail: 'in total.' },
+  checkpoint: 'three weeks',
+  sendWindow: 'morning',
+  restLine: 'Nothing is owed tonight.'
+};
+
+DEMO_LOGIC.musician = {
+  commitment: 'You said you have forty unfinished ideas. The plan does not ask for a better idea. It finishes five of the ones you already have, because finished is the skill you are missing.',
+  arrow: { from: '0 tracks finished', to: '5 and a live show' },
+  acts: [
+    { role: 'star', text: 'Work the current track toward finished, no new projects', reason: 'you said a new idea is how you escape a hard mix', doneWhen: 'the session moved this track closer to done', starter: 'open the project you touched last, not a new one.' },
+    { role: 'support', text: 'Bounce whatever exists and listen once in the car', reason: 'you said you cannot hear it in the headphones any more' },
+    { role: 'support', text: 'Write down the one thing stopping this track', reason: 'you said you stall without knowing why' }
+  ],
+  noList: ['starting a new project', 'buying another plugin', 'remixing something already finished'],
+  nonNegotiables: { candidates: ['No new project until this one is finished', 'Twenty minutes minimum on a dead day', 'Every session ends with a bounce', 'The blocker gets written down before you close', 'No new plugins until the EP is out', 'One track finished per month'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Tracks finished', value: '0', source: 'said' },
+      { label: 'Tracks the EP needs', value: '5', source: 'said' },
+      { label: 'Weeks until summer', value: '22', source: 'fact' }
+    ],
+    compute: [{ expr: '5 * 34 / 22', label: '5 tracks at roughly 34 studio hours each, over 22 weeks', approx: 7.7, shown: '≈ 8 hours' }],
+    result: { label: 'Studio hours a week', value: 'about 8' }
+  },
+  reasoning: [
+    'Eight hours a week is an hour a night with Sunday off. That is the entire EP, and it only works if the hours land on the same five tracks instead of a rolling cast of new ones.',
+    'The bounce rule is doing quiet work here. A track you have never heard outside the headphones is a track you cannot finish, because every judgment you make about it is wrong. Bounce it, hear it in the car, fix the one thing, repeat.'
+  ],
+  qas: [
+    { q: 'What if the track is not good enough?', a: 'Finish it anyway. Track five will be better than track one specifically because you finished track one.' },
+    { q: 'When do I book the show?', a: 'When three are finished. Booking it earlier is a deadline you will move; booking it then is a deadline that pulls.' },
+    { q: 'Can I write new ideas down?', a: 'Write them down, do not open them. The notebook is free. The session is not.' }
+  ],
+  sizes: { unit: 'min', ladder: [20, 45, 60, 90, 120], named: [45, 60, 90], estMinPerUnit: null, fmt: 'min' },
+  close: { cadence: 'weekly', kind: 'num', prompt: 'Tracks finished', unit: '', prefix: '', decimals: false, source: 'Asked on Sundays.', choices: null, tail: '' },
+  checkpoint: 'first finished track',
+  sendWindow: 'evening',
+  restLine: 'The session can wait a night.'
+};
+
+DEMO_LOGIC.teacher = {
+  commitment: 'You said you have lost this weight before and found it again. So the plan is built to survive a hard week at school, not to be impressive in an easy one.',
+  arrow: { from: '194 pounds', to: '177 by graduation' },
+  acts: [
+    { role: 'star', text: 'A thirty minute walk after dinner', reason: 'you said the evening is when the day falls apart', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, to the end of the street and back.' },
+    { role: 'support', text: 'Pack tomorrow’s lunch tonight', reason: 'you said the school day is where the plan gets eaten' },
+    { role: 'support', text: 'Water on the desk, refilled at every break', reason: 'you said the afternoon crash is when the snacks win' }
+  ],
+  noList: ['a new diet on Monday', 'weighing yourself twice a day', 'skipping meals to make up for one'],
+  nonNegotiables: { candidates: ['The walk happens after dinner', 'Tomorrow’s lunch is packed tonight', 'One weigh-in a week, same morning', 'Ten minutes minimum on the worst days', 'No new diet before graduation', 'Nothing gets skipped to punish a bad day'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Where you are', value: '194 lb', source: 'said' },
+      { label: 'Where you are going', value: '177 lb', source: 'said' },
+      { label: 'A pound is roughly', value: '3,500 cal', source: 'fact' },
+      { label: 'Weeks to graduation', value: '34', source: 'fact' }
+    ],
+    compute: [{ expr: '17 * 3500 / 238', label: '17 lb, at 3,500 each, over 238 days', approx: 250, shown: '≈ 250 a day' }],
+    result: { label: 'The daily gap to hold', value: '≈ 250 cal' }
+  },
+  reasoning: [
+    'Two hundred and fifty calories a day. That is the walk and the packed lunch, and nothing else has to change. It is deliberately the smallest number that still arrives in May, because you already proved you can lose it fast and you already proved fast does not stay.',
+    'You have lost eighteen pounds and kept them. That is the part worth protecting. The plan holds a gap you can keep on a week of parent conferences, which is exactly the week the last three attempts died in.'
+  ],
+  qas: [
+    { q: 'Only 250? That feels slow.', a: 'It is slow. Slow is the feature. You are not trying to lose 35 pounds, you are trying to still have lost them next year.' },
+    { q: 'What about the gym?', a: 'Add it if you want it. The plan does not need it, and a plan that needs the gym dies the first week the gym does not happen.' },
+    { q: 'What if the scale stalls?', a: 'It will, for a week or two. The daily record is what tells the difference between a stall and a slide, and Memento will say which one it is.' }
+  ],
+  sizes: { unit: 'min', ladder: [10, 20, 30, 45, 60], named: [20, 30, 45], estMinPerUnit: null, fmt: 'min' },
+  close: { cadence: 'weekly', kind: 'num', prompt: 'The scale said', unit: 'lb', prefix: '', decimals: true, source: 'Asked once a week, the same morning.', choices: null, tail: 'this morning.' },
+  checkpoint: 'four weeks',
+  sendWindow: 'evening',
+  restLine: 'Rest counts. See you tomorrow.'
+};
+
+DEMO_LOGIC.screentime = {
+  commitment: 'You said you do not choose the four hours, they just happen. So the plan does not ask for willpower at 11pm. It changes where the phone sleeps and what the first hour of the day is allowed to contain.',
+  arrow: { from: '4 hours 4 minutes a day', to: 'under 2 hours' },
+  acts: [
+    { role: 'star', text: 'The phone charges outside the bedroom tonight', reason: 'you said the worst hour is the one in bed before sleep', doneWhen: 'the phone is on the kitchen charger and you are not', starter: 'plug it in now, before you sit down.' },
+    { role: 'support', text: 'One evening hour with the phone in another room', reason: 'you said the evening disappears and you cannot say into what' },
+    { role: 'support', text: 'No feed apps before the first real thing is done', reason: 'you said the morning scroll sets the tone for the whole day' }
+  ],
+  noList: ['the phone in the bedroom', 'opening a feed before the first task', '"just checking" during a conversation'],
+  nonNegotiables: { candidates: ['The phone sleeps outside the bedroom', 'No feeds before the first real thing', 'One phone-free hour every evening', 'Five minutes of the plan on the worst days', 'No scrolling in front of another person', 'The daily number gets logged, honestly'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Your daily average now', value: '4h 04m', source: 'said' },
+      { label: 'Where you want it', value: '2h 00m', source: 'said' },
+      { label: 'The gap', value: '124 min a day', source: 'fact' }
+    ],
+    compute: [{ expr: '124 * 365 / 60', label: '124 minutes a day, across a year', approx: 754.3, shown: '≈ 754 hours' }],
+    result: { label: 'What a year of this is worth', value: '≈ 754 hours back' }
+  },
+  reasoning: [
+    'Seven hundred and fifty hours is nineteen working weeks. That is the whole argument, and it is why the plan is worth doing even on the days it feels petty. You are not fighting a habit, you are buying back a season.',
+    'The two acts that matter are both about geography, not discipline. A phone on the kitchen counter cannot be picked up at midnight, and a feed that is not opened before the first task never gets to set the tone. Willpower is the thing that fails at 11pm. Distance does not.'
+  ],
+  qas: [
+    { q: 'What if I need it for the alarm?', a: 'Buy a clock. It is nine dollars and it removes the single strongest reason the phone stays in the room.' },
+    { q: 'Is two hours realistic?', a: 'For you, from four, over a season, yes. Cutting to thirty minutes this week is the version that fails on Thursday.' },
+    { q: 'What counts as a slip?', a: 'Nothing counts as a slip. The number gets recorded, high or low, and the week is read as a whole. A bad day inside a good week is just a day.' }
+  ],
+  scale: true,
+  sizes: { unit: 'min', ladder: [15, 30, 60, 90, 120], named: [30, 60, 90], estMinPerUnit: null, fmt: 'min' },
+  close: { cadence: 'daily', kind: 'num', prompt: 'Screen time', unit: 'min', prefix: '', decimals: false, source: 'Asked every night, from your own screen time report.', choices: null, tail: 'today.' },
+  checkpoint: 'two weeks',
+  sendWindow: 'evening',
+  restLine: 'Put it down. That is the whole task tonight.'
+};
+
+DEMO_LOGIC.weight = {
+  commitment: 'You said you have done this three times and gained it back three times. So the plan is not a diet. It is a gap small enough to keep after the weight is gone, because keeping it is the part you have never done.',
+  arrow: { from: '271 pounds', to: '236' },
+  acts: [
+    { role: 'star', text: 'A forty minute walk after dinner', reason: 'you said the evening is when the day breaks and the snacking starts', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, out the door, to the corner and back.' },
+    { role: 'support', text: 'Log every meal, before you eat it', reason: 'you said you have no idea what a normal day actually adds up to' },
+    { role: 'support', text: 'Water instead of soda, all day', reason: 'you named sugar drinks as the biggest single thing' }
+  ],
+  noList: ['a new diet every January', 'fast food on weekdays', 'weighing in more than once a week'],
+  nonNegotiables: { candidates: ['The walk happens after dinner', 'The meal gets logged before it is eaten', 'No sugar drinks in the house', 'Fifteen minutes minimum on the worst days', 'No fast food on weekdays', 'One weigh-in a week, same morning'], chosen: [] },
+  eq: {
+    rows: [
+      { label: 'Where you are', value: '271 lb', source: 'said' },
+      { label: 'Where you started', value: '296 lb', source: 'said' },
+      { label: 'A pound is roughly', value: '3,500 cal', source: 'fact' },
+      { label: 'Days you have given it', value: '300', source: 'fact' }
+    ],
+    compute: [{ expr: '35 * 3500 / 300', label: '35 lb left, at 3,500 each, over 300 days', approx: 408.3, shown: '≈ 410 a day' }],
+    result: { label: 'The daily gap to hold', value: '≈ 410 cal' }
+  },
+  reasoning: [
+    'Four hundred and ten calories a day is the walk and the soda. That is it. It is not the fastest way to lose 35 pounds and it is deliberately not trying to be, because you have already proven you can lose it fast. What you have never proven is keeping a gap you can live inside.',
+    'Twenty-five pounds are already gone and have stayed gone for ten months. That is new, and it is the actual achievement here. The plan protects the thing that made it work, which was never a diet: it was a walk you did not negotiate with and a log that made the day visible.'
+  ],
+  qas: [
+    { q: 'Why not cut harder and finish sooner?', a: 'Because that is what the last three attempts did. The number Memento holds is the one you can still hold in month nine, which is where every previous try ended.' },
+    { q: 'Do I have to log forever?', a: 'No. Log until you can guess a day within a couple hundred calories, then stop. Most people get there in about six weeks.' },
+    { q: 'What if I gain a pound this week?', a: 'Then you gained a pound this week. One weigh-in is noise, four in a row is a signal, and Memento will tell you which one it is looking at.' }
+  ],
+  sizes: { unit: 'min', ladder: [15, 25, 40, 55, 75], named: [25, 40, 55], estMinPerUnit: null, fmt: 'min' },
+  close: { cadence: 'weekly', kind: 'num', prompt: 'The scale said', unit: 'lb', prefix: '', decimals: true, source: 'Asked once a week, the same morning.', choices: null, tail: 'this morning.' },
+  checkpoint: 'four weeks',
+  sendWindow: 'evening',
+  restLine: 'Rest is part of it. See you tomorrow.'
+};
+
 const DEMO_DEPTH = {
+  screentime: {
+    inbox: ['Buy an actual alarm clock', 'Ask Rachel what she reads on the train', 'Delete the app off the phone, keep it on the laptop'],
+    people: [['Rachel', 5, 12, 'The phone-free dinner rule was her idea.'], ['Mom', 11, 8, 'Calls on Sundays, deserves my attention.'], ['Book club', 21, 3, 'Stopped going when I stopped finishing books.']],
+    voice: {
+      runningToward: 'Evenings that feel long again and attention that belongs to me',
+      clarityLevel: 'Very clear on the problem, foggy on the fix', actionKnow: 'I know what to do at 9pm and not at 11pm',
+      runningFrom: 'Losing hours I cannot account for',
+      distraction: 'Instagram and the bed scroll', commitLevel: 'Serious, if it does not require willpower I do not have',
+      timeBudget: 'The whole evening, in theory',
+      costOfInaction: 'Turning thirty having read four books in three years',
+      momentumWin: 'A weekend where I genuinely did not think about my phone',
+      letterToFutureSelf: 'I keep telling myself the scrolling is harmless because it is only an hour. It is four. If nothing changes, that is a full working month of my year, every year, spent on nothing I would choose.',
+      weakestPillar: 'action'
+    },
+    progress: { unit: 'minutes a day', baseline: 372, current: 244, target: 120, shape: 'quantity_down' },
+    target: 0.65
+  },
+  weight: {
+    inbox: ['Pack lunch tonight, not at 6am', 'Ask Dr. Alvarez about the knee before adding running', 'Sign Eli up for the spring league'],
+    people: [['Ava (daughter)', 2, 41, 'Asks me to bike to the park now.'], ['Eli (son)', 2, 38, ''], ['Dad', 30, 6, 'Same body, same story. That is the warning.']],
+    voice: {
+      runningToward: 'Being the dad who plays instead of the one who watches',
+      clarityLevel: 'Clear', actionKnow: 'Yes. I have known for years, I just never kept it',
+      runningFrom: 'Losing it and gaining it back a fourth time',
+      distraction: 'Late night kitchen and the drive-thru', commitLevel: 'This is the one that has to hold',
+      timeBudget: 'Forty minutes after dinner',
+      costOfInaction: 'My dad at fifty, and my kids remembering me on the bench',
+      momentumWin: 'Twenty-five pounds gone and still gone ten months later',
+      letterToFutureSelf: 'I have lost this weight three times. Every time I lost it fast and told myself the hard part was over. The hard part was never the losing. If I am back at 296 next year, it will be because I got impatient again.',
+      weakestPillar: 'consistency'
+    },
+    progress: { unit: 'pounds', baseline: 296, current: 271, target: 236, shape: 'quantity_down' },
+    target: 0.7
+  },
   creator: {
     inbox: ['Thumbnail idea: just my face and three words', 'Ask Dev how he batches four videos in a weekend', 'Stop opening analytics before noon'],
     people: [['Mom', 7, 9, 'Loves the channel updates. Call Sundays.'], ['Dev (creator friend)', 14, 5, 'Owes me a collab date.'], ['Chris (old roommate)', 60, 26, '']],
@@ -767,22 +1281,39 @@ function buildDemoState(personaKey) {
     // dated back to the goal's start so the day view opens directly.
     actionPlan: (function () {
       const g = (DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].progress) || {};
+      const L = DEMO_LOGIC[personaKey] || {};
       const tiers = p.action.tiers || {};
       const started = Date.now() - 86400000 * 45;
       return {
         v: 1,
-        bucket: p.action.bucket || 'generic',
+        bucket: p.action.bucket || personaKey,
         star: p.neutronStar,
         starHash: _demoStarHash(p.neutronStar),
-        acts: [
-          { role: 'star', text: tiers.moderate || p.action.title, doneWhen: p.action.doneWhen || 'the move actually happened', starter: true },
+        // The logic page renders straight off these: this person's own
+        // commitment, arrow, acts with reasons, refusals, math and questions.
+        commitment: L.commitment || '',
+        arrow: L.arrow || null,
+        acts: L.acts || [
+          { role: 'star', text: tiers.moderate || p.action.title, doneWhen: 'the move actually happened' },
           { role: 'support', text: tiers.light || p.action.howToStart, doneWhen: 'a smaller version happened' }
         ],
-        noList: [], reasoning: [], qas: [],
-        close: { cadence: 'daily', kind: 'num', prompt: '', unit: g.unit || '', prefix: '', decimals: false, source: '', choices: null },
+        noList: L.noList || [],
+        nonNegotiables: L.nonNegotiables || null,
+        eq: L.eq || null,
+        reasoning: L.reasoning || [],
+        qas: L.qas || [],
+        scale: L.scale === true,
+        checkpoint: L.checkpoint || '',
+        restLine: L.restLine || '',
+        close: L.close || { cadence: 'daily', kind: 'num', prompt: '', unit: g.unit || '', prefix: '', decimals: false, source: '', choices: null },
         targets: { target: g.target != null ? g.target : null, unit: g.unit || '', baseline: g.baseline != null ? g.baseline : null, countTarget: null, daysTarget: null },
-        sizes: { unit: 'min', ladder: [15, 30, 60], named: [], estMinPerUnit: null, fmt: 'min' },
-        parts: null, verb: 'do', sendWindow: 'morning', deadline: null, offDays: null,
+        // the WEIGHT of a day's work, in this person's own unit: miles for the
+        // runner, words for the writer, cuts for the barber, minutes for the
+        // rest. The day view's ladder reads this.
+        sizes: L.sizes || { unit: 'min', ladder: [15, 30, 60], named: [], estMinPerUnit: null, fmt: 'min' },
+        parts: null, verb: 'do',
+        sendWindow: L.sendWindow || 'morning',
+        deadline: null, offDays: null,
         sessionsPerWeek: Math.max(1, Math.round(((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].target) || 0.6) * 7)),
         createdAt: _demoISO(45),
         landedAt: started,
@@ -899,6 +1430,7 @@ function _injectDemoBar(persona) {
       mk('creator', 'Creator') + mk('founder', 'Founder') + mk('student', 'Student') +
       mk('runner', 'Runner') + mk('writer', 'Writer') + mk('barber', 'Barber') +
       mk('coder', 'Job hunt') + mk('musician', 'Musician') + mk('teacher', 'Teacher') +
+      mk('screentime', 'Screen time') + mk('weight', 'Weight loss') +
       '<button id="demoExit" class="creator-box__btn creator-box__btn--danger" style="flex:0 0 auto;">Exit demo</button>';
     actions.appendChild(row);
     // Re-tapping the persona you are ALREADY in must still do something visible:

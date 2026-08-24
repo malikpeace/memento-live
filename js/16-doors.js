@@ -319,6 +319,17 @@
   function onPopState(e) {
     if (!routingEnabled()) return;
     if (suppressPop > 0) { suppressPop--; return; }
+    // NO SWIPE-BACK INSIDE MEMENTO (v1286, Malik on-device: "swiping moves
+    // them out the module and feels cheap janky and broken"). iOS drives its
+    // edge-swipe through history, so a stray drag anywhere in Clarity threw
+    // the person out of the module mid-sentence. While a surface is open, a
+    // pop we did not cause is undone: the frame is re-asserted and nothing
+    // moves. Every surface still closes through its own X, which routes to
+    // back() and suppresses its own pop above.
+    // At home we let the pop run: trapping someone on the page so they cannot
+    // leave the site would be worse than the gesture ever was.
+    var here = detect();
+    if (here !== 'home' && !TAB_SLUGS[here]) { writeHistory(here, 'push'); return; }
     var target = (e && e.state && e.state.slug) || hashSlug();
     var idx = frames.lastIndexOf(target);
     if (idx >= 0) frames.length = idx + 1;
