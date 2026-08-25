@@ -3727,7 +3727,93 @@
       go.classList.toggle('is-live', !!on);
     }
 
-    if (kind === 'num') {
+    // A DURATION IS NOT A NUMBER (v1290, Malik: "if someone has 8 hours screen
+    // time, it's hard to know that was 480+ minutes"). When the plan's close
+    // is measured in MINUTES, nobody thinks in minutes past about ninety. So
+    // the question stops asking for a raw number and asks for a time: two
+    // scrolling columns, hours and minutes, and the app does the arithmetic.
+    // Everything else (pounds, subscribers, words, cuts) keeps the keypad,
+    // because those really are numbers and can be five digits long.
+    var isTime = kind === 'num' && /^(min|mins|minute|minutes)\b/i.test(String(c.unit || '').trim());
+    if (isTime) {
+      body.classList.add('afl-q__as--num');
+      var tw = el('div', 'afl-time');
+      var hVal = 0, mVal = 0;
+
+      function wheel(count, label, step, onPick) {
+        var col = el('div', 'afl-wheel');
+        var sc = el('div', 'afl-wheel__sc');
+        var pad = el('div', 'afl-wheel__pad');
+        sc.appendChild(pad);
+        var cells = [];
+        for (var i = 0; i < count; i++) {
+          var v = i * step;
+          var cell = el('div', 'afl-wheel__i', String(v));
+          cell.dataset.v = String(v);
+          cells.push(cell);
+          sc.appendChild(cell);
+        }
+        sc.appendChild(el('div', 'afl-wheel__pad'));
+        col.appendChild(sc);
+        col.appendChild(el('span', 'afl-wheel__lab', label));
+        var ROW = 46, t = null;
+        function mark() {
+          var idx = Math.round(sc.scrollTop / ROW);
+          idx = Math.max(0, Math.min(cells.length - 1, idx));
+          cells.forEach(function (x, k) {
+            var d = Math.abs(k - idx);
+            x.classList.toggle('is-on', d === 0);
+            x.style.opacity = d === 0 ? '1' : (d === 1 ? '0.42' : '0.18');
+          });
+          onPick(Number(cells[idx].dataset.v));
+        }
+        sc.addEventListener('scroll', function () {
+          if (t) clearTimeout(t);
+          // paint every frame, but only commit once the finger has settled
+          cells.forEach(function (x, k) {
+            var d = Math.abs(k - sc.scrollTop / ROW);
+            x.style.opacity = d < 0.5 ? '1' : (d < 1.5 ? '0.42' : '0.18');
+            x.classList.toggle('is-on', d < 0.5);
+          });
+          t = setTimeout(mark, 90);
+        }, { passive: true });
+        col.__set = function (v) {
+          var idx = Math.max(0, Math.min(cells.length - 1, Math.round(v / step)));
+          sc.scrollTop = idx * ROW;
+          mark();
+        };
+        return col;
+      }
+
+      var hCol = wheel(24, 'hours', 1, function (v) { hVal = v; sync(); });
+      var mCol = wheel(12, 'min', 5, function (v) { mVal = v; sync(); });
+      function sync() {
+        raw = String(hVal * 60 + mVal);
+        live(hVal > 0 || mVal > 0);
+      }
+      tw.appendChild(hCol);
+      tw.appendChild(el('span', 'afl-time__sep', ':'));
+      tw.appendChild(mCol);
+      var band = el('div', 'afl-time__band');
+      band.setAttribute('aria-hidden', 'true');
+      tw.appendChild(band);
+      body.appendChild(tw);
+      // open on what they last recorded, so a steady number is one tap away
+      var seed = 0;
+      try {
+        var gp0 = S().goalProgress;
+        if (gp0 && isFinite(Number(gp0.current))) seed = Math.max(0, Math.round(Number(gp0.current)));
+      } catch (e) {}
+      // seeded twice: the first pass can land before the columns have their
+      // real height, and a scroll set against a zero-height box is thrown away
+      function seedWheels() {
+        hCol.__set(Math.min(23, Math.floor(seed / 60)));
+        mCol.__set(Math.round((seed % 60) / 5) * 5 % 60);
+        sync();
+      }
+      requestAnimationFrame(seedWheels);
+      setTimeout(seedWheels, 220);
+    } else if (kind === 'num') {
       body.classList.add('afl-q__as--num');
       var f = el('div', 'afl-q__field');
       var set = el('div', 'afl-q__set');

@@ -6295,3 +6295,54 @@ body:has(.afl) #appSidebar { box-shadow: none; }
   .afl-safe--stop { padding-top: 22px; }
   .afl-safe__body p { margin-bottom: 12px; }
 }
+
+/* ==========================================================================
+   THE TIME WHEELS (v1290, Malik on-device: the screen-time question asked for
+   minutes only, so "8 hours" meant typing 480). A duration is asked for as a
+   duration: two scrolling columns, hours and minutes, with the selection sitting
+   in a fixed band the way every native picker does. Only the MINUTES close uses
+   this; a weight or a subscriber count keeps its keypad.
+   ========================================================================== */
+.afl-time {
+  position: relative; display: flex; align-items: flex-start; justify-content: center;
+  gap: 6px; margin: 0 auto; width: fit-content;
+}
+.afl-time__sep {
+  font-size: 34px; font-weight: 600; line-height: 46px; color: rgba(var(--ink), 0.30);
+  height: 230px; display: flex; align-items: center; padding-bottom: 26px;
+}
+/* the band the chosen value sits in: one hairline pair, no box */
+.afl-time__band {
+  position: absolute; left: 0; right: 0; top: 92px; height: 46px; pointer-events: none;
+  border-top: 1px solid rgba(var(--ink), 0.16);
+  border-bottom: 1px solid rgba(var(--ink), 0.16);
+  background: rgba(var(--ink), 0.035);
+  border-radius: 10px;
+}
+.afl-wheel { display: flex; flex-direction: column; align-items: center; }
+.afl-wheel__sc {
+  height: 230px; width: 104px; overflow-y: scroll; scroll-snap-type: y mandatory;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  touch-action: pan-y;
+  /* the ends fade, so the column reads as a wheel and not a list */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 22%, #000 78%, transparent 100%);
+}
+.afl-wheel__sc::-webkit-scrollbar { display: none; }
+.afl-wheel__pad { height: 92px; flex: 0 0 auto; }
+.afl-wheel__i {
+  /* CENTRE, not start: the band sits in the middle of the column, so the snap
+     has to centre too or the value under the band is one row off what the code
+     thinks it is (which is exactly what it was). */
+  height: 46px; line-height: 46px; scroll-snap-align: center; scroll-snap-stop: always;
+  text-align: center; font-size: 34px; font-weight: 640; letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums; color: rgba(var(--ink), 0.95);
+  transition: opacity 0.16s ease-out, transform 0.16s ease-out;
+  transform: scale(0.86);
+}
+.afl-wheel__i.is-on { transform: scale(1); }
+.afl-wheel__lab {
+  margin-top: 6px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(var(--ink), 0.42); font-weight: 640;
+}
+@media (prefers-reduced-motion: reduce) { .afl-wheel__i { transition: none; } }
