@@ -476,6 +476,22 @@ const HONEST_LOADING_GATE = false;
   const reveal = () => {
     if (revealed) return;
     revealed = true;
+    /* v1289 THE SETTLE, KILLED AT THE SOURCE (Malik, twice, with a recording
+       and then a side-by-side). The today box is rendered by js/08 a few
+       hundred milliseconds after boot; until then it is an empty slot at its
+       CSS floor and the Memento above it fills the difference, so the card
+       painted big and then shrank while he watched. v1288 tried to reserve the
+       box's height and that fought the real layout and shrank his card, so the
+       reservation is gone and this is the honest fix: the box is FILLED before
+       the mask lifts, in this same frame. Nothing is ever seen at the wrong
+       size, because nothing is seen until it is the right size. */
+    try {
+      const cc0 = document.getElementById('commandCenter');
+      if (cc0 && !cc0.firstElementChild && typeof renderCommandCenter === 'function') {
+        cc0.innerHTML = renderCommandCenter();
+        try { if (typeof bindCommandCenter === 'function') bindCommandCenter(cc0); } catch (_) {}
+      }
+    } catch (_) {}
     try { document.body.classList.add('boot-revealed'); } catch (_) {}
     // A boot that reached the screen earns back its free self-repair, so a
     // stuck boot later in the same session still gets fixed silently first.
