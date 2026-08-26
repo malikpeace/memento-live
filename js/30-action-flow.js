@@ -1367,12 +1367,21 @@
         // wrong way (or a real vertical scroll) hands the gesture back. The
         // old rule abandoned the swipe permanently on a single stray pixel,
         // which is why a second attempt from the same finger did nothing.
-        if (my >= AXIS_LOCK && Math.abs(mx) < my * AXIS_DOM) { start = null; clear(); return; }
-        if (mx * dir <= -AXIS_LOCK) { start = null; clear(); return; }
+        if (my >= AXIS_LOCK && Math.abs(mx) < my * AXIS_DOM) { start = null; clear(); releaseHold(); return; }
+        if (mx * dir <= -AXIS_LOCK) { start = null; clear(); releaseHold(); return; }
         if (Math.abs(mx) < my * AXIS_DOM || mx * dir <= 0) return;
         start.x = e.clientX;              // travel is measured from the lock
         start.axis = 1;
         live = true;
+        // v1291 (Malik on-device: "I can't swipe to the logic page"). The room
+        // carries touch-action: pan-y, which lets WebKit take a drag with any
+        // vertical drift in it and hand us a pointercancel half way through: on
+        // a real thumb that is most pulls. The moment the pull is recognised as
+        // horizontal the room stops offering the browser anything, and the
+        // pointer is captured so every later move lands here whatever it passes
+        // over. Both are undone on release.
+        try { host.style.touchAction = 'none'; } catch (e3) {}
+        try { if (host.setPointerCapture) host.setPointerCapture(e.pointerId); } catch (e3) {}
         // v1288: the pull is now a fact, so whatever the finger landed on lets
         // go of it. A press-and-hold started on the CTA cancels here instead of
         // quietly filling underneath the drag, and it costs the hold nothing on
@@ -1387,14 +1396,19 @@
         if (!reduced()) host.classList.add('is-drag');
         return;
       }
+      if (e.cancelable) { try { e.preventDefault(); } catch (e3) {} }
       var now = Date.now(), dt = now - lastT;
       if (dt > 0) vx = (e.clientX - lastX) / dt;
       lastX = e.clientX; lastT = now;
       dx = (dir < 0) ? Math.min(0, mx) : Math.max(0, mx);   // 1:1, one way only
       drag(dx);
     };
+    function releaseHold() {
+      try { host.style.touchAction = ''; } catch (e3) {}
+    }
     var onUp = function (e) {
       if (settling || !start || e.pointerId !== start.id) return;
+      releaseHold();
       if (!live) { start = null; return; }               // a tap, not a pull
       var W = (host && host.clientWidth) || window.innerWidth;
       // a flick is a throw AT THE MOMENT OF LETTING GO. A finger that moved
@@ -1406,6 +1420,7 @@
     };
     var onCancel = function (e) {
       if (settling || !start || (e && e.pointerId !== start.id)) return;
+      releaseHold();
       if (live) settle(false);
       else { start = null; clear(); }
     };
