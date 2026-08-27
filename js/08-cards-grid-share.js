@@ -5546,10 +5546,23 @@ function renderDeskMission() {
 function ccGoPillar(cc, pillar) {
   try {
     if (pillar === _ccPillar) return;
-    if (ccPillarList().indexOf(pillar) === -1) return;
+    const list = ccPillarList();
+    if (list.indexOf(pillar) === -1) return;
+    // v1298 (Malik: "the mockups just feel smoother"). The new face arrives
+    // from the direction you travelled, the way the lab did it: a short slide
+    // and fade on the incoming card, never a hard swap.
+    const dir = (list.indexOf(pillar) > list.indexOf(_ccPillar)) ? 1 : -1;
     _ccPillar = pillar;
     cc.innerHTML = renderCommandCenter();
     bindCommandCenter(cc);
+    try {
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const card = cc.querySelector('.cc-card');
+      if (card && !reduced) {
+        card.classList.add(dir > 0 ? 'cc-card--in-r' : 'cc-card--in-l');
+        setTimeout(() => { try { card.classList.remove('cc-card--in-r', 'cc-card--in-l'); } catch (e2) {} }, 340);
+      }
+    } catch (e2) {}
   } catch (e) {}
 }
 function ccFanValue(pillar) {
@@ -5624,16 +5637,26 @@ function ccBindDeckStrip(cc, dn) {
     fan.className = 'cc-fan';
     fan.innerHTML = '<div class="cc-fan__scrim"></div>';
     const opts = [];
-    list.forEach((pillar, n) => {
+    // the rows, top to bottom: the three boxes, then Settings (Malik: the
+    // button is a door to more; Settings is the first extra room behind it)
+    const rows = list.map((pillar) => ({ pillar }));
+    rows.push({ settings: true });
+    rows.forEach((row, n) => {
       const o = document.createElement('button');
       o.type = 'button';
-      o.className = 'cc-fan__opt' + (pillar === _ccPillar ? ' is-cur' : '');
-      const v = ccFanValue(pillar);
-      o.innerHTML = esc(NAME[pillar] || pillar) + (v ? ' &nbsp;<span>' + esc(v) + '</span>' : '');
+      if (row.settings) {
+        o.className = 'cc-fan__opt cc-fan__opt--aux';
+        o.innerHTML = 'Settings';
+        o.__act = () => { try { if (typeof TabBar !== 'undefined') TabBar.switchTo('profile'); } catch (e2) {} };
+      } else {
+        o.className = 'cc-fan__opt' + (row.pillar === _ccPillar ? ' is-cur' : '');
+        const v = ccFanValue(row.pillar);
+        o.innerHTML = esc(NAME[row.pillar] || row.pillar) + (v ? ' &nbsp;<span>' + esc(v) + '</span>' : '');
+        o.__act = () => ccGoPillar(cc, row.pillar);
+      }
       o.style.right = Math.max(10, window.innerWidth - rect.right) + 'px';
-      o.style.bottom = (window.innerHeight - rect.top + 8 + (list.length - 1 - n) * 46) + 'px';
-      o.__pillar = pillar;
-      o.addEventListener('click', () => { close(); ccGoPillar(cc, pillar); });
+      o.style.bottom = (window.innerHeight - rect.top + 8 + (rows.length - 1 - n) * 46) + 'px';
+      o.addEventListener('click', () => { const a = o.__act; close(); a(); });
       fan.appendChild(o);
       opts.push(o);
     });
@@ -5658,7 +5681,7 @@ function ccBindDeckStrip(cc, dn) {
         arm(hit);
       },
       release() {
-        if (armed) { const p2 = armed.__pillar; close(); ccGoPillar(cc, p2); return true; }
+        if (armed) { const a = armed.__act; close(); a(); return true; }
         return false;
       },
       close
@@ -8493,8 +8516,8 @@ const MementoEditor = (function () {
           '<div class="mfe__row" data-tog="ring">' +
             '<span class="mfe__row-k">The ring</span>' +
             '<span class="mfe__seg">' +
-              '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White</button>' +
-              '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>Matched</button>' +
+              '<button type="button" data-v="0"' + (!_skinRingOn() ? ' class="on"' : '') + '>White</button>' +
+              '<button type="button" data-v="1"' + (_skinRingOn() ? ' class="on"' : '') + '>Matched</button>' +
             '</span>' +
           '</div>' +
           '<div class="mfe__row" data-tog="mark">' +
@@ -9575,8 +9598,16 @@ const _SKIN_VARS = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--face', '
    ========================================================================== */
 const _SKIN_MORPH_WRAP = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--mark', '--ink', '--edge', '--halo', '--mm-hue', '--clar', '--act', '--cons', '--mix', '--lit', '--bright'];
 const _SKIN_MORPH_ROOT = ['--skin-rgb', '--rim-c', '--rim-rgb', '--beam-rgb', '--halo-rgb', '--accent', '--accent-rgb', '--accent-soft'];
-const _SKIN_MORPH_MS = 600;
+const _SKIN_MORPH_MS = 850;   // v1298: Malik, "about 40% slower"
 
+// v1298 (Malik): the ring is colour-MATCHED by default; White is the explicit
+// choice. Unset means matched, 0 means white, 1 means matched.
+function _skinRingOn() {
+  try {
+    if (state.cardSkin && state.cardSkin.ring !== undefined && state.cardSkin.ring !== null) return !!state.cardSkin.ring;
+  } catch (e) {}
+  return true;
+}
 function _skinColParse(raw) {
   const v = String(raw || '').trim();
   if (!v) return null;
@@ -9704,7 +9735,7 @@ function _applyCardSkinNow(wrap) {
     // v1227 (Malik: the ring is missing on the house Memento). The house card
     // carries the ring choice too, so the Memento view's ring honours White vs
     // Matched even with no material (Matched falls back to the app accent).
-    wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
+    wrap.dataset.skinRing = _skinRingOn() ? '1' : '0';
     // v1265 (Malik, from the Apple Card): Minimal is a rider like the ring,
     // and it works with or without a material.
     wrap.dataset.skinMinimal = (state.cardSkin && state.cardSkin.minimal) ? '1' : '0';
@@ -9739,7 +9770,7 @@ function _applyCardSkinNow(wrap) {
   S.setProperty('--emit', n ? '.7' : '0');
   S.setProperty('--ring', n ? '.5' : '0');
   wrap.dataset.skin = sk.n;
-  wrap.dataset.skinRing = (state.cardSkin && state.cardSkin.ring) ? '1' : '0';
+  wrap.dataset.skinRing = _skinRingOn() ? '1' : '0';
   wrap.dataset.skinMark = (state.cardSkin && state.cardSkin.mark) ? '1' : '0';
   wrap.dataset.skinMinimal = (state.cardSkin && state.cardSkin.minimal) ? '1' : '0';
   const cls = String(sk.cls || '');
@@ -9823,8 +9854,8 @@ function _mfBuildSkinSheet(host, wrap, sig, onClose) {
           '<button type="button" data-v="0"' + ((state.prefs && state.prefs.skinColorsApp === false) ? ' class="on"' : '') + '>Card only</button>' +
         '</div>' +
         '<div class="mfsk-tog__g" data-tog="ring">' +
-          '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>White ring</button>' +
-          '<button type="button" data-v="1"' + ((state.cardSkin && state.cardSkin.ring) ? ' class="on"' : '') + '>Colour-matched</button>' +
+          '<button type="button" data-v="0"' + (!_skinRingOn() ? ' class="on"' : '') + '>White ring</button>' +
+          '<button type="button" data-v="1"' + (_skinRingOn() ? ' class="on"' : '') + '>Colour-matched</button>' +
         '</div>' +
         '<div class="mfsk-tog__g" data-tog="mark">' +
           '<button type="button" data-v="0"' + (!(state.cardSkin && state.cardSkin.mark) ? ' class="on"' : '') + '>Plain M</button>' +

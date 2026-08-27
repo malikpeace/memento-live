@@ -1043,6 +1043,17 @@ html {
      Settings" glitch). No-op for overlay scrollbars (macOS/iOS). */
   scrollbar-gutter: stable;
 }
+/* NOTHING IN MEMENTO IS SELECTABLE TEXT (v1298, Malik: a long-press washed the
+   whole screen in the iOS selection blue). This is an app, not a page: no text
+   selection, no long-press callout, anywhere. The ONLY exceptions are the
+   places a person actually types or copies from, re-enabled right below. */
+body, body * {
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}
+input, textarea, [contenteditable], [contenteditable] * {
+  -webkit-user-select: text; user-select: text;
+}
 body {
   font-family: var(--font);
   background: #000;
