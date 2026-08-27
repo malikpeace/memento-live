@@ -5598,36 +5598,59 @@ function ccBindDeckStrip(cc, dn) {
   m.innerHTML = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
   dn.appendChild(m);
 
-  // ---- scrub + tap on the dots ----
-  const dots = () => dn.querySelectorAll('i');
-  const idxAt = (x) => {
-    let best = 0, bd = Infinity;
-    dots().forEach((d, n) => {
-      const r = d.getBoundingClientRect();
-      const dx = Math.abs(x - (r.left + r.width / 2));
-      if (dx < bd) { bd = dx; best = n; }
-    });
-    return best;
+  // ---- scrub + tap on the dots (v1299: Action's own feel) ----
+  // The dots trade shape 1:1 under the finger via --w, exactly like Action's
+  // page dots, and the box commits the moment the scrub crosses a dot. The
+  // strip node is rebuilt on every commit, so tracking lives on the WINDOW
+  // for the length of the gesture and re-finds the live strip each frame.
+  const liveDn = () => cc.querySelector('.cc-dots--deck');
+  const dotsOf = (d) => d ? Array.from(d.querySelectorAll('i')) : [];
+  const posAt = (x) => {
+    const ds = dotsOf(liveDn());
+    if (!ds.length) return 0;
+    const cs = ds.map((d) => { const r = d.getBoundingClientRect(); return r.left + r.width / 2; });
+    if (x <= cs[0]) return 0;
+    if (x >= cs[cs.length - 1]) return cs.length - 1;
+    for (let i2 = 0; i2 < cs.length - 1; i2++) {
+      if (x <= cs[i2 + 1]) return i2 + (x - cs[i2]) / (cs[i2 + 1] - cs[i2]);
+    }
+    return cs.length - 1;
   };
-  let pid = null;
+  const paint = (p) => {
+    const d = liveDn(); if (!d) return;
+    d.classList.add('is-scrub');
+    dotsOf(d).forEach((el2, n) => {
+      el2.style.setProperty('--w', Math.max(0, 1 - Math.abs(n - p)).toFixed(3));
+    });
+  };
+  const clearPaint = () => {
+    const d = liveDn(); if (!d) return;
+    d.classList.remove('is-scrub');
+    dotsOf(d).forEach((el2) => el2.style.removeProperty('--w'));
+  };
   dn.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.cc-strip-m')) return;
-    pid = e.pointerId;
-    dn.classList.add('is-scrub');
-    try { dn.setPointerCapture(e.pointerId); } catch (z) {}
-    ccGoPillar(cc, list[idxAt(e.clientX)]);
+    const step = (x) => {
+      const p = posAt(x);
+      const want = list[Math.round(p)];
+      if (want && want !== _ccPillar) ccGoPillar(cc, want);
+      paint(p);
+    };
+    const mv = (ev) => {
+      if (ev.cancelable) { try { ev.preventDefault(); } catch (z) {} }
+      step(ev.clientX);
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', mv);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      clearPaint();
+    };
+    window.addEventListener('pointermove', mv, { passive: false });
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    step(e.clientX);
   });
-  dn.addEventListener('pointermove', (e) => {
-    if (pid === null || e.pointerId !== pid) return;
-    if (e.cancelable) { try { e.preventDefault(); } catch (z) {} }
-    ccGoPillar(cc, list[idxAt(e.clientX)]);
-  });
-  const scrubEnd = () => { pid = null; dn.classList.remove('is-scrub'); };
-  dn.addEventListener('pointerup', scrubEnd);
-  dn.addEventListener('pointercancel', scrubEnd);
-  // NOTE: ccGoPillar re-renders and rebuilds this strip; the captured pointer
-  // dies with the old node, so the scrub re-arms on the next touch. One box
-  // per touch-down is the natural rhythm of a 3-dot strip anyway.
 
   // ---- the fan: hold the M, slide, release ----
   const openFan = () => {
