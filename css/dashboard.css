@@ -6884,47 +6884,64 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
 #commandCenter .cc-card--in-l { animation: ccInL 300ms cubic-bezier(0.22, 1, 0.36, 1); }
 
 
-/* \2500\2500 v1302: THE HOME AURORA (Malik). The First 7 Days finale floor,
-   ported verbatim from css/clarity.css .n7d-finale: same gradients, same
-   radial mask (no defined top edge, no side clip), same 17s/21s cross-drift.
-   Only the colours moved into --aur-1/2/3 RGB triplets so the material can
-   drive them (js/08 _auroraSyncToSkin); the defaults are the house cyan,
-   spring green and periwinkle. The beams STAY, this joins them. Post-star
-   only, hidden in light mode exactly like the rays. */
+/* \2500\2500 v1305: THE SHEDDING (Malik's pick from the Background Lab,
+   round 4). The Memento sheds a veil of its own light down the screen, and
+   what lands LIVES: six coals breathing on their own clocks over a deep
+   base. Everything sits in the bottom band (the v1304 memory law: no
+   fullscreen textures), every element fades on all sides by construction
+   (the edge-safety law), colours ride --aur-1/2/3 from the skin
+   (js/08 _auroraSyncToSkin), post-star only, hidden in light mode. The
+   veil's shape is a work in progress by Malik's own call. */
 .ambient__aurora { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; overflow: hidden; }
-/* v1304 (Malik: "memento keeps crashing"): the two drifting layers were FULL
-   viewport + 18% oversize, each masked, each composited forever, roughly
-   100MB of GPU texture at 3x, which is exactly the weight iOS kills a PWA
-   over. The layers now live only in the bottom BAND of the screen (the top
-   60% was empty texture, the gradients never reached it), which cuts the
-   memory to about a third. Still oversized past every edge the drift can
-   pull from (the v1303 edge-safety law), still masked so the top fades
-   organically. And BRIGHTER (his call: it felt dead). */
-.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; left: -18%; right: -18%; top: 38%; bottom: -12%; }
-.ambient__aurora i {
-  background:
-    radial-gradient(150% 120% at 50% 135%, rgb(var(--aur-2, 63 217 78) / 0.62), transparent 78%),
-    radial-gradient(100% 100% at 26% 128%, rgb(var(--aur-1, 58 217 245) / 0.66), transparent 76%);
-  -webkit-mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
-          mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
+.ambient__aurora i, .ambient__aurora em, .ambient__aurora i b { position: absolute; display: block; }
+/* the veil: a repeating band of light travelling DOWN forever, brightest
+   where it leaves the card's bottom edge, dissolving as it falls */
+.ambient__aurora .aur-veil {
+  left: 6%; right: 6%; top: 54.6%; bottom: -4%;
+  -webkit-mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
+          mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
 }
-.ambient__aurora i::before {
-  background:
-    radial-gradient(100% 100% at 74% 128%, rgb(var(--aur-3, 128 150 255) / 0.6), transparent 76%),
-    radial-gradient(84% 80% at 50% 118%, rgba(255, 255, 255, 0.26), transparent 68%);
-  -webkit-mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
-          mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
+.ambient__aurora .aur-veil b {
+  left: 0; right: 0; top: -140%; bottom: -140%; filter: blur(16px);
+  background: repeating-linear-gradient(to bottom,
+    rgb(var(--aur-1, 58 217 245) / 0.04) 0px,
+    rgb(var(--aur-1, 58 217 245) / 0.52) 76px,
+    rgba(255, 255, 255, 0.38) 110px,
+    rgb(var(--aur-2, 63 217 78) / 0.44) 146px,
+    rgb(var(--aur-1, 58 217 245) / 0.04) 214px);
 }
-/* the second layer also breathes (see the ns-bloom animation list), so the
-   floor reads alive, not static */
-@keyframes homeAurBreath { from { opacity: 0.72; } to { opacity: 1; } }
+/* the deep base under the coals */
+.ambient__aurora .aur-base {
+  left: -14%; right: -14%; top: 56%; bottom: -6%;
+  background: radial-gradient(130% 70% at 50% 114%, rgb(var(--aur-3, 128 150 255) / 0.44), transparent 74%);
+  -webkit-mask: radial-gradient(150% 140% at 50% 128%, #000 40%, transparent 88%);
+          mask: radial-gradient(150% 140% at 50% 128%, #000 40%, transparent 88%);
+}
+/* the coals: small, separate, each its own size, hue and clock */
+.ambient__aurora em { border-radius: 50%; filter: blur(30px); }
+.ambient__aurora em:nth-of-type(1) { left: 0%;  bottom: -6%; width: 52%; height: 22%; background: rgb(var(--aur-1, 58 217 245) / 0.8); }
+.ambient__aurora em:nth-of-type(2) { left: 36%; bottom: -8%; width: 46%; height: 20%; background: rgb(var(--aur-2, 63 217 78) / 0.75); }
+.ambient__aurora em:nth-of-type(3) { left: 62%; bottom: -4%; width: 40%; height: 17%; background: rgb(var(--aur-3, 128 150 255) / 0.65); }
+.ambient__aurora em:nth-of-type(4) { left: -8%; bottom: 1%;  width: 34%; height: 14%; background: rgb(var(--aur-2, 63 217 78) / 0.55); }
+.ambient__aurora em:nth-of-type(5) { left: 22%; bottom: 3%;  width: 30%; height: 11%; background: rgba(255, 255, 255, 0.28); }
+.ambient__aurora em:nth-of-type(6) { left: 74%; bottom: 2%;  width: 32%; height: 12%; background: rgb(var(--aur-1, 58 217 245) / 0.5); }
+/* animations run ONLY once the star exists (hidden animations still run,
+   the v1288 lesson, so nothing may animate behind opacity:0) */
 body.ns-bloom .ambient__aurora { opacity: 1; }
-body.ns-bloom .ambient__aurora i { animation: homeAurA 17s ease-in-out infinite alternate; }
-body.ns-bloom .ambient__aurora i::before { animation: homeAurB 21s ease-in-out infinite alternate, homeAurBreath 9s ease-in-out infinite alternate; }
-@keyframes homeAurA { from { transform: translate(-2%, 0.8%); } to { transform: translate(2.4%, -0.8%); } }
-@keyframes homeAurB { from { transform: translate(2.2%, -0.8%); } to { transform: translate(-2.4%, 0.8%); } }
+body.ns-bloom .ambient__aurora .aur-veil b { animation: homeVeilFall 12s linear infinite; }
+body.ns-bloom .ambient__aurora em:nth-of-type(1) { animation: homeCoal 11s ease-in-out infinite alternate; }
+body.ns-bloom .ambient__aurora em:nth-of-type(2) { animation: homeCoal 15s ease-in-out infinite alternate-reverse; }
+body.ns-bloom .ambient__aurora em:nth-of-type(3) { animation: homeCoal 9s ease-in-out infinite alternate; }
+body.ns-bloom .ambient__aurora em:nth-of-type(4) { animation: homeCoal 19s ease-in-out infinite alternate-reverse; }
+body.ns-bloom .ambient__aurora em:nth-of-type(5) { animation: homeCoal 13s ease-in-out infinite alternate; }
+body.ns-bloom .ambient__aurora em:nth-of-type(6) { animation: homeCoal 17s ease-in-out infinite alternate-reverse; }
+@keyframes homeVeilFall { from { transform: translateY(0); } to { transform: translateY(214px); } }
+@keyframes homeCoal {
+  from { opacity: 0.45; transform: translate(-4%, 3%) scale(0.9); }
+  to   { opacity: 1;    transform: translate(4%, -3%) scale(1.12); }
+}
 @media (prefers-reduced-motion: reduce) {
-  body.ns-bloom .ambient__aurora i, body.ns-bloom .ambient__aurora i::before { animation: none; }
+  body.ns-bloom .ambient__aurora .aur-veil b, body.ns-bloom .ambient__aurora em { animation: none; }
 }
 html.theme-light .ambient__aurora { display: none !important; }
 /* v1303 (Malik): one light at a time. Aurora era by default: the home's
