@@ -2372,6 +2372,9 @@ window.addEventListener('keydown', (e) => {
     // reasoning as the chat bars above; without this the fan and search sat
     // on a fully readable page.
     'body.lite .cc-fan__scrim{backdrop-filter:blur(34px) saturate(1.3)!important;-webkit-backdrop-filter:blur(34px) saturate(1.3)!important;}',
+    // v1308 (Malik: the sync box is thick glass now): one modest panel,
+    // same budget reasoning as the chat bars.
+    'body.lite #commandCenter .cc-card{backdrop-filter:blur(28px) saturate(1.35)!important;-webkit-backdrop-filter:blur(28px) saturate(1.35)!important;}',
     'body.lite .spot-backdrop{backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%)!important;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%)!important;}',
     'body.lite .spot{backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%)!important;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%)!important;}',
     // Without backdrop-blur, translucent overlays would let the dashboard show

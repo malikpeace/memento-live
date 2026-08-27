@@ -6171,9 +6171,9 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 .v-consistency-n-bought__g--flat{color:rgba(var(--ink),.40)}
 .v-consistency-n-bought__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(var(--ink),.93)}
 .v-nf{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.96)}
-.v-nf .a-move{margin:0;font-size:19px;font-weight:680;line-height:1.28;letter-spacing:-.02em}
-.v-nf .a-sup{margin:10px 0 0;font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.62)}
-.v-nf .a-how{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:rgba(var(--ink),.05);box-shadow:inset 0 1px 0 rgba(var(--ink),.06);font-size:13px;line-height:1.5;color:rgba(var(--ink),.9)}
+.v-nf .a-move{margin:0;font-size:20px;font-weight:680;line-height:1.27;letter-spacing:-.022em}
+.v-nf .a-sup{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.62)}
+.v-nf .a-how{margin:9px 0 0;padding:0;border-radius:0;background:none;box-shadow:none;font-size:13.5px;line-height:1.52;color:rgba(var(--ink),.66)}
 .v-nf .a-urg{margin:11px 0 0;font-size:12.5px;color:rgba(var(--ink),.62)}
 /* v1155: the CTA follows the theme (the mockup hard-coded its dark-room
    near-white, which turned gray-on-white in light mode) */
@@ -6793,8 +6793,13 @@ html.app-asleep .crays__shaft {
    becomes breathing room beside the Memento instead of a gap in the middle.
    The tallest face has no slack, so nothing about it changes.
    ========================================================================== */
-.cc-card--pillars .v-nf > :first-child { margin-top: auto; }
-.cc-card--pillars .v-nf .a-btn { margin-top: 26px !important; }
+/* v1308 (Malik, from the render he picked): the face reads TOP-DOWN like a
+   card should. Label first, then the words, and the shared height's slack
+   settles quietly above the bottom-pinned button instead of sitting as a
+   dead slab on top. */
+.cc-card--pillars .v-nf > :first-child { margin-top: 0; }
+.cc-card--pillars .v-nf .a-btn { margin-top: auto !important; }
+.cc-card--pillars .v-nf > :nth-last-child(2) { margin-bottom: 18px; }
 
 /* ==========================================================================
    THE FACE SAYS WHICH MODULE IT IS (v1294, Malik: swiping the sync deck was
@@ -6812,8 +6817,8 @@ html.app-asleep .crays__shaft {
   letter-spacing: 0.13em; text-transform: uppercase;
   color: rgba(var(--ink), 0.34);
 }
-/* the label leads the bottom-anchored block, not the slack above it */
-.cc-card--pillars .v-nf > .cc-sync-k:first-child { margin-top: auto; }
+/* v1308: the label leads from the TOP now (the render's read) */
+.cc-card--pillars .v-nf > .cc-sync-k:first-child { margin-top: 0; }
 .cc-card--pillars .v-nf > .cc-sync-k:first-child + * { margin-top: 0; }
 
 /* ==========================================================================
@@ -6988,3 +6993,30 @@ html.home-stage-aur .ambient__aurora { opacity: 0 !important; }
 body.mf-open .ambient__aurora, body.mfe-open .ambient__aurora {
   opacity: 0; transition: opacity 0.35s ease;
 }
+
+
+/* \2500\2500 v1308: THE SYNC BOX, RE-CUT TO THE RENDER (Malik's one-shot).
+   Thick glass instead of dark film: lighter fill, real 28px blur (the lite
+   exception lives in js/11 beside the chat bars), so the room's colours
+   read as soft frost and the text pops. The frame tightens to 18px so the
+   content fills the card, Apple-style. The primary button gains the
+   render's check icon and accent label; the dim waiting state stays plain. */
+#commandCenter .cc-card {
+  background: rgba(18, 22, 28, 0.42) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
+  backdrop-filter: blur(28px) saturate(1.35);
+}
+.cc-card--pillars { padding: 18px 18px 14px !important; }
+.v-nf .a-btn:not(.a-btn--wait) {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  color: var(--accent-strong, #0b0c0e);
+}
+.v-nf .a-btn:not(.a-btn--wait)::before {
+  content: ''; width: 17px; height: 17px; flex: none;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* light mode: the box is already a white card; keep its own fill, just no
+   re-darkening from the rule above */
+html.theme-light #commandCenter .cc-card { background: rgba(255, 255, 255, 0.62) !important; }
