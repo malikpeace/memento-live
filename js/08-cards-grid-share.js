@@ -9393,7 +9393,103 @@ const _SKIN_VARS = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--face', '
 
 // Applies (or clears) the material on a card wrap. Always called AFTER
 // setLivingCardVars, so clearing can simply re-run it to restore stock.
+/* ============================================================================
+   THE SKIN MORPHS, NEVER SNAPS (v1295, Malik: "if someone has a blue then
+   changes to a pink theme, don't just snap to pink, have the colors slowly
+   morph"). One generic engine, so none of the two dozen colour writes below
+   needed touching: it reads every skin variable BEFORE the change, lets the
+   original apply run exactly as it always has, reads the result, then walks
+   each variable from old to new over ~600ms. Colours, rgb triplets and bare
+   numbers all interpolate; anything unparseable (the face gradient) lands at
+   once, under the blobs where a step is invisible. A new pick mid-morph starts
+   from wherever the colours currently are. First paint snaps: there is nothing
+   on screen yet to morph from.
+   ========================================================================== */
+const _SKIN_MORPH_WRAP = ['--sk1', '--sk2', '--sk3', '--sk4', '--plat-op', '--mark', '--ink', '--edge', '--halo', '--mm-hue', '--clar', '--act', '--cons', '--mix', '--lit', '--bright'];
+const _SKIN_MORPH_ROOT = ['--skin-rgb', '--rim-c', '--rim-rgb', '--beam-rgb', '--halo-rgb', '--accent', '--accent-rgb', '--accent-soft'];
+const _SKIN_MORPH_MS = 600;
+
+function _skinColParse(raw) {
+  const v = String(raw || '').trim();
+  if (!v) return null;
+  let m = v.match(/^#([0-9a-f]{6})$/i);
+  if (m) return { t: 'rgba', v: [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16), 1] };
+  m = v.match(/^#([0-9a-f]{3})$/i);
+  if (m) return { t: 'rgba', v: [parseInt(m[1][0] + m[1][0], 16), parseInt(m[1][1] + m[1][1], 16), parseInt(m[1][2] + m[1][2], 16), 1] };
+  m = v.match(/^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)$/i);
+  if (m) return { t: 'rgba', v: [+m[1], +m[2], +m[3], m[4] === undefined ? 1 : +m[4]] };
+  m = v.match(/^([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)$/);
+  if (m) return { t: 'trip', v: [+m[1], +m[2], +m[3]] };
+  m = v.match(/^([\d.]+)\s+([\d.]+)\s+([\d.]+)$/);
+  if (m) return { t: 'strip', v: [+m[1], +m[2], +m[3]] };
+  m = v.match(/^(-?[\d.]+)(deg|px|%)?$/);
+  if (m) return { t: 'num', v: [+m[1]], u: m[2] || '' };
+  return null;
+}
+function _skinColFmt(p, v) {
+  const r = v.map((x, i) => (p.t === 'rgba' && i < 3) || p.t === 'trip' || p.t === 'strip' ? Math.round(x) : Math.round(x * 1000) / 1000);
+  if (p.t === 'rgba') return 'rgba(' + r[0] + ',' + r[1] + ',' + r[2] + ',' + r[3] + ')';
+  if (p.t === 'trip') return r.join(',');
+  if (p.t === 'strip') return r.join(' ');
+  return String(r[0]) + (p.u || '');
+}
+function _skinMorphRun(el, names, before, after, finals) {
+  const lanes = [];
+  names.forEach((n) => {
+    const a = _skinColParse(before[n]);
+    const b = _skinColParse(after[n]);
+    if (a && b && a.t === b.t && a.v.length === b.v.length && _skinColFmt(a, a.v) !== _skinColFmt(b, b.v)) {
+      lanes.push({ n, a, b });
+      el.style.setProperty(n, _skinColFmt(a, a.v));   // start from where we were
+    }
+    // unparseable or unchanged: whatever the original apply set stays as is
+  });
+  if (!lanes.length) return;
+  if (el.__skinMorphRaf) cancelAnimationFrame(el.__skinMorphRaf);
+  const t0 = performance.now();
+  const tick = () => {
+    const p = Math.min(1, (performance.now() - t0) / _SKIN_MORPH_MS);
+    const e = 1 - Math.pow(1 - p, 3);               // ease-out cubic
+    lanes.forEach((L) => {
+      el.style.setProperty(L.n, _skinColFmt(L.a, L.a.v.map((x, i) => x + (L.b.v[i] - x) * e)));
+    });
+    if (p < 1) { el.__skinMorphRaf = requestAnimationFrame(tick); return; }
+    el.__skinMorphRaf = null;
+    // land EXACTLY on the state the original apply left, removals included
+    lanes.forEach((L) => {
+      if (finals[L.n] === '') el.style.removeProperty(L.n);
+      else el.style.setProperty(L.n, finals[L.n]);
+    });
+  };
+  el.__skinMorphRaf = requestAnimationFrame(tick);
+}
 function applyCardSkin(wrap) {
+  if (!wrap) return;
+  const root = document.documentElement;
+  const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const morph = !reduced && wrap.__skinPainted;
+  let wb = {}, rb = {};
+  if (morph) {
+    try {
+      const wc = getComputedStyle(wrap), rc = getComputedStyle(root);
+      _SKIN_MORPH_WRAP.forEach((n) => { wb[n] = wc.getPropertyValue(n); });
+      _SKIN_MORPH_ROOT.forEach((n) => { rb[n] = rc.getPropertyValue(n); });
+    } catch (e) {}
+  }
+  _applyCardSkinNow(wrap);
+  wrap.__skinPainted = true;
+  if (!morph) return;
+  try {
+    const wc2 = getComputedStyle(wrap), rc2 = getComputedStyle(root);
+    const wa = {}, ra = {}, wf = {}, rf = {};
+    _SKIN_MORPH_WRAP.forEach((n) => { wa[n] = wc2.getPropertyValue(n); wf[n] = wrap.style.getPropertyValue(n); });
+    _SKIN_MORPH_ROOT.forEach((n) => { ra[n] = rc2.getPropertyValue(n); rf[n] = root.style.getPropertyValue(n); });
+    _skinMorphRun(wrap, _SKIN_MORPH_WRAP, wb, wa, wf);
+    _skinMorphRun(root, _SKIN_MORPH_ROOT, rb, ra, rf);
+  } catch (e) {}
+}
+
+function _applyCardSkinNow(wrap) {
   if (!wrap) return;
   const sk = activeCardSkin();
   // the room the card sits in takes the material's colour (js/08 sets it,
