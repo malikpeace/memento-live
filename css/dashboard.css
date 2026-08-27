@@ -6752,3 +6752,22 @@ html.app-asleep .crays__shaft {
    ========================================================================== */
 .cc-card--pillars .v-nf > :first-child { margin-top: auto; }
 .cc-card--pillars .v-nf .a-btn { margin-top: 26px !important; }
+
+/* ==========================================================================
+   THE FACE SAYS WHICH MODULE IT IS (v1294, Malik: swiping the sync deck was
+   confusing because nothing said what you were looking at). One small word in
+   the module's own colour, injected for every face by ccSyncFace, so the three
+   pages of the deck are named the way the modules themselves are. Inside the
+   face root, so the measured shared deck height already covers it, and the
+   v1292 slack-to-top rule keeps working: the label leads the block.
+   ========================================================================== */
+.cc-sync-k {
+  margin: 0 0 7px; font-size: 10.5px; font-weight: 650;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: rgba(var(--ink), 0.42);
+}
+.cc-sync-k--clarity { color: rgba(58, 217, 245, 0.78); }
+.cc-sync-k--consistency { color: rgba(63, 217, 78, 0.78); }
+/* the label leads the bottom-anchored block, not the slack above it */
+.cc-card--pillars .v-nf > .cc-sync-k:first-child { margin-top: auto; }
+.cc-card--pillars .v-nf > .cc-sync-k:first-child + * { margin-top: 0; }

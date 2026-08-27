@@ -4838,10 +4838,19 @@ function ccSyncFace(pillar) {
     const sit = ccSituation(shape);
     if (!sit) return null;
     const d1 = ccSyncDayOne();
-    if (pillar === 'action') return ccSyncFaceAction(shape, sit, d1);
-    if (pillar === 'clarity') return ccSyncFaceClarity(shape, sit, d1);
-    if (pillar === 'consistency') return ccSyncFaceCons(shape, sit, d1);
-    return null;
+    let html = null;
+    if (pillar === 'action') html = ccSyncFaceAction(shape, sit, d1);
+    else if (pillar === 'clarity') html = ccSyncFaceClarity(shape, sit, d1);
+    else if (pillar === 'consistency') html = ccSyncFaceCons(shape, sit, d1);
+    if (!html) return null;
+    // v1294 (Malik: "the main thing making it confusing is understanding what
+    // I'm looking at... add the labels back"). Every face names its module in
+    // its own colour, injected HERE so all thirty-odd face variants carry it
+    // without each renderer knowing. It goes INSIDE the face root, so the
+    // deck's measured shared height already accounts for it.
+    const NAME = { action: 'Action', clarity: 'Clarity', consistency: 'Consistency' };
+    return html.replace(/^(<div[^>]*>)/,
+      '$1<p class="cc-sync-k cc-sync-k--' + pillar + '">' + NAME[pillar] + '</p>');
   } catch (e) { return null; }
 }
 

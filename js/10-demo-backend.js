@@ -474,7 +474,7 @@ const DEMO_LOGIC = {
     commitment: 'You said the week dies at the script, not the camera. So the plan aims there and nowhere else. One script gets written before anything else is touched.',
     arrow: { from: '8,400 subscribers', to: '100,000' },
     acts: [
-      { role: 'star', text: 'Write the first draft of this week’s video script', reason: 'you said the script is the bottleneck and everything downstream waits on it', doneWhen: 'a full rough draft exists, bad is fine', starter: 'open a blank doc and write the worst opening line you can.' },
+      { role: 'star', text: '45 minutes on this week’s script, draft only', reason: 'you said the script is the bottleneck and everything downstream waits on it', doneWhen: 'the minutes happened, bad pages count', starter: 'open a blank doc and write the worst opening line you can.' },
       { role: 'support', text: 'Draft the thumbnail while the script is still warm', reason: 'you said thumbnails get skipped when you are tired at the end' },
       { role: 'support', text: 'Analytics stay closed until the video is up', reason: 'you named opening analytics before noon as the thing that eats the morning' }
     ],
@@ -509,7 +509,7 @@ const DEMO_LOGIC = {
     commitment: 'You said the product is fine and nobody knows it exists. So the plan is attention and conversations, not code. The scary half is the half that moves the number.',
     arrow: { from: '62 paying users', to: '100' },
     acts: [
-      { role: 'star', text: 'Talk to three users about why they signed up', reason: 'you said you guess at what people want instead of asking', doneWhen: 'three real replies exist, not three sent messages', starter: 'send one message to the last person who signed up.' },
+      { role: 'star', text: 'Talk to 3 users about why they signed up', reason: 'you said you guess at what people want instead of asking', doneWhen: 'real replies exist, not just sent messages', starter: 'send one message to the last person who signed up.' },
       { role: 'support', text: 'Rewrite one line of the pricing page like a human', reason: 'you said the churned user blamed onboarding, not price' },
       { role: 'support', text: 'No refactoring until the selling is done', reason: 'you named refactoring the admin panel as the avoidance' }
     ],
@@ -533,7 +533,7 @@ const DEMO_LOGIC = {
       { q: 'What if nobody replies?', a: 'Then the message is the problem and you have learned something on day one. Rewrite it and send it to the next three.' },
       { q: 'When do I get to build again?', a: 'After the selling. Not instead of it. The plan does not ban building, it just refuses to let it go first.' }
     ],
-    sizes: { unit: 'conversations', ladder: [1, 2, 3, 5], named: [1, 3, 5], estMinPerUnit: 20, fmt: 'plain' },
+    sizes: { unit: 'users', ladder: [1, 2, 3, 5], named: [1, 3, 5], estMinPerUnit: 20, fmt: 'plain' },
     close: { cadence: 'daily', kind: 'num', prompt: 'Paying users', unit: '', prefix: '', decimals: false, source: 'Asked once a day, whenever you check.', choices: null, tail: 'today.' },
     checkpoint: 'two weeks',
     sendWindow: 'morning',
@@ -544,7 +544,7 @@ const DEMO_LOGIC = {
     commitment: 'You said you know what to do and do none of it. So the plan does not teach you studying. It moves the work one day earlier, which is the only change that kills the panic.',
     arrow: { from: '3.55 GPA', to: '3.8 by finals' },
     acts: [
-      { role: 'star', text: 'Do tomorrow’s reading before tonight', reason: 'you said the panic comes from being one day behind, every day', doneWhen: 'tomorrow’s pages are read, notes optional', starter: 'put the textbook on the desk and read one page.' },
+      { role: 'star', text: '50 minutes on tomorrow’s reading, before tonight', reason: 'you said the panic comes from being one day behind, every day', doneWhen: 'tomorrow’s pages are read, notes optional', starter: 'put the textbook on the desk and read one page.' },
       { role: 'support', text: 'Phone in the other room while you read', reason: 'you said you lose the hour without noticing' },
       { role: 'support', text: 'Same sleep and wake time, weekends included', reason: 'you said the all-nighters are what break the following week' }
     ],
@@ -579,7 +579,7 @@ const DEMO_LOGIC = {
     commitment: 'You said you run hard on good days and nothing on bad ones. A marathon does not care about good days. The plan trades intensity for a rhythm that survives a bad week.',
     arrow: { from: '5:00 marathon', to: 'under 4:00 in October' },
     acts: [
-      { role: 'star', text: 'Run today’s prescribed miles at conversation pace', reason: 'you said every run turns into a race and then you need three days off', doneWhen: 'the distance happened, slow counts', starter: 'shoes on, out the door, first half mile easy.' },
+      { role: 'star', text: 'Run 6 miles at conversation pace', reason: 'you said every run turns into a race and then you need three days off', doneWhen: 'the distance happened, slow counts', starter: 'shoes on, out the door, first half mile easy.' },
       { role: 'support', text: 'Lay tomorrow’s kit out tonight', reason: 'you said the morning decision is where the run dies' },
       { role: 'support', text: 'Long run gets its own day, protected', reason: 'you said weekends disappear and the long run goes first' }
     ],
@@ -603,7 +603,7 @@ const DEMO_LOGIC = {
       { q: 'What if I miss the long run?', a: 'The week still counts. One missed long run is a data point, four in a row is a different plan. Memento is watching for the second one, not the first.' },
       { q: 'When does the pace work start?', a: 'After eight weeks of the boring version. That is the checkpoint on this plan.' }
     ],
-    sizes: { unit: 'mi', ladder: [2, 4, 6, 10, 16], named: [4, 6, 10], estMinPerUnit: 10, fmt: 'plain' },
+    sizes: { unit: 'miles', ladder: [2, 4, 6, 10, 16], named: [4, 6, 10], estMinPerUnit: 10, fmt: 'plain' },
     close: { cadence: 'daily', kind: 'num', prompt: 'Miles', unit: 'mi', prefix: '', decimals: true, source: 'Asked after every run.', choices: null, tail: 'today.' },
     checkpoint: 'eight weeks',
     sendWindow: 'morning',
@@ -614,7 +614,7 @@ const DEMO_LOGIC = {
     commitment: 'You said you rewrite chapter one instead of writing chapter twelve. So the plan measures words added, never words polished. The draft gets finished ugly.',
     arrow: { from: '41,200 words', to: '80,000 by New Year’s Eve' },
     acts: [
-      { role: 'star', text: 'Add new words to the draft, forward only', reason: 'you said editing the opening is how you avoid the middle', doneWhen: 'the word count is higher than it was this morning', starter: 'open the file, go to the very end, write one sentence.' },
+      { role: 'star', text: 'Add 300 words to the draft, forward only', reason: 'you said editing the opening is how you avoid the middle', doneWhen: 'the word count is higher than it was this morning', starter: 'open the file, go to the very end, write one sentence.' },
       { role: 'support', text: 'Leave a note for tomorrow before you close the file', reason: 'you said starting cold is the hardest part of the day' },
       { role: 'support', text: 'No reading back further than yesterday', reason: 'you said one reread turns into a week of rewriting' }
     ],
@@ -650,7 +650,7 @@ DEMO_LOGIC.barber = {
   commitment: 'You said the chair is full some weeks and empty others. The plan does not chase more customers. It makes the ones you already cut come back on a date instead of whenever they remember.',
   arrow: { from: '$7,350 a month', to: '$10,000' },
   acts: [
-    { role: 'star', text: 'Book the next appointment before the client leaves the chair', reason: 'you said the empty weeks are people who meant to come back and did not', doneWhen: 'every client today left with a date', starter: 'ask the person in the chair right now: same time in three weeks?' },
+    { role: 'star', text: 'Rebook 6 clients before they leave the chair', reason: 'you said the empty weeks are people who meant to come back and did not', doneWhen: 'each of them left with a date', starter: 'ask the person in the chair right now: same time in three weeks?' },
     { role: 'support', text: 'Post one finished cut before you close', reason: 'you said new faces come from the page and the page goes quiet' },
     { role: 'support', text: 'Write down every no-show', reason: 'you said you cannot tell a bad week from a bad month' }
   ],
@@ -674,7 +674,7 @@ DEMO_LOGIC.barber = {
     { q: 'What if they say no to rebooking?', a: 'Some will. Asking every single person is still the highest-paid sentence in the shop.' },
     { q: 'When do I hire?', a: 'When $10k holds for three straight months, not the first time it happens. Memento is counting.' }
   ],
-  sizes: { unit: 'cuts', ladder: [2, 4, 6, 8, 12], named: [4, 6, 8], estMinPerUnit: 40, fmt: 'plain' },
+  sizes: { unit: 'clients', ladder: [2, 4, 6, 8, 12], named: [4, 6, 8], estMinPerUnit: 40, fmt: 'plain' },
   close: { cadence: 'daily', kind: 'num', prompt: 'Cuts today', unit: '', prefix: '', decimals: false, source: 'Asked at close.', choices: null, tail: '' },
   checkpoint: 'one month',
   sendWindow: 'evening',
@@ -685,7 +685,7 @@ DEMO_LOGIC.coder = {
   commitment: 'You said you bounce between tutorials. Tutorials are not the job hunt. The plan is applications and one project deep enough to talk about for thirty minutes.',
   arrow: { from: '11 applications', to: 'an offer by March' },
   acts: [
-    { role: 'star', text: 'Send one real application, tailored', reason: 'you said you rewrite the résumé instead of sending it', doneWhen: 'submitted, with a cover line written for that company', starter: 'open the last job you bookmarked and write the first sentence.' },
+    { role: 'star', text: 'Send 1 application, tailored to the company', reason: 'you said you rewrite the résumé instead of sending it', doneWhen: 'submitted, with a cover line written for that company', starter: 'open the last job you bookmarked and write the first sentence.' },
     { role: 'support', text: 'Thirty minutes on the portfolio project, not a new one', reason: 'you said every new tutorial restarts the clock' },
     { role: 'support', text: 'One message to a human who works there', reason: 'you said the callbacks came from people, not portals' }
   ],
@@ -720,7 +720,7 @@ DEMO_LOGIC.musician = {
   commitment: 'You said you have forty unfinished ideas. The plan does not ask for a better idea. It finishes five of the ones you already have, because finished is the skill you are missing.',
   arrow: { from: '0 tracks finished', to: '5 and a live show' },
   acts: [
-    { role: 'star', text: 'Work the current track toward finished, no new projects', reason: 'you said a new idea is how you escape a hard mix', doneWhen: 'the session moved this track closer to done', starter: 'open the project you touched last, not a new one.' },
+    { role: 'star', text: '60 minutes on the current track, no new projects', reason: 'you said a new idea is how you escape a hard mix', doneWhen: 'the session moved this track closer to done', starter: 'open the project you touched last, not a new one.' },
     { role: 'support', text: 'Bounce whatever exists and listen once in the car', reason: 'you said you cannot hear it in the headphones any more' },
     { role: 'support', text: 'Write down the one thing stopping this track', reason: 'you said you stall without knowing why' }
   ],
@@ -755,7 +755,7 @@ DEMO_LOGIC.teacher = {
   commitment: 'You said you have lost this weight before and found it again. So the plan is built to survive a hard week at school, not to be impressive in an easy one.',
   arrow: { from: '194 pounds', to: '177 by graduation' },
   acts: [
-    { role: 'star', text: 'A thirty minute walk after dinner', reason: 'you said the evening is when the day falls apart', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, to the end of the street and back.' },
+    { role: 'star', text: 'A 30 minute walk after dinner', reason: 'you said the evening is when the day falls apart', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, to the end of the street and back.' },
     { role: 'support', text: 'Pack tomorrow’s lunch tonight', reason: 'you said the school day is where the plan gets eaten' },
     { role: 'support', text: 'Water on the desk, refilled at every break', reason: 'you said the afternoon crash is when the snacks win' }
   ],
@@ -791,7 +791,7 @@ DEMO_LOGIC.screentime = {
   commitment: 'You said you do not choose the four hours, they just happen. So the plan does not ask for willpower at 11pm. It changes where the phone sleeps and what the first hour of the day is allowed to contain.',
   arrow: { from: '4 hours 4 minutes a day', to: 'under 2 hours' },
   acts: [
-    { role: 'star', text: 'The phone charges outside the bedroom tonight', reason: 'you said the worst hour is the one in bed before sleep', doneWhen: 'the phone is on the kitchen charger and you are not', starter: 'plug it in now, before you sit down.' },
+    { role: 'star', text: '60 minutes of the evening with the phone in another room', reason: 'you said the worst hour is the one in bed before sleep', doneWhen: 'the hour happened, unbroken', starter: 'put it on the kitchen charger now, before you sit down.' },
     { role: 'support', text: 'One evening hour with the phone in another room', reason: 'you said the evening disappears and you cannot say into what' },
     { role: 'support', text: 'No feed apps before the first real thing is done', reason: 'you said the morning scroll sets the tone for the whole day' }
   ],
@@ -827,7 +827,7 @@ DEMO_LOGIC.weight = {
   commitment: 'You said you have done this three times and gained it back three times. So the plan is not a diet. It is a gap small enough to keep after the weight is gone, because keeping it is the part you have never done.',
   arrow: { from: '271 pounds', to: '236' },
   acts: [
-    { role: 'star', text: 'A forty minute walk after dinner', reason: 'you said the evening is when the day breaks and the snacking starts', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, out the door, to the corner and back.' },
+    { role: 'star', text: 'A 40 minute walk after dinner', reason: 'you said the evening is when the day breaks and the snacking starts', doneWhen: 'the walk happened, pace does not matter', starter: 'shoes on, out the door, to the corner and back.' },
     { role: 'support', text: 'Log every meal, before you eat it', reason: 'you said you have no idea what a normal day actually adds up to' },
     { role: 'support', text: 'Water instead of soda, all day', reason: 'you named sugar drinks as the biggest single thing' }
   ],

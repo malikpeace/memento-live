@@ -4385,6 +4385,7 @@
       }
       // the size is part of the sentence: the rail owns it, nothing else does.
       var label = sizeText(plan, val);
+      var dirn = (val === lastVal) ? 1 : (ascending ? (val > lastVal ? 1 : -1) : (val < lastVal ? 1 : -1));
       // the size token inside the sentence. Longest unit spelling first, or
       // "3 hours" matches on "3 hour" and leaves an orphan "s" behind.
       var m = starAct.text.match(/^(.*?)(\d+\s*(?:minutes|minute|mins|min|hours|hour|hrs|hr))(.*)$/i);
@@ -4392,8 +4393,41 @@
         pre.textContent = m[1];
         // the number the rail is moving: it arrives from the direction the rail
         // went, never a hard swap (his on-device note).
-        swapText(tok, label, (val === lastVal) ? 1 : (ascending ? (val > lastVal ? 1 : -1) : (val < lastVal ? 1 : -1)));
+        swapText(tok, label, dirn);
         post.textContent = m[3];
+      } else if (hasSize && (plan.sizes || {}).unit) {
+        // v1294 (Malik, on a persona: "i can swipe but it doesn't actually
+        // change the action at all"). The sentence swap only knew TIME tokens,
+        // so any plan sized in its own unit (words, miles, applications, cuts)
+        // had a rail that moved supports but never the sentence: the size was
+        // literally invisible. The plan's own unit is a token too now. Only
+        // the NUMBER swaps; their unit word stays exactly as they wrote it.
+        var u0 = String(plan.sizes.unit).trim();
+        var cand = {};
+        [u0, u0 + 's', u0.replace(/s$/i, '')].forEach(function (c) {
+          c = c.trim();
+          if (c && !/^(minutes|minute|mins|min|hours|hour|hrs|hr)$/i.test(c)) cand[c.toLowerCase()] = c;
+        });
+        var alts = Object.keys(cand).sort(function (a, b) { return b.length - a.length; })
+          .map(function (c) { return c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|');
+        var m2 = alts && starAct.text.match(new RegExp('^(.*?)(\\d+)(\\s*(?:' + alts + '))(\\b.*)$', 'i'));
+        if (m2) {
+          pre.textContent = m2[1];
+          swapText(tok, String(val), dirn);
+          // the unit keeps their casing but agrees with the number: "1
+          // application", "3 applications". Regular plurals only, which is
+          // what every plan unit is.
+          var uWord = m2[3];
+          var uCore = uWord.replace(/^\s+/, '');
+          var uPad = uWord.slice(0, uWord.length - uCore.length);
+          if (val === 1) uCore = uCore.replace(/s$/i, '');
+          else if (!/s$/i.test(uCore)) uCore += 's';
+          post.textContent = uPad + uCore + m2[4];
+        } else {
+          pre.textContent = starAct.text;
+          tok.textContent = '';
+          post.textContent = '';
+        }
       } else {
         pre.textContent = starAct.text;
         tok.textContent = '';
