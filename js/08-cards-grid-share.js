@@ -1352,32 +1352,53 @@ function renderGreeting() {
   } catch (e) {}
   const mg = document.getElementById('dashGreetingMobile');
   if (mg) {
-    // Whisper bar (v709, Malik): "July 12, 2026", pinned top-right. Tapping it
-    // swaps the date for the weeks you have left to live for a few seconds,
-    // the home's quiet mortality tap.
-    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    // v976: the mobile Settings/You corner icon sits beside the date (the retired
-    // bottom bar's You tab). Opens the profile panel via the TabBar machinery.
-    // v1119 (Malik): a GEAR, not a person. Settings and profile are one
-    // surface (the You panel already opens on the account card), and a gear
-    // is what people expect to find in that corner.
-    const gearHTML = '<button class="wbar__settings" id="wbarSettings" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10.05 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg></button>';
-    // v1060 (Malik): date first, the profile button on the far right.
-    mg.innerHTML = (weeksLeft != null
-      ? '<span class="wbar__date" id="wbarDate" role="button" tabindex="0" aria-label="Show weeks left to live">' + esc(dateStr) + '</span>'
-      : '<span class="wbar__date" id="wbarDate">' + esc(dateStr) + '</span>') + gearHTML;
+    // v1302 (Malik): the header is a two-line stack now. Line 1 is the brand
+    // row: MEMENTO with the date beside it (short, dim, the mortality tap
+    // moved with it) and the corner button on the right. Line 2 greets them
+    // by first name in the slack above the card, so the card never shrinks.
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const bd = document.getElementById('brandDate');
+    if (bd) {
+      bd.textContent = dateStr;
+      if (weeksLeft != null && !bd._wbBound) {
+        bd._wbBound = true;
+        bd.setAttribute('role', 'button');
+        bd.setAttribute('tabindex', '0');
+        bd.setAttribute('aria-label', 'Show weeks left to live');
+        bd.addEventListener('click', () => {
+          clearTimeout(bd._wbT);
+          if (bd._wbOn) { bd.textContent = dateStr; bd._wbOn = false; return; }
+          bd._wbOn = true;
+          bd.textContent = '~' + weeksLeft.toLocaleString() + ' weeks left';
+          bd._wbT = setTimeout(() => { bd.textContent = dateStr; bd._wbOn = false; }, 4000);
+        });
+      }
+    }
+    // The corner: their photo by default; the M or the gear by choice
+    // (Settings > Appearance > Home corner).
+    const corner = (state.prefs && state.prefs.homeCorner) || 'photo';
+    const gearSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01A1.7 1.7 0 0 0 10.05 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.56 1.03Z"/></svg>';
+    const markSvg = '<svg viewBox="113 108 286 297" fill="currentColor" aria-hidden="true" style="width:13px;height:13px"><path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z"/></svg>';
+    const cornerInner = corner === 'gear' ? gearSvg : (corner === 'mark' ? markSvg : '');
+    const cornerCls = corner === 'photo' ? ' wbar__settings--photo' : '';
+    // The greeting: the deskGreeting words (time of day + FIRST name,
+    // Welcome pre-Clarity, Up late past midnight), on its own line.
+    const hasClarity2 = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    const first = ((state.profile && state.profile.name || '').trim().split(/\s+/)[0]) || '';
+    const h2 = now.getHours();
+    const when2 = h2 < 5 ? 'Up late' : h2 < 12 ? 'Good morning' : h2 < 17 ? 'Good afternoon' : 'Good evening';
+    const word2 = hasClarity2 ? when2 : 'Welcome';
+    const line2 = first ? (word2 + ', ' + first + '.') : (word2 + '.');
+    mg.innerHTML = '<button class="wbar__settings' + cornerCls + '" id="wbarSettings" type="button" aria-label="Settings">' + cornerInner + '</button>'
+      + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + '</div>';
     const _ws = document.getElementById('wbarSettings');
-    if (_ws) _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
-    const wd = document.getElementById('wbarDate');
-    if (wd && weeksLeft != null) {
-      const revert = () => { wd.textContent = dateStr; wd._wbOn = false; };
-      wd.addEventListener('click', () => {
-        clearTimeout(wd._wbT);
-        if (wd._wbOn) { revert(); return; }
-        wd._wbOn = true;
-        wd.textContent = '~' + weeksLeft.toLocaleString() + ' weeks left';
-        wd._wbT = setTimeout(revert, 4000);
-      });
+    if (_ws) {
+      _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
+      if (corner === 'photo') {
+        const init = (first || 'M').slice(0, 1).toUpperCase();
+        if (typeof window.applyProfileAvatar === 'function') window.applyProfileAvatar(_ws, init);
+        else _ws.textContent = init;
+      }
     }
   }
   // v1043: the desktop header date is gone with the clock block, so nothing
@@ -9634,8 +9655,30 @@ function _rgbToHex(rgb) {
 // actually changes, never on every render. Returning to the house card
 // restores whatever accent they had before their first material.
 let _skinAccentApplied = null;
+// v1302: the home aurora wears the material's own colours. Three RGB triplets
+// on the root; the CSS defaults (house cyan / spring green / periwinkle) come
+// back when they are removed.
+function _auroraSyncToSkin(sk) {
+  try {
+    const root = document.documentElement.style;
+    if (!sk) {
+      root.removeProperty('--aur-1'); root.removeProperty('--aur-2'); root.removeProperty('--aur-3');
+      return;
+    }
+    const trip = (raw, fb) => {
+      const p2 = _skinColParse(raw);
+      return (p2 && Array.isArray(p2.v) && p2.v.length >= 3)
+        ? Math.round(p2.v[0]) + ' ' + Math.round(p2.v[1]) + ' ' + Math.round(p2.v[2]) : fb;
+    };
+    root.setProperty('--aur-1', trip(sk.sk1 || sk.edge, '58 217 245'));
+    root.setProperty('--aur-2', trip(sk.sk2 || sk.sk1 || sk.edge, '63 217 78'));
+    root.setProperty('--aur-3', trip(sk.sk3 || sk.sk1 || sk.edge, '128 150 255'));
+  } catch (e) {}
+}
+
 function syncAppAccentToSkin(sk) {
   try {
+    _auroraSyncToSkin((state.prefs && state.prefs.skinColorsApp === false) ? null : sk);
     // v1152 (Malik): the Memento colours the app BY DEFAULT, with an opt-out
     // in the hold-sheet. Off = the accent snaps back to their own; the card,
     // its room and its rim keep the material either way (they ARE the skin).

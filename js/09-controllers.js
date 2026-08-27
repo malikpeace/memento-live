@@ -4930,6 +4930,18 @@ const TabBar = {
             '<div class="pref-seg" id="prefThemeMode" role="group" aria-label="Appearance. Auto follows your device.">' + seg + '</div>' +
           '</div>';
         })() +
+        // v1302 (Malik): what lives in the home's top-right corner. Their
+        // photo by default; the M or the gear for anyone who prefers it.
+        (function () {
+          const cur2 = (prefs.homeCorner === 'mark' || prefs.homeCorner === 'gear') ? prefs.homeCorner : 'photo';
+          const seg2 = [['photo', 'Photo'], ['mark', 'The M'], ['gear', 'Gear']].map(function (o) {
+            return '<button type="button" class="pref-seg__opt' + (cur2 === o[0] ? ' is-on' : '') + '" data-home-corner="' + o[0] + '" aria-pressed="' + (cur2 === o[0] ? 'true' : 'false') + '">' + o[1] + '</button>';
+          }).join('');
+          return '<div class="pref-row">' +
+            '<div class="pref-row__text"><div class="pref-row__title">Home corner</div></div>' +
+            '<div class="pref-seg" id="prefHomeCorner" role="group" aria-label="What the home\u2019s top-right button shows.">' + seg2 + '</div>' +
+          '</div>';
+        })() +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
@@ -5215,6 +5227,19 @@ const TabBar = {
         });
         applyThemeChange(() => { state.prefs.theme = mode; });
         persistNow();
+      });
+    });
+    const cornerSeg = document.getElementById('prefHomeCorner');
+    if (cornerSeg) cornerSeg.querySelectorAll('[data-home-corner]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.prefs.homeCorner = btn.getAttribute('data-home-corner');
+        cornerSeg.querySelectorAll('[data-home-corner]').forEach(b => {
+          const on = b === btn;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        persistNow();
+        try { renderAll(); } catch (e) {}
       });
     });
     wireToggle('prefFlatBg', (on) => { state.prefs.flatBg = on; });

@@ -3531,6 +3531,15 @@ html.lowfx .daycard-ns {
   height: 0.88em; width: auto; margin-right: 0.24em;
   color: var(--text-hi);
 }
+/* v1302: the date rides the brand line, MEMENTO \B7 Aug 27, in the whisper
+   bar's own quiet type. The mortality tap moved with it. */
+.dash-header__brand-date {
+  font-size: 0.78rem; font-weight: 500; color: var(--text-lo);
+  letter-spacing: 0.01em; font-variant-numeric: tabular-nums;
+  margin-left: 2px; cursor: default;
+}
+.dash-header__brand-date::before { content: '\B7'; margin-right: 10px; opacity: 0.7; }
+.dash-header__brand-date[role="button"] { cursor: pointer; }
 .dash-header__brand-name {
   font-size: 0.74rem; font-weight: 700; letter-spacing: 0.24em;
   text-transform: uppercase; color: var(--text-hi);
@@ -3543,17 +3552,38 @@ html.lowfx .daycard-ns {
   /* The greeting block (and its headline) hands the header to the brand. */
   .dash-header__greeting { display: none; }
   #dashGreetingMobile {
-    /* The date is pulled up onto the brand's line (top-right), aligned with the
-       MEMENTO lockup on the left, instead of sitting in its own row below it. The
-       freed vertical space goes to a taller Memento card. */
+    /* v1302 (Malik): two lines. Line 1 is pulled up onto the brand's line and
+       holds only the corner button (the date joined the wordmark). Line 2 is
+       the greeting, and the NET FLOW HEIGHT IS UNCHANGED (the negative bottom
+       margin pays for the greeting line exactly), so the card keeps its size
+       to the pixel: the greeting lives in the slack the stage already keeps
+       above the card. */
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 6px 12px;
+    gap: 0 12px;
     min-height: 34px;
     margin: -50px 2px 14px;
     padding-top: 0;
+    /* full row, so the absolute greeting anchors at the LEFT edge under the
+       wordmark (content-sized, this block hugged the right corner button) */
+    width: auto;
+    align-self: stretch;
+    left: 0; right: 0;
+  }
+  /* Absolutely placed under the wordmark, so it costs the layout NOTHING:
+     the card keeps its exact size and the line breathes in the slack the
+     stage already keeps above the card. The faint shadow keeps it legible
+     where the card's halo bleeds up. */
+  .mgreet-hello {
+    position: absolute;
+    left: 14px; top: 30px;   /* flush with the wordmark's M */
+    font-size: 1.2rem; font-weight: 700; letter-spacing: -0.012em;
+    line-height: 1.1;
+    color: var(--text-hi);
+    text-shadow: 0 1px 14px rgba(4, 6, 10, 0.45);
+    pointer-events: none;
   }
   /* !important matches the older mobile rule that force-showed this block. */
   .dash-header__right { display: none !important; }
@@ -6851,3 +6881,43 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
 @keyframes ccInL { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
 #commandCenter .cc-card--in-r { animation: ccInR 300ms cubic-bezier(0.22, 1, 0.36, 1); }
 #commandCenter .cc-card--in-l { animation: ccInL 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+
+/* \2500\2500 v1302: THE HOME AURORA (Malik). The First 7 Days finale floor,
+   ported verbatim from css/clarity.css .n7d-finale: same gradients, same
+   radial mask (no defined top edge, no side clip), same 17s/21s cross-drift.
+   Only the colours moved into --aur-1/2/3 RGB triplets so the material can
+   drive them (js/08 _auroraSyncToSkin); the defaults are the house cyan,
+   spring green and periwinkle. The beams STAY, this joins them. Post-star
+   only, hidden in light mode exactly like the rays. */
+.ambient__aurora { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; }
+.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; inset: 0; }
+.ambient__aurora i {
+  background:
+    radial-gradient(150% 78% at 50% 126%, rgb(var(--aur-2, 63 217 78) / 0.32), transparent 74%),
+    radial-gradient(96% 62% at 28% 120%, rgb(var(--aur-1, 58 217 245) / 0.36), transparent 72%);
+  -webkit-mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+          mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+}
+.ambient__aurora i::before {
+  background:
+    radial-gradient(96% 62% at 72% 120%, rgb(var(--aur-3, 128 150 255) / 0.36), transparent 72%),
+    radial-gradient(80% 50% at 50% 114%, rgba(255, 255, 255, 0.18), transparent 64%);
+  -webkit-mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+          mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+}
+body.ns-bloom .ambient__aurora { opacity: 1; }
+body.ns-bloom .ambient__aurora i { animation: homeAurA 17s ease-in-out infinite alternate; }
+body.ns-bloom .ambient__aurora i::before { animation: homeAurB 21s ease-in-out infinite alternate; }
+@keyframes homeAurA { from { transform: translate(-5%, 1.5%); } to { transform: translate(6%, -1.5%); } }
+@keyframes homeAurB { from { transform: translate(5.5%, -1.5%); } to { transform: translate(-6%, 1.5%); } }
+@media (prefers-reduced-motion: reduce) {
+  body.ns-bloom .ambient__aurora i, body.ns-bloom .ambient__aurora i::before { animation: none; }
+}
+html.theme-light .ambient__aurora { display: none !important; }
+/* the corner button as their photo: image covers, initial stands in */
+.wbar__settings--photo {
+  overflow: hidden;
+  font-size: 0.8rem; font-weight: 700; color: var(--text-hi);
+  background-size: cover; background-position: center;
+}
