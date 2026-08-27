@@ -187,11 +187,14 @@ html.theme-light .daycard-theme-living { --card-lift: 0 22px 90px rgba(0, 0, 0, 
 .daycard-theme-living .blob.b3 { --bb: var(--cons, 0); }
 .daycard-theme-living .blob.b4 { --bb: var(--mix, 0); }
 .daycard-theme-living .blob.b5 { --bb: calc(var(--cons, 0) * 0.5); }
-.daycard-theme-living .blob.b1 { animation: dcRoam1 22.55s ease-in-out infinite; }
-.daycard-theme-living .blob.b2 { animation: dcRoam2 29.15s ease-in-out infinite; }
-.daycard-theme-living .blob.b3 { animation: dcRoam3 20.35s ease-in-out infinite; }
-.daycard-theme-living .blob.b4 { animation: dcRoam4 15.95s ease-in-out infinite; }
-.daycard-theme-living .blob.b5 { animation: dcRoam5 25.85s ease-in-out infinite; }
+/* v1297 (Malik: "things are just flying across the card"). The roam paths and
+   the expand/collapse stay exactly as picked (G3 Alive); only the CLOCK slowed,
+   roughly half speed, so the same journeys read as drift instead of flight. */
+.daycard-theme-living .blob.b1 { animation: dcRoam1 41.8s ease-in-out infinite; }
+.daycard-theme-living .blob.b2 { animation: dcRoam2 53.9s ease-in-out infinite; }
+.daycard-theme-living .blob.b3 { animation: dcRoam3 37.7s ease-in-out infinite; }
+.daycard-theme-living .blob.b4 { animation: dcRoam4 29.6s ease-in-out infinite; }
+.daycard-theme-living .blob.b5 { animation: dcRoam5 47.9s ease-in-out infinite; }
 
 @keyframes dcRoam1 {
   0%   { transform: translate(0, 0) scale(1);              opacity: calc(var(--bb, 0) * 0.9); }

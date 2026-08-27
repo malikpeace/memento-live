@@ -6772,3 +6772,56 @@ html.app-asleep .crays__shaft {
 /* the label leads the bottom-anchored block, not the slack above it */
 .cc-card--pillars .v-nf > .cc-sync-k:first-child { margin-top: auto; }
 .cc-card--pillars .v-nf > .cc-sync-k:first-child + * { margin-top: 0; }
+
+/* ==========================================================================
+   THE DECK STRIP (v1297, Malik's lab pick 02). The deck dots are a control
+   now: 34px of touch height, tap or scrub to steer, and the M at the right
+   edge steps or fans. The M is the real mark, quiet until pressed.
+   ========================================================================== */
+#commandCenter > .cc-dots--deck {
+  position: relative; min-height: 34px; align-items: center;
+  touch-action: none; cursor: pointer;
+}
+#commandCenter > .cc-dots--deck i { pointer-events: none; transition: width 200ms cubic-bezier(0.22,1,0.36,1), height 200ms cubic-bezier(0.22,1,0.36,1), background 200ms ease; }
+#commandCenter > .cc-dots--deck.is-scrub i { height: 7px; }
+#commandCenter > .cc-dots--deck.is-scrub i.on { background: rgba(var(--ink), 1); }
+.cc-strip-m {
+  position: absolute; right: 2px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border-radius: 999px; border: 0; cursor: pointer;
+  background: rgba(var(--ink), 0.06);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.08);
+  display: grid; place-items: center; padding: 0;
+  transition: transform 200ms cubic-bezier(0.22,1,0.36,1), background 200ms ease;
+  touch-action: none;
+}
+.cc-strip-m:active { transform: translateY(-50%) scale(0.9); background: rgba(var(--ink), 0.12); }
+.cc-strip-m svg { width: 13px; height: 13px; }
+.cc-strip-m path { fill: rgba(var(--ink), 0.55); }
+/* the fan: three names above the M, in the app's own glass */
+.cc-fan { position: fixed; inset: 0; z-index: 1050; }
+.cc-fan__scrim { position: absolute; inset: 0; background: rgba(3, 5, 6, 0.55); opacity: 0; transition: opacity 240ms ease; }
+.cc-fan.is-in .cc-fan__scrim { opacity: 1; }
+.cc-fan__opt {
+  position: fixed; z-index: 1; border: 0; cursor: pointer; font: inherit;
+  font-size: 13.5px; font-weight: 640; letter-spacing: -0.01em; white-space: nowrap;
+  color: var(--text-hi); padding: 9px 15px; border-radius: 999px;
+  background: rgba(16, 21, 26, 0.96);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 10px 26px rgba(0, 0, 0, 0.5);
+  opacity: 0; transform: translateY(10px) scale(0.92);
+  transition: transform 280ms cubic-bezier(0.22,1,0.36,1), opacity 200ms ease,
+              background 150ms ease, color 150ms ease;
+  font-variant-numeric: tabular-nums;
+}
+.cc-fan__opt span { color: rgba(var(--ink), 0.45); font-weight: 560; }
+.cc-fan.is-in .cc-fan__opt { opacity: 1; transform: none; }
+.cc-fan__opt.is-cur { box-shadow: inset 0 0 0 1px rgba(var(--ink), 0.22), 0 10px 26px rgba(0, 0, 0, 0.5); }
+.cc-fan__opt.is-armed, .cc-fan__opt:active {
+  background: #f4f7f8; color: #08090b;
+}
+.cc-fan__opt.is-armed span, .cc-fan__opt:active span { color: rgba(8, 9, 11, 0.55); }
+html.theme-light .cc-fan__opt { background: rgba(244, 246, 248, 0.97); color: #0c0e10; box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 10px 26px rgba(20, 25, 30, 0.25); }
+html.theme-light .cc-fan__opt span { color: rgba(12, 14, 16, 0.45); }
+html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { background: #101418; color: #f2f5f7; }
+@media (prefers-reduced-motion: reduce) {
+  .cc-fan__opt, .cc-fan__scrim, #commandCenter > .cc-dots--deck i { transition: none; }
+}

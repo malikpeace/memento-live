@@ -5534,6 +5534,174 @@ function renderDeskMission() {
   } catch (e) {}
 }
 
+/* ============================================================================
+   THE DECK STRIP (v1297, Malik's pick from the lab: "02, the dots strip
+   alone"). The dots under the sync box become a control: tap a dot to jump to
+   that box, or put a finger down on the strip and slide along it and the deck
+   follows live. A small M (the real mark, never a lookalike) sits at the
+   strip's right edge: tap steps to the next box, hold fans the three names up
+   for a direct pick, slide and let go. Swiping the box itself still works;
+   this is the second door, near the thumb, costing the Memento nothing.
+   ========================================================================== */
+function ccGoPillar(cc, pillar) {
+  try {
+    if (pillar === _ccPillar) return;
+    if (ccPillarList().indexOf(pillar) === -1) return;
+    _ccPillar = pillar;
+    cc.innerHTML = renderCommandCenter();
+    bindCommandCenter(cc);
+  } catch (e) {}
+}
+function ccFanValue(pillar) {
+  try {
+    if (pillar === 'action') return actionDoneToday() ? 'Done' : 'Not done';
+    if (pillar === 'clarity') {
+      const gp = state.goalProgress || {};
+      if (gp.current !== null && gp.current !== undefined && gp.target) {
+        return Number(gp.current).toLocaleString() + ' / ' + Number(gp.target).toLocaleString();
+      }
+      return '';
+    }
+    if (pillar === 'consistency') {
+      if (window.ConsistencyPage && ConsistencyPage.shownUpCount) {
+        const n = ConsistencyPage.shownUpCount();
+        if (isFinite(n) && n > 0) return n + ' days';
+      }
+      return '';
+    }
+  } catch (e) {}
+  return '';
+}
+function ccBindDeckStrip(cc, dn) {
+  const list = ccPillarList();
+  if (!list || list.length < 2) return;
+  const NAME = { action: 'Action', clarity: 'Clarity', consistency: 'Consistency' };
+
+  // ---- the M (the real mark) ----
+  const m = document.createElement('button');
+  m.type = 'button';
+  m.className = 'cc-strip-m';
+  m.setAttribute('aria-label', 'Switch box');
+  m.innerHTML = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  dn.appendChild(m);
+
+  // ---- scrub + tap on the dots ----
+  const dots = () => dn.querySelectorAll('i');
+  const idxAt = (x) => {
+    let best = 0, bd = Infinity;
+    dots().forEach((d, n) => {
+      const r = d.getBoundingClientRect();
+      const dx = Math.abs(x - (r.left + r.width / 2));
+      if (dx < bd) { bd = dx; best = n; }
+    });
+    return best;
+  };
+  let pid = null;
+  dn.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.cc-strip-m')) return;
+    pid = e.pointerId;
+    dn.classList.add('is-scrub');
+    try { dn.setPointerCapture(e.pointerId); } catch (z) {}
+    ccGoPillar(cc, list[idxAt(e.clientX)]);
+  });
+  dn.addEventListener('pointermove', (e) => {
+    if (pid === null || e.pointerId !== pid) return;
+    if (e.cancelable) { try { e.preventDefault(); } catch (z) {} }
+    ccGoPillar(cc, list[idxAt(e.clientX)]);
+  });
+  const scrubEnd = () => { pid = null; dn.classList.remove('is-scrub'); };
+  dn.addEventListener('pointerup', scrubEnd);
+  dn.addEventListener('pointercancel', scrubEnd);
+  // NOTE: ccGoPillar re-renders and rebuilds this strip; the captured pointer
+  // dies with the old node, so the scrub re-arms on the next touch. One box
+  // per touch-down is the natural rhythm of a 3-dot strip anyway.
+
+  // ---- the fan: hold the M, slide, release ----
+  const openFan = () => {
+    if (document.querySelector('.cc-fan')) return null;
+    const rect = m.getBoundingClientRect();
+    const fan = document.createElement('div');
+    fan.className = 'cc-fan';
+    fan.innerHTML = '<div class="cc-fan__scrim"></div>';
+    const opts = [];
+    list.forEach((pillar, n) => {
+      const o = document.createElement('button');
+      o.type = 'button';
+      o.className = 'cc-fan__opt' + (pillar === _ccPillar ? ' is-cur' : '');
+      const v = ccFanValue(pillar);
+      o.innerHTML = esc(NAME[pillar] || pillar) + (v ? ' &nbsp;<span>' + esc(v) + '</span>' : '');
+      o.style.right = Math.max(10, window.innerWidth - rect.right) + 'px';
+      o.style.bottom = (window.innerHeight - rect.top + 8 + (list.length - 1 - n) * 46) + 'px';
+      o.__pillar = pillar;
+      o.addEventListener('click', () => { close(); ccGoPillar(cc, pillar); });
+      fan.appendChild(o);
+      opts.push(o);
+    });
+    let armed = null;
+    const arm = (el2) => {
+      if (armed === el2) return;
+      if (armed) armed.classList.remove('is-armed');
+      armed = el2;
+      if (armed) armed.classList.add('is-armed');
+    };
+    const close = () => { arm(null); if (fan.parentNode) fan.parentNode.removeChild(fan); };
+    fan.querySelector('.cc-fan__scrim').addEventListener('click', close);
+    document.body.appendChild(fan);
+    requestAnimationFrame(() => fan.classList.add('is-in'));
+    return {
+      armAt(x, y) {
+        let hit = null;
+        for (const o of opts) {
+          const r = o.getBoundingClientRect();
+          if (x >= r.left - 26 && x <= r.right + 26 && y >= r.top - 12 && y <= r.bottom + 12) { hit = o; break; }
+        }
+        arm(hit);
+      },
+      release() {
+        if (armed) { const p2 = armed.__pillar; close(); ccGoPillar(cc, p2); return true; }
+        return false;
+      },
+      close
+    };
+  };
+  let hold = null, fanCtl = null, mPid = null, mMoved = 0, mY = 0;
+  m.addEventListener('pointerdown', (e) => {
+    mPid = e.pointerId; mMoved = 0; mY = e.clientY;
+    try { m.setPointerCapture(e.pointerId); } catch (z) {}
+    hold = setTimeout(() => { hold = null; fanCtl = openFan(); }, 300);
+  });
+  m.addEventListener('pointermove', (e) => {
+    if (mPid === null || e.pointerId !== mPid) return;
+    mMoved = Math.max(mMoved, Math.abs(e.clientY - mY));
+    if (hold && mMoved > 12) { clearTimeout(hold); hold = null; mPid = null; return; }
+    if (!fanCtl) return;
+    if (e.cancelable) { try { e.preventDefault(); } catch (z) {} }
+    fanCtl.armAt(e.clientX, e.clientY);
+  });
+  const mEnd = (e) => {
+    if (mPid !== null && e && e.pointerId !== mPid) return;
+    if (hold) {
+      // a plain tap: the next box
+      clearTimeout(hold); hold = null; mPid = null;
+      const i = Math.max(0, list.indexOf(_ccPillar));
+      ccGoPillar(cc, list[(i + 1) % list.length]);
+      return;
+    }
+    mPid = null;
+    if (fanCtl) {
+      const picked = fanCtl.release();
+      if (!picked && mMoved > 30) fanCtl.close();
+      if (picked) fanCtl = null;
+      // released without landing anywhere and without moving: the fan stays
+      // open to be tapped
+      if (!picked && mMoved <= 30) return;
+      fanCtl = null;
+    }
+  };
+  m.addEventListener('pointerup', mEnd);
+  m.addEventListener('pointercancel', mEnd);
+}
+
 function bindCommandCenter(cc) {
   // v812: the desktop editorial hero mirrors every command-center re-render
   // through this single chokepoint (guarded against self-recursion).
@@ -5549,7 +5717,7 @@ function bindCommandCenter(cc) {
   try {
     if (cc && cc.id === 'commandCenter') {
       const dn = cc.querySelector('.cc-card .cc-dots');
-      if (dn) { dn.classList.add('cc-dots--deck'); cc.appendChild(dn); }
+      if (dn) { dn.classList.add('cc-dots--deck'); cc.appendChild(dn); ccBindDeckStrip(cc, dn); }
     }
   } catch (e) {}
 
