@@ -5704,8 +5704,12 @@ function ccBindDeckStrip(cc, dn) {
       const p = posAt(x);
       const target = Math.max(0, Math.min(list.length - 1, Math.round(p)));
       const land = () => {
+        // v1307: this used to RETURN when a commit was mid-flight and the
+        // finger had landed back on the current box, leaving that face
+        // stranded at half opacity. It now always waits for the commit.
+        if (cc.__deckBusy) { setTimeout(land, 330); return; }
         const cur = list.indexOf(_ccPillar);
-        if (target === cur) { const d2 = cc.__deck; if (d2 && !cc.__deckBusy) d2.cancel(); return; }
+        if (target === cur) { const d2 = cc.__deck; if (d2) d2.cancel(); return; }
         const d2 = cc.__deck;
         if (!cc.__deckBusy && d2 && Math.abs(target - cur) === 1) {
           const dx = (cur - target) * width() * 0.55;
@@ -6077,14 +6081,31 @@ function bindCommandCenter(cc) {
       // 1:1 crossfade under the finger, shared with the scrub (v1301).
       const deckDrag = (dx) => {
         if (dx !== 0) armDeck(dx);
+        // v1307 (Malik: "when swiping fast they can disappear"): with no
+        // face underneath there is nothing to reveal, so fading the top one
+        // would just delete the box. Never fade into nothing.
+        if (!under) { card.style.opacity = ''; return; }
         const p2 = Math.min(1, Math.abs(dx) / FADE_TRAVEL);
         card.style.opacity = (1 - p2).toFixed(3);
-        if (under) under.style.opacity = p2.toFixed(3);
+        under.style.opacity = p2.toFixed(3);
       };
       // v1300 (Malik: the dot strip must FEEL like the deck): the scrub in
       // ccBindDeckStrip drives this same machinery, so a finger on the dots
       // physically slides the real card.
       cc.__deck = { prebuild: prebuildDeck, drag: deckDrag, commit: deckCommit, cancel: deckCancel, card: () => card };
+      // Both neighbours are standing by BEFORE the first touch (they used to
+      // be built at touch-down, so a fast swipe could out-run the render).
+      try { requestAnimationFrame(() => { try { if (cc.isConnected && !cc.__deckBusy) prebuildDeck(); } catch (e2) {} }); } catch (e2) {}
+      // A face left mid-fade by an interrupted gesture repairs itself: any
+      // pointer release with no drag in flight restores full opacity.
+      const _heal = () => {
+        try {
+          if (x0 !== null || cc.__deckBusy) return;
+          if (card.style.opacity && card.style.opacity !== '1') { card.style.opacity = ''; card.style.transform = ''; }
+        } catch (e2) {}
+      };
+      window.addEventListener('pointerup', () => setTimeout(_heal, 400));
+      window.addEventListener('pointercancel', () => setTimeout(_heal, 400));
       const finish = (e) => {
         if (x0 === null) return;
         const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
@@ -9665,14 +9686,29 @@ function _auroraSyncToSkin(sk) {
       root.removeProperty('--aur-1'); root.removeProperty('--aur-2'); root.removeProperty('--aur-3');
       return;
     }
-    const trip = (raw, fb) => {
+    // v1307 (Malik: Moss selected, embers still house cyan). FLAT materials
+    // carry sk1..sk4 as the STRING 'none', which is truthy, so the old
+    // `sk.sk1 || sk.edge` handed 'none' to the parser and every flat skin
+    // silently fell back to the house colours. The pool now skips 'none' and
+    // mines the material's own face gradient, halo and edge, so every
+    // material colours the room.
+    const trip = (raw) => {
       const p2 = _skinColParse(raw);
       return (p2 && Array.isArray(p2.v) && p2.v.length >= 3)
-        ? Math.round(p2.v[0]) + ' ' + Math.round(p2.v[1]) + ' ' + Math.round(p2.v[2]) : fb;
+        ? Math.round(p2.v[0]) + ' ' + Math.round(p2.v[1]) + ' ' + Math.round(p2.v[2]) : null;
     };
-    root.setProperty('--aur-1', trip(sk.sk1 || sk.edge, '58 217 245'));
-    root.setProperty('--aur-2', trip(sk.sk2 || sk.sk1 || sk.edge, '63 217 78'));
-    root.setProperty('--aur-3', trip(sk.sk3 || sk.sk1 || sk.edge, '128 150 255'));
+    const pool = [];
+    const feed = (raw) => {
+      const v = String(raw || '').trim();
+      if (!v || v === 'none') return;
+      // pull every colour token out, gradients included
+      const toks = v.match(/#[0-9a-f]{6}\b|#[0-9a-f]{3}\b|rgba?\([^)]*\)/gi);
+      (toks || [v]).forEach((t) => { const c = trip(t); if (c) pool.push(c); });
+    };
+    [sk.sk1, sk.sk2, sk.sk3, sk.sk4, sk.face, sk.halo, sk.edge].forEach(feed);
+    root.setProperty('--aur-1', pool[0] || '58 217 245');
+    root.setProperty('--aur-2', pool[1] || pool[0] || '63 217 78');
+    root.setProperty('--aur-3', pool[2] || pool[0] || '128 150 255');
   } catch (e) {}
 }
 

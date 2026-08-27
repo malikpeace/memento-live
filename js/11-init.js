@@ -505,6 +505,21 @@ const HONEST_LOADING_GATE = false;
       }
     } catch (_) {}
     try { document.body.classList.add('boot-revealed'); } catch (_) {}
+    // v1307 (Malik): the home arrives in ORDER, over 5s. The Memento is
+    // alone on screen first, its reflection follows, and the room's light
+    // rises last, so everything reads as stemming from the card. Reduced
+    // motion skips the wait entirely.
+    // The gate itself is stamped in index.html's head (so it holds on the
+    // first painted frame); this only RELEASES it, in order, once the mask
+    // has lifted and the card is on screen alone.
+    try {
+      const r = document.documentElement;
+      if (r.classList.contains('home-stage')) {
+        setTimeout(() => { try { r.classList.remove('home-stage-floor'); } catch (_) {} }, 1300);
+        setTimeout(() => { try { r.classList.remove('home-stage-aur'); } catch (_) {} }, 2600);
+        setTimeout(() => { try { r.classList.remove('home-stage'); } catch (_) {} }, 5400);
+      }
+    } catch (_) {}
     // A boot that reached the screen earns back its free self-repair, so a
     // stuck boot later in the same session still gets fixed silently first.
     try { sessionStorage.removeItem('memento_boot_repaired'); } catch (_) {}
