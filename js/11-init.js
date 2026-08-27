@@ -125,8 +125,16 @@ function syncHomeViewport() {
     try {
       const cw = document.querySelector('#dayCard .daycard-wrap');
       if (cw) {
-        const cb = Math.round(cw.getBoundingClientRect().bottom);
+        const r2 = cw.getBoundingClientRect();
+        const cb = Math.round(r2.bottom);
         if (cb > 100 && cb < window.innerHeight) root.style.setProperty('--veil-top', cb + 'px');
+        // v1309: the veil pours from the CARD, so it follows the card's own
+        // width and centre. On the phone that is barely a change; on desktop
+        // (card on the left) a full-width sheet was meaningless.
+        if (r2.width > 40) {
+          root.style.setProperty('--veil-cx', Math.round(r2.left + r2.width / 2) + 'px');
+          root.style.setProperty('--veil-w', Math.round(r2.width) + 'px');
+        }
       }
     } catch (e) {}
     const p1e = document.getElementById('homePage1');
@@ -139,6 +147,78 @@ function syncHomeViewport() {
     }
   } catch (e) {}
 }
+/* \u2500\u2500 v1309 THE HOME GIVES (Malik: "if you swipe up but you're at the max
+   height, it'll still let you swipe but the elements will just move down and
+   the spacing will get kinda stretched... it feels more alive because it's
+   not stiff"). The phone home is exactly one screen with nothing to scroll,
+   so iOS has no rubber band to give. This adds one: a damped, capped pull
+   that moves the header, the Memento and the box by DIFFERENT amounts, so
+   the spacing stretches rather than the page sliding as a slab, then springs
+   home on release. Direct manipulation, so it survives reduced motion the
+   way the card drag does; only the spring is dropped there.
+   \u2500\u2500 */
+function bindHomeElastic() {
+  try {
+    const page = document.getElementById('homePage1');
+    if (!page || page.__elastic) return;
+    page.__elastic = true;
+    const head = document.getElementById('dashGreetingMobile');
+    const card = document.getElementById('dayCard');
+    const cc = document.getElementById('commandCenter');
+    if (!card || !cc) return;
+    const PARTS = [[head, 0.34], [card, 0.62], [cc, 1]];
+    let y0 = null, x0 = null, axis = null, cur = 0;
+    const put = (px, spring) => {
+      cur = px;
+      PARTS.forEach(([el, k]) => {
+        if (!el) return;
+        el.style.transition = spring ? 'transform 0.46s cubic-bezier(0.22, 1.2, 0.36, 1)' : 'none';
+        el.style.transform = px ? 'translateY(' + (px * k).toFixed(2) + 'px)' : '';
+      });
+    };
+    const blocked = () => {
+      try {
+        if (document.body.classList.contains('mf-open') || document.body.classList.contains('mfe-open')) return true;
+        if (document.querySelector('.clarity-exp.open, .action-exp.open, .spot-backdrop, .cc-fan')) return true;
+        // a live horizontal deck gesture owns the finger
+        const c = cc.querySelector('.cc-card');
+        if (c && c.dataset.swiping === '1') return true;
+        // and never fight a page that can actually scroll
+        if (document.documentElement.scrollHeight > window.innerHeight + 4) return true;
+      } catch (e) {}
+      return false;
+    };
+    page.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1 || blocked()) { y0 = null; return; }
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; axis = null;
+    }, { passive: true });
+    page.addEventListener('touchmove', (e) => {
+      if (y0 === null || e.touches.length !== 1) return;
+      const dy = e.touches[0].clientY - y0, dx = e.touches[0].clientX - x0;
+      if (!axis) {
+        if (Math.abs(dy) < 9 && Math.abs(dx) < 9) return;
+        axis = Math.abs(dy) > Math.abs(dx) * 1.2 ? 'y' : 'x';
+        if (axis === 'x') { y0 = null; return; }
+        if (blocked()) { y0 = null; return; }
+      }
+      // resistance: the further you pull the less it gives, capped at 52px
+      const sign = dy < 0 ? -1 : 1;
+      const give = Math.min(52, Math.pow(Math.abs(dy), 0.78) * 0.72) * sign;
+      put(give, false);
+    }, { passive: true });
+    const release = () => {
+      if (y0 === null && !cur) return;
+      y0 = null; axis = null;
+      if (!cur) return;
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      put(0, !reduced);
+      setTimeout(() => { PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } }); }, 520);
+    };
+    page.addEventListener('touchend', release, { passive: true });
+    page.addEventListener('touchcancel', release, { passive: true });
+  } catch (e) {}
+}
+
 try {
   const _sync = () => setTimeout(syncHomeViewport, 60);
   // (Measuring at parse time was tried and is WRONG: the chrome above the
@@ -512,6 +592,7 @@ const HONEST_LOADING_GATE = false;
     // The gate itself is stamped in index.html's head (so it holds on the
     // first painted frame); this only RELEASES it, in order, once the mask
     // has lifted and the card is on screen alone.
+    try { bindHomeElastic(); } catch (_) {}
     try {
       const r = document.documentElement;
       if (r.classList.contains('home-stage')) {

@@ -3923,6 +3923,7 @@ function bindHomeActionHold(button) {
   button.dataset.holdBound = '1';
   const HOLD_MS = 3000;
   const label = button.querySelector('.cc-hold-complete__label');
+  try { if (label && !button.dataset.ccLabel) button.dataset.ccLabel = label.textContent.trim(); } catch (e) {}
   let timer = null;
   let holding = false;
   let finished = false;
@@ -3933,7 +3934,8 @@ function bindHomeActionHold(button) {
     if (!holding || finished) return;
     holding = false;
     button.classList.remove('is-holding');
-    if (label) label.textContent = 'Mark Complete';
+    // v1309: the release wording matches the control's own label
+    if (label) label.textContent = button.dataset.ccLabel || 'Hold to complete';
   };
   const finish = () => {
     if (!holding || finished) return;
@@ -4325,7 +4327,7 @@ function ccSyncWeeks(maxWeeks) {
 function ccSyncDoneBtn(label) {
   return '<button class="a-btn cc-hold-complete" data-cc-action="didit" type="button" aria-label="Hold for three seconds to mark complete">' +
     '<span class="cc-hold-complete__fill" aria-hidden="true"></span>' +
-    '<span class="cc-hold-complete__label">' + esc(label || 'Mark it done') + '</span></button>';
+    '<span class="cc-hold-complete__label">' + esc(label || 'Hold to complete') + '</span></button>';
 }
 function ccSyncDoneState() {
   return '<div class="cc-completed-action" role="status" style="margin-top:14px;">Completed</div>';
@@ -4372,7 +4374,7 @@ function ccSyncFaceAction(shape, sit, d1) {
       : (Math.min(kept, cad) + '/' + cad + ' this week.');
     return '<div class="v v-nf"><p class="a-move">' + esc(move) + '</p>' +
       '<p class="a-sup">' + esc(sup) + '</p>' +
-      (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+      (done ? ccSyncDoneState() : ccSyncDoneBtn('Hold to complete')) + '</div>';
   }
   if (sit === 'event') {
     // The part: which act they are in, and today's move inside it.
@@ -4392,14 +4394,14 @@ function ccSyncFaceAction(shape, sit, d1) {
         '<div class="v-today-n-act__rail">' + segs + '</div>' +
         '<div class="v-today-n-act__lab">Today</div>' +
         '<div class="v-today-n-act__move">' + esc(move) + '</div>' +
-        (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+        (done ? ccSyncDoneState() : ccSyncDoneBtn('Hold to complete')) + '</div>';
     }
     // fall through to the plain move face
   }
   // The move, ready / First thirty seconds / event-without-parts / ndl ship
   return '<div class="v v-nf"><p class="a-move">' + esc(move) + '</p>' +
     (how ? '<div class="a-how">' + esc(how) + '</div>' : '') +
-    (done ? ccSyncDoneState() : ccSyncDoneBtn('Mark it done')) + '</div>';
+    (done ? ccSyncDoneState() : ccSyncDoneBtn('Hold to complete')) + '</div>';
 }
 
 // CLARITY. "What am I chasing, why, and where do I stand?"
@@ -5201,7 +5203,7 @@ function renderCommandCenter() {
       } else {
         // One deliberate confirmation. The button fills for the entire hold;
         // the Action module remains available from the primary Do navigation.
-        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Mark Complete</span></button>';
+        row += '<button class="cc-primary cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
       }
       row += '</div>';
       // Live social proof from the optional backend (real data; hidden at 0 / offline).
@@ -5417,7 +5419,7 @@ function renderDeskMission() {
       const done = actionDoneToday();
       const doneBtn = done
         ? '<div class="dkm__btn dkm__btn--done">Completed</div>'
-        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Mark Complete</span></button>';
+        : '<button class="dkm__btn dkm__btn--solid cc-hold-complete" data-cc-action="didit" aria-label="Hold for three seconds to mark complete"><span class="cc-hold-complete__fill" aria-hidden="true"></span><span class="cc-hold-complete__label">Hold to complete</span></button>';
       // v940 (Malik): the streak reads as a NUMBER + FLAME, the treatment he
       // liked, not a bare stat column. The flame is the existing tiered one
       // (streakFlameTier: colour, size and glow all escalate with the streak),

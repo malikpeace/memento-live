@@ -6907,10 +6907,13 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
 /* the veil: a repeating band of light travelling DOWN forever, brightest
    where it leaves the card's bottom edge, dissolving as it falls */
 .ambient__aurora .aur-veil {
-  /* anchored to the card's measured bottom (js/11 --veil-top), so it can
-     never begin inside the card face; the +6px tucks the seam under the
-     card's own glow */
-  left: 6%; right: 6%; top: calc(var(--veil-top, 57vh) + 6px); bottom: -4%;
+  /* anchored to the card's measured rect (js/11): its bottom edge, its centre
+     and 124% of its width, so the light pours FROM the Memento on any screen
+     (a full-width sheet was meaningless on desktop, where the card sits left) */
+  left: calc(var(--veil-cx, 50vw) - var(--veil-w, 76vw) * 0.62);
+  width: calc(var(--veil-w, 76vw) * 1.24);
+  right: auto;
+  top: calc(var(--veil-top, 57vh) + 6px); bottom: -4%;
   -webkit-mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
           mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
   /* v1306 (Malik: "not like it's slowly wedging down as it goes"): the sheet
@@ -7011,12 +7014,82 @@ body.mf-open .ambient__aurora, body.mfe-open .ambient__aurora {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   color: var(--accent-strong, #0b0c0e);
 }
+/* v1309 (Malik): the control says what the gesture IS, so the icon is a
+   FINGERPRINT, not a check. The check belongs to the finished state below. */
 .v-nf .a-btn:not(.a-btn--wait)::before {
-  content: ''; width: 17px; height: 17px; flex: none;
+  content: ''; width: 18px; height: 18px; flex: none;
   background: currentColor;
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E") center / contain no-repeat;
-          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: var(--icon-fingerprint) center / contain no-repeat;
+          mask: var(--icon-fingerprint) center / contain no-repeat;
+}
+:root {
+  --icon-fingerprint: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 11c0 3.5-.4 6-1.2 8.2'/%3E%3Cpath d='M8.6 20.5c1-2.4 1.5-5.4 1.5-9.5a1.9 1.9 0 0 1 3.8 0c0 3.3-.3 6-.9 8.3'/%3E%3Cpath d='M16.2 18.8c.5-2.3.8-4.9.8-7.8a5 5 0 0 0-10 0c0 2.6-.3 4.8-.9 6.7'/%3E%3Cpath d='M4.4 15.4c.4-1.5.6-2.9.6-4.4a7 7 0 0 1 3.6-6.1'/%3E%3Cpath d='M19.6 15.2c.3-1.4.4-2.8.4-4.2a8 8 0 0 0-4.6-7.2'/%3E%3C/svg%3E");
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M8.5 12.2l2.4 2.4 4.6-4.8'/%3E%3C/svg%3E");
+}
+/* the finished state keeps the check it always had, now stated as an icon */
+.cc-completed-action::before {
+  content: ''; width: 17px; height: 17px; margin-right: 8px; flex: none;
+  background: currentColor;
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+          mask: var(--icon-check) center / contain no-repeat;
 }
 /* light mode: the box is already a white card; keep its own fill, just no
    re-darkening from the rule above */
 html.theme-light #commandCenter .cc-card { background: rgba(255, 255, 255, 0.62) !important; }
+
+
+/* \2500\2500 v1309: THE ROOM ON A BIG SCREEN. The coals are sized in % of the
+   viewport, so a 1440-wide desktop turned six small embers into six huge
+   blobs across the whole bottom third. On desktop they are sized off the
+   viewport HEIGHT instead, blurred much further, and the whole layer is
+   dimmed, so the floor reads as one restrained wash. */
+@media (min-width: 860px) {
+  body.ns-bloom .ambient__aurora { opacity: 0.5; }
+  .ambient__aurora em { filter: blur(58px); }
+  .ambient__aurora em:nth-of-type(1) { left: 4%;  bottom: -4%; width: 38vh; height: 15vh; }
+  .ambient__aurora em:nth-of-type(2) { left: 30%; bottom: -6%; width: 34vh; height: 14vh; }
+  .ambient__aurora em:nth-of-type(3) { left: 56%; bottom: -3%; width: 30vh; height: 12vh; }
+  .ambient__aurora em:nth-of-type(4) { left: 16%; bottom: 1%;  width: 26vh; height: 10vh; }
+  .ambient__aurora em:nth-of-type(5) { left: 44%; bottom: 2%;  width: 22vh; height: 8vh; }
+  .ambient__aurora em:nth-of-type(6) { left: 70%; bottom: 1%;  width: 24vh; height: 9vh; }
+  .ambient__aurora .aur-base { top: 62%; }
+  /* the veil is already card-anchored; on desktop it just softens further */
+  .ambient__aurora .aur-veil b { filter: blur(22px); }
+}
+/* The desktop editorial panel is the same box in a different frame, so it
+   wears the same glass and the same button language. */
+/* The desktop panel IS the phone's sync box in a wider frame, so it wears the
+   same glass now that the phone's is real (v1308's rule was mobile-only, and
+   the v1061 "identical to the phone box" comment had gone stale the moment
+   the phone box became translucent). */
+#deskMission {
+  background: rgba(18, 22, 28, 0.42) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
+  backdrop-filter: blur(28px) saturate(1.35);
+}
+html.theme-light #deskMission { background: rgba(255, 255, 255, 0.66) !important; }
+/* and the same button language: fingerprint + accent for the hold, check for
+   the finished state */
+#deskMission .dkm__btn--solid, #commandCenter .cc-primary.cc-hold-complete {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  color: var(--accent-strong, var(--solid-fg));
+  white-space: nowrap;
+}
+/* the 200px fixed width predates the longer label + icon; it sizes to its
+   content now, with a floor so it never reads as a chip */
+#deskMission .dkm__btn, #deskMission .dkm__btn.cc-hold-complete {
+  width: auto; min-width: 200px; flex: 0 0 auto; padding: 0 22px;
+}
+#deskMission .dkm__btn--solid::before, #commandCenter .cc-primary.cc-hold-complete::before {
+  content: ''; width: 18px; height: 18px; flex: none;
+  background: currentColor;
+  -webkit-mask: var(--icon-fingerprint) center / contain no-repeat;
+          mask: var(--icon-fingerprint) center / contain no-repeat;
+}
+#deskMission .dkm__btn--done::before {
+  content: ''; width: 17px; height: 17px; margin-right: 8px; flex: none;
+  background: currentColor;
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+          mask: var(--icon-check) center / contain no-repeat;
+}
+#deskMission .dkm__btn--done { display: inline-flex; align-items: center; justify-content: center; }
