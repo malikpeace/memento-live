@@ -6738,3 +6738,17 @@ html.app-asleep .daycard-wrap__aura,
 html.app-asleep .crays__shaft {
   animation-play-state: paused !important;
 }
+
+/* ==========================================================================
+   THE SHORT FACE HAS NO HOLE IN IT (v1292, Malik: "it looks very visually ugly
+   and doesn't feel right"). The sync deck is ONE fixed height for all three
+   faces so swiping never moves anything (v1083/v1150, and that stays). A face
+   with little to say therefore has slack, and every pixel of it used to land
+   in a single lump between the words and the button: 109px of hole, measured.
+   The slack moves to the TOP now, so the title, the line under it and the
+   button read as one block sitting on the bottom edge, and the empty space
+   becomes breathing room beside the Memento instead of a gap in the middle.
+   The tallest face has no slack, so nothing about it changes.
+   ========================================================================== */
+.cc-card--pillars .v-nf > :first-child { margin-top: auto; }
+.cc-card--pillars .v-nf .a-btn { margin-top: 26px !important; }

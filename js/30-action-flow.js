@@ -1429,6 +1429,13 @@
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onCancel);
     return {
+      // v1292: build the second page BEFORE the first gesture, not during it.
+      // It was built on the first pointerdown, and that build is a full render
+      // of the logic page: the moves that should have been the start of the
+      // pull were still queued behind it, so the very first swipe after opening
+      // the day did nothing. Every one after it worked, which is exactly the
+      // "sometimes it just doesn't" shape. Primed on an idle frame instead.
+      prime: function () { try { buildPager(); } catch (e) {} },
       destroy: function () {
         if (timer) { clearTimeout(timer); timer = null; }
         try {
@@ -3180,7 +3187,7 @@
     // pager does: the reference view (from the M, from the swipe, from a
     // resume) and the preview build that is literally being dragged. The
     // first-visit page has no second page and gets no dots.
-    if (refOnly) mountDots(col, opts.into, 0);
+    if (refOnly) mountDots(col, opts.into, 1);
     col.appendChild(nav);
 
     if (refOnly) {
@@ -4242,7 +4249,7 @@
     // the dots sit UNDER the button, in the nav's own bottom padding, so the
     // standing button geometry is untouched. The day is the SECOND page (logic
     // is to its left), so the second dot is home.
-    mountDots(col, opts.into, 1);
+    mountDots(col, opts.into, 0);
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------
@@ -4749,14 +4756,27 @@
       return !!t.closest('.afl-day__rail');
     }
     if (!opts.into) {
+      // v1292, THE DIRECTION MOVES (Malik, twice: "I still can't swipe to the
+      // logic page", with iOS's own grey back-chevron visible in the shot).
+      // The pull WAS to the right, which starts on the left edge, and the left
+      // edge belongs to the system back gesture on every iPhone. No app can
+      // take it back: iOS claims the touch before the page ever sees it. So the
+      // page moved instead of the gesture. The logic page now lives to the
+      // RIGHT and you pull LEFT to bring it in, which is territory nothing else
+      // owns. Same page, same snap, same dots, a gesture that can actually land.
       daySnap = bindPageSnap({
         host: home,
         surface: day,
-        dir: 1,
+        dir: -1,
         blocked: swipeBlocked,
         build: function (pg) { openLogic(key, { plan: plan, standing: true, into: pg }); },
         go: toLogic
       });
+      // the page behind the gesture exists before the finger arrives
+      if (daySnap && daySnap.prime) {
+        if (typeof requestIdleCallback === 'function') requestIdleCallback(daySnap.prime, { timeout: 900 });
+        else setTimeout(daySnap.prime, 500);
+      }
     }
 
     // ---- THE CLOSED DAY (merge 3.1, the re-open) ----------------------------
