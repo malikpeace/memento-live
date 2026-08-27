@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1302';
+window.MEMENTO_JS_BUILD = 'v1303';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -916,6 +916,9 @@ function applyPrefs() {
     // flat, matte look in either theme. Distinct from bg-flat (which only drops the
     // ambient orbs). Driven by prefs.flatUi; paired with uiBlur:0 by the flat looks.
     if (document.documentElement) document.documentElement.classList.toggle('flat-ui', !!p.flatUi);
+    // v1303 (Malik): ONE background light at a time. Aurora is the default;
+    // 'beams' brings the old top-left rays back and hides the aurora.
+    try { document.body.classList.toggle('home-beams', p.homeLight === 'beams'); } catch (e) {}
     // Custom background layer (color / gradient / image behind the app).
     try { applyCustomBackground(p); } catch (eBg) {}
     // Reduce motion (calm): add a class the CSS gate keys off of.

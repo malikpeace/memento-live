@@ -4942,6 +4942,16 @@ const TabBar = {
             '<div class="pref-seg" id="prefHomeCorner" role="group" aria-label="What the home\u2019s top-right button shows.">' + seg2 + '</div>' +
           '</div>';
         })() +
+        (function () {
+          const cur3 = prefs.homeLight === 'beams' ? 'beams' : 'aurora';
+          const seg3 = [['aurora', 'Aurora'], ['beams', 'Beams']].map(function (o) {
+            return '<button type="button" class="pref-seg__opt' + (cur3 === o[0] ? ' is-on' : '') + '" data-home-light="' + o[0] + '" aria-pressed="' + (cur3 === o[0] ? 'true' : 'false') + '">' + o[1] + '</button>';
+          }).join('');
+          return '<div class="pref-row">' +
+            '<div class="pref-row__text"><div class="pref-row__title">Background</div></div>' +
+            '<div class="pref-seg" id="prefHomeLight" role="group" aria-label="The home\u2019s ambient light: the aurora floor or the corner beams.">' + seg3 + '</div>' +
+          '</div>';
+        })() +
         toggleRow('prefFlatUi', 'Glass', 'Glassy, blurred surfaces with depth. Turn off for a flat, high-contrast matte look.', !prefs.flatUi) +
         toggleRow('prefSound', 'Sound', 'Quiet synthesized moments: the typewriter, marking a move done, the card coming alive.', prefs.soundOn !== false) +
         toggleRow('prefFlatBg', 'Minimal background', 'Hide the ambient orbs and glow for a flat, paper-like surface.', !!prefs.flatBg) +
@@ -5227,6 +5237,19 @@ const TabBar = {
         });
         applyThemeChange(() => { state.prefs.theme = mode; });
         persistNow();
+      });
+    });
+    const lightSeg = document.getElementById('prefHomeLight');
+    if (lightSeg) lightSeg.querySelectorAll('[data-home-light]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.prefs.homeLight = btn.getAttribute('data-home-light');
+        lightSeg.querySelectorAll('[data-home-light]').forEach(b => {
+          const on = b === btn;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        persistNow();
+        try { applyPrefs(); } catch (e) {}
       });
     });
     const cornerSeg = document.getElementById('prefHomeCorner');
@@ -5917,6 +5940,8 @@ const TabBar = {
             pick.textContent = 'Change photo';
             if (removeBtn) removeBtn.style.display = '';
             try { if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh(); } catch (e) {}
+            // v1303: the home corner wears the photo too; repaint it now
+            try { renderAll(); } catch (e) {}
           });
         });
       });
@@ -5929,6 +5954,7 @@ const TabBar = {
         pick.textContent = 'Add photo';
         removeBtn.style.display = 'none';
         try { if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh(); } catch (e) {}
+        try { renderAll(); } catch (e) {}
       });
     })();
     bindProfileField('profRunningToward', 'runningToward');

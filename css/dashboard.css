@@ -3795,7 +3795,7 @@ body.pre-clarity .capture-fab { display: none !important; }
        measurements came from. */
     height: calc(min(var(--p1-vh, 100svh), 100lvh) - var(--p1-top, calc(var(--safe-t, 0px) + 16px)));
     box-sizing: border-box;
-    padding-bottom: calc(15px + var(--safe-b, 0px));
+    padding-bottom: calc(8px + var(--safe-b, 0px));
     scroll-snap-align: start;
   }
   /* (v1075's standalone lvh override is gone: lvh overshot by ~40px on his
@@ -4031,7 +4031,8 @@ html, body { overflow-x: clip; max-width: 100vw; }
        went to a notch that was already cleared, which is why the Memento
        looked short with the header floating far above it. The column owns
        the notch now; this is just the gap to the header. */
-    margin: 18px 0 0 0 !important; padding-top: 34px !important;
+    /* v1303 (Malik): +10px of air between the greeting and the card. */
+    margin: 18px 0 0 0 !important; padding-top: 44px !important;
     grid-column: auto !important; grid-row: auto !important;
   }
   /* v979 (Malik): the card is BIGGER now that the bottom bar is gone, and page 1
@@ -6890,8 +6891,13 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
    drive them (js/08 _auroraSyncToSkin); the defaults are the house cyan,
    spring green and periwinkle. The beams STAY, this joins them. Post-star
    only, hidden in light mode exactly like the rays. */
-.ambient__aurora { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; }
-.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; inset: 0; }
+.ambient__aurora { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; overflow: hidden; }
+/* v1303 (Malik's screenshot: "a huge black box cut off"): the drifting layer
+   was exactly viewport-sized, so every translate exposed its own hard edge.
+   The layer is now OVERSIZED on every side the drift can pull from, so its
+   edges are geometrically incapable of entering the screen (the same
+   edge-safety law the card glow lives by), and the drift is gentler. */
+.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; left: -18%; right: -18%; top: 0; bottom: -12%; }
 .ambient__aurora i {
   background:
     radial-gradient(150% 78% at 50% 126%, rgb(var(--aur-2, 63 217 78) / 0.32), transparent 74%),
@@ -6909,12 +6915,18 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
 body.ns-bloom .ambient__aurora { opacity: 1; }
 body.ns-bloom .ambient__aurora i { animation: homeAurA 17s ease-in-out infinite alternate; }
 body.ns-bloom .ambient__aurora i::before { animation: homeAurB 21s ease-in-out infinite alternate; }
-@keyframes homeAurA { from { transform: translate(-5%, 1.5%); } to { transform: translate(6%, -1.5%); } }
-@keyframes homeAurB { from { transform: translate(5.5%, -1.5%); } to { transform: translate(-6%, 1.5%); } }
+@keyframes homeAurA { from { transform: translate(-2%, 0.8%); } to { transform: translate(2.4%, -0.8%); } }
+@keyframes homeAurB { from { transform: translate(2.2%, -0.8%); } to { transform: translate(-2.4%, 0.8%); } }
 @media (prefers-reduced-motion: reduce) {
   body.ns-bloom .ambient__aurora i, body.ns-bloom .ambient__aurora i::before { animation: none; }
 }
 html.theme-light .ambient__aurora { display: none !important; }
+/* v1303 (Malik): one light at a time. Aurora era by default: the home's
+   top-left beams sleep (the asset and every ceremony that re-hosts it stay
+   intact); Settings > Appearance > Background brings them back and rests
+   the aurora instead. Scoped to the HOME ambient's own rays only. */
+body:not(.home-beams) #ambientBg > .ambient__rays { display: none !important; }
+body.home-beams .ambient__aurora { display: none !important; }
 /* the corner button as their photo: image covers, initial stands in */
 .wbar__settings--photo {
   overflow: hidden;
