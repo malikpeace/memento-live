@@ -1223,9 +1223,21 @@ function esc(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g
 // or cloud-login server state), so we sanitize on the READ side. DOMParser
 // builds an inert document (scripts never run, img onerror never fires), then
 // we drop disallowed tags, all on* handlers, and dangerous href/src/style.
+function safeReflectionHref(value) {
+  const val = String(value || '').trim();
+  return /^(https?:\/\/|mailto:)/i.test(val) ? val : '';
+}
+function safeReflectionImageSrc(value) {
+  const val = String(value || '').trim();
+  return /^data:image\/(?:png|jpe?g|webp|gif);base64,[a-z0-9+/=\s]+$/i.test(val) ? val : '';
+}
+function safeReflectionClass(value) {
+  const allowed = { rchk:1, rtoggle:1, rcallout:1, rtable:1, rwiki:1, 'rnote-img':1 };
+  return String(value || '').split(/\s+/).filter((name) => allowed[name]).join(' ');
+}
 function sanitizeReflectionHtml(html) {
   if (!html) return '';
-  const ALLOWED = { P:1, BR:1, STRONG:1, B:1, EM:1, I:1, U:1, S:1, H1:1, H2:1, H3:1, UL:1, OL:1, LI:1, A:1, IMG:1, DIV:1, SPAN:1, FONT:1, BLOCKQUOTE:1, CODE:1, PRE:1, HR:1, MARK:1 };
+  const ALLOWED = { P:1, BR:1, STRONG:1, B:1, EM:1, I:1, U:1, S:1, H1:1, H2:1, H3:1, UL:1, OL:1, LI:1, A:1, IMG:1, DIV:1, SPAN:1, FONT:1, BLOCKQUOTE:1, CODE:1, PRE:1, HR:1, MARK:1, DETAILS:1, SUMMARY:1, TABLE:1, THEAD:1, TBODY:1, TFOOT:1, TR:1, TD:1, TH:1 };
   let doc;
   try { doc = new DOMParser().parseFromString(String(html), 'text/html'); }
   catch (e) { return esc(String(html)); }
@@ -1242,14 +1254,16 @@ function sanitizeReflectionHtml(html) {
         Array.prototype.slice.call(child.attributes).forEach((a) => {
           const name = a.name.toLowerCase(), val = a.value || '';
           if (name.indexOf('on') === 0) { child.removeAttribute(a.name); return; }
-          if (name === 'href') { if (!/^(https?:\/\/|mailto:)/i.test(val)) child.removeAttribute(a.name); return; }
-          if (name === 'src') { if (!/^(data:image\/|https?:\/\/)/i.test(val)) child.removeAttribute(a.name); return; }
-          if (name === 'style') { if (/javascript:|expression\(|url\(\s*['"]?\s*javascript:/i.test(val)) child.removeAttribute(a.name); return; }
+          if (name === 'href') { const safe = safeReflectionHref(val); if (safe) child.setAttribute('href', safe); else child.removeAttribute(a.name); return; }
+          if (name === 'src') { const safe = safeReflectionImageSrc(val); if (safe) child.setAttribute('src', safe); else child.removeAttribute(a.name); return; }
+          if (name === 'style') { child.removeAttribute(a.name); return; }
+          if (name === 'class') { const safe = safeReflectionClass(val); if (safe) child.setAttribute('class', safe); else child.removeAttribute(a.name); return; }
+          if (name === 'open') { if (child.tagName !== 'DETAILS') child.removeAttribute(a.name); return; }
           if (name === 'data-img-id') { if (!/^img_[a-z0-9_]+$/i.test(val)) child.removeAttribute(a.name); return; }
           if (name === 'data-done') { if (val !== '0' && val !== '1') child.removeAttribute(a.name); return; }
           if (name === 'data-hl') { if (!/^(green|red|blue|yellow|purple)$/.test(val)) child.removeAttribute(a.name); return; }
           if (name === 'data-rnote-link') { if (!/^[a-zA-Z0-9_-]+$/.test(val)) child.removeAttribute(a.name); return; }
-          if (name !== 'class') child.removeAttribute(a.name);
+          child.removeAttribute(a.name);
         });
         clean(child);
       } else if (child.nodeType === 8) {
@@ -2305,6 +2319,9 @@ function migrateInlineMediaToIdb() {
 function stripInlineMediaForSync(s) {
   var clone;
   try { clone = JSON.parse(JSON.stringify(s)); } catch (e) { return s; }
+  // Spotify credentials are device secrets, not user content. Keep the local
+  // connection working without copying bearer/refresh tokens into cloud state.
+  try { if (clone.spotify) clone.spotify.tokens = null; } catch (e) {}
   try {
     var boards = [];
     if (clone.vivere) {

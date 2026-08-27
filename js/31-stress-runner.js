@@ -27,6 +27,7 @@
    returns; it starts nothing on load. */
 (function () {
   'use strict';
+  if (window.__MEMENTO_DEV_AUTHORIZED__ !== true) return;
 
   /* ======================================================================
      THE ROSTER

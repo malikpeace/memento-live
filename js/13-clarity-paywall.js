@@ -32,58 +32,9 @@ const ClarityPaywall = {
   _SHOW_PROOF: false,
   _PROOF: { count: 0, quote: '', who: '' },
 
-  // ===========================================================================
-  // DEV BYPASS - DELETE THIS WHOLE BLOCK BEFORE LAUNCH
-  // ---------------------------------------------------------------------------
-  // Malik, 2026-08-03: "a button that unlocks Memento and shows me exactly what
-  // happens after someone buys." Deliberately NOT a visible button: the paywall
-  // is the one screen where money happens, and a stray "admin access" control is
-  // the worst possible thing to forget to remove.
-  //
-  // Trigger: five taps on the founder avatar (the little M) inside the paywall,
-  // within half a second of each other. A customer cannot find that; he can do
-  // it on the installed phone app, where there is no URL to edit.
-  //
-  // It touches NOTHING in js/22-billing.js. It only makes the UI gate answer
-  // yes, the same way an official demo does, so the server still decides every
-  // real paid request. And it EXPIRES ON ITS OWN, so a forgotten deletion
-  // cannot ship: after the date below every line here is inert.
-  //
-  // To remove: delete this block, delete the _devUnlocked() line in isPaid(),
-  // delete the _wireDevBypass(ov) call in show(). Three deletions, all marked.
-  _DEV_BYPASS_UNTIL: '2026-09-30',
-  _devUnlocked() {
-    try {
-      if (new Date().toISOString().slice(0, 10) > this._DEV_BYPASS_UNTIL) return false;
-      return localStorage.getItem('memento_dev_unlock') === '1';
-    } catch (e) { return false; }
-  },
-  _wireDevBypass(ov) {
-    try {
-      if (new Date().toISOString().slice(0, 10) > this._DEV_BYPASS_UNTIL) return;
-      const tap = ov.querySelector('.cpw__founder-av');
-      if (!tap) return;
-      let n = 0, last = 0;
-      tap.style.cursor = 'default';
-      tap.addEventListener('click', () => {
-        const now = Date.now();
-        n = (now - last < 500) ? n + 1 : 1;
-        last = now;
-        if (n < 5) return;
-        n = 0;
-        try { localStorage.setItem('memento_dev_unlock', '1'); } catch (e) {}
-        // The REAL post-purchase path, not an imitation of it: same ceremony,
-        // same shove into Action, same everything a buyer gets.
-        this._applyVerifiedUnlock({ plan: 'founder' });
-      });
-    } catch (e) {}
-  },
-  // ===== END DEV BYPASS ======================================================
-
   // Has the user paid / been granted everything?
   isPaid() {
     try {
-      if (this._devUnlocked()) return true; // DEV BYPASS - delete before launch
       // Official demos may imitate the paid UI, but server-side billing still
       // decides whether any paid AI request is authorized.
       if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE) return true;
@@ -282,8 +233,6 @@ const ClarityPaywall = {
       });
       const skip = ov.querySelector('#cpwSkip');
       if (skip) skip.addEventListener('click', () => this.hide());
-      this._wireDevBypass(ov); // DEV BYPASS - delete before launch
-
       document.body.style.overflow = 'hidden';
       void ov.offsetWidth;
       ov.classList.add('cpw--open');

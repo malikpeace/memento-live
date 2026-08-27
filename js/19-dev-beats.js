@@ -5,6 +5,7 @@
    ?dev=beats this returns immediately and ships completely inert. Not linked from
    anywhere in the product, so a real user never reaches it. */
 (function () {
+  if (window.__MEMENTO_DEV_AUTHORIZED__ !== true) return;
   function qp(k) { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } }
   if (qp('dev') !== 'beats') return;
 

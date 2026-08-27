@@ -2122,8 +2122,26 @@ const CreatorTools = {
         sheet.remove();
         this._devToast('Ask re-armed. Watch for the card.');
       });
+      const testThisPhone = document.createElement('button');
+      testThisPhone.textContent = 'Send test to this phone';
+      testThisPhone.style.cssText = 'display:block;margin:14px 0;background:#fff;color:#0b1112;font:600 13px Geist,sans-serif;border:0;border-radius:999px;padding:10px 18px;';
+      testThisPhone.addEventListener('click', async () => {
+        testThisPhone.disabled = true;
+        testThisPhone.textContent = 'Sending...';
+        try {
+          if (!window.MementoPush || !MementoPush._testCurrentDevice) throw new Error('Push tester not loaded');
+          await MementoPush._testCurrentDevice();
+          testThisPhone.textContent = 'Sent to this phone';
+          this._devToast('Test sent only to this phone.');
+        } catch (error) {
+          testThisPhone.disabled = false;
+          testThisPhone.textContent = 'Try test again';
+          this._devToast(String(error && error.message || 'Push test failed'));
+        }
+      });
       sheet.appendChild(x);
       sheet.appendChild(force);
+      sheet.appendChild(testThisPhone);
       const pre = document.createElement('div');
       pre.textContent = JSON.stringify(out, null, 2);
       sheet.appendChild(pre);

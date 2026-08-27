@@ -36,6 +36,12 @@
     return true;
   }
 
+  function sanitizeState(value) {
+    var clone = JSON.parse(JSON.stringify(value));
+    if (clone && clone.spotify) clone.spotify.tokens = null;
+    return clone;
+  }
+
   function validateMedia(value) {
     if (value == null) return [];
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid_media');
@@ -157,12 +163,13 @@
     try {
       if (!stateValue || typeof stateValue !== 'object') return false;
       validateTree(stateValue);
+      var safeState = sanitizeState(stateValue);
       var images = await exportMedia();
       var payload = {
         backupFormat: 2,
         schemaVersion: schemaVersion,
         exportedAt: new Date().toISOString(),
-        state: stateValue,
+        state: safeState,
         media: { images: images },
       };
       var text = JSON.stringify(payload, null, 2);
@@ -189,6 +196,7 @@
     validateTree(parsed);
     var incoming = parsed && parsed.state && typeof parsed.state === 'object' ? parsed.state : parsed;
     if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('invalid_state');
+    incoming = sanitizeState(incoming);
     var records = validateMedia(parsed && parsed.state ? parsed.media : null);
     return { state: incoming, media: records };
   }
@@ -220,7 +228,7 @@
     _test: {
       validateTree: validateTree,
       validateMedia: validateMedia,
+      sanitizeState: sanitizeState,
     },
   };
 })();
-

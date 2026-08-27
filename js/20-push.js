@@ -297,6 +297,37 @@
     return flushSafetyPause();
   }
 
+  // Owner diagnostic: ask the backend to notify this exact signed-in device.
+  // The server independently verifies Malik's account, matches user + device,
+  // owns the fixed message, and rejects every ordinary account.
+  function testCurrentDevice() {
+    if (isDemo() || LOCAL) return Promise.reject(new Error('Use the installed production app'));
+    var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
+    var token = remoteToken();
+    var device = '';
+    try { device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : ''; } catch (e) {}
+    if (!url || !anon || !token || token === anon) return Promise.reject(new Error('Sign in first'));
+    if (!device) return Promise.reject(new Error('This phone has no device ID'));
+
+    return sync().then(function () {
+      return fetch(fnUrl(), {
+        method: 'POST',
+        headers: {
+          apikey: anon,
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          'x-memento-device': device
+        },
+        body: JSON.stringify({ owner_device_test: true })
+      });
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (body) {
+        if (!response.ok) throw new Error(String(body && body.error || ('Push test failed (' + response.status + ')')));
+        return body;
+      });
+    });
+  }
+
   // Refresh the server's picture of this device (open date, move, day done).
   // No-op unless the user already subscribed.
   function sync() {
@@ -707,6 +738,7 @@
     _openDeepLink: openDeepLink,
     _progressAskDue: progressAskDue,
     _offerProgressAsk: offerProgressAsk,
-    _eligible: eligible
+    _eligible: eligible,
+    _testCurrentDevice: testCurrentDevice
   };
 })();

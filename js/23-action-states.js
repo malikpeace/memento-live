@@ -7,6 +7,7 @@
    Fully gated: without ?dev=action this file returns immediately and ships
    completely inert. Not linked from anywhere in the product. */
 (function () {
+  if (window.__MEMENTO_DEV_AUTHORIZED__ !== true) return;
   function qp(k) { try { return new URLSearchParams(location.search).get(k); } catch (e) { return null; } }
   if (qp('dev') !== 'action') return;
 
