@@ -5652,11 +5652,16 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column;
   padding: max(52px, calc(var(--safe-t) + 10px)) 23px 0;
   -webkit-user-select: none; user-select: none;
-  /* ROUND 7: vertical is the page's (there is nothing to scroll here, so it is
-     simply free), HORIZONTAL IS OURS. Without this iOS keeps a sideways press
-     as a candidate pan and hands it away mid pull, and the way it hands it
-     away is pointercancel. */
-  touch-action: pan-y;
+  /* v1293, THE BUG, MEASURED. This said pan-y, meaning "vertical is the
+     browser's, horizontal is ours". That is not how a browser reads it: pan-y
+     leaves a VERTICAL pan on the table, and it decides to take one from the
+     first pixel of vertical drift, before any horizontal intent exists. A real
+     thumb drifts on every swipe. So the browser claimed the touch and handed
+     it back as pointercancel two frames in, every single time, on every
+     device: the pull was recognised and instantly thrown away, which is why
+     the swipe to the logic page simply did nothing.
+     There is nothing to scroll on this screen, so the browser gets none of it. */
+  touch-action: none;
 }
 
 /* ---- THE PAGER: day <-> logic, side by side (round 7) -------------------
@@ -5690,7 +5695,9 @@ html.theme-light .afl-q__unit.is-said { color: rgba(var(--ink), 0.66); }
   transition: transform 0.28s var(--ease-out);
 }
 @media (prefers-reduced-motion: reduce) {
-  /* reduced motion never drags the pages: past the threshold it swaps */
+  /* v1293: reduced motion keeps the DRAG, because a page tracking your finger
+     1:1 is direct manipulation and not decoration. What it drops is the spring
+     that runs after you let go: the snap lands instantly instead. */
   .afl.is-snap > .afl__col, .afl.is-snap > .afl__rise,
   .afl.is-snap > .afl-pg { transition: none; }
 }

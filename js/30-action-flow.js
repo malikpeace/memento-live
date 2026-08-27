@@ -1295,14 +1295,23 @@
 
   function bindPageSnap(cfg) {
     var host = cfg.host, dir = (cfg.dir < 0) ? -1 : 1;
-    var pager = null, start = null, live = false, settling = false;
+    var pager = null, start = null, live = false, settling = false, touchOwns = false;
     var dx = 0, vx = 0, lastX = 0, lastT = 0, timer = null;
 
     // THE SECOND PAGE is the real screen, rendered by the real function into a
     // host element (shell's preview branch), never a lookalike. Built once, on
     // the first pull, and it dies with the room it hangs in.
+    // REDUCE MOTION IS NOT NO GESTURE (v1293, and this is what was actually
+    // wrong). Every fix before this one was tested with motion on, and every
+    // one of them worked. With Reduce Motion ON, which is what Malik's phone
+    // runs, the second page was never built, the pages never followed the
+    // finger, and the pull could not land: dragging did nothing at all, so of
+    // course it read as "I can't swipe".
+    // A page that tracks your finger 1:1 is direct manipulation, not
+    // decoration, and Apple's own guidance keeps it under Reduce Motion. What
+    // that setting turns off is the springy snap afterwards, and only that.
     function buildPager() {
-      if (pager || reduced() || !host || typeof cfg.build !== 'function') return;
+      if (pager || !host || typeof cfg.build !== 'function') return;
       pager = el('div', 'afl-pg afl-pg--' + (dir < 0 ? 'r' : 'l'));
       pager.setAttribute('aria-hidden', 'true');
       host.appendChild(pager);
@@ -1313,7 +1322,7 @@
     // way a native pager's do, the active pill trading shape with the other
     // dot as you go). One variable, no second animation to keep in step.
     function drag(px) {
-      if (!host || reduced()) return;
+      if (!host) return;
       var W = host.clientWidth || window.innerWidth;
       host.style.setProperty('--afl-drag', px.toFixed(1) + 'px');
       host.style.setProperty('--afl-pg', Math.min(1, Math.abs(px) / (W || 1)).toFixed(3));
@@ -1327,24 +1336,36 @@
     function settle(across) {
       start = null; live = false;
       if (timer) { clearTimeout(timer); timer = null; }
-      if (reduced() || !host) {
+      if (!host) {
         clear();
         if (across) handover(cfg.go);
         return;
       }
       settling = true;
       var W = host.clientWidth || window.innerWidth;
-      host.classList.add('is-snap');
+      // the SNAP is the animation, so that is the only part Reduce Motion drops
+      var soft = !reduced();
+      if (soft) host.classList.add('is-snap');
       drag(across ? dir * W : 0);
       timer = setTimeout(function () {
         timer = null; settling = false;
         // the handover replaces this room, so nothing here needs unwinding
         if (across) { handover(cfg.go); return; }
         clear();
-      }, SNAP_MS + 20);
+      }, soft ? SNAP_MS + 20 : 0);
     }
     var onDown = function (e) {
+      if (touchOwns && e.pointerId !== 'touch') return;  // a finger already owns this
       if (settling) return;                              // the snap owns it now
+      // A REAL FINGER TAKES OVER, IT DOES NOT COLLIDE. pointerdown fires before
+      // touchstart, so the pointer stream opens the gesture and the finger
+      // arrives a moment later to find one already open. Without this it read
+      // as a second finger and cancelled the pull instantly, which is the same
+      // dead swipe by another route. The finger simply inherits it.
+      if (e.pointerId === 'touch' && start && start.id !== 'touch') {
+        start.id = 'touch';
+        return;
+      }
       if (start || live) { settle(false); return; }      // second finger
       if (cfg.blocked && cfg.blocked(e.target)) return;
       start = { x: e.clientX, y: e.clientY, id: e.pointerId, axis: 0, target: e.target };
@@ -1356,6 +1377,7 @@
     // are siblings, not children. Move is heard on the ROOM, release on the
     // window, so a pull can never be left half way for want of an event.
     var onMove = function (e) {
+      if (touchOwns && e.pointerId !== 'touch') return;
       if (!start || e.pointerId !== start.id || settling) return;
       var mx = e.clientX - start.x, my = Math.abs(e.clientY - start.y);
       if (!start.axis) {
@@ -1373,15 +1395,16 @@
         start.x = e.clientX;              // travel is measured from the lock
         start.axis = 1;
         live = true;
-        // v1291 (Malik on-device: "I can't swipe to the logic page"). The room
-        // carries touch-action: pan-y, which lets WebKit take a drag with any
-        // vertical drift in it and hand us a pointercancel half way through: on
-        // a real thumb that is most pulls. The moment the pull is recognised as
-        // horizontal the room stops offering the browser anything, and the
-        // pointer is captured so every later move lands here whatever it passes
-        // over. Both are undone on release.
-        try { host.style.touchAction = 'none'; } catch (e3) {}
-        try { if (host.setPointerCapture) host.setPointerCapture(e.pointerId); } catch (e3) {}
+        // NOTHING IS TOUCHED HERE (v1293). v1291 did two things at this exact
+        // point, and both of them killed the gesture they were meant to save:
+        // it captured the pointer (which retargets it, firing pointercancel on
+        // the element the finger actually landed on) and it rewrote
+        // touch-action mid-gesture (which makes the browser re-evaluate the
+        // touch and cancel it outright). Measured: pointerdown, then
+        // pointercancel two frames later, every time. The screen's touch-action
+        // is a static CSS value now (css/action.css: the day owns all of it,
+        // there is nothing to scroll there) and the gesture is simply left
+        // alone once it starts.
         // v1288: the pull is now a fact, so whatever the finger landed on lets
         // go of it. A press-and-hold started on the CTA cancels here instead of
         // quietly filling underneath the drag, and it costs the hold nothing on
@@ -1393,7 +1416,9 @@
             }));
           }
         } catch (e2) {}
-        if (!reduced()) host.classList.add('is-drag');
+        // the drag class is what makes the pages follow the finger at all, so
+        // it goes on either way; only the snap that follows is animated
+        host.classList.add('is-drag');
         return;
       }
       if (e.cancelable) { try { e.preventDefault(); } catch (e3) {} }
@@ -1403,10 +1428,9 @@
       dx = (dir < 0) ? Math.min(0, mx) : Math.max(0, mx);   // 1:1, one way only
       drag(dx);
     };
-    function releaseHold() {
-      try { host.style.touchAction = ''; } catch (e3) {}
-    }
+    function releaseHold() {}
     var onUp = function (e) {
+      if (touchOwns && e.pointerId !== 'touch') return;
       if (settling || !start || e.pointerId !== start.id) return;
       releaseHold();
       if (!live) { start = null; return; }               // a tap, not a pull
@@ -1419,6 +1443,9 @@
       settle(travel >= W * SNAP_AT || (vx * dir >= FLICK_V && travel >= FLICK_MIN));
     };
     var onCancel = function (e) {
+      // a pointercancel while a FINGER owns the pull is the browser talking
+      // about a stream we are not using: it never touches the gesture
+      if (touchOwns && (!e || e.pointerId !== 'touch')) return;
       if (settling || !start || (e && e.pointerId !== start.id)) return;
       releaseHold();
       if (live) settle(false);
@@ -1428,6 +1455,52 @@
     host.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onCancel);
+
+    /* ------------------------------------------------------------------
+       AND THE SAME GESTURE, ON TOUCH EVENTS (v1293). This is the fix.
+       Measured on the real screen: pointerdown lands, the first real move
+       locks the axis, and then the browser fires POINTERCANCEL and the pull
+       is thrown away. Every time, in both motion settings. Pointer events on
+       a scrollable page are the browser's to revoke, and it revokes them the
+       moment it thinks a pan might be starting: no amount of touch-action,
+       capture or preventDefault reliably stops it, and two attempts at those
+       made it worse.
+       Touch events are not revoked like that. The same drag runs off
+       touchstart / touchmove / touchend, whichever stream arrives first wins
+       the gesture, and the other is ignored until the finger lifts. Nothing
+       about the feel changes: same threshold, same snap, same handover.
+       ------------------------------------------------------------------ */
+    function tPoint(e) {
+      var t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+      return t ? { clientX: t.clientX, clientY: t.clientY, pointerId: 'touch' } : null;
+    }
+    cfg.surface.addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 1) return;
+      var p = tPoint(e);
+      if (!p) return;
+      touchOwns = true;
+      onDown({ clientX: p.clientX, clientY: p.clientY, pointerId: 'touch', target: e.target });
+    }, { passive: true });
+    host.addEventListener('touchmove', function (e) {
+      if (!touchOwns) return;
+      var p = tPoint(e);
+      if (!p) return;
+      // once the pull is ours the page must not also scroll under it
+      if (start && start.axis && e.cancelable) { try { e.preventDefault(); } catch (z) {} }
+      onMove({ clientX: p.clientX, clientY: p.clientY, pointerId: 'touch' });
+    }, { passive: false });
+    function tEnd(e) {
+      if (!touchOwns) return;
+      var p = tPoint(e) || { clientX: lastX, clientY: 0 };
+      onUp({ clientX: p.clientX, clientY: p.clientY, pointerId: 'touch' });
+      touchOwns = false;
+    }
+    window.addEventListener('touchend', tEnd);
+    window.addEventListener('touchcancel', function (e) {
+      if (!touchOwns) return;
+      onCancel({ pointerId: 'touch' });
+      touchOwns = false;
+    });
     return {
       // v1292: build the second page BEFORE the first gesture, not during it.
       // It was built on the first pointerdown, and that build is a full render
@@ -3187,7 +3260,7 @@
     // pager does: the reference view (from the M, from the swipe, from a
     // resume) and the preview build that is literally being dragged. The
     // first-visit page has no second page and gets no dots.
-    if (refOnly) mountDots(col, opts.into, 1);
+    if (refOnly) mountDots(col, opts.into, 0);
     col.appendChild(nav);
 
     if (refOnly) {
@@ -4249,7 +4322,7 @@
     // the dots sit UNDER the button, in the nav's own bottom padding, so the
     // standing button geometry is untouched. The day is the SECOND page (logic
     // is to its left), so the second dot is home.
-    mountDots(col, opts.into, 0);
+    mountDots(col, opts.into, 1);
     col.appendChild(nav);
 
     // ---- state --------------------------------------------------------------
@@ -4756,18 +4829,13 @@
       return !!t.closest('.afl-day__rail');
     }
     if (!opts.into) {
-      // v1292, THE DIRECTION MOVES (Malik, twice: "I still can't swipe to the
-      // logic page", with iOS's own grey back-chevron visible in the shot).
-      // The pull WAS to the right, which starts on the left edge, and the left
-      // edge belongs to the system back gesture on every iPhone. No app can
-      // take it back: iOS claims the touch before the page ever sees it. So the
-      // page moved instead of the gesture. The logic page now lives to the
-      // RIGHT and you pull LEFT to bring it in, which is territory nothing else
-      // owns. Same page, same snap, same dots, a gesture that can actually land.
+      // v1293: LEFT TO RIGHT, the way it always was and the way Malik asked for
+      // it back. The direction was never the problem (see bindPageSnap: the
+      // whole gesture was dead under Reduce Motion).
       daySnap = bindPageSnap({
         host: home,
         surface: day,
-        dir: -1,
+        dir: 1,
         blocked: swipeBlocked,
         build: function (pg) { openLogic(key, { plan: plan, standing: true, into: pg }); },
         go: toLogic
