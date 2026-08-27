@@ -6892,29 +6892,35 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
    spring green and periwinkle. The beams STAY, this joins them. Post-star
    only, hidden in light mode exactly like the rays. */
 .ambient__aurora { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.8s ease; overflow: hidden; }
-/* v1303 (Malik's screenshot: "a huge black box cut off"): the drifting layer
-   was exactly viewport-sized, so every translate exposed its own hard edge.
-   The layer is now OVERSIZED on every side the drift can pull from, so its
-   edges are geometrically incapable of entering the screen (the same
-   edge-safety law the card glow lives by), and the drift is gentler. */
-.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; left: -18%; right: -18%; top: 0; bottom: -12%; }
+/* v1304 (Malik: "memento keeps crashing"): the two drifting layers were FULL
+   viewport + 18% oversize, each masked, each composited forever, roughly
+   100MB of GPU texture at 3x, which is exactly the weight iOS kills a PWA
+   over. The layers now live only in the bottom BAND of the screen (the top
+   60% was empty texture, the gradients never reached it), which cuts the
+   memory to about a third. Still oversized past every edge the drift can
+   pull from (the v1303 edge-safety law), still masked so the top fades
+   organically. And BRIGHTER (his call: it felt dead). */
+.ambient__aurora i, .ambient__aurora i::before { content: ''; position: absolute; left: -18%; right: -18%; top: 38%; bottom: -12%; }
 .ambient__aurora i {
   background:
-    radial-gradient(150% 78% at 50% 126%, rgb(var(--aur-2, 63 217 78) / 0.32), transparent 74%),
-    radial-gradient(96% 62% at 28% 120%, rgb(var(--aur-1, 58 217 245) / 0.36), transparent 72%);
-  -webkit-mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
-          mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+    radial-gradient(150% 120% at 50% 135%, rgb(var(--aur-2, 63 217 78) / 0.62), transparent 78%),
+    radial-gradient(100% 100% at 26% 128%, rgb(var(--aur-1, 58 217 245) / 0.66), transparent 76%);
+  -webkit-mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
+          mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
 }
 .ambient__aurora i::before {
   background:
-    radial-gradient(96% 62% at 72% 120%, rgb(var(--aur-3, 128 150 255) / 0.36), transparent 72%),
-    radial-gradient(80% 50% at 50% 114%, rgba(255, 255, 255, 0.18), transparent 64%);
-  -webkit-mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
-          mask: radial-gradient(150% 128% at 50% 132%, #000 40%, transparent 88%);
+    radial-gradient(100% 100% at 74% 128%, rgb(var(--aur-3, 128 150 255) / 0.6), transparent 76%),
+    radial-gradient(84% 80% at 50% 118%, rgba(255, 255, 255, 0.26), transparent 68%);
+  -webkit-mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
+          mask: radial-gradient(160% 150% at 50% 140%, #000 46%, transparent 92%);
 }
+/* the second layer also breathes (see the ns-bloom animation list), so the
+   floor reads alive, not static */
+@keyframes homeAurBreath { from { opacity: 0.72; } to { opacity: 1; } }
 body.ns-bloom .ambient__aurora { opacity: 1; }
 body.ns-bloom .ambient__aurora i { animation: homeAurA 17s ease-in-out infinite alternate; }
-body.ns-bloom .ambient__aurora i::before { animation: homeAurB 21s ease-in-out infinite alternate; }
+body.ns-bloom .ambient__aurora i::before { animation: homeAurB 21s ease-in-out infinite alternate, homeAurBreath 9s ease-in-out infinite alternate; }
 @keyframes homeAurA { from { transform: translate(-2%, 0.8%); } to { transform: translate(2.4%, -0.8%); } }
 @keyframes homeAurB { from { transform: translate(2.2%, -0.8%); } to { transform: translate(-2.4%, 0.8%); } }
 @media (prefers-reduced-motion: reduce) {
