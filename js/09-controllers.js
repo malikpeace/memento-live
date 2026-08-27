@@ -3659,18 +3659,18 @@ const Sidebar = {
       _ensureStyles() {
         if (document.getElementById('spotStyles')) return;
         const s = document.createElement('style'); s.id = 'spotStyles';
-        s.textContent = '.spot-backdrop{position:fixed;inset:0;z-index:6000;display:flex;align-items:flex-start;justify-content:center;padding:13vh 16px 16px;background:rgba(4,5,9,0.45);opacity:0;-webkit-backdrop-filter:blur(calc(34px * var(--bx, 1))) saturate(112%);backdrop-filter:blur(calc(34px * var(--bx, 1))) saturate(112%);transition:opacity 0.2s var(--ease-out,cubic-bezier(0.16,1,0.3,1));}'
-          + '.spot{width:100%;max-width:590px;background:var(--surface-1-solid);border:none;border-radius:calc(8px * var(--rx, 1));box-shadow:var(--glass-highlight),0 24px 90px rgba(0,0,0,0.45);overflow:hidden;transform:translateY(-10px) scale(0.985);transition:transform 0.22s var(--ease-out,cubic-bezier(0.16,1,0.3,1)),opacity 0.18s ease;opacity:0;display:flex;flex-direction:column;max-height:70vh;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%);backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%);}'
+        s.textContent = '.spot-backdrop{position:fixed;inset:0;z-index:6000;display:flex;align-items:flex-start;justify-content:center;padding:13vh 16px 16px;background:rgba(4,5,9,0.62);opacity:0;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%) !important;backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%) !important;transition:opacity 0.2s var(--ease-out,cubic-bezier(0.16,1,0.3,1));}'
+          + '.spot{width:100%;max-width:590px;background:var(--surface-1-solid);border:none;border-radius:calc(14px * var(--rx, 1));box-shadow:var(--glass-highlight),0 24px 90px rgba(0,0,0,0.45);overflow:hidden;transform:translateY(-10px) scale(0.985);transition:transform 0.22s var(--ease-out,cubic-bezier(0.16,1,0.3,1)),opacity 0.18s ease;opacity:0;display:flex;flex-direction:column;max-height:70vh;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%);backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%);}'
           + '.spot-backdrop.is-on{opacity:1;}'
           + '.spot-backdrop.is-on .spot{transform:none;opacity:1;}'
-          + '.spot__bar{display:flex;align-items:center;gap:11px;padding:15px 16px;background:var(--kfill-03);}'
+          + '.spot__bar{display:flex;align-items:center;gap:12px;padding:17px 18px;background:var(--kfill-03);}'
           + '.spot__bar svg{width:18px;height:18px;color:var(--text-mid);flex:none;}'
           + '.spot__input{flex:1;min-width:0;font:inherit;font-size:1.05rem;color:var(--text-hi);background:transparent;border:0;outline:none;}'
           + '.spot__input::placeholder{color:var(--text-3);}'
           + '.spot__list{overflow-y:auto;padding:0;-webkit-overflow-scrolling:touch;}'
-          + '.spot__list:not(:empty){padding:8px;border-top:1px solid var(--hairline);}'
+          + '.spot__list:not(:empty){padding:10px;}'
           + '.spot__group{font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-lo);padding:10px 8px 5px;}'
-          + '.spot-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:0;background:transparent;border-radius:calc(8px * var(--rx, 1));padding:10px 11px;cursor:pointer;font:inherit;color:var(--text-hi);}'
+          + '.spot-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:transparent;border-radius:calc(10px * var(--rx, 1));padding:11px 12px;cursor:pointer;font:inherit;color:var(--text-hi);}'
           + '.spot-item--sel{background:rgba(var(--accent-rgb),0.16);box-shadow:none;}'
           + '.spot-item__tag{flex:none;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--text-3);}'
           + '.spot-item__tag svg{width:15px;height:15px;}'
@@ -3835,7 +3835,7 @@ const Sidebar = {
         this._ensureStyles();
         const bd = document.createElement('div'); bd.className = 'spot-backdrop'; bd.id = 'spotBackdrop';
         bd.innerHTML = '<div class="spot" role="dialog" aria-modal="true" aria-label="Spotlight search">'
-          + '<div class="spot__bar">' + this._icon('search') + '<input id="spotInput" class="spot__input" type="text" placeholder="Search or run a command" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'
+          + '<div class="spot__bar">' + this._icon('search') + '<input id="spotInput" class="spot__input" type="text" placeholder="Search" autocomplete="off" autocapitalize="off" spellcheck="false"></div>'
           + '<div class="spot__list" id="spotList"></div>'
           + '</div>';
         document.body.appendChild(bd);

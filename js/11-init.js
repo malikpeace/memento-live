@@ -2339,6 +2339,14 @@ window.addEventListener('keydown', (e) => {
     // makes messages scrolling behind them look intentional (frosted) instead
     // of harshly clipping through like a window.
     'body.lite .action-chat__input-row,body.lite .ai-chat__input-row{backdrop-filter:blur(calc(18px * var(--bx, 1))) saturate(125%)!important;-webkit-backdrop-filter:blur(calc(18px * var(--bx, 1))) saturate(125%)!important;background:rgba(10,10,14,0.55)!important;}',
+    // v1301 (Malik: "blur out the background a lot more"): the quick-launch
+    // fan's scrim and the Spotlight backdrop keep their frost even in lite
+    // mode. Each is ONE fullscreen element that rasterizes once, same budget
+    // reasoning as the chat bars above; without this the fan and search sat
+    // on a fully readable page.
+    'body.lite .cc-fan__scrim{backdrop-filter:blur(34px) saturate(1.3)!important;-webkit-backdrop-filter:blur(34px) saturate(1.3)!important;}',
+    'body.lite .spot-backdrop{backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%)!important;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(120%)!important;}',
+    'body.lite .spot{backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%)!important;-webkit-backdrop-filter:blur(calc(60px * var(--bx, 1))) saturate(140%)!important;}',
     // Without backdrop-blur, translucent overlays would let the dashboard show
     // through on mobile. Make the full-screen overlays opaque in lite mode.
     'body.lite .clarity-exp{background:#030708!important;}',

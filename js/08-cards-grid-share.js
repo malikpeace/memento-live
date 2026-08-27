@@ -5654,10 +5654,7 @@ function ccBindDeckStrip(cc, dn) {
     // now drives the SAME physical deck as swiping the box: one dot-gap of
     // finger equals one full card of travel, 1:1, committing the moment the
     // finger reaches the next dot and springing home if it lets go early.
-    const width = () => {
-      const d2 = cc.__deck; const c2 = d2 && d2.card();
-      return (c2 ? c2.offsetWidth : 330) + 60;
-    };
+    const width = () => 140; // one dot-gap = one full crossfade (FADE_TRAVEL)
     try { if (cc.__deck) cc.__deck.prebuild(); } catch (z) {}
     let lastX = e.clientX;
     const step = (x) => {
@@ -5935,12 +5932,11 @@ function bindCommandCenter(cc) {
           // said "nothing moved" while his eyes correctly saw the incoming
           // card grow on every single swipe. Depth now comes from the offset
           // and the shadow only. Cards slide at exactly their real size.
-          u.style.transform = 'translateY(7px)';
-          // v1080: FULLY opaque. At 0.85 the card behind it showed straight
-          // through, which is the "see through the cards" Malik reported. A
-          // stacked card reads as depth through scale and shadow, never
-          // through transparency.
-          u.style.opacity = '1';
+          // v1301 (Malik: "no longer swipe like a stack, simply just fade").
+          // The incoming face sits exactly in place and FADES in as the
+          // current one fades out; nothing slides, nothing rises.
+          u.style.transform = 'none';
+          u.style.opacity = '0';
           u.style.zIndex = '0';
           return u;
         } catch (e) { return null; }
@@ -5984,8 +5980,8 @@ function bindCommandCenter(cc) {
           Object.keys(preEls).forEach((k) => { if (preEls[k] !== under) preEls[k].style.display = 'none'; });
           // rest pose, in case a direction reversal re-reveals it mid-gesture
           under.style.transition = 'none';
-          under.style.transform = 'translateY(7px)';
-          under.style.opacity = '1';
+          under.style.transform = 'none';
+          under.style.opacity = '0';
           under.style.display = '';
           void under.offsetWidth;
           under.style.transition = '';
@@ -6013,64 +6009,56 @@ function bindCommandCenter(cc) {
         }
         if (axis !== 'x') return;
         e.preventDefault();
-        if (dx !== 0) armDeck(dx);
-        void 0;
-        // 1:1 follow with a whisper of rotation; the top card is an object in
-        // the hand, not a value being interpolated.
-        card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
-        if (under) {
-          const p = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
-          under.style.transform = 'translateY(' + (7 - p * 7).toFixed(1) + 'px)';
-        }
+        deckDrag(dx);
       });
       // COMMIT: the top card leaves the way it was moving, the one beneath
       // rises to full size, then the real render takes over. Shared by the
       // card swipe AND the dot scrub (v1300), so both feel like one machine.
+      // How many px of finger equal a complete crossfade. The dot scrub
+      // passes exactly this for one dot-gap, so both inputs share the curve.
+      const FADE_TRAVEL = 140;
       const deckCommit = (dx) => {
         if (!under) return false;
         const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         _ccPillar = underPillar;
-        const off = (dx < 0 ? -1 : 1) * (card.offsetWidth + 60);
         if (reduced) {
           disarmDeck();
           try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
           return true;
         }
         cc.__deckBusy = true;
-        card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
-        card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
-        under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1)';
-        under.style.transform = 'translateY(0)';
+        card.style.transition = 'opacity .2s ease-in';
+        card.style.opacity = '0';
+        under.style.transition = 'opacity .2s ease-out';
+        under.style.opacity = '1';
         setTimeout(() => {
           disarmDeck();
           card.dataset.swiping = '';
-          card.style.transition = ''; card.style.transform = '';
+          card.style.transition = ''; card.style.opacity = ''; card.style.transform = '';
           try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
           cc.__deckBusy = false;
-        }, 300);
+        }, 230);
         return true;
       };
-      // CANCEL: spring home, the stack settles back down.
+      // CANCEL: fade back to where you were.
       const deckCancel = () => {
-        card.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
-        card.style.transform = 'translateX(0) rotate(0deg)';
+        card.style.transition = 'opacity .22s ease-out';
+        card.style.opacity = '1';
         if (under) {
-          under.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
-          under.style.transform = 'translateY(7px)';
+          under.style.transition = 'opacity .22s ease-in';
+          under.style.opacity = '0';
         }
         setTimeout(() => {
-          card.style.transition = ''; card.dataset.swiping = '';
+          card.style.transition = ''; card.style.opacity = ''; card.dataset.swiping = '';
           disarmDeck();
-        }, 320);
+        }, 250);
       };
-      // 1:1 drag pose, shared with the scrub.
+      // 1:1 crossfade under the finger, shared with the scrub (v1301).
       const deckDrag = (dx) => {
         if (dx !== 0) armDeck(dx);
-        card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
-        if (under) {
-          const p2 = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
-          under.style.transform = 'translateY(' + (7 - p2 * 7).toFixed(1) + 'px)';
-        }
+        const p2 = Math.min(1, Math.abs(dx) / FADE_TRAVEL);
+        card.style.opacity = (1 - p2).toFixed(3);
+        if (under) under.style.opacity = p2.toFixed(3);
       };
       // v1300 (Malik: the dot strip must FEEL like the deck): the scrub in
       // ccBindDeckStrip drives this same machinery, so a finger on the dots

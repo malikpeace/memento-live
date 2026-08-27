@@ -4881,12 +4881,10 @@ html.theme-light .cc-dots i.on { background: var(--text-hi); }
 
    Skipped when the Glass setting is off: that surface is already solid, and
    swapping it would be the only visible change in the whole gesture. */
-html:not(.flat-ui) #commandCenter.cc-deck-live .cc-card:not(.cc-under) {
-  background: #05060a !important;
-}
-html:not(.flat-ui).theme-light #commandCenter.cc-deck-live .cc-card:not(.cc-under) {
-  background: #f7f8fa !important;
-}
+/* v1301: the deck no longer slides, it crossfades in place, so the top card
+   stays its normal glass self; the old forced-solid swap (which existed to
+   stop see-through during the slide) caused a visible background flash at
+   gesture start and is retired. */
 html.theme-light #commandCenter .cc-card {
   background: rgba(255,255,255,0.62) !important;
   box-shadow:
@@ -6805,15 +6803,20 @@ html.app-asleep .crays__shaft {
   touch-action: none;
 }
 .cc-strip-m:active { transform: translateY(-50%) scale(0.9); background: rgba(var(--ink), 0.12); }
-.cc-strip-m svg { width: 14px; height: 14px; color: rgba(var(--ink), 0.6); }
+.cc-strip-m svg { width: 17px; height: 17px; color: rgba(var(--ink), 0.66); }
 /* the fan: three names above the M, in the app's own glass */
 .cc-fan { position: fixed; inset: 0; z-index: 1050; }
 .cc-fan__scrim {
-  position: absolute; inset: 0; background: rgba(3, 5, 6, 0.52);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2);
+  /* v1301 (Malik: "blur out the background a lot more"): a real frost, the
+     page behind reads as colour only. */
+  position: absolute; inset: 0; background: rgba(3, 5, 6, 0.6);
+  /* !important: survives the global body.lite *{backdrop-filter:none} perf
+     rule (js/11); ONE fullscreen scrim is cheap, and without it the fan sat
+     on a readable page (Malik's report). */
+  -webkit-backdrop-filter: blur(34px) saturate(1.3) !important; backdrop-filter: blur(34px) saturate(1.3) !important;
   opacity: 0; transition: opacity 240ms ease;
 }
-html.theme-light .cc-fan__scrim { background: rgba(232, 236, 238, 0.5); }
+html.theme-light .cc-fan__scrim { background: rgba(232, 236, 238, 0.62); }
 .cc-fan__opt--aux { color: rgba(var(--ink), 0.66); }
 .cc-fan.is-in .cc-fan__scrim { opacity: 1; }
 .cc-fan__opt {
