@@ -208,7 +208,7 @@ html.theme-light .tab-bar__do-check { color: rgba(22, 140, 32, 0.95); }
     display: flex; align-items: center; justify-content: center;
     /* !important: base.css's `#panelProfile > *` (ID) sets position:relative +
        z-index:1, which would otherwise win over this class. */
-    position: fixed !important; top: calc(var(--safe-t) + 12px); right: 14px;
+    position: fixed !important; top: calc(var(--safe-t) + 12px); left: 14px;
     z-index: 5 !important;
     width: 32px; height: 32px; border-radius: 50%; border: none;
     background: var(--kfill-08); color: var(--text-2);
@@ -216,8 +216,12 @@ html.theme-light .tab-bar__do-check { color: rgba(22, 140, 32, 0.95); }
     cursor: pointer; -webkit-tap-highlight-color: transparent;
     transition: background var(--t-fast);
   }
+  .tab-panel__close svg { width: 16px; height: 16px; }
   /* invisible 44px tap target without growing the visual */
   .tab-panel__close::after { content: ''; position: absolute; inset: -6px; }
+  /* v1300: the arrow lives over the panel's top-left, where Reflect's date
+     used to start; the content steps down clear of it. */
+  .tab-panel__inner { padding-top: calc(var(--safe-t) + 64px) !important; }
   .tab-panel__close:active { background: var(--kfill-14); }
 }
 .tab-panel__inner {

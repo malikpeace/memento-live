@@ -3861,10 +3861,20 @@ const Sidebar = {
       _renderList(q) {
         const list = document.getElementById('spotList'); if (!list) return;
         const emptyQuery = !(q || '').trim();
-        const items = this._filter(q); this._filtered = items;
-        if (emptyQuery) { list.innerHTML = ''; return; }
+        let items;
+        if (emptyQuery) {
+          // v1300 (Malik: "recommendations already there", Raycast-style): an
+          // empty palette leads with the places, ready to tap. Built from
+          // _commands() so the unlock gating still holds.
+          const WANT = ['Open Clarity', 'Open Action', 'Open Consistency', 'New note', 'Open Memento Mori', 'Open Settings'];
+          const all = this._commands();
+          items = WANT.map(t => all.find(c => c.title === t)).filter(Boolean).map(c => Object.assign({}, c, { group: 'Go to' }));
+        } else {
+          items = this._filter(q);
+        }
+        this._filtered = items;
         if (this._sel >= items.length) this._sel = Math.max(0, items.length - 1);
-        if (!items.length) { list.innerHTML = '<div class="spot__empty">No matches. Try a different word.</div>'; return; }
+        if (!items.length) { list.innerHTML = emptyQuery ? '' : '<div class="spot__empty">No matches. Try a different word.</div>'; return; }
         let h = '', lastGroup = null;
         items.forEach((it, idx) => {
           if (it.group !== lastGroup) { h += '<div class="spot__group">' + esc(it.group || '') + '</div>'; lastGroup = it.group; }

@@ -2384,23 +2384,28 @@ body.lite .welcome-intro__mirror > * { animation: none; opacity: 1; transform: n
    even though nothing is drawn there, so losing the circle cannot cost a
    thumb. Position and safe-area inset are unchanged. The colour is ink-based,
    so it flips for light mode on its own. */
+/* v1300 (Malik: "the X looks really cheap... use the back arrow"). The global
+   close is now the Memento view's own top-LEFT back arrow, verbatim: a 36px
+   quiet circle with a 17px chevron, ink-based so both themes carry it. The
+   invisible ::after keeps Apple's 44px hit area. */
 .fullscreen-close-global {
   position: fixed;
-  top: calc(var(--safe-t, 0px) + 16px);
-  right: 16px;
+  top: calc(var(--safe-t, 0px) + 14px);
+  left: 14px;
   z-index: 10001;
-  width: 44px; height: 44px;
-  border: none;
-  background: none;
-  color: rgba(var(--ink),0.78);
-  font-size: 26px;
-  line-height: 1;
+  width: 36px; height: 36px;
+  border: none; border-radius: 50%;
+  background: rgba(var(--ink), 0.08);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.09);
+  color: rgba(var(--ink), 0.8);
   display: none;
   align-items: center; justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color var(--t-fast) ease, opacity var(--t-fast) ease, transform 0.1s ease;
 }
+.fullscreen-close-global svg { width: 17px; height: 17px; }
+.fullscreen-close-global::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; }
 .fullscreen-close-global.visible { display: flex; }
 /* When an inner sheet (today / refine / milestone) is open, the sheet has its
    own close X. Hide the global one so they don't stack. Also hide it whenever

@@ -6805,8 +6805,7 @@ html.app-asleep .crays__shaft {
   touch-action: none;
 }
 .cc-strip-m:active { transform: translateY(-50%) scale(0.9); background: rgba(var(--ink), 0.12); }
-.cc-strip-m svg { width: 13px; height: 13px; }
-.cc-strip-m path { fill: rgba(var(--ink), 0.55); }
+.cc-strip-m svg { width: 14px; height: 14px; color: rgba(var(--ink), 0.6); }
 /* the fan: three names above the M, in the app's own glass */
 .cc-fan { position: fixed; inset: 0; z-index: 1050; }
 .cc-fan__scrim {

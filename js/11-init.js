@@ -982,24 +982,27 @@ let _nsMenuDelegateBound = false;
 function bindNeutronStarMenuDelegate() {
   if (_nsMenuDelegateBound) return;
   _nsMenuDelegateBound = true;
+  // v1300 (Malik: the menu tap "did nothing", and Refine already lives at the
+  // bottom of page 2). The ... now opens the "What is a Neutron Star?"
+  // reminder DIRECTLY, and the close X is handled here too, so neither tap
+  // can lose the race the per-node bindings used to lose in the pager.
   document.addEventListener('click', (ev) => {
     try {
       const btn = ev.target && ev.target.closest && ev.target.closest('#nsMenuBtn');
       if (btn) {
         ev.stopPropagation();
         const scene = btn.closest('#nsScene') || document;
-        const sheet = scene.querySelector('#nsMenuSheet');
-        if (!sheet) return;
-        const open = sheet.classList.toggle('is-open');
-        sheet.setAttribute('aria-hidden', open ? 'false' : 'true');
+        const sheet = scene.querySelector('#nsExplainSheet');
+        if (sheet) sheet.setAttribute('aria-hidden', 'false');
         return;
       }
-      // a tap anywhere else closes any open sheet, unless it is inside one
-      if (ev.target && ev.target.closest && ev.target.closest('#nsMenuSheet')) return;
-      document.querySelectorAll('#nsMenuSheet.is-open').forEach((s) => {
-        s.classList.remove('is-open');
-        s.setAttribute('aria-hidden', 'true');
-      });
+      const x = ev.target && ev.target.closest && ev.target.closest('#nsExplainClose');
+      if (x) {
+        ev.stopPropagation();
+        const sheet = x.closest('#nsExplainSheet');
+        if (sheet) sheet.setAttribute('aria-hidden', 'true');
+        return;
+      }
     } catch (e) {}
   }, true);
 }

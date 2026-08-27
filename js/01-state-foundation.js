@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1299';
+window.MEMENTO_JS_BUILD = 'v1300';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1493,7 +1493,7 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
   return `
     <div class="ns-star-scene ns-star-scene--manifesto ns-star-scene--min" id="nsScene">
       <div class="ns-star-scene__starfield" id="nsStarfield" aria-hidden="true"></div>
-      <button type="button" class="ns-min__menu-btn" id="nsMenuBtn" aria-label="More options" aria-haspopup="true">&middot;&middot;&middot;</button>
+      <button type="button" class="ns-min__menu-btn" id="nsMenuBtn" aria-label="What is a Neutron Star?">&middot;&middot;&middot;</button>
       <div class="ns-star-stage" id="nsStarStage">
         <div class="ns-star-glow"></div>
         <canvas class="ns-star-blob" id="nsStarBlob" width="360" height="360" aria-hidden="true"></canvas>
@@ -1520,11 +1520,6 @@ function renderNeutronStarSummary(summary, { allowContinue = false, showRestart 
           </button>`;
         })()}
       </div>
-      <div class="ns-min__sheet" id="nsMenuSheet" aria-hidden="true" role="menu">
-        <button type="button" id="summaryContinue" class="ns-min__sheet-item" role="menuitem">Refine answers</button>
-        <button type="button" id="nsExplainBtn" class="ns-min__sheet-item" role="menuitem">What's a Neutron Star?</button>
-      </div>
-
       <!-- Explanation sheet: opens from the "What's this?" quiet link.
            Recaps what a Neutron Star is as a metaphor + why clarity matters.
            Lives at the SCENE level (not inside the scrolling detail) so it

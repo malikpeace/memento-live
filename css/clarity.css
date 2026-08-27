@@ -2773,10 +2773,14 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 .clarity-exp.open-content .clarity-exp__top {
   pointer-events: auto;
 }
+.clarity-exp__close svg { width: 17px; height: 17px; }
 .clarity-exp__close {
   width: 36px; height: 36px; border-radius: 50%;
-  background: transparent; border: none;
-  color: rgba(var(--ink),0.55); font-size: 1.5rem; line-height: 1;
+  /* v1300: the universal back arrow (the Memento view's in-back, verbatim).
+     Clarity is dark cinema, so the fill is white-based like the original. */
+  background: rgba(255, 255, 255, 0.08); border: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.82); line-height: 1;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: color var(--t-fast), opacity var(--t-fast);
   font-family: var(--font);
@@ -4190,7 +4194,9 @@ html.lowfx .fs--collapse .fs-neb { animation-duration: 3.6s; }
 }
 .ns-min__cta:active { transform: scale(0.985); }
 .ns-min__menu-btn {
-  position: absolute; top: calc(var(--safe-t, 0px) + 14px); left: 18px; z-index: 5;
+  /* v1300: the back arrow owns the top-left now; the reminder moves to the
+     corner the X freed up. */
+  position: absolute; top: calc(var(--safe-t, 0px) + 14px); right: 18px; z-index: 5;
   appearance: none; border: 0; cursor: pointer;
   width: 40px; height: 32px; border-radius: var(--ctl-r);
   background: rgba(255, 255, 255, 0.07);

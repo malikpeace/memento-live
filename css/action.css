@@ -5774,8 +5774,10 @@ html.theme-light .afl-day__nnl { color: rgba(var(--ink), 0.82); }
    wide desktop window the mark stays with the content column while the chip
    stays at the window edge, which is the right call for both.) */
 .afl-day__m {
+  /* v1300: the back arrow owns the top-left; the M takes the corner the X
+     left behind, same inset, same 44px hit. */
   position: absolute; z-index: 5;
-  top: calc(var(--safe-t, 0px) + 16px); left: 16px;
+  top: calc(var(--safe-t, 0px) + 16px); right: 16px;
   width: 44px; height: 44px; display: grid; place-items: center;
   border: 0; background: none; padding: 0; cursor: pointer;
 }

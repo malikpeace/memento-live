@@ -5594,8 +5594,10 @@ function ccBindDeckStrip(cc, dn) {
   const m = document.createElement('button');
   m.type = 'button';
   m.className = 'cc-strip-m';
-  m.setAttribute('aria-label', 'Switch box');
-  m.innerHTML = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z"/></svg>';
+  m.setAttribute('aria-label', 'Search');
+  // v1300 (Malik: "a search can still be a launcher just more useful"): the
+  // button is Search now. Tap opens Spotlight; the hold-fan stays.
+  m.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
   dn.appendChild(m);
 
   // ---- scrub + tap on the dots (v1299: Action's own feel) ----
@@ -5630,21 +5632,57 @@ function ccBindDeckStrip(cc, dn) {
   };
   dn.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.cc-strip-m')) return;
+    // v1300 (Malik: "no liquid feeling... everything just jumps"). The scrub
+    // now drives the SAME physical deck as swiping the box: one dot-gap of
+    // finger equals one full card of travel, 1:1, committing the moment the
+    // finger reaches the next dot and springing home if it lets go early.
+    const width = () => {
+      const d2 = cc.__deck; const c2 = d2 && d2.card();
+      return (c2 ? c2.offsetWidth : 330) + 60;
+    };
+    try { if (cc.__deck) cc.__deck.prebuild(); } catch (z) {}
+    let lastX = e.clientX;
     const step = (x) => {
+      lastX = x;
       const p = posAt(x);
-      const want = list[Math.round(p)];
-      if (want && want !== _ccPillar) ccGoPillar(cc, want);
       paint(p);
+      if (cc.__deckBusy) return;
+      const d2 = cc.__deck; if (!d2) return;
+      const cur = list.indexOf(_ccPillar);
+      let delta = p - cur;
+      if (delta > 1) delta = 1; if (delta < -1) delta = -1;
+      const dx = -delta * width();
+      if (Math.abs(delta) >= 0.995) { d2.drag(dx); d2.commit(dx); return; }
+      d2.drag(dx);
     };
     const mv = (ev) => {
       if (ev.cancelable) { try { ev.preventDefault(); } catch (z) {} }
       step(ev.clientX);
     };
-    const up = () => {
+    const up = (ev) => {
       window.removeEventListener('pointermove', mv);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
       clearPaint();
+      const x = (ev && ev.clientX != null) ? ev.clientX : lastX;
+      const p = posAt(x);
+      const target = Math.max(0, Math.min(list.length - 1, Math.round(p)));
+      const land = () => {
+        const cur = list.indexOf(_ccPillar);
+        if (target === cur) { const d2 = cc.__deck; if (d2 && !cc.__deckBusy) d2.cancel(); return; }
+        const d2 = cc.__deck;
+        if (!cc.__deckBusy && d2 && Math.abs(target - cur) === 1) {
+          const dx = (cur - target) * width() * 0.55;
+          d2.drag(dx);
+          d2.commit(dx);
+        } else if (!cc.__deckBusy) {
+          ccGoPillar(cc, list[target]);
+        } else {
+          // a commit is mid-flight; settle onto the right box after it lands
+          setTimeout(land, 330);
+        }
+      };
+      land();
     };
     window.addEventListener('pointermove', mv, { passive: false });
     window.addEventListener('pointerup', up);
@@ -5727,10 +5765,11 @@ function ccBindDeckStrip(cc, dn) {
   const mEnd = (e) => {
     if (mPid !== null && e && e.pointerId !== mPid) return;
     if (hold) {
-      // a plain tap: the next box
+      // a plain tap: Spotlight (v1300, Malik's call: tap is search, period).
+      // Deferred past the tap's own trailing click, which would otherwise
+      // land on the fresh backdrop and close the palette instantly.
       clearTimeout(hold); hold = null; mPid = null;
-      const i = Math.max(0, list.indexOf(_ccPillar));
-      ccGoPillar(cc, list[(i + 1) % list.length]);
+      setTimeout(() => { try { if (window.Spotlight) window.Spotlight.open(); } catch (e2) {} }, 120);
       return;
     }
     mPid = null;
@@ -5966,35 +6005,35 @@ function bindCommandCenter(cc) {
           under.style.transform = 'translateY(' + (7 - p * 7).toFixed(1) + 'px)';
         }
       });
-      const finish = (e) => {
-        if (x0 === null) return;
-        const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
-        const wasX = axis === 'x';
-        x0 = null; y0 = null; axis = null;
+      // COMMIT: the top card leaves the way it was moving, the one beneath
+      // rises to full size, then the real render takes over. Shared by the
+      // card swipe AND the dot scrub (v1300), so both feel like one machine.
+      const deckCommit = (dx) => {
+        if (!under) return false;
         const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (wasX && Math.abs(dx) >= COMMIT && under) {
-          // COMMIT: the top card leaves the way it was moving, the one
-          // beneath rises to full size, then the real render takes over.
-          _ccPillar = underPillar;
-          const off = (dx < 0 ? -1 : 1) * (card.offsetWidth + 60);
-          if (reduced) {
-            disarmDeck();
-            try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
-            return;
-          }
-          card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
-          card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
-          under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1)';
-          under.style.transform = 'translateY(0)';
-          setTimeout(() => {
-            disarmDeck();
-            card.dataset.swiping = '';
-            card.style.transition = ''; card.style.transform = '';
-            try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
-          }, 300);
-          return;
+        _ccPillar = underPillar;
+        const off = (dx < 0 ? -1 : 1) * (card.offsetWidth + 60);
+        if (reduced) {
+          disarmDeck();
+          try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
+          return true;
         }
-        // CANCEL: spring home, the stack settles back down.
+        cc.__deckBusy = true;
+        card.style.transition = 'transform .24s cubic-bezier(.4,.0,.9,.6)';
+        card.style.transform = 'translateX(' + off + 'px) rotate(' + (off * 0.02) + 'deg)';
+        under.style.transition = 'transform .24s cubic-bezier(.2,.8,.3,1)';
+        under.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          disarmDeck();
+          card.dataset.swiping = '';
+          card.style.transition = ''; card.style.transform = '';
+          try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
+          cc.__deckBusy = false;
+        }, 300);
+        return true;
+      };
+      // CANCEL: spring home, the stack settles back down.
+      const deckCancel = () => {
         card.style.transition = 'transform .3s cubic-bezier(.3,.85,.3,1)';
         card.style.transform = 'translateX(0) rotate(0deg)';
         if (under) {
@@ -6005,6 +6044,27 @@ function bindCommandCenter(cc) {
           card.style.transition = ''; card.dataset.swiping = '';
           disarmDeck();
         }, 320);
+      };
+      // 1:1 drag pose, shared with the scrub.
+      const deckDrag = (dx) => {
+        if (dx !== 0) armDeck(dx);
+        card.style.transform = 'translateX(' + dx.toFixed(1) + 'px) rotate(' + (dx * 0.02).toFixed(2) + 'deg)';
+        if (under) {
+          const p2 = Math.min(1, Math.abs(dx) / (COMMIT * 2.2));
+          under.style.transform = 'translateY(' + (7 - p2 * 7).toFixed(1) + 'px)';
+        }
+      };
+      // v1300 (Malik: the dot strip must FEEL like the deck): the scrub in
+      // ccBindDeckStrip drives this same machinery, so a finger on the dots
+      // physically slides the real card.
+      cc.__deck = { prebuild: prebuildDeck, drag: deckDrag, commit: deckCommit, cancel: deckCancel, card: () => card };
+      const finish = (e) => {
+        if (x0 === null) return;
+        const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
+        const wasX = axis === 'x';
+        x0 = null; y0 = null; axis = null;
+        if (wasX && Math.abs(dx) >= COMMIT && deckCommit(dx)) return;
+        deckCancel();
       };
       card.addEventListener('pointerup', finish);
       card.addEventListener('pointercancel', finish);
@@ -8599,6 +8659,7 @@ const MementoEditor = (function () {
         } else {
           if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
           state.cardSkin[key] = b.getAttribute('data-v') === '1' ? 1 : 0;
+          if (key === 'ring') state.cardSkin.ringSet = 1;
         }
         try { persistNow(); } catch (err) {}
         applyCardSkin(document.querySelector('#dayCard .daycard-wrap'));
@@ -9627,9 +9688,15 @@ const _SKIN_MORPH_MS = 850;   // v1298: Malik, "about 40% slower"
 // choice. Unset means matched, 0 means white, 1 means matched.
 function _skinRingOn() {
   try {
-    if (state.cardSkin && state.cardSkin.ring !== undefined && state.cardSkin.ring !== null) return !!state.cardSkin.ring;
+    const cs = state.cardSkin;
+    // an explicit choice (the White/Matched toggle stamps ringSet) always wins
+    if (cs && cs.ringSet) return !!cs.ring;
+    if (cs && cs.ring === 1) return true;
+    // v1300 default (Malik): every MATERIAL ships colour-matched; the default
+    // Memento look (no material) keeps the white platinum ring.
+    return !!(cs && cs.id);
   } catch (e) {}
-  return true;
+  return false;
 }
 function _skinColParse(raw) {
   const v = String(raw || '').trim();
@@ -9948,6 +10015,7 @@ function _mfBuildSkinSheet(host, wrap, sig, onClose) {
       } else {
         if (!state.cardSkin) state.cardSkin = { id: '', ring: 0, mark: 0 };
         state.cardSkin[key] = b.getAttribute('data-v') === '1' ? 1 : 0;
+        if (key === 'ring') state.cardSkin.ringSet = 1;
       }
       try { persistNow(); } catch (err) {}
       applyCardSkin(wrap);
