@@ -6762,12 +6762,13 @@ html.app-asleep .crays__shaft {
    v1292 slack-to-top rule keeps working: the label leads the block.
    ========================================================================== */
 .cc-sync-k {
-  margin: 0 0 7px; font-size: 10.5px; font-weight: 650;
+  /* v1295 (Malik): all three labels read as quiet wayfinding, not headlines.
+     One dim ink for Action, Clarity and Consistency alike; the module colours
+     stay where the modules are. */
+  margin: 0 0 7px; font-size: 10.5px; font-weight: 640;
   letter-spacing: 0.13em; text-transform: uppercase;
-  color: rgba(var(--ink), 0.42);
+  color: rgba(var(--ink), 0.34);
 }
-.cc-sync-k--clarity { color: rgba(58, 217, 245, 0.78); }
-.cc-sync-k--consistency { color: rgba(63, 217, 78, 0.78); }
 /* the label leads the bottom-anchored block, not the slack above it */
 .cc-card--pillars .v-nf > .cc-sync-k:first-child { margin-top: auto; }
 .cc-card--pillars .v-nf > .cc-sync-k:first-child + * { margin-top: 0; }
