@@ -3546,6 +3546,11 @@ html.lowfx .daycard-ns {
 }
 #dashGreetingMobile { display: none; }
 @media (max-width: 859.98px) {
+  /* v1306 (Malik: "scale down the overall size of the sync boxes a bit...
+     don't change the info"): one uniform 6% shrink of the whole box, via
+     zoom so the LAYOUT shrinks with it (transform would fight the deck's
+     no-transform law) and the freed height flows back to the card. */
+  body .app.dash-v2 #homePage1 > #commandCenter > .cc-card { zoom: 0.94; }
   /* The brand lockup is PURE BRANDING on mobile (v685): the drawer is gone on
      phones (bottom bar is the only nav), so no cursor, no hit area, no press cue. */
   .dash-header__brand { display: inline-flex; }
@@ -6897,9 +6902,17 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
 /* the veil: a repeating band of light travelling DOWN forever, brightest
    where it leaves the card's bottom edge, dissolving as it falls */
 .ambient__aurora .aur-veil {
-  left: 6%; right: 6%; top: 54.6%; bottom: -4%;
+  /* anchored to the card's measured bottom (js/11 --veil-top), so it can
+     never begin inside the card face; the +6px tucks the seam under the
+     card's own glow */
+  left: 6%; right: 6%; top: calc(var(--veil-top, 57vh) + 6px); bottom: -4%;
   -webkit-mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
           mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
+  /* v1306 (Malik: "not like it's slowly wedging down as it goes"): the sheet
+     is tipped in perspective, top edge pinned, so it leaves the card narrow
+     and WIDENS as it falls, the way poured light spreads. */
+  transform: perspective(720px) rotateX(24deg);
+  transform-origin: 50% 0%;
 }
 .ambient__aurora .aur-veil b {
   left: 0; right: 0; top: -140%; bottom: -140%; filter: blur(16px);

@@ -117,6 +117,18 @@ function syncHomeViewport() {
     // number while the user is already looking. Phones take the CSS value and
     // nothing can move it. Tablets still measure, because there the chrome
     // genuinely differs (v1106: 124 real vs 75 assumed).
+    // v1306 (Malik's screenshot: a faint line INSIDE the card): the veil used
+    // a fixed 54.6% top, but the card's bottom is a different fraction on
+    // every device (the card flexes), so on his phone the veil began inside
+    // the translucent card face. The veil now anchors to the card's real
+    // measured bottom; re-measured on the same settle/foreground passes.
+    try {
+      const cw = document.querySelector('#dayCard .daycard-wrap');
+      if (cw) {
+        const cb = Math.round(cw.getBoundingClientRect().bottom);
+        if (cb > 100 && cb < window.innerHeight) root.style.setProperty('--veil-top', cb + 'px');
+      }
+    } catch (e) {}
     const p1e = document.getElementById('homePage1');
     if (window.innerWidth < 768) {
       root.style.removeProperty('--p1-top');
