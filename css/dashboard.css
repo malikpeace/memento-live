@@ -6090,14 +6090,14 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 .v-hu .v-hu__ends { display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); font-variant-numeric: tabular-nums; }
 .v-hu .v-hu__ends span:last-child { color: rgba(var(--ink), 0.72); font-weight: 600; }
 .v-hu .v-hu__note { margin: 15px 0 0; font-size: 13.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.56); }
-.v-math .v-math__goal { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 11px; }
-.v-math .v-math__eq { display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px; margin: 0 0 7px; }
-.v-math .v-math__n { font-size: 15.5px; font-weight: 600; letter-spacing: -0.022em; color: rgba(var(--ink), 0.74); font-variant-numeric: tabular-nums; }
-.v-math .v-math__n--lit { color: var(--text-hi, rgba(var(--ink), 0.96)); }
-.v-math .v-math__o { font-size: 15.5px; font-weight: 500; color: var(--text-lo, rgba(var(--ink), 0.40)); }
+.v-math .v-math__goal { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 18px; }
+.v-math .v-math__eq { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 9px; margin: 0; line-height: 1.24; }
+.v-math .v-math__n { font-size: 21px; font-weight: 640; letter-spacing: -0.026em; color: rgba(var(--ink), 0.82); font-variant-numeric: tabular-nums; }
+.v-math .v-math__n--lit { color: var(--text-hi, rgba(var(--ink), 0.96)); font-weight: 700; }
+.v-math .v-math__o { font-size: 19px; font-weight: 400; color: var(--text-lo, rgba(var(--ink), 0.38)); }
 .v-math .v-math__step { font-size: 13.5px; font-weight: 500; letter-spacing: -0.008em; color: rgba(var(--ink), 0.52); padding: 0 0 13px; border-bottom: 1px solid rgba(var(--ink), 0.09); }
 .v-math .v-math__out { margin: 14px 0 9px; font-size: 23px; line-height: 1.06; font-weight: 640; letter-spacing: -0.034em; color: var(--text-hi, rgba(var(--ink), 0.96)); font-variant-numeric: tabular-nums; }
-.v-math .v-math__foot { font-size: 11.5px; line-height: 1.42; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.50); }
+.v-math .v-math__foot { font-size: 13px; line-height: 1.46; font-weight: 500; letter-spacing: -0.006em; color: rgba(var(--ink), 0.52); }
 .v-true .v-true__goal { font-size: 13.5px; line-height: 1.34; font-weight: 500; letter-spacing: -0.01em; color: var(--text-mid, rgba(var(--ink), 0.62)); margin: 0 0 12px; }
 .v-true .v-true__rows { display: flex; flex-direction: column; gap: 9px; margin: 0 0 12px; }
 .v-true .v-true__row { display: flex; align-items: baseline; gap: 9px; }
