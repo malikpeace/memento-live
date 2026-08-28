@@ -7105,9 +7105,7 @@ html.theme-light #deskMission { background: rgba(255, 255, 255, 0.66) !important
 /* v1310: the reflection dips out while the home is being pulled. It already
    travels WITH the Memento (it lives inside #dayCard); the artifact was the
    elastic gap under the card exposing it where the box normally covers it. */
-body.home-pulling .daycard-theme-living .daycard-floor {
-  opacity: 0 !important; transition: opacity 0.14s ease;
-}
+/* (v1310's reflection fade is retired: it travels with the card instead.) */
 
 
 /* \2500\2500 v1311: THE PULL'S CHEAP MODE (Malik: the elastic was crashing the
@@ -7125,6 +7123,15 @@ body.home-pulling #commandCenter .cc-card {
 html.theme-light body.home-pulling #commandCenter .cc-card {
   background: rgba(255, 255, 255, 0.82) !important;
 }
-body.home-pulling .ambient__aurora .aur-veil { opacity: 0; transition: opacity 0.12s ease; }
+/* v1312: the veil and the reflection are NOT hidden any more (Malik: "just
+   make it attached to the bottom of the memento"). js/11 moves the veil on
+   the card's own factor and the reflection lives inside the card, so both
+   stay welded to its bottom edge for the whole pull. */
 body.home-pulling .ambient__aurora em,
 body.home-pulling .ambient__aurora .aur-veil b { animation-play-state: paused !important; }
+
+
+/* v1312 (Malik): the greeting's dark glow exists to hold it legible over the
+   card's halo on the dark home. On a pale ground it reads as a blur behind
+   the words, so light mode drops it. */
+html.theme-light .mgreet-hello { text-shadow: none; }

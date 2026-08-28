@@ -181,8 +181,16 @@ function bindHomeElastic() {
     //      backdrop-filtered element re-samples its whole backdrop every
     //      frame. body.home-pulling drops that blur (and parks the room's
     //      animations) for the length of the drag only.
-    const PARTS = [[head, 0.28], [card, 0.6], [cc, 1.15]];
-    const CAP = 84;
+    // v1312 (Malik: "make it even more elastic", and the veil/reflection must
+    // stay ATTACHED to the Memento rather than vanishing). The veil rides the
+    // card's own factor, so the light stays welded to the card's bottom edge
+    // through the whole pull; the reflection already lives inside #dayCard,
+    // so it travels for free once we stop hiding it. Transforming an already
+    // composited blurred layer is a matrix change, not a repaint, so this
+    // costs far less than the backdrop-blur re-sampling that v1311 removed.
+    const veil = document.querySelector('.ambient__aurora .aur-veil');
+    const PARTS = [[head, 0.25], [card, 0.58], [veil, 0.58], [cc, 1.25]];
+    const CAP = 120;
     let y0 = null, x0 = null, axis = null, cur = 0, want = 0, frame = 0;
     const paint = () => {
       frame = 0;
@@ -241,7 +249,7 @@ function bindHomeElastic() {
         try { document.body.classList.add('home-pulling'); } catch (e2) {}
       }
       const sign = dy < 0 ? -1 : 1;
-      schedule(Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 0.82) * sign);
+      schedule(Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 1.05) * sign);
     }, { passive: true });
     const release = () => {
       if (y0 === null && !cur && !want) return;
