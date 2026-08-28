@@ -647,8 +647,8 @@ const HONEST_LOADING_GATE = false;
       const r = document.documentElement;
       if (r.classList.contains('home-stage')) {
         setTimeout(() => { try { r.classList.remove('home-stage-floor'); } catch (_) {} }, 1300);
-        setTimeout(() => { try { r.classList.remove('home-stage-aur'); } catch (_) {} }, 2600);
-        setTimeout(() => { try { r.classList.remove('home-stage'); } catch (_) {} }, 5400);
+        setTimeout(() => { try { r.classList.remove('home-stage-aur'); } catch (_) {} }, 4000);
+        setTimeout(() => { try { r.classList.remove('home-stage'); } catch (_) {} }, 9400);
       }
     } catch (_) {}
     // A boot that reached the screen earns back its free self-repair, so a
