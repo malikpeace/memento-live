@@ -7206,3 +7206,14 @@ body.calm-motion .mk, body.calm-motion img.img-skeleton { animation: none; }
 .cc-card--pillars .v > :last-child { margin-top: auto !important; }
 /* the label always leads from the top, never gets pushed by the pin */
 .cc-card--pillars .v > .cc-sync-k:first-child { margin-top: 0; }
+
+
+/* v1317 (Malik, from his Settings screenshot): the tab panels are deliberately
+   transparent so the ambient shows through, which was fine when the ambient
+   was a corner glow. The aurora is a FLOOR, so on Settings it pooled bright
+   green behind the last cards and read as a stain. The room belongs to the
+   home; a panel gets the plain dark ambient behind it. */
+body:has(.tab-panel.is-shown) .ambient__aurora {
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
