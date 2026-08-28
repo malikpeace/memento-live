@@ -25,7 +25,6 @@
     var sources = {
       beats: 'js/19-dev-beats.js?v=v1020',
       promptLab: 'js/22-prompt-lab.js?v=v1020',
-      actionStates: 'js/23-action-states.js?v=v1020',
       stress: 'js/31-stress-runner.js?v=v1221'
     };
 
@@ -51,7 +50,6 @@
     }
 
     if (query('dev') === 'beats') load('beats').catch(function () {});
-    if (query('dev') === 'action') load('actionStates').catch(function () {});
 
     var promptArm = query('plab');
     try { promptArm = promptArm || sessionStorage.getItem('plab'); } catch (e) {}

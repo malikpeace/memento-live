@@ -122,8 +122,8 @@
 
       if (typeof ActionExperience !== 'undefined') {
         ActionExperience.open = function () {
+          // v1319: the old module is deleted; this flag can no longer be true
           var devStates = false;
-          try { devStates = /[?&]dev=action-states\b/.test(location.search); } catch (e) {}
           if (internal() || !Doors.enabled() || devStates || ActionFlow.legacyRedirect === false) {
             return raw.actionLegacyOpen.apply(ActionExperience, arguments);
           }

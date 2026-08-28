@@ -5267,8 +5267,8 @@
   //
   //   - the old open stays as ActionExperience.openLegacy() (the retirement
   //     brief and the dev state browser need it),
-  //   - ?dev=action-states still gets the OLD module, because that browser
-  //     exists to render the old module's states (3.3 updates it),
+  //   - (v1319: the old module and its ?dev=action-states browser are both
+  //     deleted; ActionExperience is now a shim that forwards here),
   //   - kill switch: ActionFlow.legacyRedirect = false before the first tap,
   //     or delete this block. Nothing else changes.
   //
