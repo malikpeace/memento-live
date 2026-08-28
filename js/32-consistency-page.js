@@ -91,6 +91,31 @@
       Math.round(suggestedTarget() * 100) + '% of days. Start there, or pick your own.';
   }
 
+  /* ---------------- the deadline (v1320, Malik) --------------------------
+     The page already knew the plan's cadence and the goal's shape; the one
+     thing it had access to and never showed was the DATE this is all aimed
+     at. ccGoalShape() carries it. Weeks while the date is far, DAYS once it
+     is inside two weeks, because that is when a day starts to matter. Goals
+     with no deadline render nothing at all, never an empty slot. */
+  function deadlineLine() {
+    try {
+      var shape = (typeof ccGoalShape === 'function') ? ccGoalShape() : null;
+      var dl = shape && shape.deadline;
+      if (!dl) return '';
+      var end = (dl instanceof Date) ? dl : new Date(dl);
+      if (isNaN(end.getTime())) return '';
+      var today = todayDate();
+      var days = Math.round((new Date(end.getFullYear(), end.getMonth(), end.getDate()) - today) / 86400000);
+      var when = MON[end.getMonth()] + ' ' + end.getDate();
+      if (days < 0) return '<div class="one__dl">' + when + ' has passed.</div>';
+      if (days === 0) return '<div class="one__dl">' + when + ' is today.</div>';
+      var left = (days <= 14)
+        ? plural(days, 'day')
+        : plural(Math.round(days / 7), 'week');
+      return '<div class="one__dl">' + left + ' to ' + when + '.</div>';
+    } catch (e) { return ''; }
+  }
+
   /* ---------------- the goal's shape -> the hero wording ------------------ */
   function shapeInfo() {
     var type = '';
@@ -296,6 +321,7 @@
     return '<div><div class="one__crown' + (counted ? ' lit' : '') + '">' + mMark('', 22) + '</div>' +
       '<div class="one__num" style="font-size:' + size + 'px">' + n.toLocaleString() + '</div>' +
       '<div class="one__sub">' + word + '.</div>' +
+      deadlineLine() +
       '<div class="one__today' + (counted ? '' : ' off') + '"><u></u>' +
       (counted ? 'Today is counted.' : 'Today is not counted yet.') + '</div>' +
       begin + '</div>' +
