@@ -6100,14 +6100,25 @@ function bindCommandCenter(cc) {
       try { requestAnimationFrame(() => { try { if (cc.isConnected && !cc.__deckBusy) prebuildDeck(); } catch (e2) {} }); } catch (e2) {}
       // A face left mid-fade by an interrupted gesture repairs itself: any
       // pointer release with no drag in flight restores full opacity.
-      const _heal = () => {
-        try {
-          if (x0 !== null || cc.__deckBusy) return;
-          if (card.style.opacity && card.style.opacity !== '1') { card.style.opacity = ''; card.style.transform = ''; }
-        } catch (e2) {}
-      };
-      window.addEventListener('pointerup', () => setTimeout(_heal, 400));
-      window.addEventListener('pointercancel', () => setTimeout(_heal, 400));
+      // v1311 THE LEAK: bindCommandCenter runs on EVERY face switch, and this
+      // pair of window listeners was added each time, each closure pinning
+      // that render's card. Fifty swipes meant a hundred listeners and fifty
+      // dead cards held in memory, which is a crash the user pays for later.
+      // Bound ONCE per #commandCenter, and it looks the live card up itself.
+      if (!cc.__healBound) {
+        cc.__healBound = true;
+        const _heal = () => {
+          try {
+            if (cc.__deckBusy) return;
+            const live = cc.querySelector('.cc-card:not(.cc-under)');
+            if (live && live.style.opacity && live.style.opacity !== '1') {
+              live.style.opacity = ''; live.style.transform = '';
+            }
+          } catch (e2) {}
+        };
+        window.addEventListener('pointerup', () => setTimeout(_heal, 400));
+        window.addEventListener('pointercancel', () => setTimeout(_heal, 400));
+      }
       const finish = (e) => {
         if (x0 === null) return;
         const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;

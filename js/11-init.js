@@ -166,38 +166,67 @@ function bindHomeElastic() {
     const card = document.getElementById('dayCard');
     const cc = document.getElementById('commandCenter');
     if (!card || !cc) return;
-    // v1310 (Malik: smoother and more prominent): further travel and a wider
-    // spread between the three, so the stretch is unmistakable.
-    // The veil is anchored to the card's RESTING bottom, so it has to travel
-    // with the card or its top seam slides into the card face (the same faint
-    // line Malik caught in v1306, reappearing only while pulling).
-    const veil = document.querySelector('.ambient__aurora .aur-veil');
-    const PARTS = [[head, 0.28], [card, 0.6], [veil, 0.6], [cc, 1.15]];
+    // v1311 (Malik: "the app crashes... make sure it's native and doesn't
+    // f*** anything up"). THREE things were making this expensive enough to
+    // get the PWA killed, all fixed here and in the CSS:
+    //   1. every touchmove wrote styles directly, so a 120Hz finger could
+    //      force several layout+raster passes per frame. Writes are now
+    //      rAF-batched: one write per frame, no matter how fast the touch
+    //      stream arrives.
+    //   2. the veil (a huge blurred + masked layer) was being transformed
+    //      alongside everything else. It is not moved at all now; the CSS
+    //      fades it for the length of the drag, which also keeps the seam
+    //      hidden without paying for it.
+    //   3. the box carries a real backdrop blur, and moving a
+    //      backdrop-filtered element re-samples its whole backdrop every
+    //      frame. body.home-pulling drops that blur (and parks the room's
+    //      animations) for the length of the drag only.
+    const PARTS = [[head, 0.28], [card, 0.6], [cc, 1.15]];
     const CAP = 84;
-    let y0 = null, x0 = null, axis = null, cur = 0;
-    const put = (px, spring) => {
-      cur = px;
-      PARTS.forEach(([el, k]) => {
-        if (!el) return;
-        el.style.transition = spring ? 'transform 0.46s cubic-bezier(0.22, 1.2, 0.36, 1)' : 'none';
-        el.style.transform = px ? 'translateY(' + (px * k).toFixed(2) + 'px)' : '';
-      });
+    let y0 = null, x0 = null, axis = null, cur = 0, want = 0, frame = 0;
+    const paint = () => {
+      frame = 0;
+      cur = want;
+      for (let i = 0; i < PARTS.length; i++) {
+        const el = PARTS[i][0];
+        if (!el) continue;
+        el.style.transform = want ? 'translate3d(0,' + (want * PARTS[i][1]).toFixed(2) + 'px,0)' : '';
+      }
+    };
+    const schedule = (px) => {
+      want = px;
+      if (!frame) frame = requestAnimationFrame(paint);
     };
     const blocked = () => {
       try {
         if (document.body.classList.contains('mf-open') || document.body.classList.contains('mfe-open')) return true;
         if (document.querySelector('.clarity-exp.open, .action-exp.open, .spot-backdrop, .cc-fan')) return true;
-        // a live horizontal deck gesture owns the finger
         const c = cc.querySelector('.cc-card');
         if (c && c.dataset.swiping === '1') return true;
-        // and never fight a page that can actually scroll
         if (document.documentElement.scrollHeight > window.innerHeight + 4) return true;
       } catch (e) {}
       return false;
     };
+    const settle = () => {
+      // the spring runs on the compositor, then every inline style is wiped
+      // so nothing is left promoted between gestures
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      PARTS.forEach(([el]) => {
+        if (!el) return;
+        el.style.transition = reduced ? '' : 'transform 0.44s cubic-bezier(0.22, 1.15, 0.36, 1)';
+        el.style.transform = '';
+      });
+      want = 0; cur = 0;
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      setTimeout(() => {
+        PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } });
+        try { document.body.classList.remove('home-pulling'); } catch (e) {}
+      }, reduced ? 20 : 480);
+    };
     page.addEventListener('touchstart', (e) => {
       if (e.touches.length !== 1 || blocked()) { y0 = null; return; }
       y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; axis = null;
+      PARTS.forEach(([el]) => { if (el) el.style.transition = ''; });
     }, { passive: true });
     page.addEventListener('touchmove', (e) => {
       if (y0 === null || e.touches.length !== 1) return;
@@ -207,30 +236,23 @@ function bindHomeElastic() {
         axis = Math.abs(dy) > Math.abs(dx) * 1.2 ? 'y' : 'x';
         if (axis === 'x') { y0 = null; return; }
         if (blocked()) { y0 = null; return; }
-        // the card's mirrored reflection hides behind the box at rest; the
-        // pull can open a gap under the card, so it steps out for the drag
-        try { document.body.classList.add('home-pulling'); } catch (e) {}
+        // the drag's cheap mode: no backdrop blur, no ambient animation, no
+        // veil, no reflection. All of it comes back on release.
+        try { document.body.classList.add('home-pulling'); } catch (e2) {}
       }
-      // resistance: the further you pull the less it gives, capped at 52px
-      // a softer curve: it glides most of the way and only stiffens near the
-      // end of its travel, instead of resisting hard from the first pixel
       const sign = dy < 0 ? -1 : 1;
-      const give = Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 0.82) * sign;
-      put(give, false);
+      schedule(Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 0.82) * sign);
     }, { passive: true });
     const release = () => {
-      if (y0 === null && !cur) return;
+      if (y0 === null && !cur && !want) return;
       y0 = null; axis = null;
-      if (!cur) { try { document.body.classList.remove('home-pulling'); } catch (e) {} return; }
-      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      put(0, !reduced);
-      setTimeout(() => {
-        PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } });
-        try { document.body.classList.remove('home-pulling'); } catch (e) {}
-      }, 520);
+      if (!cur && !want) { try { document.body.classList.remove('home-pulling'); } catch (e) {} return; }
+      settle();
     };
     page.addEventListener('touchend', release, { passive: true });
     page.addEventListener('touchcancel', release, { passive: true });
+    // a backgrounded app must not come back mid-pull
+    document.addEventListener('visibilitychange', () => { if (document.hidden) release(); });
   } catch (e) {}
 }
 
