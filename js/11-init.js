@@ -190,7 +190,11 @@ function bindHomeElastic() {
     // costs far less than the backdrop-blur re-sampling that v1311 removed.
     const veil = document.querySelector('.ambient__aurora .aur-veil');
     const PARTS = [[head, 0.25], [card, 0.58], [veil, 0.58], [cc, 1.25]];
-    const CAP = 120;
+    // v1313 (Malik: "I don't really want a limit to it, but as they continue
+    // to scroll add more friction"). No cap. give = K*dy / (1 + dy/D)
+    // approaches K*D and never arrives, so the pull keeps giving as far as
+    // the finger goes while every pixel costs more than the one before it.
+    const K = 0.92, D = 340;
     let y0 = null, x0 = null, axis = null, cur = 0, want = 0, frame = 0;
     const paint = () => {
       frame = 0;
@@ -249,7 +253,8 @@ function bindHomeElastic() {
         try { document.body.classList.add('home-pulling'); } catch (e2) {}
       }
       const sign = dy < 0 ? -1 : 1;
-      schedule(Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 1.05) * sign);
+      const mag = Math.abs(dy);
+      schedule((K * mag / (1 + mag / D)) * sign);
     }, { passive: true });
     const release = () => {
       if (y0 === null && !cur && !want) return;

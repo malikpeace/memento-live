@@ -6927,7 +6927,13 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
   transform-origin: 50% 0%;
 }
 .ambient__aurora .aur-veil b {
-  left: 0; right: 0; top: -140%; bottom: -140%; filter: blur(16px);
+  /* v1313 (the crash, properly diagnosed): this layer was 3.8x the veil's own
+     height AND blurred 16px AND animating, permanently. That is why moving it
+     during a pull was enough to get the app killed twice. It only ever needs
+     to cover the veil plus ONE fall period (214px), and the softness is
+     already in the gradient's long ramps, so the blur halves too. Roughly a
+     quarter of the pixels it used to rasterise, every frame. */
+  left: 0; right: 0; top: -230px; bottom: 0; filter: blur(9px);
   background: repeating-linear-gradient(to bottom,
     rgb(var(--aur-1, 58 217 245) / 0.04) 0px,
     rgb(var(--aur-1, 58 217 245) / 0.4) 76px,
@@ -7127,8 +7133,16 @@ html.theme-light body.home-pulling #commandCenter .cc-card {
    make it attached to the bottom of the memento"). js/11 moves the veil on
    the card's own factor and the reflection lives inside the card, so both
    stay welded to its bottom edge for the whole pull. */
+/* Everything that animates on the home parks for the length of a drag, so a
+   pull composites STATIC layers instead of moving ones. Nothing is hidden,
+   nothing detaches; it all simply holds its pose until you let go. */
 body.home-pulling .ambient__aurora em,
-body.home-pulling .ambient__aurora .aur-veil b { animation-play-state: paused !important; }
+body.home-pulling .ambient__aurora .aur-veil b,
+body.home-pulling .daycard-ns__liquid,
+body.home-pulling .daycard-ns__burn,
+body.home-pulling .daycard-ns__plat,
+body.home-pulling .ambient__rays-beam,
+body.home-pulling .ambient__rays-beam-shaft { animation-play-state: paused !important; }
 
 
 /* v1312 (Malik): the greeting's dark glow exists to hold it legible over the
