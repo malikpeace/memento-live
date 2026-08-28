@@ -4070,7 +4070,11 @@ html, body { overflow-x: clip; max-width: 100vw; }
      and one showed through behind the incoming card (Malik: "I can see a
      card behind the card that's coming"). */
   body.ns-bloom .app.dash-v2 #commandCenter .cc-card:not([style*="display: none"]) {
-    padding-top: 32px !important; padding-bottom: 30px !important;
+    /* v1310 (Malik: "too much space between the top of the sync boxes and the
+       text"). This 32px is the rule that quietly beat v1308's 18px: it
+       out-specifies .cc-card--pillars, so the tighter frame never landed.
+       The number lives HERE now, where the home actually reads it. */
+    padding-top: 18px !important; padding-bottom: 30px !important;
     min-height: 206px !important;
     display: flex !important; flex-direction: column !important; justify-content: center !important;
   }
@@ -6171,25 +6175,25 @@ body.mf-open #dashGreetingMobile { opacity: 0; transition: opacity 200ms ease; p
 .v-consistency-n-bought__g--flat{color:rgba(var(--ink),.40)}
 .v-consistency-n-bought__foot{margin-top:16px;font-size:14px;line-height:1.35;color:rgba(var(--ink),.93)}
 .v-nf{display:flex;flex-direction:column;min-height:172px;font-variant-numeric:tabular-nums;color:rgba(var(--ink),.96)}
-.v-nf .a-move{margin:0;font-size:20px;font-weight:680;line-height:1.27;letter-spacing:-.022em}
-.v-nf .a-sup{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.62)}
-.v-nf .a-how{margin:9px 0 0;padding:0;border-radius:0;background:none;box-shadow:none;font-size:13.5px;line-height:1.52;color:rgba(var(--ink),.66)}
+.v-nf .a-move{margin:0;font-size:22px;font-weight:680;line-height:1.26;letter-spacing:-.024em}
+.v-nf .a-sup{margin:9px 0 0;font-size:15px;line-height:1.5;color:rgba(var(--ink),.62)}
+.v-nf .a-how{margin:10px 0 0;padding:0;border-radius:0;background:none;box-shadow:none;font-size:15px;line-height:1.5;color:rgba(var(--ink),.68)}
 .v-nf .a-urg{margin:11px 0 0;font-size:12.5px;color:rgba(var(--ink),.62)}
 /* v1155: the CTA follows the theme (the mockup hard-coded its dark-room
    near-white, which turned gray-on-white in light mode) */
 .v-nf .a-btn{margin:auto 0 0;width:100%;padding:13px;border:0;border-radius: var(--btn-r);background:var(--solid-bg,#f2f3f6);color:var(--solid-fg,#0b0c0e);font:inherit;font-size:14.5px;font-weight:680;cursor:pointer}
 .v-nf .a-btn--wait{background:rgba(var(--ink),.055);box-shadow:inset 0 1px 0 rgba(var(--ink),.07);color:rgba(var(--ink),.45)}
 .v-nf .a-note{margin:9px 0 0;font-size:11.5px;color:rgba(var(--ink),.4)}
-.v-nf .c-star{margin:0;font-size:22px;font-weight:700;line-height:1.28;letter-spacing:-.025em}
-.v-nf .c-why{margin:14px 0 0;font-size:14.5px;line-height:1.58;color:rgba(var(--ink),.9)}
+.v-nf .c-star{margin:0;font-size:23px;font-weight:700;line-height:1.26;letter-spacing:-.026em}
+.v-nf .c-why{margin:13px 0 0;font-size:15px;line-height:1.55;color:rgba(var(--ink),.9)}
 .v-nf .c-cost{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.62)}
 .v-nf .c-meta{margin:auto 0 0;padding-top:12px;font-size:12.5px;color:rgba(var(--ink),.4)}
 .v-nf .ck-day{margin:12px 0 0;font-size:32px;font-weight:700;letter-spacing:-.035em}
 .v-nf .ck-day span{margin-left:8px;font-size:13px;font-weight:500;letter-spacing:0;color:rgba(var(--ink),.62)}
 .v-nf .d-row{display:flex;align-items:baseline;gap:11px}
 .v-nf .d-big{font-size:44px;font-weight:700;letter-spacing:-.045em;line-height:1}
-.v-nf .d-lbl{font-size:12.5px;line-height:1.35;color:rgba(var(--ink),.62)}
-.v-nf .d-foot{margin:auto 0 0;padding-top:12px;font-size:12.5px;line-height:1.5;color:rgba(var(--ink),.88)}
+.v-nf .d-lbl{font-size:13.5px;line-height:1.35;color:rgba(var(--ink),.62)}
+.v-nf .d-foot{margin:auto 0 0;padding-top:12px;font-size:13.5px;line-height:1.5;color:rgba(var(--ink),.88)}
 .v-cdt{align-items:center;text-align:center;justify-content:center}
 .v-cdt .d-big{font-size:56px}
 .v-cdt .d-lbl{margin-top:6px}
@@ -6813,7 +6817,7 @@ html.app-asleep .crays__shaft {
   /* v1295 (Malik): all three labels read as quiet wayfinding, not headlines.
      One dim ink for Action, Clarity and Consistency alike; the module colours
      stay where the modules are. */
-  margin: 0 0 7px; font-size: 10.5px; font-weight: 640;
+  margin: 0 0 8px; font-size: 11px; font-weight: 640;
   letter-spacing: 0.13em; text-transform: uppercase;
   color: rgba(var(--ink), 0.34);
 }
@@ -7093,3 +7097,11 @@ html.theme-light #deskMission { background: rgba(255, 255, 255, 0.66) !important
           mask: var(--icon-check) center / contain no-repeat;
 }
 #deskMission .dkm__btn--done { display: inline-flex; align-items: center; justify-content: center; }
+
+
+/* v1310: the reflection dips out while the home is being pulled. It already
+   travels WITH the Memento (it lives inside #dayCard); the artifact was the
+   elastic gap under the card exposing it where the box normally covers it. */
+body.home-pulling .daycard-theme-living .daycard-floor {
+  opacity: 0 !important; transition: opacity 0.14s ease;
+}

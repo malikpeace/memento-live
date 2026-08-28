@@ -166,7 +166,14 @@ function bindHomeElastic() {
     const card = document.getElementById('dayCard');
     const cc = document.getElementById('commandCenter');
     if (!card || !cc) return;
-    const PARTS = [[head, 0.34], [card, 0.62], [cc, 1]];
+    // v1310 (Malik: smoother and more prominent): further travel and a wider
+    // spread between the three, so the stretch is unmistakable.
+    // The veil is anchored to the card's RESTING bottom, so it has to travel
+    // with the card or its top seam slides into the card face (the same faint
+    // line Malik caught in v1306, reappearing only while pulling).
+    const veil = document.querySelector('.ambient__aurora .aur-veil');
+    const PARTS = [[head, 0.28], [card, 0.6], [veil, 0.6], [cc, 1.15]];
+    const CAP = 84;
     let y0 = null, x0 = null, axis = null, cur = 0;
     const put = (px, spring) => {
       cur = px;
@@ -200,19 +207,27 @@ function bindHomeElastic() {
         axis = Math.abs(dy) > Math.abs(dx) * 1.2 ? 'y' : 'x';
         if (axis === 'x') { y0 = null; return; }
         if (blocked()) { y0 = null; return; }
+        // the card's mirrored reflection hides behind the box at rest; the
+        // pull can open a gap under the card, so it steps out for the drag
+        try { document.body.classList.add('home-pulling'); } catch (e) {}
       }
       // resistance: the further you pull the less it gives, capped at 52px
+      // a softer curve: it glides most of the way and only stiffens near the
+      // end of its travel, instead of resisting hard from the first pixel
       const sign = dy < 0 ? -1 : 1;
-      const give = Math.min(52, Math.pow(Math.abs(dy), 0.78) * 0.72) * sign;
+      const give = Math.min(CAP, Math.pow(Math.abs(dy), 0.86) * 0.82) * sign;
       put(give, false);
     }, { passive: true });
     const release = () => {
       if (y0 === null && !cur) return;
       y0 = null; axis = null;
-      if (!cur) return;
+      if (!cur) { try { document.body.classList.remove('home-pulling'); } catch (e) {} return; }
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       put(0, !reduced);
-      setTimeout(() => { PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } }); }, 520);
+      setTimeout(() => {
+        PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } });
+        try { document.body.classList.remove('home-pulling'); } catch (e) {}
+      }, 520);
     };
     page.addEventListener('touchend', release, { passive: true });
     page.addEventListener('touchcancel', release, { passive: true });
