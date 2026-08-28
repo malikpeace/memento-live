@@ -7149,3 +7149,23 @@ body.home-pulling .ambient__rays-beam-shaft { animation-play-state: paused !impo
    card's halo on the dark home. On a pale ground it reads as a blur behind
    the words, so light mode drops it. */
 html.theme-light .mgreet-hello { text-shadow: none; }
+
+
+/* ¨0¨0 v1314: THE SKELETON (Malik's pick from the lab: the breath, not
+   the sweep). ONE primitive for every real wait in Memento: a flat ink block
+   on the app's own rounded language that rises and falls. It is never used
+   where the data is already local, because a skeleton over instant content
+   invents a delay that does not exist. */
+.mk { background: rgba(var(--ink), 0.075); border-radius: 7px; animation: mkBreath 1.9s ease-in-out infinite; }
+.mk--r { border-radius: 999px; }
+.mk--t { height: 12px; }
+@keyframes mkBreath { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+body.calm-motion .mk, body.calm-motion img.img-skeleton { animation: none; }
+@media (prefers-reduced-motion: reduce) { .mk, img.img-skeleton { animation: none; } }
+/* the home's corner button while the photo is still coming out of storage:
+   the circle breathes instead of flashing an initial it is about to replace */
+.wbar__settings--photo.is-loading { color: transparent; }
+.wbar__settings--photo.is-loading::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(var(--ink), 0.10); animation: mkBreath 1.9s ease-in-out infinite;
+}

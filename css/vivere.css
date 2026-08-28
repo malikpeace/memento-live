@@ -129,10 +129,13 @@
 .vcard__note:empty::before { content: attr(data-ph); color: var(--text-3); }
 .vcard__img { display: block; width: 100%; border-radius: calc(6px * var(--rx, 1)); pointer-events: none; }
 /* Async IndexedDB image hydration: skeleton shimmer until the objectURL lands. */
-img.img-skeleton { min-height: 60px; background: linear-gradient(100deg, rgba(var(--ink),0.05) 30%, rgba(var(--ink),0.10) 50%, rgba(var(--ink),0.05) 70%); background-size: 200% 100%; animation: imgShimmer 1.2s ease-in-out infinite; }
+/* v1314 (Malik picked the BREATH over the sweep in the skeleton lab): a flat
+   ink block that simply rises and falls. Same motion everywhere a skeleton
+   appears in Memento, so a loading state always reads as one language. */
+img.img-skeleton { min-height: 60px; background: rgba(var(--ink), 0.075); animation: mkBreath 1.9s ease-in-out infinite; }
 img.img-missing { min-height: 48px; background: var(--kfill-05); }
 img.img-loaded { animation: imgFadeIn 0.22s ease-out; }
-@keyframes imgShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes mkBreath { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
 @keyframes imgFadeIn { from { opacity: 0; } to { opacity: 1; } }
 body.calm-motion img.img-skeleton, body.calm-motion img.img-loaded { animation: none; }
 @media (prefers-reduced-motion: reduce) { img.img-skeleton, img.img-loaded { animation: none; } }

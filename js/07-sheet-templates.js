@@ -5951,10 +5951,20 @@ const SHEET_TEMPLATES = {
             b3.setAttribute('data-imgnote', e2.id);
             const img3 = document.createElement('img');
             const iid = im.getAttribute('data-img-id');
+            // v1314 (the skeleton, Malik's breath): reading each thumbnail out
+            // of storage is a real wait, and the wall used to stay empty for
+            // all of it. The tile is laid out breathing straight away and the
+            // picture drops into it when it arrives.
+            img3.classList.add('img-skeleton');
             if (iid && typeof idbGetBlobURL === 'function') {
-              try { const u = await idbGetBlobURL(iid); if (u) img3.src = u; } catch (x) {}
+              try {
+                const u = await idbGetBlobURL(iid);
+                if (u) { img3.src = u; img3.classList.remove('img-skeleton'); img3.classList.add('img-loaded'); }
+              } catch (x) {}
             } else if (im.getAttribute('src')) {
               img3.src = im.getAttribute('src');
+              img3.classList.remove('img-skeleton');
+              img3.classList.add('img-loaded');
             }
             if (!img3.src) continue;
             b3.appendChild(img3);

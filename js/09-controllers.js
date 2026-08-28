@@ -3634,7 +3634,12 @@ const Sidebar = {
       if (!el) return;
       const id = state.profile && state.profile.avatarId;
       if (id && typeof idbGetBlobURL === 'function') {
+        // v1314: reading a photo out of storage is a REAL wait, so the circle
+        // breathes until it lands instead of flashing the initial it is about
+        // to replace.
+        try { el.classList.add('is-loading'); } catch (e) {}
         idbGetBlobURL(id).then((url) => {
+          try { el.classList.remove('is-loading'); } catch (e) {}
           if (!el.isConnected) return;
           if (url) {
             el.style.backgroundImage = 'url("' + url + '")';
@@ -3645,7 +3650,7 @@ const Sidebar = {
             el.style.backgroundImage = '';
             el.textContent = fallbackInitial || '';
           }
-        }).catch(() => {});
+        }).catch(() => { try { el.classList.remove('is-loading'); } catch (e) {} });
         return;
       }
       el.style.backgroundImage = '';
