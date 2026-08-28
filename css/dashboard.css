@@ -7169,3 +7169,22 @@ body.calm-motion .mk, body.calm-motion img.img-skeleton { animation: none; }
   content: ''; position: absolute; inset: 0; border-radius: 50%;
   background: rgba(var(--ink), 0.10); animation: mkBreath 1.9s ease-in-out infinite;
 }
+
+
+/* ¨0¨0 v1315: THE HOME WAS DRAWING SCREENS NOBODY CAN SEE. Measured on
+   the live home: 89M blurred device pixels alive at 3x, and only ~18M of it
+   is anything you can actually look at. The rest is closed overlays that
+   never left: they stay display:flex at full size with opacity:0 or
+   visibility:hidden, and an invisible blurred layer still holds its GPU
+   texture (the v-law Malik already knows: opacity:0 does not free anything).
+   That is the baseline the elastic pull was landing on top of.
+
+   Surgical on purpose: only the heavy BLURRED CLUSTERS inside those closed
+   surfaces are dropped, never the surfaces themselves, so no entrance
+   animation anywhere is touched and nothing on screen changes. */
+/* the splash never comes back once dismissed */
+.splash.dismissed { display: none !important; }
+/* Clarity's beam cluster only exists while Clarity is open */
+.clarity-exp:not(.open):not(.open-bg):not(.open-content) .crays { display: none !important; }
+/* the login orbs only exist while the login screen is up */
+#loginScreen.hidden .login__orb { display: none !important; }
