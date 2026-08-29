@@ -954,7 +954,7 @@ const CloudSync = (function () {
         client.auth.getSession().then((r) => {
           session = (r && r.data && r.data.session) || null;
           if (session) {
-            hideSplashLink();
+            splashSignedInArrival();
             beginFirstSync();
             refreshAccountCard();
           }
@@ -1668,6 +1668,28 @@ const CloudSync = (function () {
     try { const link = document.getElementById('splashSignin'); if (link) link.style.display = 'none'; } catch (e) {}
   }
 
+  // v1328 (Malik, from his phone): a signed-in person is never a stranger.
+  // iOS can evict the PWA's local copy, so a returning account can boot onto
+  // the marketing splash ("Get started") because the local welcomeSeen marker
+  // is gone while the auth session survived. The moment ANY path learns a
+  // session exists: hide Sign in, flip the CTA to "Continue", and walk them
+  // through automatically, no tap needed. Splash.dismiss() owns the restore
+  // gate (v1327), so a pending cloud restore shows the proper restore page
+  // and the restored state routes them to the right place. New signed-out
+  // visitors are untouched, and a dismissed splash makes this a no-op.
+  function splashSignedInArrival() {
+    hideSplashLink();
+    try {
+      const sp = document.getElementById('splash');
+      if (!sp || sp.classList.contains('dismissed')) return;
+      const label = sp.querySelector('.splash__cta-label');
+      if (label) label.textContent = 'Continue';
+      setTimeout(function () {
+        try { if (typeof Splash !== 'undefined' && Splash.dismiss) Splash.dismiss(); } catch (e) {}
+      }, 400);
+    } catch (e) {}
+  }
+
   function bindSplashSignin() {
     const link = document.getElementById('splashSignin');
     if (!link) return;
@@ -1699,7 +1721,7 @@ const CloudSync = (function () {
         sessionChecked = true;
         dnote('boot session: ' + (session ? ('signed in as ' + email()) : 'none'));
         if (session) {
-          hideSplashLink();
+          splashSignedInArrival();
           beginFirstSync();
         } else {
           firstSyncState = FIRST_SYNC_WAITING;
@@ -1732,7 +1754,7 @@ const CloudSync = (function () {
           const genuineArrival = !had || uid !== lastAuthUser;
           lastAuthUser = uid;
           if (!genuineArrival) return;
-          hideSplashLink();
+          splashSignedInArrival();
           closeDialog();
           // NOTE deliberately no clearAdoptGuard here. Every page load's
           // first auth event looks like an arrival, so clearing here let a
