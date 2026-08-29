@@ -6263,8 +6263,10 @@ const Splash = {
     // home. Signed-out devices are untouched: the gate reads as not pending.
     try {
       if (window.CloudSync && CloudSync.firstSyncPending && CloudSync.firstSyncPending()) {
-        const label = this.el.querySelector('.splash__cta-label');
-        if (label) label.textContent = 'Restoring your Memento...';
+        // v1327 (Malik, from his phone): the wait wears the full-screen
+        // restore page (M + one line), not a relabeled button, which read
+        // as a glitch when the restore ran long.
+        try { if (CloudSync.showRestoreScreen) CloudSync.showRestoreScreen(); } catch (e) {}
         const startedAt = Date.now();
         const poll = setInterval(() => {
           const stillPending = (() => {
@@ -6272,7 +6274,7 @@ const Splash = {
           })();
           if (stillPending && Date.now() - startedAt < 15000) return;
           clearInterval(poll);
-          if (label) label.textContent = 'Get started';
+          try { if (CloudSync.hideRestoreScreen) CloudSync.hideRestoreScreen(); } catch (e) {}
           this.dismiss();
         }, 250);
         return;

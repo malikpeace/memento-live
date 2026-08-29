@@ -105,10 +105,15 @@ const CloudSync = (function () {
         restoreEl.setAttribute('aria-live', 'polite');
         restoreEl.setAttribute('data-cloud-keep', '');
         restoreEl.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050608;color:#f5f5f7;font-family:inherit;opacity:0;transition:opacity .2s ease;';
-        // Malik's pick (2026-08-01, mockups/restore-loading.html option 2):
-        // the bare M alone, breathing. No sentence, no progress bar.
+        // Malik's pick (2026-08-01, mockups/restore-loading.html option 2)
+        // was the bare breathing M; v1327 (Malik, from his phone) adds the
+        // one quiet line under it, so a slow restore reads as the app
+        // working instead of a stuck button.
         restoreEl.setAttribute('aria-label', 'Restoring your Memento');
-        restoreEl.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
+        restoreEl.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;">' +
+          '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>' +
+          '<div style="margin-top:22px;font-size:15px;font-weight:600;color:rgba(255,255,255,0.42);">Restoring your Memento</div>' +
+          '</div>';
         if (!document.getElementById('cloudRestoreStyle')) {
           const style = document.createElement('style');
           style.id = 'cloudRestoreStyle';
@@ -1812,6 +1817,7 @@ const CloudSync = (function () {
 
   return {
     init, available, isLoggedIn, email, accessToken, firstSyncPending,
+    showRestoreScreen, hideRestoreScreen,
     schedulePush, pushNow, syncNow,
     sendCode, verifyCode, signOut, mergeDecision, buildMergedState, createShare, lastSyncedText,
     communityDays, openDialog, closeDialog, openDeletionDialog

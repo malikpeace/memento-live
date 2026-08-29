@@ -57,10 +57,12 @@ const DayCounter = {
   _line(n) {
     const first = ((state.profile && state.profile.name || '').trim().split(/\s+/)[0]) || '';
     const withName = (t) => first ? (t + ', ' + first + '.') : (t + '.');
-    if (n === 7) return withName('A full week');
-    if (n === 30) return withName('A full month');
-    if (n === 100) return withName('100 days');
-    if (n === 365) return withName('One year');
+    // v1327 (Malik): milestones celebrate, they don't announce. "Month 1!"
+    // over "A full month, Mark." (his words: that read cold).
+    if (n === 7) return 'Week 1!';
+    if (n === 30) return 'Month 1!';
+    if (n === 100) return '100 days!';
+    if (n === 365) return 'Year 1!';
     if (n === 1) return 'It starts today.';
     try {
       if (typeof comebackGapDays === 'function' && comebackGapDays() >= 2) return withName('Welcome back');
@@ -110,7 +112,9 @@ const DayCounter = {
       };
       setTimeout(() => requestAnimationFrame(tick), 620);
     }
-    const total = reduce ? 1400 : holdAfter + 700;
+    // v1327 (Malik): let it linger, about 5 seconds on screen, so the moment
+    // breathes. A tap still continues immediately.
+    const total = reduce ? 3200 : Math.max(5000, holdAfter + 700);
     this._timer = setTimeout(() => this.dismiss(), total);
     el.addEventListener('click', () => this.dismiss(), { once: true });
   },
