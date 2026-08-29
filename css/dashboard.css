@@ -7022,15 +7022,20 @@ body.mf-open .ambient__aurora, body.mfe-open .ambient__aurora {
   backdrop-filter: blur(28px) saturate(1.35);
 }
 .cc-card--pillars { padding: 18px 18px 14px !important; }
+/* v1325 (Malik): the LABEL is max-contrast against the button fill (white on
+   the light-mode black button, black on the dark-mode white button, that is
+   exactly what --solid-fg already is); ONLY the fingerprint keeps the accent
+   tint. Accent-colored text on the solid button went unreadable on some
+   accents. */
 .v-nf .a-btn:not(.a-btn--wait) {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  color: var(--accent-strong, #0b0c0e);
+  color: var(--solid-fg, #0b0c0e);
 }
 /* v1309 (Malik): the control says what the gesture IS, so the icon is a
    FINGERPRINT, not a check. The check belongs to the finished state below. */
 .v-nf .a-btn:not(.a-btn--wait)::before {
   content: ''; width: 18px; height: 18px; flex: none;
-  background: currentColor;
+  background: var(--accent-strong, currentColor);
   -webkit-mask: var(--icon-fingerprint) center / contain no-repeat;
           mask: var(--icon-fingerprint) center / contain no-repeat;
 }
@@ -7087,7 +7092,8 @@ html.theme-light #deskMission { background: rgba(255, 255, 255, 0.66) !important
    the finished state */
 #deskMission .dkm__btn--solid, #commandCenter .cc-primary.cc-hold-complete {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  color: var(--accent-strong, var(--solid-fg));
+  /* v1325: label max-contrast, icon carries the accent (same as the phone) */
+  color: var(--solid-fg, #0b1112);
   white-space: nowrap;
 }
 /* the 200px fixed width predates the longer label + icon; it sizes to its
@@ -7097,9 +7103,16 @@ html.theme-light #deskMission { background: rgba(255, 255, 255, 0.66) !important
 }
 #deskMission .dkm__btn--solid::before, #commandCenter .cc-primary.cc-hold-complete::before {
   content: ''; width: 18px; height: 18px; flex: none;
-  background: currentColor;
+  background: var(--accent-strong, currentColor);
   -webkit-mask: var(--icon-fingerprint) center / contain no-repeat;
           mask: var(--icon-fingerprint) center / contain no-repeat;
+}
+/* v1325: the light-mode solid button is near-BLACK, so the darkened
+   --accent-strong drowns on it; the icon wears the bright accent there. */
+html.theme-light .v-nf .a-btn:not(.a-btn--wait)::before,
+html.theme-light #deskMission .dkm__btn--solid::before,
+html.theme-light #commandCenter .cc-primary.cc-hold-complete::before {
+  background: var(--accent, currentColor);
 }
 #deskMission .dkm__btn--done::before {
   content: ''; width: 17px; height: 17px; margin-right: 8px; flex: none;
