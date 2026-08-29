@@ -40,6 +40,7 @@ const PRECACHE = [
   // v1273 without entering the shell, so an installed app could open with no
   // network and reach an incomplete Consistency (or none at all).
   './js/32-consistency-page.js', './css/consistency-page.css',
+  './js/34-day-counter.js', './css/daycounter.css',
   './fonts/fonts.css', './fonts/geist-400.otf', './fonts/geist-500.otf', './fonts/geist-700.otf',
   './fonts/dmsans-0.woff2', './fonts/dmsans-1.woff2',
   './icons/icon.svg', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png',

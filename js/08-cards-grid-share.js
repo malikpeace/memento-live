@@ -1323,6 +1323,27 @@ const MoreSpace = {
   }
 };
 
+// v1324 (Malik): the greeting words, ONE source for the home (both call sites
+// below) and the day counter, so they can never disagree. His calibration:
+// "Welcome to Memento" pre-star, capitalized time words, a bare "Up late?"
+// past midnight (no name, the wink IS the greeting), and a date-seeded
+// "Hello" roughly one day in five so it stays alive without ever being
+// random mid-session (same trick as the comeback sentence).
+function ccGreetingLine(first) {
+  try {
+    const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    if (!hasStar) return first ? ('Welcome to Memento, ' + first + '.') : 'Welcome to Memento.';
+    const h = new Date().getHours();
+    if (h < 5) return 'Up late?';
+    let seed = 0;
+    const k = (typeof getTodayISO === 'function' ? getTodayISO() : '') + ':hello';
+    for (let i = 0; i < k.length; i++) seed = (seed * 31 + k.charCodeAt(i)) >>> 0;
+    const word = (seed % 5) === 0 ? 'Hello'
+      : (h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening');
+    return first ? (word + ', ' + first + '.') : (word + '.');
+  } catch (e) { return 'Hello.'; }
+}
+
 function renderGreeting() {
   const now = new Date();
   // v1042 (Malik): no time-of-day greeting anywhere. This function now only
@@ -1381,14 +1402,9 @@ function renderGreeting() {
     const markSvg = '<svg viewBox="113 108 286 297" fill="currentColor" aria-hidden="true" style="width:13px;height:13px"><path d="M113 108 L256 251 L399 108 L399 405 L113 405 Z"/></svg>';
     const cornerInner = corner === 'gear' ? gearSvg : (corner === 'mark' ? markSvg : '');
     const cornerCls = corner === 'photo' ? ' wbar__settings--photo' : '';
-    // The greeting: the deskGreeting words (time of day + FIRST name,
-    // Welcome pre-Clarity, Up late past midnight), on its own line.
-    const hasClarity2 = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
+    // The greeting: the shared ccGreetingLine words (v1324), on its own line.
     const first = ((state.profile && state.profile.name || '').trim().split(/\s+/)[0]) || '';
-    const h2 = now.getHours();
-    const when2 = h2 < 5 ? 'Up late' : h2 < 12 ? 'Good morning' : h2 < 17 ? 'Good afternoon' : 'Good evening';
-    const word2 = hasClarity2 ? when2 : 'Welcome';
-    const line2 = first ? (word2 + ', ' + first + '.') : (word2 + '.');
+    const line2 = ccGreetingLine(first);
     mg.innerHTML = '<button class="wbar__settings' + cornerCls + '" id="wbarSettings" type="button" aria-label="Settings">' + cornerInner + '</button>'
       + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + '</div>';
     const _ws = document.getElementById('wbarSettings');
@@ -5374,11 +5390,10 @@ function renderDeskMission() {
     try {
       const g = document.getElementById('deskGreeting');
       if (g) {
+        // v1324: same shared words as the phone (first name only there; the
+        // desktop header keeps the full trimmed name it always used).
         const name = (state.profile && state.profile.name || '').trim();
-        const h = new Date().getHours();
-        const when = h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-        const word = hasClarity ? when : 'Welcome';
-        g.textContent = name ? (word + ', ' + name + '.') : (word + '.');
+        g.textContent = ccGreetingLine(name);
       }
     } catch (e) {}
     const pa = (state.action && state.action.primaryAction) || {};

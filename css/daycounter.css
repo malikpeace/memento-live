@@ -1,0 +1,69 @@
+/* ============================================================
+   daycounter.css - THE DAY COUNTER overlay (v1324).
+   A ceremony surface: dark always, like the splash it extends.
+   Hard colors on purpose (one root rule, no theme opt-outs).
+   100lvh, not 100dvh/inset:0 - the on-device bottom-bar law.
+   ============================================================ */
+
+.dayc {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 100lvh;
+  z-index: 1395; /* just under the splash (1400), over everything else */
+  background: #050607;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.28s ease-out;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.dayc--in { opacity: 1; }
+.dayc--out { opacity: 0; transition: opacity 0.3s ease-in; }
+
+/* The light-mode top fade must never paint its band over this dark surface
+   (caught in the 390-light cell). Same guard the splash uses (css/misc.css). */
+body:has(.dayc) #topFade { display: none; }
+
+.dayc__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 24px;
+  /* the notch never matters here (content is centered), but keep the
+     column clear of extreme small-height layouts */
+  max-height: 100%;
+}
+
+.dayc__m { width: 56px; height: 56px; margin-bottom: 26px; }
+.dayc__m path { fill: #f5f5f7; }
+
+.dayc__num {
+  font-size: 46px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.96);
+  font-variant-numeric: tabular-nums;
+}
+.dayc__num--ms { color: #3fd94e; }
+
+.dayc__line {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+  margin-top: 14px;
+}
+
+/* staggered soft rise, same curve as the lab mockup */
+.dayc__fx { opacity: 0; transform: translateY(8px); }
+.dayc--in .dayc__fx { animation: daycRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.dayc--in .dayc__fx--d1 { animation-delay: 0.15s; }
+.dayc--in .dayc__fx--d2 { animation-delay: 0.55s; }
+@keyframes daycRise { to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dayc__fx, .dayc--in .dayc__fx { animation: none; opacity: 1; transform: none; }
+}
