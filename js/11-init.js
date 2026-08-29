@@ -518,7 +518,61 @@ document.addEventListener('keydown', (e) => {
       (typeof _lv === 'string' && (_lv.indexOf('sheet:') === 0 || _lv.indexOf('tab:') === 0))
     ));
 
-    if (!isReturning && !hasRestorable) return; // first-time visitor - show splash + onboarding
+    // v1329 (Malik's recording, 2026-08-29): iOS can evict the app's local
+    // data while the Supabase auth token (a different localStorage key)
+    // survives. Local then reads as a stranger, so the boot played the whole
+    // ugly chain on his phone: hero splash flash, restore flash, and a beat
+    // of the pre-Clarity home before the cloud copy landed. The token is
+    // readable SYNCHRONOUSLY here, so a signed-in person with an evicted
+    // local copy skips the marketing splash entirely and boots behind the
+    // quiet restore cover; js/12's first sync then lands the real state
+    // (its adopt path reloads behind this same cover). Demo boots and true
+    // first-time visitors are untouched.
+    let coverForSignedIn = false;
+    if (!isReturning && !hasRestorable) {
+      let hasAuthToken = false;
+      try {
+        if (!(typeof DEMO_MODE !== 'undefined' && DEMO_MODE)) {
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.indexOf('sb-') === 0 && k.indexOf('-auth-token') > 0) { hasAuthToken = true; break; }
+          }
+        }
+      } catch (_) {}
+      if (!hasAuthToken) return; // true first-time visitor - show splash + onboarding
+      coverForSignedIn = true;
+      try {
+        let cover = document.getElementById('cloudRestoreScreen');
+        if (!cover) {
+          cover = document.createElement('div');
+          cover.id = 'cloudRestoreScreen';
+          cover.setAttribute('role', 'status');
+          cover.setAttribute('aria-live', 'polite');
+          cover.setAttribute('data-cloud-keep', '');
+          cover.setAttribute('aria-label', 'Restoring your Memento');
+          cover.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050608;color:#f5f5f7;font-family:inherit;opacity:1;transition:opacity .2s ease;';
+          cover.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;">' +
+            '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>' +
+            '<div style="margin-top:22px;font-size:15px;font-weight:600;color:rgba(255,255,255,0.42);">Restoring your Memento</div>' +
+            '</div>';
+          if (!document.getElementById('cloudRestoreStyle')) {
+            const st = document.createElement('style');
+            st.id = 'cloudRestoreStyle';
+            st.textContent = '@keyframes mementoRestoreBreathe{0%,100%{opacity:.4}50%{opacity:.95}}@media(prefers-reduced-motion:reduce){#cloudRestoreScreen svg{animation:none!important;opacity:.9}}';
+            document.body.appendChild(st);
+          }
+          document.body.appendChild(cover);
+        }
+        // This cover may NEVER trap anyone: if js/12 fails to take it over
+        // (crash, blocked script), it lets go on its own.
+        setTimeout(() => {
+          try {
+            const c = document.getElementById('cloudRestoreScreen');
+            if (c && c.style.opacity !== '0') { c.style.opacity = '0'; setTimeout(() => { try { c.style.display = 'none'; } catch (_) {} }, 220); }
+          } catch (_) {}
+        }, 16000);
+      } catch (_) {}
+    }
 
     // Returning user (with or without a saved view): hard-cut the splash so
     // there is NO flash of Memento branding on every reload. We still bring
@@ -529,7 +583,9 @@ document.addEventListener('keydown', (e) => {
       splashEl.classList.add('dismissed');
     }
     try { Splash.stopBeams && Splash.stopBeams(); } catch (_) {}
-    if (!state.meta.onboarded) { state.meta.onboarded = true; persistNow(); }
+    // The signed-in cover boot must not stamp flags into the blank local copy
+    // (the cloud restore is about to replace it wholesale).
+    if (!coverForSignedIn && !state.meta.onboarded) { state.meta.onboarded = true; persistNow(); }
     const app = document.getElementById('app');
     // Render the dashboard now (we need the .widget--action element in the
     // DOM for the zoom-from-card animation), but ONLY show it visually if

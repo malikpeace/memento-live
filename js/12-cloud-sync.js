@@ -98,6 +98,10 @@ const CloudSync = (function () {
 
   function showRestoreScreen() {
     try {
+      // v1329: js/11 may have raised the cover synchronously at boot (the
+      // signed-in-with-evicted-local path); adopt that node, never stack a
+      // second one.
+      if (!restoreEl) restoreEl = document.getElementById('cloudRestoreScreen');
       if (!restoreEl) {
         restoreEl = document.createElement('div');
         restoreEl.id = 'cloudRestoreScreen';
@@ -138,6 +142,7 @@ const CloudSync = (function () {
     try {
       clearTimeout(restoreFailsafe);
       restoreScreenSpent = true;
+      if (!restoreEl) restoreEl = document.getElementById('cloudRestoreScreen'); // adopt js/11's boot cover
       if (!restoreEl) return;
       restoreEl.style.opacity = '0';
       setTimeout(function () { if (restoreEl && restoreEl.style.opacity === '0') restoreEl.style.display = 'none'; }, 220);
