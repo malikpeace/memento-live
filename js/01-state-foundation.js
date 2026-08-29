@@ -107,6 +107,11 @@ const DEFAULT_STATE = {
   // target === null means the star has no number: every distance surface
   // stays dormant and asks for nothing.
   goalProgress: { starHash: '', target: null, unit: '', baseline: null, current: null, updatedAt: '', askedDay: '', history: [] },
+  // THE PERFECT WEEK protocol (v1334, Malik). null until a week is started.
+  // Shape when live: { startedAt, startDay: 'YYYY-MM-DD', source: 'ai'|'fallback',
+  //   conditions: [{id, text, why}], days: { 'YYYY-MM-DD': { conds: {id: true} } },
+  //   completedAt: null, keptRhythm: false }. Owned by js/35-perfect-week.js.
+  perfectWeek: null,
   // THE MERGE foundation (2026-08-19). goalDone = finale receipts keyed by
   // starHash: fired = witnessed = never re-earned; cleared ONLY by the
   // explicit surgical goal reset, NEVER tied to entitlement. rewards holds

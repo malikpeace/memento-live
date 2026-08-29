@@ -6094,6 +6094,55 @@ async function actionPlanFix(plan, failures, inputs, meta) {
 const ACTION_PLAN_MODEL = 'claude-opus-5';
 const ACTION_PLAN_MAX_TOKENS = 6000;
 
+/* ============================================================
+   THE PERFECT WEEK: CONDITIONS (v1334, Malik's protocol).
+   The person has their star and their ONE move. This proposes the 3-4
+   daily CONDITIONS around it: the body-and-brain commitments that make
+   the move actually happen for the next 7 days. Locked frame (Malik,
+   2026-08-29): conditions are AI-derived FROM their goal and their own
+   Clarity words, each with a visible why. They support the move, they
+   never compete with it.
+   ============================================================ */
+const PW_CONDITIONS_SYSTEM = `You are Memento's Perfect Week builder. The person just committed to ONE main move toward their goal. You propose the daily CONDITIONS around that move: the body-and-brain commitments that make it actually happen for the next 7 days.
+
+RULES
+- Exactly 4 conditions.
+- A condition SUPPORTS the move. It is never the move itself, never a second goal, never busywork.
+- Imperative, concrete, checkable at the end of a day, 2 to 6 words each. Examples of the size: "Sleep by 11", "No phone before the session", "20 min outside".
+- Each carries a "why" of at most 10 plain words tying it to THEIR goal or their own words. No hype, no science-speak.
+- At least one guards focus (phone, distraction) and at least one is bodily (sleep, movement, food, daylight), unless their goal makes that absurd.
+- Ground them in what they SAID. If their words name a struggle, aim a condition straight at it.
+- No medical claims, no supplements, no extreme protocols, nothing that could harm.
+
+Return ONLY raw JSON, no fences, no commentary:
+{"conditions":[{"text":"...","why":"..."},{"text":"...","why":"..."},{"text":"...","why":"..."},{"text":"...","why":"..."}]}`;
+
+async function perfectWeekConditionsGenerate() {
+  const a = (state.clarity && state.clarity.answers) || {};
+  const pa = (state.action && state.action.primaryAction) || {};
+  const parts = [];
+  parts.push('STAR: ' + String(a.neutronStar || '').slice(0, 200));
+  if (a.coreWhy) parts.push('WHY: ' + String(a.coreWhy).slice(0, 300));
+  if (pa.title) parts.push('THE MAIN MOVE: ' + String(pa.title).slice(0, 200));
+  if (a.antiVision) parts.push('WHAT THEY FEAR BECOMING: ' + String(a.antiVision).slice(0, 300));
+  if (a.identityLine) parts.push('WHO THEY SAID THEY ARE BECOMING: ' + String(a.identityLine).slice(0, 200));
+  const raw = await callClaude(
+    [{ role: 'user', content: parts.join('\n') }],
+    PW_CONDITIONS_SYSTEM + '\n\n' + MALIK_VOICE_SPEC,
+    { model: ACTION_PLAN_MODEL, maxTokens: 700, paidAction: true, noProfile: true, cache: true, thinking: 'off', timeout: 60000 }
+  );
+  const m = String(raw || '').match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('pw_conditions_unparsable');
+  const obj = JSON.parse(m[0]);
+  const list = (Array.isArray(obj.conditions) ? obj.conditions : [])
+    .filter((c) => c && c.text)
+    .slice(0, 4)
+    .map((c) => ({ text: String(c.text).trim().slice(0, 48), why: String(c.why || '').trim().slice(0, 90) }));
+  if (list.length < 3) throw new Error('pw_conditions_short');
+  return list;
+}
+try { window.perfectWeekConditionsGenerate = perfectWeekConditionsGenerate; } catch (e) {}
+
 async function actionPlanGenerate(options) {
   const opts = options || {};
   const started = Date.now();

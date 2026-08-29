@@ -1,0 +1,174 @@
+/* ============================================================
+   perfectweek.css - THE PERFECT WEEK setup surface (v1334).
+   Theme-faithful like the Action intake screens (v859 law): it
+   follows the app theme, no per-page dark opt-out. Chips wear the
+   onboarding selected language (subtle fill + the glowing dot,
+   no borders). The nav is Clarity's exact recipe.
+   ============================================================ */
+
+.pwk {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 100lvh;
+  z-index: 1100; /* --z-exp, same layer as the other module experiences */
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(var(--accent-rgb, 58, 217, 245), 0.05), transparent 60%),
+    var(--surface-0, #030405);
+  color: rgba(var(--ink), 0.95);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+.pwk--in { opacity: 1; }
+
+.pwk__col {
+  flex: 1;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--safe-t, 0px) + 72px) 22px 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pwk__mark { color: rgba(var(--ink), 0.7); margin-bottom: 14px; }
+.pwk__mark svg { display: block; }
+
+.pwk__line {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  color: rgba(var(--ink), 0.96);
+}
+.pwk__sub {
+  font-size: 14px;
+  color: rgba(var(--ink), 0.55);
+  margin: 0 0 18px;
+}
+.pwk__sub--wait { animation: pwkWait 1.6s ease-in-out infinite; }
+@keyframes pwkWait { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+
+.pwk__chips { display: flex; flex-direction: column; gap: 9px; }
+.pwk__chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+  width: 100%;
+  padding: 13px 40px 13px 15px;
+  border: none;
+  border-radius: var(--ctl-r, 8px);
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  color: rgba(var(--ink), 0.78);
+  font-family: var(--font);
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--t-fast, 150ms) ease, color var(--t-fast, 150ms) ease;
+}
+/* the onboarding selected language: subtle fill + the glowing dot */
+.pwk__chip::after {
+  content: '';
+  position: absolute;
+  right: 15px; top: 50%;
+  width: 6px; height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: #7eecff;
+  box-shadow: 0 0 8px rgba(126, 236, 255, 0.7);
+  opacity: 0;
+  transition: opacity var(--t-fast, 150ms) ease;
+}
+.pwk__chip.is-on { background: rgba(126, 236, 255, 0.14); color: rgba(var(--ink), 0.97); }
+.pwk__chip.is-on::after { opacity: 1; }
+.pwk__chip:active { transform: scale(0.985); }
+.pwk__chip-t { font-size: 15px; font-weight: 650; }
+.pwk__chip-w { font-size: 12px; color: rgba(var(--ink), 0.5); line-height: 1.35; }
+
+.pwk__add {
+  margin-top: 12px;
+  align-self: flex-start;
+  border: none;
+  background: none;
+  color: rgba(var(--ink), 0.5);
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.pwk__add:hover { color: rgba(var(--ink), 0.8); }
+.pwk__addrow { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+.pwk__addrow[hidden] { display: none; }
+.pwk__input {
+  flex: 1;
+  font-family: var(--font);
+  font-size: 15px;
+  color: rgba(var(--ink), 0.92);
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  border: none;
+  border-radius: var(--ctl-r, 8px);
+  padding: 13px 15px;
+  outline: none;
+}
+.pwk__addgo {
+  flex: 0 0 auto;
+  width: 44px; height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--solid-bg);
+  color: var(--solid-fg);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+/* Clarity's exact nav recipe (the button law): same paddings, same solid
+   tokens, same shadow. */
+.pwk__nav {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding: 16px 0 calc(var(--safe-b, 0px) + 28px);
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.pwk__go {
+  flex: 1;
+  padding: 18px;
+  border: none;
+  border-radius: var(--btn-r);
+  font-family: var(--font);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  background: var(--solid-bg);
+  color: var(--solid-fg);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.38);
+  cursor: pointer;
+  transition: all var(--t-fast) ease;
+}
+.pwk__go:disabled { opacity: 0.4; cursor: default; }
+.pwk__go:active { transform: scale(0.97); }
+.pwk__skip {
+  flex: 0 0 auto;
+  padding: 18px 16px;
+  border: none;
+  border-radius: var(--btn-r);
+  background: var(--kfill-04, rgba(var(--ink), 0.04));
+  color: rgba(var(--ink), 0.6);
+  font-family: var(--font);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pwk { transition: none; }
+  .pwk__sub--wait { animation: none; opacity: 0.7; }
+}
