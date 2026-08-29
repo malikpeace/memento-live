@@ -550,11 +550,12 @@ document.addEventListener('keydown', (e) => {
           cover.setAttribute('aria-live', 'polite');
           cover.setAttribute('data-cloud-keep', '');
           cover.setAttribute('aria-label', 'Restoring your Memento');
-          cover.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#050608;color:#f5f5f7;font-family:inherit;opacity:1;transition:opacity .2s ease;';
-          cover.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;">' +
-            '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>' +
-            '<div style="margin-top:22px;font-size:15px;font-weight:600;color:rgba(255,255,255,0.42);">Restoring your Memento</div>' +
-            '</div>';
+          // v1330 (Malik): NO text, NO layout of its own. The same bare M, at
+          // the same size and position, on the same #0a0a0e as the boot mask
+          // and the native startup image, just breathing. Launch -> mask ->
+          // this -> app must read as ONE M the whole way.
+          cover.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#0a0a0e;color:#f5f5f7;font-family:inherit;opacity:1;transition:opacity .2s ease;';
+          cover.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
           if (!document.getElementById('cloudRestoreStyle')) {
             const st = document.createElement('style');
             st.id = 'cloudRestoreStyle';

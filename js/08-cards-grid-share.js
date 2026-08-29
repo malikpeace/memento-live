@@ -2031,6 +2031,14 @@ const CreatorTools = {
     const anchor = document.getElementById('dashGreetingMobile');
     if (!anchor || !anchor.parentNode) return;
     anchor.insertAdjacentElement('afterend', box);
+    // v1330 (Malik's oldest layout gripe, root-caused): the bar sits IN the
+    // page flow above the Memento, and on the live app the owner gate waits
+    // 1-2s for the auth token, so every open mounted it late and shoved the
+    // whole home (his "card shrinks and everything moves" glitch). Remember
+    // that this device is the owner's, so the NEXT boot mounts the bar in
+    // the very first paint and nothing ever moves. A real gate failure
+    // (sign-out, revoked) unmounts and forgets below.
+    try { localStorage.setItem('memento_cc_bar', '1'); } catch (e) {}
     this._bindMountedBox();
     this._placeBox(box);
     try {
@@ -2043,12 +2051,28 @@ const CreatorTools = {
 
   _unmount() {
     const box = document.getElementById('creatorBox');
-    if (box) box.remove();
+    if (box) { box.remove(); try { localStorage.removeItem('memento_cc_bar'); } catch (e) {} }
   },
 
   _syncGate() {
     if (this._devCondition()) this._mount();
-    else this._unmount();
+    // The optimistic hint mount gets a grace window: the owner token takes
+    // 1-2s to load, and unmounting in that gap is exactly the layout shove
+    // this fix kills. After the window, the real gate rules absolutely.
+    else if (!this._graceUntil || Date.now() > this._graceUntil) this._unmount();
+  },
+
+  // v1330: optimistic first-paint mount for a device that has proven itself
+  // the owner's before. The real gate probes still run and unmount if the
+  // account is genuinely gone, so a customer can never keep the bar (the
+  // hint is only ever written by a successful gated mount).
+  _mountFromHint() {
+    try {
+      if (localStorage.getItem('memento_cc_bar') === '1') {
+        this._graceUntil = Date.now() + 15000;
+        this._mount();
+      }
+    } catch (e) {}
   },
 
   init() {
@@ -2058,6 +2082,7 @@ const CreatorTools = {
       setTimeout(() => this._syncGate(), 250);
       setTimeout(() => this._syncGate(), 1200);
     };
+    this._mountFromHint();
     this._syncGate();
     // CloudSync loads after this file. These bounded probes catch its restored
     // session without leaving a permanent polling loop alive in the app.
@@ -4797,13 +4822,21 @@ function ccSyncStall(shape, cs) {
 function ccSyncDeckHeight(cc) {
   try {
     if (!cc || cc.id !== 'commandCenter') return;
+    // v1330 (Malik's law: the home's final geometry NEVER moves). Once the
+    // home is visible, a re-render may only ever GROW the deck (content that
+    // genuinely needs more room), never shrink it, and a transient blank
+    // render (a cloud restore mid-flight, an entitlement repaint) must not
+    // drop the set height back to the CSS floor. Pre-reveal renders are
+    // invisible and stay free to re-measure.
+    const _revealed = document.body && document.body.classList.contains('boot-revealed');
+    const _cur = parseFloat(cc.style.getPropertyValue('--cc-deck-h')) || 0;
     const card = cc.querySelector('.cc-card--pillars');
-    if (!card) { cc.style.removeProperty('--cc-deck-h'); return; }
+    if (!card) { if (!_revealed || !_cur) cc.style.removeProperty('--cc-deck-h'); return; }
     const faces = ['action', 'clarity', 'consistency'].map(p => ccSyncFace(p)).filter(Boolean);
     // v1156: during a lockdown the comeback sentence is the tallest face on
     // the deck, so it has to be measured too or a long variant overruns it.
     try { if (ccLockdownActive()) faces.push('<div class="v v-nf">' + ccComebackSentence() + '<button class="a-btn" type="button">Build momentum</button></div>'); } catch (e) {}
-    if (!faces.length) { cc.style.removeProperty('--cc-deck-h'); return; }
+    if (!faces.length) { if (!_revealed || !_cur) cc.style.removeProperty('--cc-deck-h'); return; }
     const probe = document.createElement('div');
     probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:' + card.clientWidth + 'px;visibility:hidden;pointer-events:none;';
     faces.forEach(h => {
@@ -4823,7 +4856,9 @@ function ccSyncDeckHeight(cc) {
     probe.remove();
     // v1153: dots left the card, and Malik wants the deck a touch taller so
     // the sparser faces never read as empty.
-    const H = Math.max(240, Math.min(340, maxH + 18));
+    let H = Math.max(240, Math.min(340, maxH + 18));
+    // v1330: post-reveal the deck only grows, never shrinks (the law above).
+    if (_revealed && _cur > H) H = _cur;
     cc.style.setProperty('--cc-deck-h', H + 'px');
   } catch (e) {}
 }
@@ -6446,6 +6481,27 @@ function bindCommandCenter(cc) {
     if (vivOpen) vivOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('vivere'); } catch (e) {} });
     const wkOpen = cc.querySelector('[data-weekly-open]');
     if (wkOpen) wkOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('inbox'); } catch (e) {} });
+  } catch (e) {}
+  // v1330 (Malik's law: the home's geometry NEVER moves once visible). The
+  // deck var only rules the pillar faces; a transient render of a different
+  // card (mid-restore blank, a gating repaint) still changed the box's own
+  // height and shoved the Memento. So the CONTAINER locks: post-reveal it
+  // may only grow, never shrink. A viewport width change resets the lock so
+  // rotation can never strand a stale height (empty-band risk).
+  // Ordering matters: v1289 renders this box BEFORE boot-revealed is stamped,
+  // so the lock must track every render (pre-reveal renders are invisible and
+  // may re-lock freely, both directions); once revealed it can only grow.
+  try {
+    if (cc && cc.id === 'commandCenter') {
+      const _rv = document.body.classList.contains('boot-revealed');
+      if (cc._ccLockW !== window.innerWidth) { cc._ccLockW = window.innerWidth; cc._ccLockH = 0; }
+      cc.style.minHeight = '';
+      const _h = cc.getBoundingClientRect().height;
+      const _prev = cc._ccLockH || 0;
+      const _lock = (_rv && _prev > _h) ? _prev : _h;
+      cc._ccLockH = _lock;
+      if (_lock > 0) cc.style.minHeight = _lock.toFixed(2) + 'px';
+    }
   } catch (e) {}
 }
 // Daily Memento: a calm, day-stable line at the foot of the dashboard. Mirrors
