@@ -115,7 +115,7 @@ const CloudSync = (function () {
         // each other. Same M, same 56px, same #0a0a0e as the mask and the
         // native startup image: launch -> mask -> restore -> app is ONE M.
         restoreEl.setAttribute('aria-label', 'Restoring your Memento');
-        restoreEl.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
+        restoreEl.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out -1.3s infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
         if (!document.getElementById('cloudRestoreStyle')) {
           const style = document.createElement('style');
           style.id = 'cloudRestoreStyle';
@@ -868,7 +868,12 @@ const CloudSync = (function () {
     if (firstSyncState === FIRST_SYNC_READY) return true;
     if (firstSyncState === FIRST_SYNC_RESTORING && firstSyncPromise) return firstSyncPromise;
     firstSyncState = FIRST_SYNC_RESTORING;
-    if (!restoreScreenSpent) showRestoreScreen();
+    // v1331: within the boot window, a signed-in restore ALWAYS runs under
+    // the cover, even if an early transient "no session" read spent it (that
+    // gap is how Malik's restore ran visibly on the blank home). Mid-session
+    // focus retries stay uncovered, as before.
+    const _bootCover = (window.__mementoBootCoverAt && (Date.now() - window.__mementoBootCoverAt) < 20000);
+    if (!restoreScreenSpent || _bootCover) showRestoreScreen();
     firstSyncPromise = (async function () {
       const result = await withTimeout(pullAndMerge(), FIRST_PULL_TIMEOUT_MS, { ok: false, timedOut: true });
       if (result && result.timedOut) dnote('first sync TIMED OUT after ' + (FIRST_PULL_TIMEOUT_MS / 1000) + 's');

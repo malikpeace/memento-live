@@ -95,15 +95,14 @@ function syncHomeViewport() {
       || window.navigator.standalone === true
       || /[?&]standalone=1/.test(location.search || '');
     if (standalone) {
-      const inner = Math.round(window.innerHeight || 0);
-      const scr = Math.round((window.screen && window.screen.height) || 0);
-      const h = (inner > 200 && scr > 200) ? Math.min(inner, scr) : inner;
-      // v1128: index.html already set this before the first paint. Rewrite it
-      // only when the screen REALLY changed (rotation, split view), never for
-      // a pixel or two of noise: a late write moves the card under his eyes,
-      // which is the jump he reported.
-      const prev = parseFloat(root.style.getPropertyValue('--p1-vh')) || 0;
-      if (h > 200 && Math.abs(h - prev) > 2) root.style.setProperty('--p1-vh', h + 'px');
+      // v1331: the measured-pixels era is over. A cold standalone launch's
+      // innerHeight lies short, so the head script's early snapshot was wrong
+      // and THIS pass's later correction (+2.5s settle) was the exact jump
+      // Malik kept recording. 100lvh is the true standalone height from the
+      // first frame, and the engine keeps it right through rotation and
+      // split view on its own, so this value never changes and nothing can
+      // ever move the column again.
+      if (root.style.getPropertyValue('--p1-vh') !== '100lvh') root.style.setProperty('--p1-vh', '100lvh');
     } else {
       root.style.removeProperty('--p1-vh');
     }
@@ -541,6 +540,11 @@ document.addEventListener('keydown', (e) => {
       } catch (_) {}
       if (!hasAuthToken) return; // true first-time visitor - show splash + onboarding
       coverForSignedIn = true;
+      // v1331: stamp the boot-cover moment so js/12 may re-raise the cover
+      // within the boot window even after an early hide (a cold-launch
+      // getSession can transiently read "no session" and lift it; the real
+      // auth event then arrives and the restore must go back under cover).
+      try { window.__mementoBootCoverAt = Date.now(); } catch (_) {}
       try {
         let cover = document.getElementById('cloudRestoreScreen');
         if (!cover) {
@@ -555,7 +559,7 @@ document.addEventListener('keydown', (e) => {
           // and the native startup image, just breathing. Launch -> mask ->
           // this -> app must read as ONE M the whole way.
           cover.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:#0a0a0e;color:#f5f5f7;font-family:inherit;opacity:1;transition:opacity .2s ease;';
-          cover.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
+          cover.innerHTML = '<svg viewBox="140 136 232 240" width="56" height="58" aria-hidden="true" style="display:block;animation:mementoRestoreBreathe 2.6s ease-in-out -1.3s infinite"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="#f5f5f7"/></svg>';
           if (!document.getElementById('cloudRestoreStyle')) {
             const st = document.createElement('style');
             st.id = 'cloudRestoreStyle';
