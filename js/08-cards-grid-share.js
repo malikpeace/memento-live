@@ -1968,6 +1968,7 @@ const CreatorTools = {
         <button class="creator-box__btn" id="creatorJumpCelebration">Celebration</button>
         <button class="creator-box__btn" id="creatorGiveNeutronStar">Give Neutron Star</button>
         <div class="creator-box__divider">Stages &amp; animations</div>
+        <button class="creator-box__btn" id="creatorDayCounter">Day counter (tap to cycle)</button>
         <button class="creator-box__btn" id="creatorJumpBlankCard">Blank card</button>
         <button class="creator-box__btn" id="creatorJumpUnlock">Evolution 1 · cyan (Clarity)</button>
         <button class="creator-box__btn" id="creatorJumpEvoPlat">Evolution 2 · platinum (Action)</button>
@@ -2099,6 +2100,17 @@ const CreatorTools = {
     bind('creatorJumpStyle', () => this.jumpStyle());
     bind('creatorGiveNeutronStar', () => this.giveNeutronStar());
     // Stage & animation jumps (Malik: fly around Memento from the cheat bar)
+    // v1326 (Malik): feel the day counter on-device. Each tap plays the next
+    // size so the weighted climb (small quick, big heavy) can be judged for
+    // real. QA-only; the daily gate and paid gate are untouched.
+    bind('creatorDayCounter', () => {
+      try {
+        const seq = [2, 6, 30, 47, 100, 365];
+        this._daycIdx = ((this._daycIdx || 0) % seq.length);
+        if (typeof DayCounter !== 'undefined') { DayCounter.dismiss(); DayCounter.show(seq[this._daycIdx]); }
+        this._daycIdx++;
+      } catch (e) {}
+    });
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
     bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat', 'action'));

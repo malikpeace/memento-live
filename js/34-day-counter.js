@@ -85,8 +85,12 @@ const DayCounter = {
       '</div>';
     document.body.appendChild(el);
     this._el = el;
-    // seen = shown, even if they skip instantly; a crash-refresh must not replay it
-    try { localStorage.setItem(this._KEY, (typeof getTodayISO === 'function') ? getTodayISO() : '') } catch (e) {}
+    // seen = shown, even if they skip instantly; a crash-refresh must not
+    // replay it. A FORCED show (the Cheat Code Bar QA button) does not spend
+    // the day's real showing.
+    if (typeof forceN !== 'number') {
+      try { localStorage.setItem(this._KEY, (typeof getTodayISO === 'function') ? getTodayISO() : '') } catch (e) {}
+    }
     void el.offsetWidth;
     el.classList.add('dayc--in');
 
