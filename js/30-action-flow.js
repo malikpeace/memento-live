@@ -847,7 +847,7 @@
   var current = null;   // { name, teardown }
   var escBound = null;
   var closeBound = null;
-  var FADE_OUT = 180, FADE_IN = 240;
+  var FADE_OUT = 180, FADE_IN = 450; // v1333: entry matches Clarity's arrival weight
 
   // THE WAY OUT (Malik, on-device: "there is no way out on the phone").
   // The app's own fullscreen close chip, the same primitive Clarity shows. An

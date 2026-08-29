@@ -4803,7 +4803,13 @@ html.theme-light .afl { --afl-bg: var(--surface-0); --afl-bg-rgb: 238, 240, 243;
    and pops"). The outgoing shell fades under the incoming one. Motion law
    numbers: 180 out on ease-in, 240 in on the app's ease-out. The classes are
    removed the moment the animation ends, so no `both` fill holds a layer. */
-.afl.is-in { animation: aflShellIn 0.24s var(--ease-out) both; }
+/* v1333 (Malik: "for action it's just an instant pop"): the ENTRY from the
+   app now matches its siblings' arrival weight. Clarity enters over 0.6s,
+   Consistency over 0.3s; Action's 0.24s opacity on a dark-to-dark swap read
+   as a cut. Same recipe, same family curve as Clarity, opacity only, no new
+   motion language. is-in only ever fires on the FIRST room (entering the
+   flow); screen-to-screen swaps stay instant by design (round 8). */
+.afl.is-in { animation: aflShellIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .afl.is-exiting { pointer-events: none; animation: aflShellOut 0.18s ease-in both; }
 @keyframes aflShellIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes aflShellOut { from { opacity: 1; } to { opacity: 0; } }
