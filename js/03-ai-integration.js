@@ -32,6 +32,21 @@ function hasAnthropicKey() {
   try { return !!window.MEMENTO_SUPABASE_URL; } catch (e) { return false; }
 }
 
+// The backend knows whether a 429 is a brief traffic throttle or a monthly
+// allowance. Prefer that truthful, bounded message; never expose internal
+// limiter scopes or raw response bodies to the person using Memento.
+function aiRateLimitMessage(rawBody) {
+  try {
+    const parsed = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+    const error = parsed && parsed.error;
+    const message = error && error.type === 'rate_limit_error'
+      ? String(error.message || '').trim()
+      : '';
+    if (message && message.length <= 240) return message;
+  } catch (e) {}
+  return 'You\u2019re moving a little too quickly. Try again shortly.';
+}
+
 // AI conversation state
 let aiChatMessages = [];
 let aiChatReady = false;
@@ -1598,7 +1613,7 @@ async function actionBackgroundResult(messages, systemPrompt, options, onProgres
     const body = await response.text();
     if (response.status === 409) throw new Error('Another Action plan is already finishing. Reopen Memento in a moment.');
     if (response.status === 403) throw new Error('Paid Memento access is required for this step.');
-    if (response.status === 429) throw new Error('Rate limited. Wait a moment and try again.');
+    if (response.status === 429) throw new Error(aiRateLimitMessage(body));
     throw new Error('API error (' + response.status + '): ' + body.substring(0, 160));
   }
 
@@ -2992,7 +3007,7 @@ async function callClaude(messages, systemPrompt, options = {}) {
       if (useProxy && response.status === 404) throw new Error('The AI service is temporarily unavailable. Try again in a moment.');
       if (paidAction && response.status === 403) throw new Error('Paid Memento access is required for this step.');
       if (response.status === 401) throw new Error('The AI service rejected the request. Try again in a moment.');
-      if (response.status === 429) throw new Error('Rate limited. Wait a moment and try again.');
+      if (response.status === 429) throw new Error(aiRateLimitMessage(errorBody));
       if (response.status === 529) throw new Error('API is overloaded. Please try again shortly.');
       throw new Error('API error (' + response.status + '): ' + errorBody.substring(0, 200));
     }
