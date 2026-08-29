@@ -35,7 +35,7 @@ const PRECACHE = [
   './js/26-reward-referee.js', './js/27-rewards-daily.js', './css/rewards-daily.css',
   './js/28-rewards-milestones.js', './css/rewards-milestones.css',
   './js/29-rewards-finale.js', './css/rewards-finale.css',
-  './js/30-action-flow.js', './js/15-router.js',
+  './js/30-action-flow.js', './js/33-action-shim.js', './js/15-router.js',
   // v1277 (audit F1): Consistency is a core offline surface. It shipped in
   // v1273 without entering the shell, so an installed app could open with no
   // network and reach an incomplete Consistency (or none at all).
