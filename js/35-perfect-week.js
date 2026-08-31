@@ -96,17 +96,19 @@ const PerfectWeek = (() => {
     el.className = 'pwk';
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-label', 'The Perfect Week Protocol');
+    // The module explainer, wearing the app's INTRO recipe verbatim (the
+    // action-intro component in css/clarity.css): title fades at 0.3s, lines
+    // land at reading pace, the button arrives only after the last line with
+    // the orbiting comet border, tap anywhere skips.
     el.innerHTML =
-      '<div class="pwk__col">' +
-        '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-        '<h1 class="pwk__title">The Perfect Week Protocol.</h1>' +
-        '<p class="pwk__creed">You know your goal. You have your move. This is where it becomes real.</p>' +
-        '<p class="pwk__body">For the next 7 days, you live like the person who gets there: your move, done, every single day. Do it at least 5 of the 7 and you finish the protocol.</p>' +
-        '<p class="pwk__body"><b>Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</b></p>' +
-        '<div class="pwk__nav">' +
-          '<button type="button" class="pwk__skip" id="pwkSkip">Not now</button>' +
-          '<button type="button" class="pwk__go" id="pwkGo">Continue</button>' +
+      '<div class="action-intro" id="pwkIntro">' +
+        '<h1 class="action-intro__title">The Perfect<br>Week Protocol.</h1>' +
+        '<div class="action-intro__lines">' +
+          '<p class="action-intro__line action-intro__line--1">You know your goal. You have your move. This is where it becomes real.</p>' +
+          '<p class="action-intro__line action-intro__line--2">For the next 7 days, you live like the person who gets there: your move, done, every single day. Five of the seven and the protocol is yours.</p>' +
+          '<p class="action-intro__line action-intro__line--3">Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</p>' +
         '</div>' +
+        '<div class="action-intro__btn-pill"><button type="button" class="action-intro__btn" id="pwkGo">Continue</button></div>' +
       '</div>';
     document.body.appendChild(el);
     root = el;
@@ -114,7 +116,13 @@ const PerfectWeek = (() => {
     void el.offsetWidth;
     el.classList.add('pwk--in');
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
-    el.querySelector('#pwkSkip').addEventListener('click', close);
+    // Tap anywhere before the lines finish: snap everything visible (the
+    // intro recipe's own skip class).
+    const intro = el.querySelector('#pwkIntro');
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('#pwkGo')) return;
+      intro.classList.add('action-intro--skipped');
+    });
     el.querySelector('#pwkGo').addEventListener('click', () => {
       const held = root; root = null;
       held.classList.remove('pwk--in');

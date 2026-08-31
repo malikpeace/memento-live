@@ -1047,6 +1047,8 @@ body.calm-motion .cgraph__cell--ignite, body.lite .cgraph__cell--ignite { animat
 }
 
 /* ── Action Intro Sequence ── mirrors clarity-intro layout/animation */
+/* NOTE (v1337): the Perfect Week Protocol intro (js/35) reuses this whole
+   action-intro component verbatim. Not dead code; do not delete. */
 .action-intro {
   display: flex;
   flex-direction: column;

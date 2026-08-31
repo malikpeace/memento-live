@@ -229,3 +229,18 @@
   .pwk { transition: none; }
   .pwk__hold.is-holding .pwk__hold-fill { transition-duration: 3000ms; } /* the fill IS the progress meter, it stays */
 }
+
+/* The intro rides the app's action-intro recipe (css/clarity.css) verbatim.
+   Three lines instead of four, so the button lands right after line 3
+   finishes reading (same fade + comet orbit, earlier clock). */
+.pwk .action-intro__btn-pill {
+  animation: clarityIntroFade 0.5s ease 5.6s forwards, orbit 3.6s linear 5.6s infinite;
+}
+.pwk .action-intro--skipped .action-intro__btn-pill {
+  opacity: 1 !important;
+  animation: orbit 3.6s linear infinite !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pwk .action-intro__title, .pwk .action-intro__line { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .pwk .action-intro__btn-pill { opacity: 1 !important; animation: none !important; }
+}
