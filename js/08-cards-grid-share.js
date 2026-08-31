@@ -4090,6 +4090,9 @@ const CC_PILLARS = ['action', 'clarity', 'consistency'];
 // else, until Build momentum is tapped.
 function ccLockdownActive() {
   try {
+    // v1340 (Malik's law): while a Perfect Week Protocol is live, the WEEK
+    // owns all miss-messaging; the comeback stays quiet until it ends.
+    if (typeof PerfectWeek !== 'undefined' && PerfectWeek.active && PerfectWeek.active()) return false;
     const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
     const pa = (state.action && state.action.primaryAction) || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
@@ -4961,8 +4964,15 @@ function ccSyncFace(pillar) {
     // v1294 labels, so every action-face variant carries it.
     try {
       if (pillar === 'action' && typeof PerfectWeek !== 'undefined' && PerfectWeek.active && PerfectWeek.active()) {
+        // Piece 3: the morning after a held day, the kind line + the floor.
+        let heldLine = '';
+        try {
+          if (PerfectWeek.heldYesterday() && !actionDoneToday()) {
+            heldLine = '<p class="cc-pwheld">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
+          }
+        } catch (e) {}
         return html.replace(/^(<div[^>]*class="([^"]*)"[^>]*>)/, (m0, tag, cls) => tag.replace(cls, cls + ' v-pw'))
-          .replace(/^(<div[^>]*>)/, '$1' + PerfectWeek.weekStrip());
+          .replace(/^(<div[^>]*>)/, '$1' + PerfectWeek.weekStrip() + heldLine);
       }
     } catch (e) {}
     return html.replace(/^(<div[^>]*>)/,

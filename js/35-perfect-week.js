@@ -89,6 +89,19 @@ const PerfectWeek = (() => {
   }
 
 
+
+  // Piece 3: held days. Yesterday inside the week with no move = held.
+  function heldYesterday() {
+    if (!active() || dayNumber() < 2) return false;
+    try {
+      const d = new Date(todayKey() + 'T00:00:00');
+      d.setDate(d.getDate() - 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      if (key < data().startDay) return false;
+      return !(typeof actionCompletionForDay === 'function' && actionCompletionForDay(key));
+    } catch (e) { return false; }
+  }
+
   // ---------- piece 2: the home week strip ----------
   // Dots derive LIVE from the completion ledger (no event hooks to miss):
   // green = the move happened that day, held = a past day without it.
@@ -242,6 +255,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data, weekStrip };
+  return { open, openSetup, active, dayNumber, data, weekStrip, heldYesterday };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}
