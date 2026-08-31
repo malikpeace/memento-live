@@ -165,6 +165,32 @@
 }
 .pwk__opt--num { padding: 12px 0; font-variant-numeric: tabular-nums; }
 
+/* setup condition chips (white selected law; the why stacks under the text) */
+.pwk__chips { display: flex; flex-direction: column; gap: 9px; margin-top: 4px; }
+.pwk__chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  color: rgba(var(--ink), 0.8);
+  font-family: var(--font);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--t-fast, 150ms) ease, color var(--t-fast, 150ms) ease;
+}
+.pwk__chip:active { transform: scale(0.985); }
+.pwk__chip.is-on { background: var(--solid-bg, #ffffff); color: var(--solid-fg, #0b1112); }
+.pwk__chip-t { display: block; font-size: 15.5px; font-weight: 700; line-height: 1.3; }
+.pwk__chip-w { display: block; font-size: 12.5px; font-weight: 500; color: rgba(var(--ink), 0.5); line-height: 1.4; }
+.pwk__chip.is-on .pwk__chip-w { color: var(--solid-fg, #0b1112); opacity: 0.55; }
+.pwk__wait { font-size: 14px; color: rgba(var(--ink), 0.55); animation: pwkWait 1.6s ease-in-out infinite; }
+
 /* Clarity's exact nav recipe. The hold button is the sign: the same 3s
    deliberate gesture that completes a day, with the sweeping fill. */
 .pwk__nav {
@@ -364,3 +390,20 @@
 .pwm__row--now .pwm__dot { background: rgba(11, 12, 14, 0.12); }
 .pwm__row--now .pwm__dot.is-on { background: var(--color-consistency, #3fd94e); }
 .pwf__line--done { color: rgba(var(--ink), 0.85); font-weight: 600; }
+
+/* milestone stats + accomplishment */
+.pwm__stats { display: flex; gap: 10px; margin-top: 14px; }
+.pwm__stat {
+  flex: 1;
+  border-radius: 12px;
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  padding: 13px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.pwm__n { font-size: 24px; font-weight: 750; font-variant-numeric: tabular-nums; color: rgba(var(--ink), 0.95); }
+.pwm__n i { font-style: normal; font-size: 15px; color: rgba(var(--ink), 0.45); }
+.pwm__l { font-size: 11.5px; font-weight: 600; color: rgba(var(--ink), 0.5); }
+.pwk__opt-note { font-size: 12px; font-weight: 500; color: rgba(var(--ink), 0.4); }

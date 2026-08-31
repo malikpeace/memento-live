@@ -70,7 +70,7 @@ const PerfectWeek = (() => {
       // Endowed progress: setup fires after move #1, so day 1 is usually
       // already earned. Light it from the real ledger, never assume.
       try {
-        if (typeof actionCompletionForDay === 'function' && actionCompletionForDay(start)) days[start] = { move: true };
+        if (moveDoneOn(start)) days[start] = { move: true };
       } catch (e) {}
       state.perfectWeek = {
         startedAt: Date.now(),
@@ -91,6 +91,24 @@ const PerfectWeek = (() => {
 
 
 
+
+  // The app's actionCompletionForDay always answers about TODAY (its day
+  // param is vestigial), so the week keeps its OWN per-day ledger lookup,
+  // in the same 4am action-day space, any completion that day counts.
+  function moveDoneOn(dayIso) {
+    try {
+      const history = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
+      const key = (typeof actionDayKey === 'function') ? actionDayKey(new Date(dayIso + 'T12:00:00')) : dayIso;
+      for (let i = history.length - 1; i >= 0; i--) {
+        const e = history[i];
+        if (!e || !e.date) continue;
+        const ek = (typeof actionDayKey === 'function') ? actionDayKey(new Date(e.date)) : String(e.date).slice(0, 10);
+        if (ek === key) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
   // Piece 3: held days. Yesterday inside the week with no move = held.
   function heldYesterday() {
     if (!active() || dayNumber() < 2) return false;
@@ -99,7 +117,7 @@ const PerfectWeek = (() => {
       d.setDate(d.getDate() - 1);
       const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       if (key < data().startDay) return false;
-      return !(typeof actionCompletionForDay === 'function' && actionCompletionForDay(key));
+      return !moveDoneOn(key);
     } catch (e) { return false; }
   }
 
@@ -117,7 +135,7 @@ const PerfectWeek = (() => {
         const dt = new Date(d.startDay + 'T00:00:00');
         dt.setDate(dt.getDate() + i);
         const key = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-        const done = (typeof actionCompletionForDay === 'function') && !!actionCompletionForDay(key);
+        const done = moveDoneOn(key);
         if (done) st = 'done';
         else if (i === n - 1) st = 'today';
         else if (i < n - 1) st = 'held';
@@ -172,7 +190,7 @@ const PerfectWeek = (() => {
     ).join('');
     let held = '';
     try {
-      const doneToday = (typeof actionDoneToday === 'function' && actionDoneToday());
+      const doneToday = moveDoneOn(todayKey());
       if (doneToday) {
         // the day-close receipt, in the one message slot
         const left = 7 - n;
@@ -212,12 +230,25 @@ const PerfectWeek = (() => {
         const dt = new Date(d.startDay + 'T00:00:00');
         dt.setDate(dt.getDate() + i);
         const key = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-        const ok = (typeof actionCompletionForDay === 'function') && !!actionCompletionForDay(key);
+        const ok = moveDoneOn(key);
         marks.push(ok);
         if (ok) done++;
       } catch (e) { marks.push(false); }
     }
     return { done: done, marks: marks };
+  }
+
+
+  function condKeptCount() {
+    const d = data();
+    let k = 0;
+    try {
+      Object.keys(d.days || {}).forEach((day) => {
+        const c = (d.days[day] && d.days[day].conds) || {};
+        Object.keys(c).forEach((id) => { if (c[id]) k++; });
+      });
+    } catch (e) {}
+    return k;
   }
 
   function maybeMilestone() {
@@ -257,14 +288,20 @@ const PerfectWeek = (() => {
         '<h1 class="pwk__title">' + title + '</h1>' +
         '<p class="pwk__creed">' + subline + '</p>' +
         '<div class="pwm__cmp">' +
-          '<div class="pwm__row"><span class="pwm__lbl">The week before, you said</span>' + strip(baseline) + '</div>' +
+          '<div class="pwm__row"><span class="pwm__lbl">Last week</span>' + strip(baseline) + '</div>' +
           '<div class="pwm__row pwm__row--now"><span class="pwm__lbl">Your Protocol week</span>' + strip(st.marks) + '</div>' +
         '</div>' +
-        '<div class="pwk__q" style="margin-top:24px">How do you feel?</div>' +
+        '<div class="pwm__stats">' +
+          '<div class="pwm__stat"><span class="pwm__n">' + st.done + '<i>/7</i></span><span class="pwm__l">moves done</span></div>' +
+          '<div class="pwm__stat"><span class="pwm__n">' + condKeptCount() + '</span><span class="pwm__l">conditions kept</span></div>' +
+        '</div>' +
+        '<div class="pwk__q" style="margin-top:22px">How do you feel?</div>' +
         '<div class="pwk__row" data-pwm-feel>' +
           ['Different', 'Stronger', 'Honestly, tired'].map((w) =>
             '<button type="button" class="pwk__opt" data-f="' + w + '">' + w + '</button>').join('') +
         '</div>' +
+        '<div class="pwk__q" style="margin-top:18px">What did you get done this week? <span class="pwk__opt-note">optional</span></div>' +
+        '<input type="text" class="pwk__input" id="pwmDid" maxlength="90" placeholder="In your words" autocomplete="off">' +
         '<div class="pwk__nav">' +
           (ended === 'under' ? '<button type="button" class="pwk__skip" id="pwmRerun">Run it back</button>' : '') +
           '<button type="button" class="pwk__go" id="pwmKeep">Keep the rhythm</button>' +
@@ -288,6 +325,7 @@ const PerfectWeek = (() => {
         d.endedAs = ended;
         d.feel = feel;
         d.movesDone = st.done;
+        try { d.didLine = String((el.querySelector('#pwmDid') || {}).value || '').trim().slice(0, 90); } catch (e) {}
         persistNow();
       } catch (e) {}
       close();
