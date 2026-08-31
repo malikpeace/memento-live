@@ -88,6 +88,32 @@ const PerfectWeek = (() => {
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
   }
 
+
+  // ---------- piece 2: the home week strip ----------
+  // Dots derive LIVE from the completion ledger (no event hooks to miss):
+  // green = the move happened that day, held = a past day without it.
+  function weekStrip() {
+    if (!active()) return '';
+    const d = data();
+    const n = dayNumber();
+    let dots = '';
+    for (let i = 0; i < 7; i++) {
+      let cls = '';
+      try {
+        const dt = new Date(d.startDay + 'T00:00:00');
+        dt.setDate(dt.getDate() + i);
+        const key = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        const done = (typeof actionCompletionForDay === 'function') && !!actionCompletionForDay(key);
+        if (done) cls = 'on';
+        else if (i < n - 1) cls = 'held';
+      } catch (e) {}
+      dots += '<i class="' + cls + '"></i>';
+    }
+    return '<div class="cc-pwstrip" aria-label="The Perfect Week Protocol, day ' + n + ' of 7">' +
+      '<span class="cc-pwstrip__t">Perfect Week &middot; Day ' + n + ' of 7</span>' +
+      '<span class="cc-pwstrip__dots">' + dots + '</span></div>';
+  }
+
   /* ---------- the intro (the module explainer, like Action/Clarity) ---------- */
 
   function open() {
@@ -216,6 +242,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data };
+  return { open, openSetup, active, dayNumber, data, weekStrip };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}
