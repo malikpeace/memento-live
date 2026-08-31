@@ -246,7 +246,11 @@
 }
 
 /* ---------- the Protocol FACE (v1341): its own box in the deck ---------- */
-.v-weekface { display: flex; flex-direction: column; }
+/* THE FILL LAW, structurally: the deck sizes every face to the TALLEST one,
+   so this face stretches its content across whatever height it is given.
+   No fixed stack + leftover gap, ever. */
+.v-weekface { display: flex; flex-direction: column; height: 100%; }
+.v-weekface .pwf__conds { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-evenly; }
 .pwf__head {
   display: flex;
   align-items: center;
@@ -255,7 +259,7 @@
   margin-bottom: 13px;
 }
 .pwf__head span:first-child {
-  font-size: 16.5px;
+  font-size: 18px;
   font-weight: 750;
   letter-spacing: -0.01em;
   color: rgba(var(--ink), 0.95);
@@ -269,8 +273,8 @@
 .pwf__sq {
   flex: 1 1 0;
   min-width: 0;
-  height: 44px;
-  border-radius: 9px;
+  height: 48px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
   font-size: 14px;
@@ -279,7 +283,7 @@
   background: rgba(var(--ink), 0.07);
   color: rgba(var(--ink), 0.35);
 }
-.pwf__sq svg { width: 16px; height: 16px; }
+.pwf__sq svg { width: 18px; height: 18px; }
 .pwf__sq--done { background: var(--color-consistency, #3fd94e); color: #08090a; }
 .pwf__sq--today { background: var(--solid-bg, #f5f5f7); color: var(--solid-fg, #0b0c0e); font-weight: 800; }
 .pwf__sq--held { background: rgba(var(--ink), 0.30); color: rgba(var(--ink), 0.6); font-weight: 700; }
@@ -295,10 +299,10 @@
 
 /* the conditions, ON the face, checkable (the fill-the-box law: big rows) */
 .pwf__clabel {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: rgba(var(--ink), 0.45);
-  margin: 14px 0 7px;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(var(--ink), 0.8);
+  margin: 16px 0 4px;
 }
 .pwf__conds { display: flex; flex-direction: column; }
 .pwf__cond {
@@ -306,7 +310,7 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px 2px;
+  padding: 12px 2px;
   border: none;
   background: none;
   text-align: left;
@@ -317,8 +321,8 @@
 }
 .pwf__cond:last-child { border-bottom: none; }
 .pwf__ck {
-  width: 22px; height: 22px;
-  border-radius: 7px;
+  width: 25px; height: 25px;
+  border-radius: 8px;
   border: 1.5px solid rgba(var(--ink), 0.18);
   flex: 0 0 auto;
   display: grid;
@@ -327,10 +331,10 @@
   transition: background var(--t-fast, 150ms) ease;
 }
 .pwf__cond.is-done .pwf__ck { background: var(--solid-bg, #f5f5f7); border-color: var(--solid-bg, #f5f5f7); }
-.pwf__ck svg { width: 12px; height: 12px; }
+.pwf__ck svg { width: 14px; height: 14px; }
 .pwf__ct {
-  font-size: 15px;
-  font-weight: 550;
+  font-size: 16.5px;
+  font-weight: 600;
   color: rgba(var(--ink), 0.85);
   line-height: 1.3;
 }
