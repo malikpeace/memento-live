@@ -245,53 +245,41 @@
   .pwk .action-intro__btn-pill { opacity: 1 !important; animation: none !important; }
 }
 
-/* ---------- piece 2: the home week face ---------- */
-.cc-pwstrip {
+/* ---------- the Protocol FACE (v1341): its own box in the deck ---------- */
+.v-weekface { display: flex; flex-direction: column; }
+.pwf__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.cc-pwstrip__t {
   font-size: 12px;
   font-weight: 600;
   color: rgba(var(--ink), 0.5);
   font-variant-numeric: tabular-nums;
+  margin-bottom: 12px;
 }
-.cc-pwstrip__dots { display: flex; gap: 4px; }
-.cc-pwstrip__dots i {
-  width: 13px; height: 4px;
-  border-radius: 2px;
-  background: rgba(var(--ink), 0.12);
-}
-.cc-pwstrip__dots i.on { background: var(--color-consistency, #3fd94e); }
-.cc-pwstrip__dots i.held { background: rgba(var(--ink), 0.32); }
-
-/* The move is the one lit thing: white card (near-black in light mode via
-   the solid tokens), the styling law. */
-.v-pw .a-move {
-  background: var(--solid-bg, #fff);
-  color: var(--solid-fg, #0b1112) !important;
-  padding: 12px 14px 13px;
-  border-radius: 10px;
-  position: relative;
-}
-.v-pw .a-move::before {
-  content: 'Your move';
-  display: block;
-  font-size: 11px;
+.pwf__sqs { display: flex; gap: 5px; }
+.pwf__sq {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 34px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--solid-fg, #0b1112);
-  opacity: 0.5;
-  margin-bottom: 3px;
-  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  background: rgba(var(--ink), 0.07);
+  color: rgba(var(--ink), 0.35);
 }
-
-/* Piece 3: the held-day morning line */
-.cc-pwheld {
-  font-size: 13px;
+.pwf__sq svg { width: 13px; height: 13px; }
+.pwf__sq--done { background: var(--color-consistency, #3fd94e); color: #08090a; }
+.pwf__sq--today { background: var(--solid-bg, #f5f5f7); color: var(--solid-fg, #0b0c0e); font-weight: 800; }
+.pwf__sq--held { background: rgba(var(--ink), 0.30); color: rgba(var(--ink), 0.6); font-weight: 700; }
+.pwf__line {
+  font-size: 12.5px;
   line-height: 1.5;
   color: rgba(var(--ink), 0.6);
-  margin: 0 0 10px;
 }
+/* the v1316 foot-pin rule pushes a face's last child to the box floor; this
+   face wants its one message right under the squares */
+.cc-card--pillars .v.v-weekface > .pwf__line { margin: 12px 0 0 !important; }

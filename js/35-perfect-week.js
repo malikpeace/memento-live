@@ -102,29 +102,51 @@ const PerfectWeek = (() => {
     } catch (e) { return false; }
   }
 
-  // ---------- piece 2: the home week strip ----------
-  // Dots derive LIVE from the completion ledger (no event hooks to miss):
-  // green = the move happened that day, held = a past day without it.
-  function weekStrip() {
-    if (!active()) return '';
+  // ---------- the Protocol FACE (v1341, its own box in the deck) ----------
+  // Day squares derive LIVE from the completion ledger (no event hooks to
+  // miss): green check = the move happened, white = today, dimmed solid =
+  // held, quiet number = waiting.
+  function dayStates() {
     const d = data();
     const n = dayNumber();
-    let dots = '';
+    const out = [];
     for (let i = 0; i < 7; i++) {
-      let cls = '';
+      let st = 'wait';
       try {
         const dt = new Date(d.startDay + 'T00:00:00');
         dt.setDate(dt.getDate() + i);
         const key = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
         const done = (typeof actionCompletionForDay === 'function') && !!actionCompletionForDay(key);
-        if (done) cls = 'on';
-        else if (i < n - 1) cls = 'held';
+        if (done) st = 'done';
+        else if (i === n - 1) st = 'today';
+        else if (i < n - 1) st = 'held';
       } catch (e) {}
-      dots += '<i class="' + cls + '"></i>';
+      out.push(st);
     }
-    return '<div class="cc-pwstrip" aria-label="The Perfect Week Protocol, day ' + n + ' of 7">' +
-      '<span class="cc-pwstrip__t">Perfect Week Protocol &middot; Day ' + n + ' of 7</span>' +
-      '<span class="cc-pwstrip__dots">' + dots + '</span></div>';
+    return out;
+  }
+
+  const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 6"/></svg>';
+
+  function faceHtml() {
+    if (!active()) return null;
+    const n = dayNumber();
+    const squares = dayStates().map((st, i) =>
+      '<span class="pwf__sq pwf__sq--' + st + '">' + (st === 'done' ? CHECK : (i + 1)) + '</span>'
+    ).join('');
+    // ONE message slot, never stacked: the held line when it applies,
+    // otherwise nothing (conditions take this slot in v1.1).
+    let slot = '';
+    try {
+      if (heldYesterday() && !(typeof actionDoneToday === 'function' && actionDoneToday())) {
+        slot = '<p class="pwf__line">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
+      }
+    } catch (e) {}
+    return '<div class="v v-nf v-weekface" aria-label="The Perfect Week Protocol, day ' + n + ' of 7">' +
+      '<div class="pwf__head"><span>Perfect Week Protocol</span><span>Day ' + n + ' of 7</span></div>' +
+      '<div class="pwf__sqs">' + squares + '</div>' +
+      slot +
+      '</div>';
   }
 
   /* ---------- the intro (the module explainer, like Action/Clarity) ---------- */
@@ -255,6 +277,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data, weekStrip, heldYesterday };
+  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}

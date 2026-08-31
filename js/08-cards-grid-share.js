@@ -4109,6 +4109,13 @@ function ccPillarList() {
     const pa = (state.action && state.action.primaryAction) || {};
     const hasPlan = !!(state.action && state.action.planGenerated && pa.title);
     if (hasPlan && ccLockdownActive()) return ['action', 'clarity'];
+    // v1341: while a Perfect Week Protocol is live it gets its own face,
+    // right after Action.
+    try {
+      if (hasPlan && typeof PerfectWeek !== 'undefined' && PerfectWeek.active && PerfectWeek.active()) {
+        return ['action', 'week', 'clarity', 'consistency'];
+      }
+    } catch (e) {}
     return hasPlan ? CC_PILLARS : ['action', 'clarity'];
   } catch (e) { return CC_PILLARS; }
 }
@@ -4837,7 +4844,7 @@ function ccSyncDeckHeight(cc) {
     const _cur = parseFloat(cc.style.getPropertyValue('--cc-deck-h')) || 0;
     const card = cc.querySelector('.cc-card--pillars');
     if (!card) { if (!_revealed || !_cur) cc.style.removeProperty('--cc-deck-h'); return; }
-    const faces = ['action', 'clarity', 'consistency'].map(p => ccSyncFace(p)).filter(Boolean);
+    const faces = ['action', 'clarity', 'consistency'].concat((typeof PerfectWeek !== 'undefined' && PerfectWeek.active && PerfectWeek.active()) ? ['week'] : []).map(p => ccSyncFace(p)).filter(Boolean);
     // v1156: during a lockdown the comeback sentence is the tallest face on
     // the deck, so it has to be measured too or a long variant overruns it.
     try { if (ccLockdownActive()) faces.push('<div class="v v-nf">' + ccComebackSentence() + '<button class="a-btn" type="button">Build momentum</button></div>'); } catch (e) {}
@@ -4948,6 +4955,12 @@ function ccSyncFace(pillar) {
     if (!sit) return null;
     const d1 = ccSyncDayOne();
     let html = null;
+    // v1341 (Malik: "the action box stays the same, the perfect week is its
+    // own box"): the Protocol face is a temporary SIBLING in the deck, it
+    // names its own header, no injected kicker.
+    if (pillar === 'week') {
+      try { return (typeof PerfectWeek !== 'undefined' && PerfectWeek.faceHtml) ? PerfectWeek.faceHtml() : null; } catch (e) { return null; }
+    }
     if (pillar === 'action') html = ccSyncFaceAction(shape, sit, d1);
     else if (pillar === 'clarity') html = ccSyncFaceClarity(shape, sit, d1);
     else if (pillar === 'consistency') html = ccSyncFaceCons(shape, sit, d1);
@@ -4958,23 +4971,6 @@ function ccSyncFace(pillar) {
     // without each renderer knowing. It goes INSIDE the face root, so the
     // deck's measured shared height already accounts for it.
     const NAME = { action: 'Action', clarity: 'Clarity', consistency: 'Consistency' };
-    // v1338 (the Perfect Week Protocol, piece 2): during an active week the
-    // ACTION face wears the week strip instead of its module kicker, and the
-    // move goes white (the one lit thing). Injected here, same trick as the
-    // v1294 labels, so every action-face variant carries it.
-    try {
-      if (pillar === 'action' && typeof PerfectWeek !== 'undefined' && PerfectWeek.active && PerfectWeek.active()) {
-        // Piece 3: the morning after a held day, the kind line + the floor.
-        let heldLine = '';
-        try {
-          if (PerfectWeek.heldYesterday() && !actionDoneToday()) {
-            heldLine = '<p class="cc-pwheld">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
-          }
-        } catch (e) {}
-        return html.replace(/^(<div[^>]*class="([^"]*)"[^>]*>)/, (m0, tag, cls) => tag.replace(cls, cls + ' v-pw'))
-          .replace(/^(<div[^>]*>)/, '$1' + PerfectWeek.weekStrip() + heldLine);
-      }
-    } catch (e) {}
     return html.replace(/^(<div[^>]*>)/,
       '$1<p class="cc-sync-k cc-sync-k--' + pillar + '">' + NAME[pillar] + '</p>');
   } catch (e) { return null; }
