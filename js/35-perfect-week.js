@@ -63,7 +63,7 @@ const PerfectWeek = (() => {
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 340);
   }
 
-  function startWeek(whenSlot, baselineDays) {
+  function startWeek(baselineDays) {
     try {
       const start = todayKey();
       const days = {};
@@ -75,7 +75,6 @@ const PerfectWeek = (() => {
       state.perfectWeek = {
         startedAt: Date.now(),
         startDay: start,
-        whenSlot: whenSlot,
         baselineDays: baselineDays,
         days: days,
         completedAt: null,
@@ -89,31 +88,60 @@ const PerfectWeek = (() => {
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
   }
 
+  /* ---------- the intro (the module explainer, like Action/Clarity) ---------- */
+
+  function open() {
+    if (root) return;
+    const el = document.createElement('div');
+    el.className = 'pwk';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', 'The Perfect Week Protocol');
+    el.innerHTML =
+      '<div class="pwk__col">' +
+        '<div class="pwk__mark">' + markSvg(16) + '</div>' +
+        '<h1 class="pwk__title">The Perfect Week Protocol.</h1>' +
+        '<p class="pwk__creed">You know your goal. You have your move. This is where it becomes real.</p>' +
+        '<p class="pwk__body">For the next 7 days, you live like the person who gets there: your move, done, every single day. Do it at least 5 of the 7 and you finish the protocol.</p>' +
+        '<p class="pwk__body"><b>Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</b></p>' +
+        '<div class="pwk__nav">' +
+          '<button type="button" class="pwk__skip" id="pwkSkip">Not now</button>' +
+          '<button type="button" class="pwk__go" id="pwkGo">Continue</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+    root = el;
+    document.body.style.overflow = 'hidden';
+    void el.offsetWidth;
+    el.classList.add('pwk--in');
+    try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
+    el.querySelector('#pwkSkip').addEventListener('click', close);
+    el.querySelector('#pwkGo').addEventListener('click', () => {
+      const held = root; root = null;
+      held.classList.remove('pwk--in');
+      setTimeout(() => { try { held.remove(); } catch (e) {} openSetup(); }, 300);
+    });
+  }
+
   /* ---------- the setup screen (piece 1) ---------- */
 
   function openSetup() {
     if (root) return;
-    let whenSlot = '';
     let baselineDays = null;
 
     const el = document.createElement('div');
     el.className = 'pwk';
     el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'The Perfect Week');
+    el.setAttribute('aria-label', 'The Perfect Week Protocol');
     el.innerHTML =
       '<div class="pwk__col">' +
         '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-        '<h1 class="pwk__title">The Perfect Week.</h1>' +
+        '<h1 class="pwk__title">The Perfect Week Protocol.</h1>' +
         '<p class="pwk__creed">Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</p>' +
-        '<div class="pwk__q">When is your move happening each day?</div>' +
-        '<div class="pwk__row" data-pw-when>' +
-          ['morning', 'midday', 'evening'].map((w) =>
-            '<button type="button" class="pwk__opt" data-w="' + w + '">' + w.charAt(0).toUpperCase() + w.slice(1) + '</button>').join('') +
-        '</div>' +
         '<div class="pwk__q">Last week, how many days did you actually work on this?</div>' +
-        '<div class="pwk__row pwk__row--nums" data-pw-base>' +
-          [0, 1, 2, 3, 4, 5, 6, 7].map((n) =>
-            '<button type="button" class="pwk__opt pwk__opt--num" data-n="' + n + '">' + n + '</button>').join('') +
+        '<div class="pwk__slider">' +
+          '<div class="pwk__sval" id="pwkSval" aria-hidden="true">&ndash;</div>' +
+          '<input type="range" class="pwk__range" id="pwkRange" min="0" max="7" step="1" value="0" aria-label="Days worked last week, 0 to 7">' +
+          '<div class="pwk__smarks" aria-hidden="true"><span>0</span><span>7</span></div>' +
         '</div>' +
         '<div class="pwk__nav">' +
           '<button type="button" class="pwk__skip" id="pwkSkip">Not this week</button>' +
@@ -131,22 +159,22 @@ const PerfectWeek = (() => {
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
 
     const holdBtn = el.querySelector('#pwkHold');
-    const syncHold = () => { holdBtn.disabled = !(whenSlot && baselineDays !== null); };
+    const syncHold = () => { holdBtn.disabled = baselineDays === null; };
 
-    el.querySelectorAll('[data-pw-when] .pwk__opt').forEach((b) => {
-      b.addEventListener('click', () => {
-        whenSlot = b.getAttribute('data-w');
-        el.querySelectorAll('[data-pw-when] .pwk__opt').forEach((x) => x.classList.toggle('is-on', x === b));
-        syncHold();
-      });
-    });
-    el.querySelectorAll('[data-pw-base] .pwk__opt').forEach((b) => {
-      b.addEventListener('click', () => {
-        baselineDays = parseInt(b.getAttribute('data-n'), 10);
-        el.querySelectorAll('[data-pw-base] .pwk__opt').forEach((x) => x.classList.toggle('is-on', x === b));
-        syncHold();
-      });
-    });
+    // The slider: the value floats above the thumb; the first touch wakes it.
+    const range = el.querySelector('#pwkRange');
+    const sval = el.querySelector('#pwkSval');
+    const syncSlider = () => {
+      const v = parseInt(range.value, 10);
+      baselineDays = v;
+      sval.textContent = v === 7 ? '7, every day' : (v === 0 ? '0 days' : v + (v === 1 ? ' day' : ' days'));
+      const pct = v / 7;
+      sval.style.left = 'calc(' + (pct * 100) + '% + ' + ((0.5 - pct) * 28) + 'px)';
+      range.style.setProperty('--pw-fill', (pct * 100) + '%');
+      syncHold();
+    };
+    range.addEventListener('input', syncSlider);
+    range.addEventListener('pointerdown', () => { if (baselineDays === null) syncSlider(); });
     el.querySelector('#pwkSkip').addEventListener('click', close);
 
     // The sign: the app's one deliberate gesture, the same 3s hold that
@@ -161,7 +189,7 @@ const PerfectWeek = (() => {
         holdTimer = null;
         holdBtn.classList.remove('is-holding');
         holdBtn.classList.add('is-done');
-        startWeek(whenSlot, baselineDays);
+        startWeek(baselineDays);
       }, HOLD_MS);
     };
     const cancelHold = () => {
@@ -180,6 +208,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { openSetup, active, dayNumber, data };
+  return { open, openSetup, active, dayNumber, data };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}

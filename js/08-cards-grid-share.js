@@ -2137,7 +2137,7 @@ const CreatorTools = {
         this._daycIdx++;
       } catch (e) {}
     });
-    bind('creatorPerfectWeek', () => { try { if (window.PerfectWeek) PerfectWeek.openSetup(); } catch (e) {} });
+    bind('creatorPerfectWeek', () => { try { if (window.PerfectWeek) PerfectWeek.open(); } catch (e) {} });
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
     bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat', 'action'));
