@@ -181,7 +181,7 @@ const PerfectWeek = (() => {
     const conds = (d.conditions || []);
     if (conds.length) {
       const on = todayConds();
-      condRows = '<div class="pwf__clabel">Today&rsquo;s conditions</div><div class="pwf__conds">' +
+      condRows = '<div class="pwf__clabel">Conditions:</div><div class="pwf__conds">' +
         conds.map((c) =>
           '<button type="button" class="pwf__cond' + (on[c.id] ? ' is-done' : '') + '" data-pwc="' + c.id + '" aria-pressed="' + (on[c.id] ? 'true' : 'false') + '">' +
             '<span class="pwf__ck">' + (on[c.id] ? CHECK : '') + '</span>' +

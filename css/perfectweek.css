@@ -251,11 +251,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 14px;
-  font-weight: 650;
-  color: rgba(var(--ink), 0.62);
   font-variant-numeric: tabular-nums;
   margin-bottom: 13px;
+}
+.pwf__head span:first-child {
+  font-size: 16.5px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: rgba(var(--ink), 0.95);
+}
+.pwf__head span:last-child {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(var(--ink), 0.55);
 }
 .pwf__sqs { display: flex; gap: 5px; }
 .pwf__sq {
