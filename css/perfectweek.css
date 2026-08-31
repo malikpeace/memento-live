@@ -278,7 +278,7 @@
   position: relative;
 }
 .v-pw .a-move::before {
-  content: 'The move';
+  content: 'Your move';
   display: block;
   font-size: 11px;
   font-weight: 600;

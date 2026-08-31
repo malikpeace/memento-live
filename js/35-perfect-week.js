@@ -110,7 +110,7 @@ const PerfectWeek = (() => {
       dots += '<i class="' + cls + '"></i>';
     }
     return '<div class="cc-pwstrip" aria-label="The Perfect Week Protocol, day ' + n + ' of 7">' +
-      '<span class="cc-pwstrip__t">Perfect Week &middot; Day ' + n + ' of 7</span>' +
+      '<span class="cc-pwstrip__t">Perfect Week Protocol &middot; Day ' + n + ' of 7</span>' +
       '<span class="cc-pwstrip__dots">' + dots + '</span></div>';
   }
 
