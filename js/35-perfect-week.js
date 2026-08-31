@@ -63,7 +63,7 @@ const PerfectWeek = (() => {
     setTimeout(() => { try { el.remove(); } catch (e) {} }, 340);
   }
 
-  function startWeek(baselineDays) {
+  function startWeek(baselineDays, conditions) {
     try {
       const start = todayKey();
       const days = {};
@@ -76,6 +76,7 @@ const PerfectWeek = (() => {
         startedAt: Date.now(),
         startDay: start,
         baselineDays: baselineDays,
+        conditions: (conditions || []).map((c, i) => ({ id: 'c' + i, text: c.text, why: c.why || '' })),
         days: days,
         completedAt: null,
         endedAs: null,
@@ -128,24 +129,69 @@ const PerfectWeek = (() => {
 
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 6"/></svg>';
 
+  function todayConds() {
+    const d = data();
+    if (!d) return {};
+    const day = (d.days && d.days[todayKey()]) || {};
+    return day.conds || {};
+  }
+
+  function toggleCondition(id) {
+    try {
+      const d = data();
+      if (!d || !active()) return;
+      const k = todayKey();
+      d.days[k] = d.days[k] || {};
+      d.days[k].conds = d.days[k].conds || {};
+      d.days[k].conds[id] = !d.days[k].conds[id];
+      persistNow();
+      if (typeof renderAll === 'function') renderAll();
+    } catch (e) {}
+  }
+
+  // Delegated wiring for the face's condition rows; called by js/08 after
+  // every command-center render.
+  function bindFace(cc) {
+    try {
+      if (!cc) return;
+      cc.querySelectorAll('[data-pwc]').forEach((b) => {
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCondition(b.getAttribute('data-pwc'));
+        });
+      });
+    } catch (e) {}
+  }
+
   function faceHtml() {
     if (!active()) return null;
     const n = dayNumber();
+    const d = data();
     const squares = dayStates().map((st, i) =>
       '<span class="pwf__sq pwf__sq--' + st + '">' + (st === 'done' ? CHECK : (i + 1)) + '</span>'
     ).join('');
-    // ONE message slot, never stacked: the held line when it applies,
-    // otherwise nothing (conditions take this slot in v1.1).
-    let slot = '';
+    let held = '';
     try {
       if (heldYesterday() && !(typeof actionDoneToday === 'function' && actionDoneToday())) {
-        slot = '<p class="pwf__line">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
+        held = '<p class="pwf__line">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
       }
     } catch (e) {}
+    // The conditions, checkable in place, today's state from the day record.
+    let condRows = '';
+    const conds = (d.conditions || []);
+    if (conds.length) {
+      const on = todayConds();
+      condRows = '<div class="pwf__clabel">Today&rsquo;s conditions</div><div class="pwf__conds">' +
+        conds.map((c) =>
+          '<button type="button" class="pwf__cond' + (on[c.id] ? ' is-done' : '') + '" data-pwc="' + c.id + '" aria-pressed="' + (on[c.id] ? 'true' : 'false') + '">' +
+            '<span class="pwf__ck">' + (on[c.id] ? CHECK : '') + '</span>' +
+            '<span class="pwf__ct">' + esc2(c.text) + '</span>' +
+          '</button>').join('') + '</div>';
+    }
     return '<div class="v v-nf v-weekface" aria-label="The Perfect Week Protocol, day ' + n + ' of 7">' +
       '<div class="pwf__head"><span>Perfect Week Protocol</span><span>Day ' + n + ' of 7</span></div>' +
       '<div class="pwf__sqs">' + squares + '</div>' +
-      slot +
+      held + condRows +
       '</div>';
   }
 
@@ -191,11 +237,20 @@ const PerfectWeek = (() => {
     });
   }
 
-  /* ---------- the setup screen (piece 1) ---------- */
+  /* ---------- the setup screen: conditions + baseline + the sign ---------- */
+
+  const FALLBACK = [
+    { text: 'Train 45 minutes', why: 'A working body shows up with you' },
+    { text: 'No phone until the move is done', why: 'The day starts with the goal, not the feed' },
+    { text: 'Sleep by 10', why: 'Tired days are the days you skip it' },
+    { text: '30 min outside, no earbuds', why: 'Daylight and quiet reset the head' }
+  ];
 
   function openSetup() {
     if (root) return;
     let baselineDays = null;
+    const picked = {};
+    let conds = [];
 
     const el = document.createElement('div');
     el.className = 'pwk';
@@ -204,9 +259,10 @@ const PerfectWeek = (() => {
     el.innerHTML =
       '<div class="pwk__col">' +
         '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-        '<h1 class="pwk__title">The Perfect Week Protocol.</h1>' +
-        '<p class="pwk__creed">Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</p>' +
-        '<div class="pwk__q">Last week, how many days did you actually work on this?</div>' +
+        '<h1 class="pwk__title">Your conditions.</h1>' +
+        '<p class="pwk__creed">The move is the goal. These are the terms you live it on. None of them are easy. That&rsquo;s the point.</p>' +
+        '<div id="pwkConds"><p class="pwk__wait">Building your conditions&hellip;</p></div>' +
+        '<div class="pwk__q" style="margin-top:22px">Last week, how many days did you actually work on this?</div>' +
         '<div class="pwk__slider">' +
           '<div class="pwk__sval" id="pwkSval" aria-hidden="true">&ndash;</div>' +
           '<input type="range" class="pwk__range" id="pwkRange" min="0" max="7" step="1" value="0" aria-label="Days worked last week, 0 to 7">' +
@@ -228,9 +284,40 @@ const PerfectWeek = (() => {
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
 
     const holdBtn = el.querySelector('#pwkHold');
-    const syncHold = () => { holdBtn.disabled = baselineDays === null; };
+    const countOn = () => Object.keys(picked).filter((k) => picked[k]).length;
+    const syncHold = () => { holdBtn.disabled = !(baselineDays !== null && countOn() >= 2); };
 
-    // The slider: the value floats above the thumb; the first touch wakes it.
+    function renderConds(list) {
+      conds = list;
+      list.forEach((c, i) => { if (picked[i] === undefined) picked[i] = i < 3; });
+      const host = el.querySelector('#pwkConds');
+      if (!host) return;
+      host.innerHTML = '<div class="pwk__chips">' + list.map((c, i) =>
+        '<button type="button" class="pwk__chip' + (picked[i] ? ' is-on' : '') + '" data-i="' + i + '" aria-pressed="' + (picked[i] ? 'true' : 'false') + '">' +
+          '<span class="pwk__chip-t">' + esc2(c.text) + '</span>' +
+          (c.why ? '<span class="pwk__chip-w">' + esc2(c.why) + '</span>' : '') +
+        '</button>').join('') + '</div>';
+      host.querySelectorAll('[data-i]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const i = b.getAttribute('data-i');
+          if (picked[i] && countOn() <= 2) return;
+          picked[i] = !picked[i];
+          b.classList.toggle('is-on', picked[i]);
+          b.setAttribute('aria-pressed', picked[i] ? 'true' : 'false');
+          syncHold();
+        });
+      });
+      syncHold();
+    }
+    try {
+      if (typeof perfectWeekConditionsGenerate === 'function') {
+        perfectWeekConditionsGenerate().then(
+          (list) => { if (root === el) renderConds(list); },
+          () => { if (root === el) renderConds(FALLBACK.slice()); }
+        );
+      } else renderConds(FALLBACK.slice());
+    } catch (e) { renderConds(FALLBACK.slice()); }
+
     const range = el.querySelector('#pwkRange');
     const sval = el.querySelector('#pwkSval');
     const syncSlider = () => {
@@ -246,8 +333,6 @@ const PerfectWeek = (() => {
     range.addEventListener('pointerdown', () => { if (baselineDays === null) syncSlider(); });
     el.querySelector('#pwkSkip').addEventListener('click', close);
 
-    // The sign: the app's one deliberate gesture, the same 3s hold that
-    // completes a day. Fill sweeps; release early and nothing happens.
     let holdTimer = null;
     const HOLD_MS = 3000;
     const startHold = (e) => {
@@ -258,7 +343,7 @@ const PerfectWeek = (() => {
         holdTimer = null;
         holdBtn.classList.remove('is-holding');
         holdBtn.classList.add('is-done');
-        startWeek(baselineDays);
+        startWeek(baselineDays, conds.filter((c, i) => picked[i]));
       }, HOLD_MS);
     };
     const cancelHold = () => {
@@ -277,6 +362,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday };
+  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday, bindFace, toggleCondition };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}

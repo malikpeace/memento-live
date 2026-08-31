@@ -5918,6 +5918,7 @@ function bindCommandCenter(cc) {
   // set here, never per swipe, and clamped so a runaway line can never
   // squeeze the Memento the way the old measured version did.
   try { ccSyncDeckHeight(cc); } catch (e) {}
+  try { if (typeof PerfectWeek !== 'undefined' && PerfectWeek.bindFace) PerfectWeek.bindFace(cc); } catch (e) {}
   // v1153 (Malik): the deck dots live UNDER the box, near the bottom of the
   // screen, not inside the card. Hoisted after every render so each face
   // keeps authoring them in place.
