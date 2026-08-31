@@ -172,7 +172,13 @@ const PerfectWeek = (() => {
     ).join('');
     let held = '';
     try {
-      if (heldYesterday() && !(typeof actionDoneToday === 'function' && actionDoneToday())) {
+      const doneToday = (typeof actionDoneToday === 'function' && actionDoneToday());
+      if (doneToday) {
+        // the day-close receipt, in the one message slot
+        const left = 7 - n;
+        const dip = (n === 3) ? 'That was the dip, and you went through it. ' : '';
+        held = '<p class="pwf__line pwf__line--done">Day ' + n + ' down. ' + dip + (left > 0 ? (left + (left === 1 ? ' day' : ' days') + ' to go.') : 'The week is yours tomorrow.') + '</p>';
+      } else if (heldYesterday()) {
         held = '<p class="pwf__line">Yesterday got away from you. One held day doesn&rsquo;t end a week, and the smallest honest version counts today.</p>';
       }
     } catch (e) {}
@@ -193,6 +199,104 @@ const PerfectWeek = (() => {
       '<div class="pwf__sqs">' + squares + '</div>' +
       held + condRows +
       '</div>';
+  }
+
+
+  /* ---------- the day-7 milestone (v1345) ---------- */
+  function weekStats() {
+    const d = data();
+    let done = 0;
+    const marks = [];
+    for (let i = 0; i < 7; i++) {
+      try {
+        const dt = new Date(d.startDay + 'T00:00:00');
+        dt.setDate(dt.getDate() + i);
+        const key = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        const ok = (typeof actionCompletionForDay === 'function') && !!actionCompletionForDay(key);
+        marks.push(ok);
+        if (ok) done++;
+      } catch (e) { marks.push(false); }
+    }
+    return { done: done, marks: marks };
+  }
+
+  function maybeMilestone() {
+    const d = data();
+    if (!d || d.completedAt || !d.startDay) return false;
+    if (dayNumber() <= 7) return false;
+    openMilestone();
+    return true;
+  }
+
+  function openMilestone() {
+    if (root) return;
+    const d = data();
+    const st = weekStats();
+    const base = Math.max(0, Math.min(7, d.baselineDays == null ? 0 : d.baselineDays));
+    const ended = st.done >= 7 ? 'perfect' : (st.done >= 5 ? 'completed' : 'under');
+    const strip = (fills) => '<div class="pwm__strip">' + fills.map((f) =>
+      '<span class="pwm__dot' + (f ? ' is-on' : '') + '"></span>').join('') + '</div>';
+    const baseline = [];
+    for (let i = 0; i < 7; i++) baseline.push(i < base);
+    let title, subline;
+    if (ended === 'perfect') { title = 'The Perfect Week.'; subline = 'Seven for seven. That is rare air.'; }
+    else if (ended === 'completed') { title = 'You completed your week.'; subline = st.done + ' of 7 days. You proved you CAN.'; }
+    else {
+      title = st.done + ' out of 7.';
+      if (st.done === 0) subline = 'The week fought back hard. The next one starts whenever you say.';
+      else if (base > 0 && st.done > base) subline = 'A week ago that was ' + base + (base === 1 ? ' day' : ' days') + '. You multiplied it. The week fought back, and you still showed up ' + st.done + (st.done === 1 ? ' time' : ' times') + '.';
+      else subline = 'The week fought back. You still showed up ' + st.done + (st.done === 1 ? ' time' : ' times') + ', and that counts.';
+    }
+    const el = document.createElement('div');
+    el.className = 'pwk';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-label', 'Your Perfect Week Protocol, finished');
+    el.innerHTML =
+      '<div class="pwk__col pwk__col--center">' +
+        '<div class="pwk__mark">' + markSvg(16) + '</div>' +
+        '<h1 class="pwk__title">' + title + '</h1>' +
+        '<p class="pwk__creed">' + subline + '</p>' +
+        '<div class="pwm__cmp">' +
+          '<div class="pwm__row"><span class="pwm__lbl">The week before, you said</span>' + strip(baseline) + '</div>' +
+          '<div class="pwm__row pwm__row--now"><span class="pwm__lbl">Your Protocol week</span>' + strip(st.marks) + '</div>' +
+        '</div>' +
+        '<div class="pwk__q" style="margin-top:24px">How do you feel?</div>' +
+        '<div class="pwk__row" data-pwm-feel>' +
+          ['Different', 'Stronger', 'Honestly, tired'].map((w) =>
+            '<button type="button" class="pwk__opt" data-f="' + w + '">' + w + '</button>').join('') +
+        '</div>' +
+        '<div class="pwk__nav">' +
+          (ended === 'under' ? '<button type="button" class="pwk__skip" id="pwmRerun">Run it back</button>' : '') +
+          '<button type="button" class="pwk__go" id="pwmKeep">Keep the rhythm</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+    root = el;
+    document.body.style.overflow = 'hidden';
+    void el.offsetWidth;
+    el.classList.add('pwk--in');
+    let feel = '';
+    el.querySelectorAll('[data-pwm-feel] .pwk__opt').forEach((b) => {
+      b.addEventListener('click', () => {
+        feel = b.getAttribute('data-f');
+        el.querySelectorAll('[data-pwm-feel] .pwk__opt').forEach((x) => x.classList.toggle('is-on', x === b));
+      });
+    });
+    const finish = (rerun) => {
+      try {
+        d.completedAt = Date.now();
+        d.endedAs = ended;
+        d.feel = feel;
+        d.movesDone = st.done;
+        persistNow();
+      } catch (e) {}
+      close();
+      if (rerun) { setTimeout(() => { try { openSetup(); } catch (e) {} }, 380); }
+      else { try { if (typeof renderAll === 'function') renderAll(); } catch (e) {} }
+    };
+    const rr = el.querySelector('#pwmRerun');
+    if (rr) rr.addEventListener('click', () => finish(true));
+    el.querySelector('#pwmKeep').addEventListener('click', () => finish(false));
   }
 
   /* ---------- the intro (the module explainer, like Action/Clarity) ---------- */
@@ -362,6 +466,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday, bindFace, toggleCondition };
+  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday, bindFace, toggleCondition, maybeMilestone, openMilestone };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}

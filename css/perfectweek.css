@@ -340,3 +340,27 @@
 }
 .pwf__cond.is-done .pwf__ct { color: rgba(var(--ink), 0.45); text-decoration: line-through; }
 .pwf__line { font-size: 13px; }
+
+/* ---------- the day-7 milestone ---------- */
+.pwk__col--center { justify-content: center; padding-bottom: 24px; }
+.pwm__cmp { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.pwm__row {
+  border-radius: 12px;
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  padding: 14px 16px;
+}
+.pwm__row--now { background: var(--solid-bg, #f5f5f7); }
+.pwm__lbl {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(var(--ink), 0.5);
+  margin-bottom: 9px;
+}
+.pwm__row--now .pwm__lbl { color: var(--solid-fg, #0b0c0e); opacity: 0.55; }
+.pwm__strip { display: flex; gap: 5px; }
+.pwm__dot { flex: 1 1 0; height: 7px; border-radius: 4px; background: rgba(var(--ink), 0.12); }
+.pwm__dot.is-on { background: var(--color-consistency, #3fd94e); }
+.pwm__row--now .pwm__dot { background: rgba(11, 12, 14, 0.12); }
+.pwm__row--now .pwm__dot.is-on { background: var(--color-consistency, #3fd94e); }
+.pwf__line--done { color: rgba(var(--ink), 0.85); font-weight: 600; }
