@@ -1,18 +1,22 @@
 /* ============================================================
-   35-perfect-week.js - THE PERFECT WEEK PROTOCOL (v1334, phase 1).
+   35-perfect-week.js - THE PERFECT WEEK (lean v1, Malik greenlit
+   2026-08-30 after the grill).
 
-   Malik's frame, locked 2026-08-29: the week SERVES the move. Right
-   after the plan exists, Memento proposes the 3-4 daily conditions
-   (AI-derived from their goal + their own Clarity words, each with a
-   visible why); the person confirms or trims; for 7 days the home
-   carries the move lit and the conditions quiet. This file owns the
-   state + the SETUP screen. Phase 2 wires the home strip, the day
-   close, and the day-7 proof.
+   The week is Memento's activation bridge: after the plan lands and
+   they do move #1, seven named days with the move as the ONE thing
+   that lights a day. Lean v1 = the frame only: setup (when + baseline
+   + hold-to-start), the home week face, held days, the day close, and
+   the day-7 milestone. AI conditions are v1.1 (identity layer, pool
+   uniformly ~7/10 hard, never gating completion).
 
-   Phase-1 entry points: PerfectWeek.openSetup() (public), plus the
-   Cheat Code Bar QA button. The live post-plan flow is NOT wired yet,
-   by design: nothing customers reach changes until Malik blesses the
-   screen on-device.
+   THIS FILE (piece 1) ships the SETUP SCREEN + state. QA entry only
+   (Cheat Code Bar / PerfectWeek.openSetup()); the live post-move
+   wiring lands after Malik approves each piece on screenshots.
+
+   state.perfectWeek when live:
+   { startedAt, startDay:'YYYY-MM-DD', whenSlot:'morning'|'midday'|'evening',
+     baselineDays: 0-7, days:{ 'YYYY-MM-DD': { move:true } },
+     completedAt:null, endedAs:null, rerunOffered:false, v:1 }
    ============================================================ */
 
 const PerfectWeek = (() => {
@@ -41,15 +45,6 @@ const PerfectWeek = (() => {
     return n >= 1 && n <= 7;
   }
 
-  // The safety net when the AI call fails (offline, demo, quota): the week
-  // still starts, with the honest generic set. FIXER SHIPS, never bounces.
-  const FALLBACK = [
-    { text: 'Sleep by 11', why: 'A rested brain shows up with you' },
-    { text: 'No phone first hour', why: 'The morning belongs to the move' },
-    { text: '20 min outside', why: 'Daylight resets the head between efforts' },
-    { text: 'One real meal', why: 'Fuel for the work, not around it' }
-  ];
-
   function esc2(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
@@ -65,19 +60,28 @@ const PerfectWeek = (() => {
     el.classList.remove('pwk--in');
     document.body.style.overflow = '';
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide(); } catch (e) {}
-    setTimeout(() => { try { el.remove(); } catch (e) {} }, 320);
+    setTimeout(() => { try { el.remove(); } catch (e) {} }, 340);
   }
 
-  function startWeek(conds, source) {
+  function startWeek(whenSlot, baselineDays) {
     try {
+      const start = todayKey();
+      const days = {};
+      // Endowed progress: setup fires after move #1, so day 1 is usually
+      // already earned. Light it from the real ledger, never assume.
+      try {
+        if (typeof actionCompletionForDay === 'function' && actionCompletionForDay(start)) days[start] = { move: true };
+      } catch (e) {}
       state.perfectWeek = {
         startedAt: Date.now(),
-        startDay: todayKey(),
-        source: source || 'ai',
-        conditions: conds.map((c, i) => ({ id: 'c' + i, text: c.text, why: c.why || '' })),
-        days: {},
+        startDay: start,
+        whenSlot: whenSlot,
+        baselineDays: baselineDays,
+        days: days,
         completedAt: null,
-        keptRhythm: false
+        endedAs: null,
+        rerunOffered: false,
+        v: 1
       };
       persistNow();
     } catch (e) {}
@@ -85,93 +89,39 @@ const PerfectWeek = (() => {
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
   }
 
-  function renderConditions(list, source) {
-    if (!root) return;
-    const col = root.querySelector('.pwk__col');
-    if (!col) return;
-    const picked = {};
-    list.forEach((c, i) => { picked[i] = i < 3; }); // first three on, fourth offered
-    col.innerHTML =
-      '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-      '<h1 class="pwk__line">Your move needs a body and brain that show up with you. For your goal, these matter most this week:</h1>' +
-      '<p class="pwk__sub">Keep 3 or 4. Fewer is stronger.</p>' +
-      '<div class="pwk__chips">' +
-      list.map((c, i) =>
-        '<button type="button" class="pwk__chip' + (picked[i] ? ' is-on' : '') + '" data-pw-i="' + i + '" aria-pressed="' + (picked[i] ? 'true' : 'false') + '">' +
-          '<span class="pwk__chip-t">' + esc2(c.text) + '</span>' +
-          (c.why ? '<span class="pwk__chip-w">' + esc2(c.why) + '</span>' : '') +
-        '</button>'
-      ).join('') +
-      '</div>' +
-      '<button type="button" class="pwk__add" id="pwkAddBtn">Add your own&hellip;</button>' +
-      '<div class="pwk__addrow" id="pwkAddRow" hidden>' +
-        '<input class="pwk__input" id="pwkInput" type="text" maxlength="42" placeholder="Say it your way" autocomplete="off">' +
-        '<button type="button" class="pwk__addgo" id="pwkAddGo" aria-label="Add">&#8594;</button>' +
-      '</div>' +
-      '<div class="pwk__nav">' +
-        '<button type="button" class="pwk__skip" id="pwkSkip">Not now</button>' +
-        '<button type="button" class="pwk__go" id="pwkGo">Start my week</button>' +
-      '</div>';
-
-    const countOn = () => Object.keys(picked).filter((k) => picked[k]).length;
-    const goBtn = col.querySelector('#pwkGo');
-    const syncGo = () => { goBtn.disabled = countOn() < 2; };
-
-    col.querySelectorAll('[data-pw-i]').forEach((b) => {
-      b.addEventListener('click', () => {
-        const i = b.getAttribute('data-pw-i');
-        if (picked[i] && countOn() <= 2) return;      // never below 2
-        if (!picked[i] && countOn() >= 5) return;     // never above 5
-        picked[i] = !picked[i];
-        b.classList.toggle('is-on', picked[i]);
-        b.setAttribute('aria-pressed', picked[i] ? 'true' : 'false');
-        syncGo();
-      });
-    });
-
-    // Add-your-own: the field appears only on request; the Clarity keyboard
-    // settle rides along where the recipe exists (device-verified pattern).
-    const addBtn = col.querySelector('#pwkAddBtn');
-    const addRow = col.querySelector('#pwkAddRow');
-    const input = col.querySelector('#pwkInput');
-    addBtn.addEventListener('click', () => {
-      addBtn.hidden = true;
-      addRow.hidden = false;
-      try { if (typeof bindKeyboardSettle === 'function') bindKeyboardSettle(root, input); } catch (e) {}
-      setTimeout(() => { try { input.focus(); } catch (e) {} }, 60);
-    });
-    const commitAdd = () => {
-      const t = String(input.value || '').trim().slice(0, 42);
-      if (!t) return;
-      const i = list.length;
-      list.push({ text: t, why: '' });
-      picked[i] = countOn() < 5;
-      input.value = '';
-      renderConditions(list, source);               // simple re-render keeps state honest
-    };
-    col.querySelector('#pwkAddGo').addEventListener('click', commitAdd);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commitAdd(); } });
-
-    col.querySelector('#pwkSkip').addEventListener('click', close);
-    goBtn.addEventListener('click', () => {
-      const keep = list.filter((c, i) => picked[i]);
-      if (keep.length < 2) return;
-      startWeek(keep, source);
-    });
-    syncGo();
-  }
+  /* ---------- the setup screen (piece 1) ---------- */
 
   function openSetup() {
     if (root) return;
+    let whenSlot = '';
+    let baselineDays = null;
+
     const el = document.createElement('div');
     el.className = 'pwk';
     el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'Set up your Perfect Week');
+    el.setAttribute('aria-label', 'The Perfect Week');
     el.innerHTML =
       '<div class="pwk__col">' +
         '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-        '<h1 class="pwk__line">You saw the week. Let&rsquo;s set yours up.</h1>' +
-        '<p class="pwk__sub pwk__sub--wait">Building the conditions around your move&hellip;</p>' +
+        '<h1 class="pwk__title">The Perfect Week.</h1>' +
+        '<p class="pwk__creed">Almost everyone who quits, quits in the first week. Finish it and you&rsquo;re past where most people die.</p>' +
+        '<div class="pwk__q">When is your move happening each day?</div>' +
+        '<div class="pwk__row" data-pw-when>' +
+          ['morning', 'midday', 'evening'].map((w) =>
+            '<button type="button" class="pwk__opt" data-w="' + w + '">' + w.charAt(0).toUpperCase() + w.slice(1) + '</button>').join('') +
+        '</div>' +
+        '<div class="pwk__q">Last week, how many days did you actually work on this?</div>' +
+        '<div class="pwk__row pwk__row--nums" data-pw-base>' +
+          [0, 1, 2, 3, 4, 5, 6, 7].map((n) =>
+            '<button type="button" class="pwk__opt pwk__opt--num" data-n="' + n + '">' + n + '</button>').join('') +
+        '</div>' +
+        '<div class="pwk__nav">' +
+          '<button type="button" class="pwk__skip" id="pwkSkip">Not this week</button>' +
+          '<button type="button" class="pwk__hold" id="pwkHold" disabled aria-label="Hold for three seconds to start your week">' +
+            '<span class="pwk__hold-fill" aria-hidden="true"></span>' +
+            '<span class="pwk__hold-label">Hold to start the week</span>' +
+          '</button>' +
+        '</div>' +
       '</div>';
     document.body.appendChild(el);
     root = el;
@@ -180,15 +130,54 @@ const PerfectWeek = (() => {
     el.classList.add('pwk--in');
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
 
-    const useFallback = () => { if (root) renderConditions(FALLBACK.map((c) => ({ text: c.text, why: c.why })), 'fallback'); };
-    try {
-      if (typeof perfectWeekConditionsGenerate === 'function') {
-        perfectWeekConditionsGenerate().then(
-          (list) => { if (root) renderConditions(list, 'ai'); },
-          () => useFallback()
-        );
-      } else useFallback();
-    } catch (e) { useFallback(); }
+    const holdBtn = el.querySelector('#pwkHold');
+    const syncHold = () => { holdBtn.disabled = !(whenSlot && baselineDays !== null); };
+
+    el.querySelectorAll('[data-pw-when] .pwk__opt').forEach((b) => {
+      b.addEventListener('click', () => {
+        whenSlot = b.getAttribute('data-w');
+        el.querySelectorAll('[data-pw-when] .pwk__opt').forEach((x) => x.classList.toggle('is-on', x === b));
+        syncHold();
+      });
+    });
+    el.querySelectorAll('[data-pw-base] .pwk__opt').forEach((b) => {
+      b.addEventListener('click', () => {
+        baselineDays = parseInt(b.getAttribute('data-n'), 10);
+        el.querySelectorAll('[data-pw-base] .pwk__opt').forEach((x) => x.classList.toggle('is-on', x === b));
+        syncHold();
+      });
+    });
+    el.querySelector('#pwkSkip').addEventListener('click', close);
+
+    // The sign: the app's one deliberate gesture, the same 3s hold that
+    // completes a day. Fill sweeps; release early and nothing happens.
+    let holdTimer = null;
+    const HOLD_MS = 3000;
+    const startHold = (e) => {
+      if (holdBtn.disabled || holdTimer) return;
+      if (e && e.cancelable) { try { e.preventDefault(); } catch (x) {} }
+      holdBtn.classList.add('is-holding');
+      holdTimer = setTimeout(() => {
+        holdTimer = null;
+        holdBtn.classList.remove('is-holding');
+        holdBtn.classList.add('is-done');
+        startWeek(whenSlot, baselineDays);
+      }, HOLD_MS);
+    };
+    const cancelHold = () => {
+      if (!holdTimer) return;
+      clearTimeout(holdTimer);
+      holdTimer = null;
+      holdBtn.classList.remove('is-holding');
+    };
+    holdBtn.addEventListener('pointerdown', startHold);
+    holdBtn.addEventListener('pointerup', cancelHold);
+    holdBtn.addEventListener('pointerleave', cancelHold);
+    holdBtn.addEventListener('pointercancel', cancelHold);
+    holdBtn.addEventListener('touchstart', startHold, { passive: false });
+    holdBtn.addEventListener('touchend', cancelHold);
+    holdBtn.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') startHold(e); });
+    holdBtn.addEventListener('keyup', cancelHold);
   }
 
   return { openSetup, active, dayNumber, data };
