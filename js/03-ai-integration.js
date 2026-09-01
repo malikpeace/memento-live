@@ -6106,7 +6106,7 @@ const ACTION_PLAN_MAX_TOKENS = 6000;
 const PW_CONDITIONS_SYSTEM = `You are Memento's Perfect Week builder. The person just committed to ONE main move toward their goal. You propose the daily CONDITIONS around that move: the body-and-brain commitments that make it actually happen for the next 7 days.
 
 RULES
-- Exactly 4 conditions.
+- Exactly 10 conditions, ordered by fit: the four that matter most for THIS person first.
 - A condition SUPPORTS the move. It is never the move itself, never a second goal, never busywork.
 - DEMANDING, uniformly. Every condition sits around 7/10 difficulty for an average person, and the gaps between them stay narrow, so choosing is always hard-vs-hard and no easy week can be assembled. "Train 45 minutes" not "stretch 4 minutes"; "Sleep by 9:30" not "try to sleep earlier"; "No phone until the move is done" not "less phone".
 - Imperative, concrete, checkable at the end of a day, 2 to 6 words each.
@@ -6116,7 +6116,7 @@ RULES
 - No medical claims, no supplements, no extreme protocols, nothing that could harm.
 
 Return ONLY raw JSON, no fences, no commentary:
-{"conditions":[{"text":"...","why":"..."},{"text":"...","why":"..."},{"text":"...","why":"..."},{"text":"...","why":"..."}]}`;
+{"conditions":[{"text":"...","why":"..."} x10]}`;
 
 async function perfectWeekConditionsGenerate() {
   const a = (state.clarity && state.clarity.answers) || {};
@@ -6130,16 +6130,16 @@ async function perfectWeekConditionsGenerate() {
   const raw = await callClaude(
     [{ role: 'user', content: parts.join('\n') }],
     PW_CONDITIONS_SYSTEM + '\n\n' + MALIK_VOICE_SPEC,
-    { model: ACTION_PLAN_MODEL, maxTokens: 700, paidAction: true, noProfile: true, cache: true, thinking: 'off', timeout: 60000 }
+    { model: ACTION_PLAN_MODEL, maxTokens: 1600, paidAction: true, noProfile: true, cache: true, thinking: 'off', timeout: 60000 }
   );
   const m = String(raw || '').match(/\{[\s\S]*\}/);
   if (!m) throw new Error('pw_conditions_unparsable');
   const obj = JSON.parse(m[0]);
   const list = (Array.isArray(obj.conditions) ? obj.conditions : [])
     .filter((c) => c && c.text)
-    .slice(0, 4)
+    .slice(0, 10)
     .map((c) => ({ text: String(c.text).trim().slice(0, 48), why: String(c.why || '').trim().slice(0, 90) }));
-  if (list.length < 3) throw new Error('pw_conditions_short');
+  if (list.length < 6) throw new Error('pw_conditions_short');
   return list;
 }
 try { window.perfectWeekConditionsGenerate = perfectWeekConditionsGenerate; } catch (e) {}

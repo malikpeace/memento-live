@@ -382,10 +382,16 @@ const PerfectWeek = (() => {
   /* ---------- the setup screen: conditions + baseline + the sign ---------- */
 
   const FALLBACK = [
-    { text: 'Train 45 minutes', why: 'A working body shows up with you' },
     { text: 'No phone until the move is done', why: 'The day starts with the goal, not the feed' },
+    { text: 'Train 45 minutes', why: 'A working body shows up with you' },
     { text: 'Sleep by 10', why: 'Tired days are the days you skip it' },
-    { text: '30 min outside, no earbuds', why: 'Daylight and quiet reset the head' }
+    { text: '30 min outside, no earbuds', why: 'Daylight and quiet reset the head' },
+    { text: 'No social media before noon', why: 'Protects the hours real work happens' },
+    { text: 'Cold shower to start the day', why: 'Proof you do hard things before 9am' },
+    { text: 'One real meal, cooked', why: 'Fuel for the work, not around it' },
+    { text: 'Read 20 minutes, no screen', why: 'A brain that consumes well builds well' },
+    { text: 'Zero snooze, up first alarm', why: 'The day belongs to you from minute one' },
+    { text: 'Plan tomorrow before bed', why: 'A decided morning cannot be stolen' }
   ];
 
   function openSetup() {
@@ -403,19 +409,27 @@ const PerfectWeek = (() => {
         '<div class="pwk__mark">' + markSvg(16) + '</div>' +
         '<h1 class="pwk__title">Your conditions.</h1>' +
         '<p class="pwk__creed">The move is the goal. These are the terms you live it on. None of them are easy. That&rsquo;s the point.</p>' +
-        '<div id="pwkConds"><p class="pwk__wait">Building your conditions&hellip;</p></div>' +
-        '<div class="pwk__q" style="margin-top:22px">Last week, how many days did you actually work on this?</div>' +
-        '<div class="pwk__slider">' +
-          '<div class="pwk__sval" id="pwkSval" aria-hidden="true">&ndash;</div>' +
-          '<input type="range" class="pwk__range" id="pwkRange" min="0" max="7" step="1" value="0" aria-label="Days worked last week, 0 to 7">' +
-          '<div class="pwk__smarks" aria-hidden="true"><span>0</span><span>7</span></div>' +
+        '<div id="pwkStep1">' +
+          '<div id="pwkConds"><p class="pwk__wait">Building your conditions&hellip;</p></div>' +
+          '<div class="pwk__nav">' +
+            '<button type="button" class="pwk__skip" id="pwkSkip">Not this week</button>' +
+            '<button type="button" class="pwk__go" id="pwkNext" disabled>Continue</button>' +
+          '</div>' +
         '</div>' +
-        '<div class="pwk__nav">' +
-          '<button type="button" class="pwk__skip" id="pwkSkip">Not this week</button>' +
-          '<button type="button" class="pwk__hold" id="pwkHold" disabled aria-label="Hold for three seconds to start your week">' +
-            '<span class="pwk__hold-fill" aria-hidden="true"></span>' +
-            '<span class="pwk__hold-label">Hold to start the week</span>' +
-          '</button>' +
+        '<div id="pwkStep2" hidden>' +
+          '<div class="pwk__q" style="margin-top:6px">Last week, how many days did you actually work on this?</div>' +
+          '<div class="pwk__slider">' +
+            '<div class="pwk__sval" id="pwkSval" aria-hidden="true">&ndash;</div>' +
+            '<input type="range" class="pwk__range" id="pwkRange" min="0" max="7" step="1" value="0" aria-label="Days worked last week, 0 to 7">' +
+            '<div class="pwk__smarks" aria-hidden="true"><span>0</span><span>7</span></div>' +
+          '</div>' +
+          '<div class="pwk__nav">' +
+            '<button type="button" class="pwk__skip" id="pwkSkip2">Not this week</button>' +
+            '<button type="button" class="pwk__hold" id="pwkHold" disabled aria-label="Hold for three seconds to start your week">' +
+              '<span class="pwk__hold-fill" aria-hidden="true"></span>' +
+              '<span class="pwk__hold-label">Hold to start the week</span>' +
+            '</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(el);
@@ -426,8 +440,20 @@ const PerfectWeek = (() => {
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
 
     const holdBtn = el.querySelector('#pwkHold');
+    const nextBtn = el.querySelector('#pwkNext');
     const countOn = () => Object.keys(picked).filter((k) => picked[k]).length;
-    const syncHold = () => { holdBtn.disabled = !(baselineDays !== null && countOn() >= 2); };
+    const syncHold = () => {
+      if (nextBtn) nextBtn.disabled = countOn() < 2;
+      holdBtn.disabled = !(baselineDays !== null && countOn() >= 2);
+    };
+    nextBtn.addEventListener('click', () => {
+      el.querySelector('#pwkStep1').hidden = true;
+      el.querySelector('#pwkStep2').hidden = false;
+      const t = el.querySelector('.pwk__title'); if (t) t.textContent = 'One honest number.';
+      const cr = el.querySelector('.pwk__creed'); if (cr) cr.textContent = 'So day 7 can show you the difference.';
+      try { el.querySelector('.pwk__col').scrollTop = 0; } catch (e) {}
+    });
+    el.querySelector('#pwkSkip2').addEventListener('click', close);
 
     function renderConds(list) {
       conds = list;

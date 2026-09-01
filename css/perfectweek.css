@@ -407,3 +407,7 @@
 .pwm__n i { font-style: normal; font-size: 15px; color: rgba(var(--ink), 0.45); }
 .pwm__l { font-size: 11.5px; font-weight: 600; color: rgba(var(--ink), 0.5); }
 .pwk__opt-note { font-size: 12px; font-weight: 500; color: rgba(var(--ink), 0.4); }
+
+#pwkStep1[hidden], #pwkStep2[hidden] { display: none; }
+#pwkStep1, #pwkStep2 { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+#pwkConds { overflow-y: auto; -webkit-overflow-scrolling: touch; }
