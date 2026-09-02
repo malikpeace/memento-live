@@ -259,6 +259,9 @@
 /* The intro rides the app's action-intro recipe (css/clarity.css) verbatim.
    Three lines instead of four, so the button lands right after line 3
    finishes reading (same fade + comet orbit, earlier clock). */
+/* the Action intro's orbiting shimmer is NOT part of the Protocol (Malik, 2026-09-02) */
+.pwk .action-intro__btn-pill::before,
+.pwk .action-intro__btn-pill::after { display: none !important; animation: none !important; }
 .pwk .action-intro__btn-pill {
   animation: clarityIntroFade 0.5s ease 5.6s forwards, orbit 3.6s linear 5.6s infinite;
 }
