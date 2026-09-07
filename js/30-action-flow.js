@@ -793,6 +793,86 @@
       return MON[d.getMonth()] + ' ' + d.getDate();
     } catch (e) { return iso; }
   }
+  // ===========================================================================
+  // THE FINISH LINE (v1349, QA-gated). A plan may carry `finish`: the date its
+  // own math lands on, an estimate until the person keeps it or picks their
+  // own. Habit plans carry none and render nothing. The decision lives in
+  // finish.user; the AI never writes it. setFinish is the one door.
+  // ===========================================================================
+  var ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+  function finishInfo(plan) {
+    var f = plan && plan.finish;
+    if (!f || typeof f !== 'object') return null;
+    if (!(typeof f.date === 'string' && ISO_RE.test(f.date))) return null;
+    return f;
+  }
+  function finishLiveDate(plan) {
+    var f = finishInfo(plan);
+    if (!f) return '';
+    if (f.user && typeof f.user.date === 'string' && ISO_RE.test(f.user.date)) return f.user.date;
+    return f.date;
+  }
+  function finishDecided(plan) {
+    var f = finishInfo(plan);
+    return !!(f && f.user && typeof f.user.date === 'string' && ISO_RE.test(f.user.date));
+  }
+  // What a picked date costs, in the plan's own unit. Plain arithmetic on
+  // numbers the plan already carries, nothing invented. Empty when the plan
+  // has no rate to compare against. It informs; it never blocks.
+  function finishCostLine(plan, iso) {
+    var f = finishInfo(plan);
+    if (!f || !f.remaining || !f.rate) return '';
+    var left = Number(f.remaining.value), planRate = Number(f.rate.value);
+    if (!isFinite(left) || !isFinite(planRate) || planRate <= 0) return '';
+    var days = daysUntil(iso);
+    if (days <= 0) return 'That date is today. Pick one ahead of you.';
+    var need = left / (days / 7);
+    var unit = String(f.remaining.unit || '').trim();
+    var fmt = function (n) { return String(Math.round(n * 10) / 10); };
+    var line = 'That\u2019s ' + fmt(need) + (unit ? ' ' + unit : '') + ' a week. The plan runs ' + fmt(planRate) + '.';
+    var safe = Number(f.safe);
+    if (isFinite(safe) && safe > 0 && need > safe) line += ' Safe is ' + fmt(safe) + '. Your call.';
+    else if (need > planRate) line += ' Faster than the math. Your call.';
+    else line += ' Slower, and it holds.';
+    return line;
+  }
+  function setFinish(iso) {
+    var st = S();
+    if (!st || !(typeof iso === 'string' && ISO_RE.test(iso))) return null;
+    var p = st.actionPlan;
+    if (!p || !finishInfo(p)) return null;
+    p.finish.user = { date: iso, at: Date.now() };
+    p.deadline = iso;
+    try { var pn = G('persistNow'); if (pn) pn(); } catch (e) {}
+    return iso;
+  }
+  // The phone's own date picker, nothing custom. The input lives for one
+  // pick and leaves. Called only inside a tap, so showPicker is allowed.
+  function finishPicker(startIso, onPick) {
+    var inp = document.createElement('input');
+    inp.type = 'date';
+    inp.className = 'afl-fin__picker';
+    inp.setAttribute('aria-label', 'Pick your finish date');
+    if (startIso) inp.value = startIso;
+    try { inp.min = dayKey(new Date()); } catch (e) {}
+    document.body.appendChild(inp);
+    var done = false;
+    var leave = function () {
+      if (done) return;
+      done = true;
+      setTimeout(function () { try { inp.remove(); } catch (e) {} }, 500);
+    };
+    inp.addEventListener('change', function () {
+      var v = inp.value;
+      if (ISO_RE.test(v)) { try { onPick(v); } catch (e) {} }
+      leave();
+    });
+    inp.addEventListener('blur', function () { setTimeout(leave, 250); });
+    try {
+      if (typeof inp.showPicker === 'function') inp.showPicker();
+      else { inp.focus(); inp.click(); }
+    } catch (e) { try { inp.focus(); inp.click(); } catch (e2) {} }
+  }
   // the clock time a thing happened. No argument = now; a reopened closed day
   // passes the time it was actually held.
   function stamp(at) {
@@ -3059,6 +3139,54 @@
         if (at > -1 && nnChosen.indexOf(at) < 0 && nnChosen.length < 2) nnChosen.push(at);
       });
     } catch (e) {}
+    // ---- THE FINISH LINE (v1349) -------------------------------------------
+    // Frames the standards: the date first, then what they hold to reach it.
+    // Asked once, like the non-negotiables; the reference view shows it as a
+    // quiet row with a tap to change (below, next to the rhythm row).
+    var fin = finishInfo(plan);
+    var finOn = !refOnly && !!fin;
+    var finPick = finishDecided(plan) ? finishLiveDate(plan) : '';
+    var finPaint = function () {};
+    if (finOn) {
+      var finWrap = el('div', 'afl-nn afl-fin');
+      finWrap.appendChild(el('p', 'afl-nn__lead', 'Your finish line.'));
+      var finSub = el('p', 'afl-nn__sub');
+      finSub.appendChild(el('b', null, dateLabel(fin.date) + '.'));
+      finSub.appendChild(document.createTextNode(' ' + (fin.source === 'said'
+        ? 'The date you gave.'
+        : 'From your numbers' + (fin.basis ? ': ' + fin.basis : '') + '. An estimate, until you make it yours.')));
+      finWrap.appendChild(finSub);
+      var finList = el('div', 'afl-nn__list');
+      var keepB = btn('afl-nn__a', 'Keep ' + dateLabel(fin.date));
+      var ownB = btn('afl-nn__a', 'Pick my own');
+      keepB.setAttribute('role', 'radio');
+      ownB.setAttribute('role', 'radio');
+      var finCost = el('p', 'afl-fin__cost');
+      finCost.hidden = true;
+      finPaint = function () {
+        var kept = !!finPick && finPick === fin.date;
+        var own = !!finPick && !kept;
+        keepB.classList.toggle('is-on', kept);
+        keepB.setAttribute('aria-pressed', kept ? 'true' : 'false');
+        ownB.classList.toggle('is-on', own);
+        ownB.setAttribute('aria-pressed', own ? 'true' : 'false');
+        ownB.textContent = own ? dateLabel(finPick) : 'Pick my own';
+        var cost = own ? finishCostLine(plan, finPick) : '';
+        finCost.textContent = cost;
+        finCost.hidden = !cost;
+        gateSync();
+      };
+      keepB.addEventListener('click', function () { finPick = fin.date; finPaint(); });
+      ownB.addEventListener('click', function () {
+        finishPicker(finPick || fin.date, function (iso) { finPick = iso; finPaint(); });
+      });
+      finList.appendChild(keepB);
+      finList.appendChild(ownB);
+      finWrap.appendChild(finList);
+      finWrap.appendChild(finCost);
+      box.appendChild(finWrap);
+      finPaint();
+    }
     if (refOnly) {
       // THE REFERENCE VIEW. Only what they actually hold, and nothing to tap.
       // The five they passed over are not their standard, so they are not on
@@ -3077,6 +3205,21 @@
       // among the others: how often Memento asks where they are, and a tap to
       // change it. Only on a plan that asks at all; the sheet writes through
       // ActionFlow.setCadencePref, the one door for this.
+      if (fin) {
+        var finRow = btn('afl-rhy afl-rhy--fin');
+        finRow.appendChild(el('span', 'afl-rhy__l', 'Finish line'));
+        var finVal = el('span', 'afl-rhy__v', dateLabel(finishLiveDate(plan)));
+        finRow.appendChild(finVal);
+        finRow.setAttribute('aria-label', 'Finish line ' + dateLabel(finishLiveDate(plan)) + '. Change it.');
+        finRow.addEventListener('click', function () {
+          finishPicker(finishLiveDate(plan), function (iso) {
+            try { setFinish(iso); } catch (e) {}
+            if (plan.finish) { plan.finish.user = { date: iso, at: Date.now() }; plan.deadline = iso; }
+            finVal.textContent = dateLabel(iso);
+          });
+        });
+        box.appendChild(finRow);
+      }
       try { var rr = rhythmRow(); if (rr) box.appendChild(rr); } catch (e) {}
     } else if (nnCands.length) {
       var nnWrap = el('div', 'afl-nn');
@@ -3300,7 +3443,7 @@
       }
       // a plan with no candidates (anything written before schema v1.1) has no
       // picker on the page, so this half is simply always satisfied.
-      function picked() { return !nnOn || nnChosen.length >= 1; }
+      function picked() { return (!nnOn || nnChosen.length >= 1) && (!finOn || !!finPick); }
       function gatesPass() { return eligible && picked(); }
       gateSync = function () {
         if (!eligible && gateProgress() >= GATE) eligible = true;
@@ -3338,6 +3481,14 @@
             var lp = livePlan();
             if (lp && lp !== plan && lp.nonNegotiables) lp.nonNegotiables.chosen = plan.nonNegotiables.chosen.slice();
             var pn = G('persistNow'); if (pn) pn();
+          }
+          // THE DATE IS WRITTEN AT AGREE TIME too: kept or picked, it is theirs.
+          if (finOn && finPick && plan.finish) {
+            plan.finish.user = { date: finPick, at: Date.now() };
+            plan.deadline = finPick;
+            var lp2 = livePlan();
+            if (lp2 && lp2 !== plan && lp2.finish) { lp2.finish.user = { date: finPick, at: Date.now() }; lp2.deadline = finPick; }
+            var pn2 = G('persistNow'); if (pn2) pn2();
           }
         } catch (e) {}
         if (typeof opts.onAgree === 'function') opts.onAgree();
@@ -5235,6 +5386,8 @@
     // weekly | custom (custom needs days, 0=Sunday). Documented in
     // ACTION-PLAN-SCHEMA.md.
     setCadencePref: function (pref) { return applyCadencePref(pref); },
+    setFinish: function (iso) { return setFinish(iso); },
+    finishDate: function () { try { return finishLiveDate(livePlan()); } catch (e) { return ''; } },
     cadencePref: livePref,
     CADENCE_CHIPS: CADENCE_CHIPS,
     baselineFrom: baselineFrom,

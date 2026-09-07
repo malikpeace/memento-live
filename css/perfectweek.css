@@ -413,4 +413,29 @@
 
 #pwkStep1[hidden], #pwkStep2[hidden] { display: none; }
 #pwkStep1, #pwkStep2 { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-#pwkConds { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#pwkConds { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+#pwkConds > .pwk__chips { flex: 0 0 auto; }
+
+/* ---------- the wait (v1350): Action's loading recipe, worn here ---------- */
+/* .afl-ld__head / __clk / __state / __fact / __src / __say / __ticks come from
+   css/action.css verbatim; this file only lays them into the pwk column and
+   parks the breathing M where the button will be. */
+.pwk-ld { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; transition: opacity 0.45s ease; }
+.pwk-ld.is-gone { opacity: 0; }
+.pwk-ld .afl-ld__stage { padding-bottom: 12px; }
+.pwk .afl-ld__m {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: calc(var(--safe-b, 0px) + 60px); width: 21px; height: 22px; z-index: 5;
+  color: rgba(var(--ink), 1); pointer-events: none;
+  animation: aflBreathe 4s ease-in-out infinite alternate;
+}
+.pwk .afl-ld__m svg { display: block; }
+.pwk__nav { transition: opacity 0.5s ease; }
+.pwk__nav.is-waiting { opacity: 0; pointer-events: none; }
+.pwk__go:disabled { opacity: 0.4; cursor: default; }
+.pwk__chips { opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 0.8, 0.3, 1); }
+.pwk__chips.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .pwk .afl-ld__m { animation: none; opacity: 0.35; }
+  .pwk__chips { opacity: 1; transform: none; transition: none; }
+}

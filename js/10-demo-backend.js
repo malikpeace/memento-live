@@ -859,6 +859,19 @@ DEMO_LOGIC.weight = {
   restLine: 'Rest is part of it. See you tomorrow.'
 };
 
+// v1349: the finish line the weight plan's own math lands on (35 lb at the
+// 410-a-day gap = about 300 days), dated from today so the demo never stales.
+try {
+  (function () {
+    var d = new Date(); d.setDate(d.getDate() + 300);
+    var iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    DEMO_LOGIC.weight.finish = {
+      date: iso, source: 'estimate', basis: '35 lb at 0.8 lb a week',
+      remaining: { value: 35, unit: 'lb' }, rate: { value: 0.8, unit: 'lb', per: 'week' }, safe: 2
+    };
+  })();
+} catch (e) {}
+
 const DEMO_DEPTH = {
   screentime: {
     sync: { type: 'maintenance' },
@@ -1337,6 +1350,7 @@ function buildDemoState(personaKey) {
         parts: null, verb: 'do',
         sendWindow: L.sendWindow || 'morning',
         deadline: null, offDays: null,
+        finish: L.finish || null,
         sessionsPerWeek: Math.max(1, Math.round(((DEMO_DEPTH[personaKey] && DEMO_DEPTH[personaKey].target) || 0.6) * 7)),
         createdAt: _demoISO(45),
         landedAt: started,

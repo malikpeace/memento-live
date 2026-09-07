@@ -1970,6 +1970,7 @@ const CreatorTools = {
         <div class="creator-box__divider">Stages &amp; animations</div>
         <button class="creator-box__btn" id="creatorDayCounter">Day counter (tap to cycle)</button>
         <button class="creator-box__btn" id="creatorPerfectWeek">Perfect Week setup</button>
+        <button class="creator-box__btn" id="creatorFinishBeat">Finish line beat</button>
         <button class="creator-box__btn" id="creatorJumpBlankCard">Blank card</button>
         <button class="creator-box__btn" id="creatorJumpUnlock">Evolution 1 · cyan (Clarity)</button>
         <button class="creator-box__btn" id="creatorJumpEvoPlat">Evolution 2 · platinum (Action)</button>
@@ -2138,6 +2139,19 @@ const CreatorTools = {
       } catch (e) {}
     });
     bind('creatorPerfectWeek', () => { try { if (window.PerfectWeek) PerfectWeek.open(); } catch (e) {} });
+    // v1349 QA: the finish-line confirm beat, first-visit mode. Needs a plan
+    // that carries `finish` (the weight demo does); elsewhere it opens the
+    // weight demo first.
+    bind('creatorFinishBeat', () => {
+      try {
+        const p = state.actionPlan;
+        if (!p || !p.finish) { location.href = location.pathname + '?demo=weight&cc=1'; return; }
+        p.agreedAt = null;
+        const recs = state.dayRecords || {};
+        Object.keys(recs).forEach((k) => { if (recs[k] && recs[k].starHash === p.starHash) delete recs[k]; });
+        if (window.ActionFlow && ActionFlow.openLogic) ActionFlow.openLogic(null, {});
+      } catch (e) {}
+    });
     bind('creatorJumpBlankCard', () => this.jumpBlankCard());
     bind('creatorJumpUnlock', () => this.jumpUnlockCinema());
     bind('creatorJumpEvoPlat', () => this.jumpEvoColour('evo2-plat', 'action'));

@@ -6167,6 +6167,17 @@ html.theme-light .afl-cd__d:not(.is-on) { color: rgba(var(--ink), 0.70); }
 .afl-rhy:active .afl-rhy__v { color: rgba(var(--ink), 0.72); }
 .afl-rhy:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; }
 
+/* THE FINISH LINE (v1349). Same ruled rows as the non-negotiables; the cost
+   line is body copy at the page's own alpha, never dimmed. The picker is the
+   phone's own, parked out of sight for the one tap it lives for. */
+/* the section below brings its own top rule; a bottom rule here doubled it */
+.afl-fin .afl-nn__a:last-child { box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12); }
+.afl-fin__cost { margin: 12px 0 0; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92); text-wrap: pretty; }
+.afl-fin__picker {
+  position: fixed; left: 50%; bottom: 24%; width: 1px; height: 1px;
+  opacity: 0.01; border: 0; padding: 0; margin: 0; pointer-events: none;
+}
+
 /* END: THE ACTION FLOW appended section */
 
 /* ---- LIGHT MODE CONTRAST PASS -------------------------------------------

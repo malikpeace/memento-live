@@ -394,6 +394,26 @@ const PerfectWeek = (() => {
     { text: 'Plan tomorrow before bed', why: 'A decided morning cannot be stolen' }
   ];
 
+  // What the wait shows: their own words, the way Action's loading screen does.
+  // Nothing invented; a person with less on file sees fewer lines, never filler.
+  function loadingFacts() {
+    const f = [];
+    try {
+      const a = (state.clarity && state.clarity.answers) || {};
+      const p = state.actionPlan || {};
+      const star = String(a.neutronStar || p.star || '').trim();
+      if (star) f.push({ s: 'Your goal, in your words.', t: star, q: true });
+      const move = p.acts && p.acts[0] && String(p.acts[0].text || '').trim();
+      if (move) f.push({ s: 'Your move.', t: move });
+      const why = String(a.coreWhy || '').trim();
+      if (why) f.push({ s: 'Why it matters, you said.', t: why, q: true });
+      const nn = (p.nonNegotiables && Array.isArray(p.nonNegotiables.chosen)) ? p.nonNegotiables.chosen : [];
+      nn.slice(0, 2).forEach((t) => { if (t) f.push({ s: 'Your non-negotiable.', t: String(t) }); });
+    } catch (e) {}
+    f.push({ s: 'The bar.', t: 'None of these will be easy. Hard next to hard, and you choose.' });
+    return f;
+  }
+
   function openSetup() {
     if (root) return;
     let baselineDays = null;
@@ -410,8 +430,23 @@ const PerfectWeek = (() => {
         '<h1 class="pwk__title">Your conditions.</h1>' +
         '<p class="pwk__creed">The move is the goal. These are the terms you live it on. None of them are easy. That&rsquo;s the point.</p>' +
         '<div id="pwkStep1">' +
-          '<div id="pwkConds"><p class="pwk__wait">Building your conditions&hellip;</p></div>' +
-          '<div class="pwk__nav">' +
+          '<div id="pwkConds">' +
+            // THE LOADING RECIPE, Action's own (js/30 openLoading, css .afl-ld__*):
+            // elapsed clock, the honest wait line, their own words cycling with
+            // ticks, the M breathing where the button will be. Ported verbatim,
+            // nothing new invented (Malik, 2026-09-07: "similar to how whenever
+            // the action plan is loading, it looks really cool").
+            '<div class="pwk-ld" id="pwkLd">' +
+              '<div class="afl-ld__head"><h4>Writing them now.</h4><p class="afl-ld__clk" id="pwkClk">0:00</p></div>' +
+              '<p class="afl-ld__state" id="pwkLdState">This usually takes about a minute.</p>' +
+              '<div class="afl-ld__stage">' +
+                '<div class="afl-ld__layer"><div class="afl-ld__fact" id="pwkFact"><p class="afl-ld__src" id="pwkSrc"></p><p class="afl-ld__say" id="pwkSay"></p></div></div>' +
+                '<div class="afl-ld__ticks" id="pwkTicks"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="afl-ld__m" id="pwkLdM" aria-hidden="true">' + markSvg(21) + '</div>' +
+          '<div class="pwk__nav is-waiting" id="pwkNav1">' +
             '<button type="button" class="pwk__skip" id="pwkSkip">Not this week</button>' +
             '<button type="button" class="pwk__go" id="pwkNext" disabled>Continue</button>' +
           '</div>' +
@@ -477,14 +512,90 @@ const PerfectWeek = (() => {
       });
       syncHold();
     }
+    // ---- the wait, run like Action's loading screen ----------------------
+    const LD_HOLD = 6000;
+    const LD_STATES = ['This usually takes about a minute.',
+      'Still writing. This one is taking longer. You have big plans lol',
+      'Still writing... almost done I promise.'];
+    const ldTimers = [];
+    const ldAt = (ms, fn) => { ldTimers.push(setTimeout(fn, ms)); };
+    const ldBox = el.querySelector('#pwkLd');
+    const ldClk = el.querySelector('#pwkClk');
+    const ldState = el.querySelector('#pwkLdState');
+    const ldFact = el.querySelector('#pwkFact');
+    const ldSrc = el.querySelector('#pwkSrc');
+    const ldSay = el.querySelector('#pwkSay');
+    const ldTicks = el.querySelector('#pwkTicks');
+    const ldM = el.querySelector('#pwkLdM');
+    const nav1 = el.querySelector('#pwkNav1');
+    const FACTS = loadingFacts();
+    const ticks = FACTS.map(() => { const t = document.createElement('i'); ldTicks.appendChild(t); return t; });
+    const t0 = Date.now();
+    let ldIdx = 0, ldPass = 0, landed = false;
+    const clkT = setInterval(() => {
+      const sec = Math.floor((Date.now() - t0) / 1000);
+      ldClk.textContent = Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2);
+      const k = sec >= 120 ? 2 : (sec >= 60 ? 1 : 0);
+      if (ldState.textContent !== LD_STATES[k]) {
+        ldState.classList.add('is-swap');
+        ldAt(450, () => { ldState.textContent = LD_STATES[k]; ldState.classList.remove('is-swap'); });
+      }
+    }, 1000);
+    const ldShow = () => {
+      if (!FACTS.length || landed) return;
+      const f = FACTS[ldIdx];
+      ldFact.classList.toggle('is-calm', ldPass > 0);
+      ldSrc.textContent = f.s;
+      ldSay.textContent = '';
+      if (f.q) {
+        const o = document.createElement('span'); o.className = 'afl-ld__mk'; o.textContent = '\u201c';
+        const c = document.createElement('span'); c.className = 'afl-ld__mk'; c.textContent = '\u201d';
+        ldSay.appendChild(o); ldSay.appendChild(document.createTextNode(f.t)); ldSay.appendChild(c);
+      } else ldSay.textContent = f.t;
+      ticks.forEach((t, k) => t.classList.toggle('is-on', k <= ldIdx));
+      ldAt(20, () => ldFact.classList.add('is-on'));
+      ldAt(LD_HOLD - 600, () => ldFact.classList.remove('is-on'));
+      ldAt(LD_HOLD, () => { ldIdx++; if (ldIdx >= FACTS.length) { ldIdx = 0; ldPass++; } ldShow(); });
+    };
+    ldShow();
+    const land = (list) => {
+      if (landed || root !== el) return;
+      landed = true;
+      // never a flash: the wait shows for at least a beat even when the
+      // brain answers fast
+      const wait = Math.max(0, 1400 - (Date.now() - t0));
+      setTimeout(() => {
+        if (root !== el) return;
+        ldTimers.forEach(clearTimeout);
+        clearInterval(clkT);
+        ldBox.classList.add('is-gone');
+        try {
+          let now = '1';
+          try { now = getComputedStyle(ldM).opacity; } catch (e) {}
+          ldM.style.animation = 'none';
+          ldM.style.opacity = now;
+          void ldM.offsetWidth;
+          ldM.style.transition = 'opacity 400ms ease-in';
+          ldM.style.opacity = '0';
+        } catch (e) {}
+        setTimeout(() => {
+          if (root !== el) return;
+          try { ldM.remove(); } catch (e) {}
+          renderConds(list);
+          const chips = el.querySelector('.pwk__chips');
+          if (chips) { void chips.offsetWidth; chips.classList.add('is-in'); }
+          nav1.classList.remove('is-waiting');
+        }, 460);
+      }, wait);
+    };
     try {
       if (typeof perfectWeekConditionsGenerate === 'function') {
         perfectWeekConditionsGenerate().then(
-          (list) => { if (root === el) renderConds(list); },
-          () => { if (root === el) renderConds(FALLBACK.slice()); }
+          (list) => land(list),
+          () => land(FALLBACK.slice())
         );
-      } else renderConds(FALLBACK.slice());
-    } catch (e) { renderConds(FALLBACK.slice()); }
+      } else land(FALLBACK.slice());
+    } catch (e) { land(FALLBACK.slice()); }
 
     const range = el.querySelector('#pwkRange');
     const sval = el.querySelector('#pwkSval');
