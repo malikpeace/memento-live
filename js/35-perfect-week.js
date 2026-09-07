@@ -24,8 +24,16 @@ const PerfectWeek = (() => {
 
   function data() { return (state && state.perfectWeek) || null; }
 
+  // THE WEEK LIVES IN THE LEDGER'S DAY (v1352). The move ledger keys days at
+  // 4am (v1004: one day boundary, a 1am session belongs to the evening
+  // before). The week used the midnight calendar day, so between 00:00 and
+  // 04:00 a held move lit yesterday's square while the face said today. Same
+  // clock now, everywhere in this file.
   function todayKey() {
-    try { return (typeof getTodayISO === 'function') ? getTodayISO() : ''; } catch (e) { return ''; }
+    try {
+      if (typeof actionDayKey === 'function') return actionDayKey(new Date());
+      return (typeof getTodayISO === 'function') ? getTodayISO() : '';
+    } catch (e) { return ''; }
   }
 
   // Day 1..7 while a week is live; 0 before start; >7 after it ends.
@@ -72,6 +80,20 @@ const PerfectWeek = (() => {
       try {
         if (moveDoneOn(start)) days[start] = { move: true };
       } catch (e) {}
+      // A finished week is proof, never overwritten: it moves to the log
+      // (newest first, capped) before the new one starts. A week that ended
+      // under 5 and is being run back marks the new one, so Run it back is
+      // offered once, never as a loop.
+      const prev = state.perfectWeek;
+      let rerun = false;
+      try {
+        if (prev && prev.completedAt) {
+          state.perfectWeekLog = Array.isArray(state.perfectWeekLog) ? state.perfectWeekLog : [];
+          state.perfectWeekLog.unshift(prev);
+          state.perfectWeekLog = state.perfectWeekLog.slice(0, 12);
+          rerun = prev.endedAs === 'under' && !prev.rerun;
+        }
+      } catch (e) {}
       state.perfectWeek = {
         startedAt: Date.now(),
         startDay: start,
@@ -80,7 +102,7 @@ const PerfectWeek = (() => {
         days: days,
         completedAt: null,
         endedAs: null,
-        rerunOffered: false,
+        rerun: rerun,
         v: 1
       };
       persistNow();
@@ -303,7 +325,7 @@ const PerfectWeek = (() => {
         '<div class="pwk__q" style="margin-top:18px">What did you get done this week? <span class="pwk__opt-note">optional</span></div>' +
         '<input type="text" class="pwk__input" id="pwmDid" maxlength="90" placeholder="In your words" autocomplete="off">' +
         '<div class="pwk__nav">' +
-          (ended === 'under' ? '<button type="button" class="pwk__skip" id="pwmRerun">Run it back</button>' : '') +
+          (ended === 'under' && !d.rerun ? '<button type="button" class="pwk__skip" id="pwmRerun">Run it back</button>' : '') +
           '<button type="button" class="pwk__go" id="pwmKeep">Keep the rhythm</button>' +
         '</div>' +
       '</div>';
