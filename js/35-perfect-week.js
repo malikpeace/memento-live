@@ -492,7 +492,8 @@ const PerfectWeek = (() => {
 
     function renderConds(list) {
       conds = list;
-      list.forEach((c, i) => { if (picked[i] === undefined) picked[i] = i < 3; });
+      // nothing preselected (Malik, 2026-09-07): the pick is theirs, from zero
+      list.forEach((c, i) => { if (picked[i] === undefined) picked[i] = false; });
       const host = el.querySelector('#pwkConds');
       if (!host) return;
       host.innerHTML = '<div class="pwk__chips">' + list.map((c, i) =>
@@ -503,7 +504,6 @@ const PerfectWeek = (() => {
       host.querySelectorAll('[data-i]').forEach((b) => {
         b.addEventListener('click', () => {
           const i = b.getAttribute('data-i');
-          if (picked[i] && countOn() <= 2) return;
           picked[i] = !picked[i];
           b.classList.toggle('is-on', picked[i]);
           b.setAttribute('aria-pressed', picked[i] ? 'true' : 'false');
