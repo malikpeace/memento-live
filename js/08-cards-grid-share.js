@@ -1971,6 +1971,8 @@ const CreatorTools = {
         <button class="creator-box__btn" id="creatorDayCounter">Day counter (tap to cycle)</button>
         <button class="creator-box__btn" id="creatorPerfectWeek">Perfect Week setup</button>
         <button class="creator-box__btn" id="creatorFinishBeat">Finish line beat</button>
+        <button class="creator-box__btn" id="creatorPWDay">Protocol +1 day</button>
+        <button class="creator-box__btn" id="creatorPWEnd">Protocol: finish week</button>
         <button class="creator-box__btn" id="creatorJumpBlankCard">Blank card</button>
         <button class="creator-box__btn" id="creatorJumpUnlock">Evolution 1 · cyan (Clarity)</button>
         <button class="creator-box__btn" id="creatorJumpEvoPlat">Evolution 2 · platinum (Action)</button>
@@ -2139,6 +2141,17 @@ const CreatorTools = {
       } catch (e) {}
     });
     bind('creatorPerfectWeek', () => { try { if (window.PerfectWeek) PerfectWeek.open(); } catch (e) {} });
+    // v1353 QA: walk a live week from the phone. +1 day moves the start one
+    // day earlier (yesterday becomes held unless the move was done); finish
+    // jumps past day 7 and raises the milestone.
+    const pwShift = (days) => {
+      const d = state.perfectWeek; if (!d || !d.startDay) return false;
+      const dt = new Date(d.startDay + 'T12:00:00'); dt.setDate(dt.getDate() - days);
+      d.startDay = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      persistNow(); return true;
+    };
+    bind('creatorPWDay', () => { try { if (pwShift(1)) renderAll(); } catch (e) {} });
+    bind('creatorPWEnd', () => { try { const d = state.perfectWeek; if (!d) return; d.completedAt = null; pwShift(Math.max(0, 8 - PerfectWeek.dayNumber())); renderAll(); PerfectWeek.maybeMilestone(); } catch (e) {} });
     // v1349 QA: the finish-line confirm beat, first-visit mode. Needs a plan
     // that carries `finish` (the weight demo does); elsewhere it opens the
     // weight demo first.
@@ -6536,6 +6549,9 @@ function bindCommandCenter(cc) {
       if (_lock > 0) cc.style.minHeight = _lock.toFixed(2) + 'px';
     }
   } catch (e) {}
+  // v1353: the Perfect Week Protocol offers itself the moment home is still
+  // after the action lands (once per plan; see js/35 offerable()).
+  try { if (typeof PerfectWeek !== 'undefined' && PerfectWeek.maybeOffer) PerfectWeek.maybeOffer(); } catch (e) {}
 }
 // Daily Memento: a calm, day-stable line at the foot of the dashboard. Mirrors
 // the mockup's bottom quote bar. Picks deterministically by day so it does not

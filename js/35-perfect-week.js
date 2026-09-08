@@ -61,10 +61,40 @@ const PerfectWeek = (() => {
     return '<svg viewBox="140 136 232 240" width="' + sz + '" height="' + Math.round(sz * 240 / 232) + '" aria-hidden="true"><path d="M150 146 L256 252 L362 146 L362 366 L150 366 Z" fill="currentColor"/></svg>';
   }
 
+  // The global back arrow (FullscreenClose) exits via exitToModules, which
+  // knows nothing about this surface; without this the arrow left the
+  // Protocol standing. Bound in capture while our surface is up, released
+  // on close, so the app's own handler never sees the tap.
+  let backBound = null;
+  function armBack() {
+    try {
+      const b = document.getElementById('fullscreenCloseGlobal');
+      if (!b || backBound) return;
+      backBound = (e) => {
+        if (!root) return;
+        try { e.preventDefault(); e.stopPropagation(); } catch (x) {}
+        close();
+      };
+      b.addEventListener('pointerdown', backBound, true);
+      b.addEventListener('click', backBound, true);
+    } catch (e) {}
+  }
+  function disarmBack() {
+    try {
+      const b = document.getElementById('fullscreenCloseGlobal');
+      if (b && backBound) {
+        b.removeEventListener('pointerdown', backBound, true);
+        b.removeEventListener('click', backBound, true);
+      }
+    } catch (e) {}
+    backBound = null;
+  }
+
   function close() {
     const el = root;
     if (!el) return;
     root = null;
+    disarmBack();
     el.classList.remove('pwk--in');
     document.body.style.overflow = '';
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.hide) FullscreenClose.hide(); } catch (e) {}
@@ -97,6 +127,7 @@ const PerfectWeek = (() => {
       state.perfectWeek = {
         startedAt: Date.now(),
         startDay: start,
+        starHash: (state.actionPlan && state.actionPlan.starHash) || 'legacy',
         baselineDays: baselineDays,
         conditions: (conditions || []).map((c, i) => ({ id: 'c' + i, text: c.text, why: c.why || '' })),
         days: days,
@@ -241,6 +272,59 @@ const PerfectWeek = (() => {
       '</div>';
   }
 
+
+  /* ---------- THE LIVE TRIGGER (v1353) ----------
+     Malik's call (2026-09-07): the second they land on home after getting
+     their action. Once per plan. "Not this week" ends the offer for that
+     plan; a started week ends it for good; a NEW plan (new starHash) may
+     offer again after a finished week. Demos, any open surface, a hidden tab
+     and any route but home hold it back, and it simply tries again on the
+     next home render: that is the next-open catch. */
+  let offerTimer = null;
+  function planHash() {
+    try { return (state.actionPlan && state.actionPlan.starHash) || 'legacy'; } catch (e) { return 'legacy'; }
+  }
+  function offerable() {
+    try {
+      if (/[?&]demo=/.test(location.search)) return false;
+      if (!(typeof ClarityPaywall !== 'undefined' && ClarityPaywall.isPaid())) return false;
+      const a = state.action || {};
+      if (!(a.planGenerated && a.primaryAction && a.primaryAction.title)) return false;
+      const p = state.actionPlan;
+      const agreed = !!(p && p.agreedAt) || Object.keys(state.dayRecords || {}).length > 0;
+      if (!agreed) return false;
+      const hash = planHash();
+      const d = data();
+      if (d && (!d.completedAt || d.starHash === hash)) return false;
+      const dis = state.perfectWeekDismissed;
+      if (dis && dis.starHash === hash) return false;
+      if (root || document.hidden) return false;
+      const h = String(location.hash || '').replace(/^#\/?/, '');
+      if (h && h !== 'home') return false;
+      if (document.querySelector('.afl, .pwk, .cn-dlgwrap, .action-intro')) return false;
+      const cover = document.getElementById('cloudRestoreScreen');
+      if (cover) {
+        const cs = getComputedStyle(cover);
+        if (cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.05) return false;
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+  // Called by js/08 after every home render. Debounced: the home paints a
+  // few times on the way in; the intro rises once the room is still.
+  function maybeOffer() {
+    if (offerTimer) return;
+    offerTimer = setTimeout(() => {
+      offerTimer = null;
+      if (offerable()) open();
+    }, 900);
+  }
+  function dismissForPlan() {
+    try {
+      state.perfectWeekDismissed = { starHash: planHash(), at: Date.now() };
+      persistNow();
+    } catch (e) {}
+  }
 
   /* ---------- the day-7 milestone (v1345) ---------- */
   function weekStats() {
@@ -387,6 +471,7 @@ const PerfectWeek = (() => {
     void el.offsetWidth;
     el.classList.add('pwk--in');
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
+    armBack();
     // Tap anywhere before the lines finish: snap everything visible (the
     // intro recipe's own skip class).
     const intro = el.querySelector('#pwkIntro');
@@ -495,6 +580,7 @@ const PerfectWeek = (() => {
     void el.offsetWidth;
     el.classList.add('pwk--in');
     try { if (typeof FullscreenClose !== 'undefined' && FullscreenClose.show) FullscreenClose.show(''); } catch (e) {}
+    armBack();
 
     const holdBtn = el.querySelector('#pwkHold');
     const nextBtn = el.querySelector('#pwkNext');
@@ -510,7 +596,7 @@ const PerfectWeek = (() => {
       const cr = el.querySelector('.pwk__creed'); if (cr) cr.textContent = 'So day 7 can show you the difference.';
       try { el.querySelector('.pwk__col').scrollTop = 0; } catch (e) {}
     });
-    el.querySelector('#pwkSkip2').addEventListener('click', close);
+    el.querySelector('#pwkSkip2').addEventListener('click', () => { dismissForPlan(); close(); });
 
     function renderConds(list) {
       conds = list;
@@ -632,7 +718,7 @@ const PerfectWeek = (() => {
     };
     range.addEventListener('input', syncSlider);
     range.addEventListener('pointerdown', () => { if (baselineDays === null) syncSlider(); });
-    el.querySelector('#pwkSkip').addEventListener('click', close);
+    el.querySelector('#pwkSkip').addEventListener('click', () => { dismissForPlan(); close(); });
 
     let holdTimer = null;
     const HOLD_MS = 3000;
@@ -663,6 +749,6 @@ const PerfectWeek = (() => {
     holdBtn.addEventListener('keyup', cancelHold);
   }
 
-  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday, bindFace, toggleCondition, maybeMilestone, openMilestone };
+  return { open, openSetup, active, dayNumber, data, faceHtml, heldYesterday, bindFace, toggleCondition, maybeMilestone, openMilestone, maybeOffer, offerable };
 })();
 try { window.PerfectWeek = PerfectWeek; } catch (e) {}
