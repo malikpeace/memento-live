@@ -140,6 +140,8 @@ const PerfectWeek = (() => {
     } catch (e) {}
     close();
     try { if (typeof renderAll === 'function') renderAll(); } catch (e) {}
+    // v1354: the one notification ask, now that they have a week to remind.
+    try { if (window.MementoPush && MementoPush.offerAfterProtocol) MementoPush.offerAfterProtocol({ week: true, delay: 1100 }); } catch (e) {}
   }
 
 
@@ -324,6 +326,9 @@ const PerfectWeek = (() => {
       state.perfectWeekDismissed = { starHash: planHash(), at: Date.now() };
       persistNow();
     } catch (e) {}
+    // Not this week still gets the one ask (for the move itself), after the
+    // surface has left.
+    try { if (window.MementoPush && MementoPush.offerAfterProtocol) MementoPush.offerAfterProtocol({ week: false, delay: 700 }); } catch (e) {}
   }
 
   /* ---------- the day-7 milestone (v1345) ---------- */

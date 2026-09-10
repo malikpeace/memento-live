@@ -383,7 +383,16 @@
 
   // Benefit first, plain, and honest about the ceiling: one a day, never at
   // night. This card IS the pre-prompt; the OS prompt only fires on "Turn on".
+  // v1354 (Malik): the ask moved to right after they get the Perfect Week
+  // Protocol, so it arrives with a reason attached. _ctx says which one.
+  var _ctx = null;
   function cardCopy() {
+    if (_ctx && _ctx.week) {
+      return {
+        title: 'Reminders for your week',
+        sub: 'One a day, only if the move is not done yet. Never at night, never spam. They are the difference between a week you finish and a week that quietly disappears.'
+      };
+    }
     return {
       title: 'Get the most out of Memento',
       sub: 'We highly, highly recommend turning on notifications so Memento can keep you on track when things inevitably get tough. We’ll never spam. Only what is useful toward your goal.'
@@ -486,10 +495,31 @@
     }).catch(function () {});
   }
 
-  // Called by js/08 right after the first-white ceremony finishes.
-  function maybePromptAfterFirstWin() {
+  // v1354: THE ONE ASK, after the Protocol. js/35 calls this the moment the
+  // week starts (or the moment they say Not this week), so the permission
+  // question lands after the most value Memento has delivered so far, with
+  // the week's reminders as the reason. Every gate in eligible() still holds
+  // (paid, signed in, installed, never asked).
+  function offerAfterProtocol(opts) {
+    _ctx = opts || null;
     if (FORCE) return showCard();
     if (!eligible()) return;
+    setTimeout(function () { if (eligible()) offerCard(); }, (opts && opts.delay) || 900);
+  }
+  // Has the Protocol moment already happened for this plan? Until it has, the
+  // boot fallback below stays quiet so the ask is never spent early.
+  function protocolDecided() {
+    try {
+      if (!(state.actionPlan && state.actionPlan.starHash)) return true;   // no plan yet: nothing to wait for
+      if (state.perfectWeek) return true;
+      var dis = state.perfectWeekDismissed;
+      return !!(dis && dis.starHash === state.actionPlan.starHash);
+    } catch (e) { return true; }
+  }
+  // Kept for callers; the first-white bloom no longer asks (v1354).
+  function maybePromptAfterFirstWin() {
+    if (FORCE) return showCard();
+    if (!eligible() || !protocolDecided()) return;
     offerCard();
   }
 
@@ -500,15 +530,9 @@
      the card; if they bought in a browser tab (the common path: pay, then
      install), the flag is spent on the first open of the installed app. */
   function armPostPayment() {
+    // v1354: records the debt only. The ask itself waits for the Protocol
+    // moment (offerAfterProtocol); asking at purchase was too soon.
     lsSet(ARM_KEY, '1');
-    if (!isStandalone()) return;
-    var tries = 0;
-    var tick = function () {
-      if (lsGet(ASK_KEY) === '1') return;
-      if (eligible()) { offerCard(); return; }
-      if (tries++ < 40) setTimeout(tick, 1500);  // ~60s: the ceremony's length
-    };
-    setTimeout(tick, 2000);
   }
 
   /* ---- THE IN-APP FALLBACK ASK -------------------------------------------
@@ -695,7 +719,9 @@
       // Paid + installed + never asked: this is the post-payment pre-prompt,
       // whether they bought a minute ago (ARM_KEY, spent here when the
       // purchase happened in a browser tab) or months ago on another device.
-      if (eligible()) { offerCard(); return; }
+      // v1354: only once the Protocol moment has passed for this plan; before
+      // that the ask belongs to js/35, right after they get the Protocol.
+      if (eligible() && protocolDecided()) { offerCard(); return; }
       offerProgressAsk();
     }, 8000);
   }
@@ -731,6 +757,7 @@
       return out;
     },
     maybePromptAfterFirstWin: maybePromptAfterFirstWin,
+    offerAfterProtocol: offerAfterProtocol,
     // js/13 calls this the moment a purchase verifies (notifications phase C).
     armPostPayment: armPostPayment,
     supported: supported,

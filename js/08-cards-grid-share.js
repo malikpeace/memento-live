@@ -7548,8 +7548,8 @@ function renderDayCard() {
           // later re-render can never replay it (adding to a detached wrap is inert)
           setTimeout(() => { try { wrap.classList.add('daycard-firstwhite'); } catch (e) {} }, 520);
           setTimeout(() => { try { wrap.classList.remove('daycard-firstwhite'); } catch (e) {} }, 3600);
-          // The one push-permission ask, right after the win lands (js/20-push).
-          setTimeout(() => { try { window.MementoPush && MementoPush.maybePromptAfterFirstWin(); } catch (e) {} }, 4300);
+          // v1354: the push ask no longer fires here. It lands right after the
+          // Perfect Week Protocol (js/35 -> MementoPush.offerAfterProtocol).
         }
       } catch (e) {}
     } else {
