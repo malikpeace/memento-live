@@ -2750,6 +2750,11 @@ window.addEventListener('keydown', (e) => {
 // swipe) and log one app_open per day for the Activation Point readout (local).
 (function () {
   try { if (window.Analytics) Analytics.track('app_open'); } catch (e) {}
+  // v1363: one app_installed per device, the first time it opens installed.
+  try {
+    var _inst = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    if (_inst && window.Analytics) Analytics.track('app_installed');
+  } catch (e) {}
   try {
     var hint = document.getElementById('homeModulesHint');
     if (hint) hint.addEventListener('click', function () {

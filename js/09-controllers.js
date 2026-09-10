@@ -4967,6 +4967,21 @@ const TabBar = {
         // (Card shape removed v1153, Malik: the tall card is universal until
         // further notice; js/01 forces tall even on accounts that had square.)
       '</div>' +
+      // v1363: the owner's funnel reader. Shown only to the owner's signed-in
+      // account (the server enforces the same list); numbers, never people.
+      ((function () {
+        try {
+          const em = (typeof CloudSync !== 'undefined' && CloudSync.email) ? String(CloudSync.email() || '').toLowerCase() : '';
+          if (!em || MEMENTO_OWNER_EMAILS.indexOf(em) < 0) return '';
+          return '<div class="you-h">Owner</div>' +
+            '<div class="you-card">' +
+              '<div class="pref-row" id="youStatsRow" role="button" tabindex="0" style="cursor:pointer;">' +
+                '<div class="pref-row__text"><div class="pref-row__title">Memento stats</div>' +
+                '<div class="pref-row__sub">Opens, Clarity, paywall, paid, Protocol. Last 7, 30, 90 days.</div></div>' +
+              '</div>' +
+            '</div>';
+        } catch (e) { return ''; }
+      })()) +
       '<div class="you-h">Behavior</div>' +
       '<div class="you-card">' +
         toggleRow('prefReduceMotion', 'Reduce motion', 'Calms the orbiting ring, drifting glow, and ambient motion.', reduceMotion) +
@@ -5229,6 +5244,13 @@ const TabBar = {
       if (on && state.ui) { state.ui.unlockQueue = []; state.ui.pendingReveal = ''; }
       try { if (typeof renderGrid === 'function') renderGrid(); if (typeof renderAll === 'function') renderAll(); } catch (e) {}
     });
+    // v1363: the owner's stats sheet
+    const statsRow = document.getElementById('youStatsRow');
+    if (statsRow) {
+      const openStats = () => { try { openOwnerStats(); } catch (e) {} };
+      statsRow.addEventListener('click', openStats);
+      statsRow.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openStats(); } });
+    }
     // Appearance: Auto / Light / Dark. Runs through applyThemeChange() for
     // the cross-fade; Auto resolves against the device (themeIsLight).
     const themeSeg = document.getElementById('prefThemeMode');
@@ -6935,3 +6957,75 @@ const GrabberTrial = {
     grab.addEventListener('pointercancel', () => { dragging = false; dy = 0; exp.classList.add('is-springing'); exp.style.transform = ''; setTimeout(clear, 460); });
   }
 };
+
+// ===========================================================================
+// v1363: THE OWNER'S STATS SHEET. One fetch to memento-stats (owner-gated on
+// the server), one dialog: the funnel per window with the conversions that
+// matter, plus the Luna vs Sonnet split and how weeks ended.
+// ===========================================================================
+const MEMENTO_OWNER_EMAILS = ['mjpeaceis@gmail.com'];
+async function openOwnerStats() {
+  const wrap = document.createElement('div');
+  wrap.className = 'cn-dlgwrap';
+  wrap.setAttribute('role', 'dialog');
+  wrap.setAttribute('aria-modal', 'true');
+  const box = document.createElement('div');
+  box.className = 'cn-dlg cn-dlg--afl cn-dlg--wide owner-stats';
+  box.innerHTML = '<h4>Memento stats</h4><p class="owner-stats__wait">Reading the numbers.</p>';
+  wrap.appendChild(box);
+  document.body.appendChild(wrap);
+  requestAnimationFrame(() => wrap.classList.add('is-on'));
+  const close = () => { try { wrap.remove(); } catch (e) {} };
+  wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+  const esc2 = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  try {
+    const supaUrl = window.MEMENTO_SUPABASE_URL || '', supaAnon = window.MEMENTO_SUPABASE_ANON || '';
+    const token = (typeof CloudSync !== 'undefined' && CloudSync.accessToken) ? String(CloudSync.accessToken() || '') : '';
+    if (!supaUrl || !token) throw new Error('Sign in first.');
+    const res = await fetch(supaUrl + '/functions/v1/memento-stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'apikey': supaAnon },
+      body: JSON.stringify({ windows: [7, 30, 90] })
+    });
+    if (!res.ok) throw new Error(res.status === 403 ? 'This account is not the owner.' : 'Stats are unavailable right now.');
+    const data = await res.json();
+    const W = data.windows || {};
+    const n = (w, ev) => ((W[w] && W[w].events && W[w].events[ev]) || {}).devices || 0;
+    const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '\u2013';
+    const row = (label, f) => '<tr><td>' + esc2(label) + '</td><td>' + f(7) + '</td><td>' + f(30) + '</td><td>' + f(90) + '</td></tr>';
+    const obj = (w, key) => (W[w] && W[w][key]) || {};
+    const split = (w, key) => { const o = obj(w, key); const ks = Object.keys(o); return ks.length ? ks.map(k => k + ' ' + o[k]).join(', ') : '\u2013'; };
+    let html = '<h4>Memento stats</h4>' +
+      '<table class="owner-stats__t"><thead><tr><th></th><th>7d</th><th>30d</th><th>90d</th></tr></thead><tbody>' +
+      row('People who opened', (w) => n(w, 'app_open')) +
+      row('Installed (home screen)', (w) => n(w, 'app_installed')) +
+      row('Finished onboarding', (w) => n(w, 'onboarding_done')) +
+      row('Started Clarity', (w) => n(w, 'clarity_start')) +
+      row('Got their star', (w) => n(w, 'ceremony_done')) +
+      row('Saw the paywall', (w) => n(w, 'paywall_shown')) +
+      row('Paid', (w) => n(w, 'paywall_unlock')) +
+      row('Plan landed', (w) => n(w, 'plan_landed')) +
+      row('Protocol offered', (w) => n(w, 'protocol_offered')) +
+      row('Protocol started', (w) => n(w, 'protocol_start')) +
+      row('Protocol finished', (w) => n(w, 'protocol_done')) +
+      row('Notifications on', (w) => n(w, 'push_enabled')) +
+      row('Active days (moves done)', (w) => (W[w] && W[w].active_device_days) || 0) +
+      '</tbody></table>' +
+      '<table class="owner-stats__t owner-stats__t--conv"><thead><tr><th>Conversion</th><th>7d</th><th>30d</th><th>90d</th></tr></thead><tbody>' +
+      row('Open to star', (w) => pct(n(w, 'ceremony_done'), n(w, 'app_open'))) +
+      row('Star to paywall', (w) => pct(n(w, 'paywall_shown'), n(w, 'ceremony_done'))) +
+      row('Star to paid', (w) => pct(n(w, 'paywall_unlock'), n(w, 'ceremony_done'))) +
+      row('Paid to Protocol started', (w) => pct(n(w, 'protocol_start'), n(w, 'paywall_unlock'))) +
+      '</tbody></table>' +
+      '<div class="owner-stats__k"><b>Interview model (stars)</b> 30d: ' + esc2(split(30, 'interview')) + '</div>' +
+      '<div class="owner-stats__k"><b>Plans bought</b> 30d: ' + esc2(split(30, 'plans')) + '</div>' +
+      '<div class="owner-stats__k"><b>Weeks ended</b> 30d: ' + esc2(split(30, 'weeks')) + '</div>' +
+      '<p class="owner-stats__note">Counts are distinct devices, not people. Demo personas never count.</p>' +
+      '<button type="button" class="owner-stats__close">Done</button>';
+    box.innerHTML = html;
+    box.querySelector('.owner-stats__close').addEventListener('click', close);
+  } catch (err) {
+    box.innerHTML = '<h4>Memento stats</h4><p class="owner-stats__wait">' + esc2(err && err.message || 'Stats are unavailable right now.') + '</p><button type="button" class="owner-stats__close">Done</button>';
+    box.querySelector('.owner-stats__close').addEventListener('click', close);
+  }
+}

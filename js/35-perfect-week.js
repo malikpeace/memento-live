@@ -124,6 +124,7 @@ const PerfectWeek = (() => {
           rerun = prev.endedAs === 'under' && !prev.rerun;
         }
       } catch (e) {}
+      try { Analytics.track('protocol_start'); } catch (e) {}
       state.perfectWeek = {
         startedAt: Date.now(),
         startDay: start,
@@ -323,13 +324,14 @@ const PerfectWeek = (() => {
     if (offerTimer) return;
     offerTimer = setTimeout(() => {
       offerTimer = null;
-      if (offerable()) open();
+      if (offerable()) { try { Analytics.track('protocol_offered'); } catch (e) {} open(); }
     }, 900);
   }
   function dismissForPlan() {
     try {
       state.perfectWeekDismissed = { starHash: planHash(), at: Date.now() };
       persistNow();
+      try { Analytics.track('protocol_skip'); } catch (e) {}
     } catch (e) {}
     // Not this week still gets the one ask (for the move itself), after the
     // surface has left.
@@ -439,6 +441,7 @@ const PerfectWeek = (() => {
       try {
         d.completedAt = Date.now();
         d.endedAs = ended;
+        try { Analytics.track('protocol_done', { result: ended }); } catch (e) {}
         d.feel = feel;
         d.movesDone = st.done;
         try { d.didLine = String((el.querySelector('#pwmDid') || {}).value || '').trim().slice(0, 90); } catch (e) {}

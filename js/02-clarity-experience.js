@@ -281,7 +281,7 @@ const ClarityExperience = {
     // instead of a blank start. Their diagnostic answers also reach the AI via
     // buildProfileContext; this pre-selects the area as a reversible default.
     try { if (!state.clarity.completed) this._seedFromOnboarding(); } catch (e) {}
-    try { if (typeof Analytics !== 'undefined') Analytics.track('clarity_start'); } catch (e) {} // Funnel
+    try { if (typeof Analytics !== 'undefined') Analytics.track('clarity_start', { interview: (typeof lunaActive === 'function' && lunaActive()) ? 'luna' : 'sonnet' }); } catch (e) {} // Funnel
     this._cinematicOpen();
   },
 

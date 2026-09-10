@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1367';
+window.MEMENTO_JS_BUILD = 'v1368';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -585,6 +585,7 @@ const Analytics = {
       // once per day (we count distinct active days, not raw taps).
       let key = null;
       if (event === 'ceremony_done') key = 'ceremony_done';
+      else if (event === 'app_installed') key = 'app_installed';   // once per device, ever
       else if (event === 'consistency_first_open') key = 'consistency_first_open';
       else if (event === 'app_open' || event === 'action_done') key = event + ':' + day;
       if (key) { if (state.analytics.onceFlags[key]) return; state.analytics.onceFlags[key] = true; }

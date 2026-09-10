@@ -4921,7 +4921,7 @@ async function triggerSynthesis() {
         state.clarity.completed = true;
         if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
         if (state.dev) state.dev.relocked = false;
-        try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
+        try { Analytics.track('ceremony_done', { interview: (typeof lunaActive === 'function' && lunaActive()) ? 'luna' : 'sonnet' }); } catch (e) {} // Activation Point
       }
       persistNow();
     } catch (e) {}
@@ -4944,7 +4944,7 @@ function completeWizard() {
     state.clarity.completed = true;
     if (!state.clarity.completedAt) state.clarity.completedAt = Date.now();
     if (state.dev) state.dev.relocked = false;
-    try { Analytics.track('ceremony_done'); } catch (e) {} // Activation Point
+    try { Analytics.track('ceremony_done', { interview: (typeof lunaActive === 'function' && lunaActive()) ? 'luna' : 'sonnet' }); } catch (e) {} // Activation Point
   }
   delete state.clarity.draft; // Clear saved progress
 
