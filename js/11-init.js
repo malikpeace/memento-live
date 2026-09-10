@@ -908,9 +908,10 @@ function initStarBlob(canvas, size = 240, variant) {
     : Math.min(window.devicePixelRatio || 1, _hero ? 3 : 2);
   const _size = (_lite && !_hero) ? Math.min(size, 420) : size;
   const _inDash = !!(canvas.closest && canvas.closest('.app'));
-  const _minDelta = _lite && !_hero ? 33 : 0;   // ~30fps cap on the tiny ambient blob only
+  const _minDelta = variant === 'pulsar' || (_lite && !_hero) ? 33 : 0;
+  const _reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let _last = 0;
-  const _buf = Math.min(Math.round(_size * dpr), 1600);
+  const _buf = Math.min(Math.round(_size * dpr), variant === 'pulsar' ? 720 : 1600);
   canvas.width = _buf;
   canvas.height = _buf;
 
@@ -969,14 +970,15 @@ void main(){
   gl_FragColor = vec4(final, alpha);
 }`;
 
-  // PULSAR = the calm Magnetar Malik picked from proto-pulsar-styles.html (v505): the
-  // same marbled plasma body language + flowing polar jets on a tilted axis, with a
-  // slow quiet 2.8s breath (no shockwave, no glint, no hard beat). Renders with a
-  // luminance alpha so the CSS halo behind the canvas still shows through.
+  // Approved Pulsar: original cyan Beacon core, expanding energy jets and haze.
+  // Shared by the Clarity tutorial, ignition, reveal and saved Neutron Star.
   const fsrcPulsar = `
-precision highp float;
-uniform float u_time;
+precision mediump float;
 uniform vec2 u_res;
+uniform float u_time;
+const float u_tilt = -.45;
+const vec3 u_light = vec3(.4,.94,1.);
+
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
 vec2 mod289(vec2 x){return x-floor(x*(1./289.))*289.;}
 vec3 permute(vec3 x){return mod289(((x*34.)+1.)*x);}
@@ -994,50 +996,76 @@ float snoise(vec2 v){
   vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
   return 130.*dot(m,g);
 }
+
+
+float hash(vec3 p){p=fract(p*.1031);p+=dot(p,p.yzx+33.33);return fract((p.x+p.y)*p.z);}
+float noise(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){return .57*noise(p)+.28*noise(p*2.03+8.)+.15*noise(p*4.01+17.);}
 void main(){
-  vec2 uv = (gl_FragCoord.xy / u_res) * 2.0 - 1.0;
-  uv.x *= u_res.x / u_res.y;
-  // Zoomed OUT (v506): the canvas is much larger than the star so the jets have room to
-  // run long and melt into black INSIDE the frame; the body keeps its visual size.
-  uv *= 3.0;
-  float T = u_time;
-  float phase = fract(T / 2.8);
-  float beat = pow(max(sin(3.14159 * phase), 0.0), 2.2);
-  float r = length(uv);
-  float n1 = snoise(uv * 1.5 + vec2(T * 0.12, T * 0.08));
-  float n2 = snoise(uv * 2.7 - vec2(T * 0.10, T * 0.15));
-  vec3 body = mix(vec3(0.28, 0.82, 0.92), vec3(0.55, 0.93, 1.00), smoothstep(-0.6, 0.6, n1));
-  body = mix(body, vec3(0.95, 0.97, 1.0), smoothstep(-0.1, 0.7, n2) * 0.7);
-  float mask = 1.0 - smoothstep(0.41, 0.47, r);
-  float core = exp(-r * 4.8) * (1.35 + 0.18 * beat);
-  float halo = exp(-r * 1.44) * 0.5 * (1.0 + 0.14 * beat);
-  float tilt = -0.5;
-  vec2 ax = vec2(sin(tilt), cos(tilt));
-  float along = dot(uv, ax);
-  float across = dot(uv, vec2(-ax.y, ax.x));
-  float aa = abs(along);
-  float flow = 0.75 + 0.45 * snoise(vec2(aa * 4.0 - T * 2.2, across * 14.0));
-  float jw = 0.066 + 0.11 * aa;
-  // v596: STRETCHED jets (Malik: almost full screen). Zoom 3.0 gives them room; every
-  // body radius below is rescaled x1.46 so the star body stays its usual visual size.
-  // Fade completes at aa 3.25, before the tilted-axis edge (~3.4), so no cutoff.
-  float jet = exp(-pow(across / jw, 2.0) * 2.5) * smoothstep(3.25, 0.72, aa) * smoothstep(0.26, 0.61, aa) * flow;
-  float ji = 0.92 + 0.26 * beat;
-  float backglow = exp(-r * 0.85) * 0.16 * (1.0 + 0.2 * beat);
-  vec3 col = vec3(0.45, 0.92, 1.00) * backglow;
-  col += body * mask * (1.0 + 0.07 * beat);
-  col += vec3(1.0) * core;
-  col += vec3(0.45, 0.92, 1.00) * halo;
-  col += vec3(0.70, 0.95, 1.00) * jet * ji;
-  float alpha = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);
-  gl_FragColor = vec4(col, alpha);
+ vec2 uv=(gl_FragCoord.xy/u_res)*2.-1.;
+ // The app's full-screen canvas is larger than the mockup stage. Keep the
+ // complete plumes inside that stage, with air around their fading tips.
+ uv*=1.35;
+
+ float r=length(uv),R=.30/1.75,t=u_time;
+ float pulse=1.+.025*sin(t*.95);
+ vec2 axis=vec2(sin(u_tilt),cos(u_tilt));
+ float along=dot(uv,axis),across=dot(uv,vec2(axis.y,-axis.x)),a=abs(along);
+ float beyond=max(a-R,0.);
+ float fade=1.-smoothstep(.64,.99,a);
+ // Diverging light plumes: narrow at the poles, widening smoothly with distance.
+ float spread=.009+.16*pow(beyond,1.12);
+ float width=spread*.40;
+ float stream=.70+.30*sin(a*48.-t*4.2);
+ float travelling=pow(.5+.5*sin(a*27.-t*5.4),8.);
+ float spine=exp(-pow(across/width,2.))*fade;
+ float flow=sin(a*32.-t*3.2+across/spread*2.);
+ float sheath=exp(-pow(across/spread,2.))*fade*(.35+.14*travelling+.05*flow);
+ float mist=exp(-pow(across/(spread*1.65),2.))*fade*.085;
+ float jet=(spine+sheath+mist)*smoothstep(R*.56,R*1.13,a)*(stream+travelling*.55);
+ vec3 col=u_light*jet*1.88*pulse;
+ float fork=sin(a*26.-t*2.8)*spread*.13;
+ float filamentA=exp(-pow((across-fork-spread*.66)/(.0026+beyond*.008),2.));
+ float filamentB=exp(-pow((across+fork+spread*.72)/(.0031+beyond*.009),2.));
+ float filaments=(filamentA+filamentB)*fade*smoothstep(R*.88,R*1.35,a);
+ col+=u_light*filaments*(.08+.14*travelling);
+ float knotPhase=fract(a*2.25-t*.42);
+ float knots=exp(-pow((knotPhase-.52)/.075,2.))*spine;
+ col+=vec3(.72,.98,1.)*knots*.75*fade;
+ float outside=max(r-R,0.);
+ col+=u_light*.115*exp(-outside*15.)*(1.-smoothstep(.70,.98,r));
+ // A quiet, uneven atmosphere around the Pulsar. It stays behind the hard rim
+ // and beams so the silhouette remains crisp instead of becoming a glow blob.
+ float fogNoise=fbm(vec3(uv*4.1,t*.022));
+ float fogShape=exp(-outside*5.8)*(1.-smoothstep(.48,.74,r));
+ float fogEdge=smoothstep(R*.96,R*1.12,r);
+ float fogWisps=smoothstep(.38,.82,fogNoise+.12*sin(atan(uv.y,uv.x)*3.-t*.09));
+ col+=u_light*fogShape*fogEdge*(.018+.085*fogWisps);
+ col=vec3(1.)-exp(-col*1.35);
+ col=pow(max(col,vec3(0.)),vec3(.9));
+ // Preserve the original Beacon's soft light core, colors and breathing motion.
+ vec2 originalUV=uv*1.75;float originalR=length(originalUV);
+ float beat=pow(max(sin(3.14159*fract(t/5.8)),0.),2.2)*.55;
+ float n1=snoise(originalUV*2.2+vec2(t*.12,t*.08));
+ float n2=snoise(originalUV*4.-vec2(t*.10,t*.15));
+ vec3 body=mix(vec3(.15,.65,.85),vec3(.65,.95,1.),smoothstep(-.6,.6,n1));
+ body=mix(body,vec3(.95,.97,1.),smoothstep(-.1,.7,n2)*.7);
+ float mask=1.-smoothstep(.28,.32,originalR);
+ col*=1.-mask;
+ col+=body*mask*(1.+.07*beat);
+ col+=vec3(1.)*exp(-originalR*7.)*(1.35+.18*beat);
+ col+=vec3(.12,.43,.62)*exp(-originalR*2.1)*.5*(1.+.14*beat);
+ float alpha=clamp(max(col.r,max(col.g,col.b)),0.,1.);
+ gl_FragColor=vec4(col,alpha);
 }`;
 
   const fsrc = (variant === 'pulsar') ? fsrcPulsar : fsrcClassic;
 
   function makeShader(type, src) {
     const s = gl.createShader(type);
-    gl.shaderSource(s, src);
+    const precision = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
+    gl.shaderSource(s, type === gl.FRAGMENT_SHADER && (!precision || !precision.precision)
+      ? src.replace('precision highp float;', 'precision mediump float;') : src);
     gl.compileShader(s);
     return s;
   }
@@ -1072,19 +1100,22 @@ void main(){
     // Pause the dashboard's star while a full-screen module is open, and
     // fps-cap on mobile. Both keep a requestAnimationFrame alive so it resumes
     // instantly when conditions clear.
-    if (window.__scrolling || (_inDash && window.__moduleOpen)) { animId = requestAnimationFrame(draw); return; }
+    if (document.hidden || window.__scrolling || (_inDash && window.__moduleOpen)) { animId = requestAnimationFrame(draw); return; }
     if (_minDelta && (t - _last) < _minDelta) { animId = requestAnimationFrame(draw); return; }
     _last = t;
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.uniform1f(uTime, t * 0.001);
+    gl.uniform1f(uTime, _reducedMotion.matches ? 8 : t * 0.001);
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if (_reducedMotion.matches) { running = false; return; }
     animId = requestAnimationFrame(draw);
   }
   function startLoop() { if (!running) { running = true; animId = requestAnimationFrame(draw); } }
   function stopLoop() { running = false; cancelAnimationFrame(animId); }
+  const motionChanged = () => { stopLoop(); startLoop(); };
+  if (_reducedMotion.addEventListener) _reducedMotion.addEventListener('change', motionChanged);
   // Pause when offscreen, resume when visible
   const visObs = new IntersectionObserver(([e]) => { e.isIntersecting ? startLoop() : stopLoop(); }, { threshold: 0 });
   visObs.observe(canvas);
@@ -1094,6 +1125,7 @@ void main(){
       stopLoop();
       visObs.disconnect();
       mutObs.disconnect();
+      if (_reducedMotion.removeEventListener) _reducedMotion.removeEventListener('change', motionChanged);
       const ext = gl.getExtension('WEBGL_lose_context');
       if (ext) ext.loseContext();
     }
@@ -1104,6 +1136,7 @@ void main(){
     stopLoop();
     visObs.disconnect();
     mutObs.disconnect();
+    if (_reducedMotion.removeEventListener) _reducedMotion.removeEventListener('change', motionChanged);
     const ext = gl.getExtension('WEBGL_lose_context');
     if (ext) ext.loseContext();
   };
