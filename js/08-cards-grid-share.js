@@ -1332,7 +1332,7 @@ const MoreSpace = {
 function ccGreetingLine(first) {
   try {
     const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
-    if (!hasStar) return first ? ('Welcome, ' + first + '.') : 'Welcome.';
+    if (!hasStar) return first ? ('Welcome to Memento, ' + first + '.') : 'Welcome to Memento.';
     const h = new Date().getHours();
     if (h < 5) return 'Up late?';
     let seed = 0;
@@ -1448,8 +1448,9 @@ function renderGreeting() {
     // The greeting: the shared ccGreetingLine words (v1324), on its own line.
     const first = ((state.profile && state.profile.name || '').trim().split(/\s+/)[0]) || '';
     const line2 = ccGreetingLine(first);
+    const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
     mg.innerHTML = '<button class="wbar__settings' + cornerCls + '" id="wbarSettings" type="button" aria-label="Settings">' + cornerInner + '</button>'
-      + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + ccGreetingGoalHtml() + '</div>';
+      + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + (hasStar ? ccGreetingGoalHtml() : '') + '</div>';
     const _ws = document.getElementById('wbarSettings');
     if (_ws) {
       _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
@@ -5528,7 +5529,7 @@ function renderDeskMission() {
         // v1324: same shared words as the phone (first name only there; the
         // desktop header keeps the full trimmed name it always used).
         const name = (state.profile && state.profile.name || '').trim();
-        g.innerHTML = esc(ccGreetingLine(name)) + ccGreetingGoalHtml();
+        g.innerHTML = esc(ccGreetingLine(name)) + (hasClarity ? ccGreetingGoalHtml() : '');
       }
     } catch (e) {}
     const pa = (state.action && state.action.primaryAction) || {};
