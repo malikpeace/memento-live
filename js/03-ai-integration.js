@@ -50,6 +50,7 @@ function aiRateLimitMessage(rawBody) {
 // AI conversation state
 let aiChatMessages = [];
 let aiChatReady = false;
+let aiChatPaused = false;   // v1355: the model asked to pause (safety_stop)
 let aiChatProgress = null; // 0-100 reported by AI per question; null = use fallback
 let aiChatLoading = false;
 let aiSynthesisResult = null;
@@ -2884,6 +2885,141 @@ let clarityEscalated = false;
 function clarityChatModel() {
   return clarityEscalated ? ANTHROPIC_MODEL_SYNTHESIS : ANTHROPIC_MODEL_CLARITY;
 }
+
+// ===========================================================================
+// v1355: THE CLARITY INTERVIEW ON LUNA (GPT-5.6, OpenAI Responses API).
+// The server owns the provider and the verbatim V13 prompt; this flag only
+// shapes what the client sends: the lab's exact turn format (the starting
+// context + "Begin Clarity", then raw answers), NO per-turn steering notes,
+// and the reasoning history carried turn to turn (store:false on the
+// provider, so the items ride with us). The Opus descent turn (quality
+// 'deep') and synthesis stay on Anthropic, untouched. Flip to false and the
+// interview is back on Sonnet with zero other changes.
+// ===========================================================================
+const CLARITY_INTERVIEW_ON_LUNA = true;
+const CLARITY_LUNA_ESCALATION = false;
+const _lunaHistByEntry = new WeakMap();   // assistant entry -> history after that reply
+function lunaActive() {
+  try { return CLARITY_INTERVIEW_ON_LUNA && !getAnthropicKey() && !!window.MEMENTO_SUPABASE_URL; } catch (e) { return false; }
+}
+function lunaOpener(context) { return 'Starting context supplied by this person:\n' + context + '\n\nBegin Clarity. Ask the first question.'; }
+// The Luna opener carries FACTS only: what this person said on the way in and
+// what their profile holds. None of the Sonnet-era path notes or coaching
+// directives (buildContextMessage) ever reach Luna; V13 owns the method.
+function buildLunaContext() {
+  const lines = [];
+  try {
+    const w = wizardAnswers || {};
+    const domains = Array.isArray(w.discoverDomain) ? w.discoverDomain : (w.discoverDomain ? [w.discoverDomain] : []);
+    const other = String(w.discoverDomainCustom || '').trim();
+    const domainName = (v) => (v === 'other' && other) ? other : ((typeof DISCOVERY_DOMAINS !== 'undefined' && DISCOVERY_DOMAINS.find(d => d.value === v)) || {}).label || v;
+    if (w.knowDomain === 'yes') {
+      lines.push('They say they know what they want to do with their life.');
+      if (w.whatSpecifically) lines.push('In their own words: "' + String(w.whatSpecifically).trim() + '"');
+    } else if (w.knowDomain === 'kinda') {
+      lines.push('They say they kind of know what they want, a rough idea, not fully clear yet.');
+      if (w.kindaDescribe) lines.push('How they described it: "' + String(w.kindaDescribe).trim() + '"');
+    } else {
+      lines.push('They say they do not yet know what they want to do with their life.');
+      if (domains.includes('no_idea')) lines.push('Not even a broad area yet.');
+      else {
+        if (domains[0]) lines.push('Broad area that interests them: ' + domainName(domains[0]));
+        if (domains.length > 1) lines.push('Also interested in: ' + domains.slice(1).map(domainName).join(', '));
+        const dd = w.domainDrilldown || '', ddc = String(w.domainDrilldownCustom || '').trim();
+        if (dd === 'idk') lines.push('Asked to get more specific, they said they are not sure yet.');
+        else if (dd === 'other_custom' && ddc) lines.push('Asked to get more specific, they wrote: "' + ddc + '"');
+        else if (dd) lines.push('Asked to get more specific, they picked: "' + dd + '"');
+      }
+    }
+  } catch (e) {}
+  try {
+    const p = state.profile || {};
+    const t = (v, n) => { v = String(v || '').replace(/\s+/g, ' ').trim(); return v.length > n ? v.slice(0, n).trim() + '...' : v; };
+    const age = (typeof ageFromBirthday === 'function') ? ageFromBirthday(p.birthday) : null;
+    if (p.name) lines.push('Name: ' + t(p.name, 40));
+    if (age != null) lines.push('Age: ' + age);
+    if (p.runningToward) lines.push('What they want to make progress in: ' + t(p.runningToward, 90));
+    if (p.clarityLevel) lines.push('How clear they are on what they want: ' + t(p.clarityLevel, 40));
+    if (p.runningFrom) lines.push('What keeps pulling them back: ' + t(p.runningFrom, 90));
+    if (p.distraction) lines.push('Their biggest pull on attention: ' + t(p.distraction, 30));
+    if (p.costOfInaction) lines.push('The cost of staying stuck, in their words: ' + t(p.costOfInaction, 90));
+    if (p.momentumWin) lines.push('What a year of momentum gets them, in their words: ' + t(p.momentumWin, 90));
+    if (p.commitLevel) lines.push('How committed they said they are: ' + t(p.commitLevel, 40));
+    if (p.timeBudget) lines.push('Daily time they said they can give: ' + t(p.timeBudget, 30));
+    if (p.letterToFutureSelf) lines.push('Their own note about themselves and their goals: ' + t(p.letterToFutureSelf, 220));
+  } catch (e) {}
+  return lines.join('\n');
+}
+// The history the next turn carries: whatever came back with the last reply.
+// Held off the persisted draft on purpose (encrypted reasoning blobs are big);
+// after a reload the next turn simply rebuilds the plain transcript.
+function lunaHistoryForNextTurn() {
+  const last = [...aiChatMessages].reverse().find(m => m.role === 'assistant');
+  return (last && _lunaHistByEntry.get(last)) || null;
+}
+// The full plain transcript in the lab's shape, for a turn with no carried
+// history (first turn after a reload, after an Opus descent turn, after back).
+function lunaTranscript() {
+  const out = [{ role: 'user', content: lunaOpener(buildLunaContext()) }];
+  aiChatMessages.forEach((m) => {
+    if (m.role === 'assistant') {
+      // The reply as the person saw it: question, subtext, and the options
+      // they chose from, in the contract's own shape.
+      const reply = {
+        question: String(m.content || ''),
+        hint: String(m._hint || ''),
+        type: (m._type === 'choices') ? 'choices' : 'text',
+        options: Array.isArray(m._options) ? m._options.map(String) : [],
+        progress: (typeof m._progress === 'number') ? m._progress : 0,
+        act: [1, 2, 3].includes(m._act) ? m._act : 1,
+        milestone: m._milestone === 'what_confirmed' ? 'what_confirmed' : '',
+        ready: false,
+        safety_stop: false
+      };
+      out.push({ role: 'assistant', content: JSON.stringify(reply) });
+    } else {
+      const text = String(m.content || '').trim();
+      if (text) out.push({ role: 'user', content: text });
+    }
+  });
+  return out;
+}
+// One interview turn on Luna: one bounded retry on an empty or cut-off reply,
+// never a loop, and the person's answer is never dropped by this function.
+const LUNA_TURN_TIMEOUT_MS = 95000;   // the lab waited 90s; the server allows 120s
+async function lunaTurn(msgs, opts) {
+  opts.luna = true;        // the server routes to Luna only when the client declares it
+  opts.noProfile = true;   // profile facts already ride in the opener, never as instructions
+  opts.timeout = LUNA_TURN_TIMEOUT_MS;
+  let lastErr = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    opts._meta = {};
+    let text = '';
+    try {
+      text = await callClaude(msgs, AI_DISCOVERY_SYSTEM_PROMPT, opts);
+    } catch (e) {
+      // An older backend does not know the interview field: signal the caller
+      // to run this turn the Sonnet way instead of failing the person.
+      if (/unsupported_clarity_field|invalid_interview|history_not_allowed/i.test(String(e && e.message))) {
+        const u = new Error('luna_unsupported'); u.lunaUnsupported = true; throw u;
+      }
+      lastErr = e;
+      if (attempt === 0 && /empty response|busy|overloaded|unexpected response/i.test(String(e && e.message))) continue;
+      throw e;
+    }
+    const raw = (opts._meta && opts._meta.raw) || {};
+    const parsed = parseAiQuestion(text);
+    const cutOff = !!(opts._meta && opts._meta.stopReason === 'max_tokens');
+    const bad = parsed._fallback || cutOff || !String(parsed.question || '').trim();
+    if (bad) {
+      lastErr = new Error('The interview hiccuped. Send that once more.');
+      if (attempt === 0) continue;
+      throw lastErr;   // an unfinished reply is never accepted, even on the last try
+    }
+    return { text, parsed, history: Array.isArray(raw.luna_history) ? raw.luna_history : null };
+  }
+  throw lastErr || new Error('The interview hiccuped. Send that once more.');
+}
 function clarityDiscoveryOptions(model) {
   return {
     model: model,
@@ -2973,6 +3109,8 @@ async function callClaude(messages, systemPrompt, options = {}) {
         profile_context: profileContext
       };
       if (options.clarityQuality) reqBody.quality = options.clarityQuality;
+      if (options.luna) reqBody.interview = 'luna';
+      if (options.luna && Array.isArray(options.lunaHistory) && options.lunaHistory.length) reqBody.history = options.lunaHistory;
     } else if (useProxy) {
       reqBody = {
         model: options.model || ANTHROPIC_MODEL,
@@ -3028,6 +3166,7 @@ async function callClaude(messages, systemPrompt, options = {}) {
         options._meta.model = data.model || '';
         options._meta.usage = data.usage || null;
         options._meta.stopReason = data.stop_reason || '';
+        options._meta.raw = data;
       }
     } catch (e) {}
     // Safe extraction: content may be missing, empty, or lead with a non-text
@@ -3053,7 +3192,11 @@ async function callClaude(messages, systemPrompt, options = {}) {
     // identical so structured callers are unaffected. Never loops (options
     // flag guards recursion); on a second miss the rewrite ships anyway,
     // still better than the original.
-    if (!options._voiceRetry) {
+    // v1355: Luna's replies are never rewritten by the Sonnet-era voice lint.
+    // V13 owns its own voice; a second call here would change the tested
+    // behavior and add cost and wait. The bounded retry for cut-off replies
+    // lives in lunaTurn, not here.
+    if (!options._voiceRetry && !options.luna) {
       const hits = voiceLint(cleaned);
       if (hits.length) {
         try {
@@ -3510,6 +3653,13 @@ function renderAiChat() {
       <button class="wiz__nav-btn wiz__nav-btn--next ai-chat__retry" id="aiRetry" style="margin-top:16px;max-width:200px;align-self:center;flex:none;">Try Again</button>`;
   }
 
+  // v1355: paused by the model (safety_stop). Its own words, one quiet way out.
+  if (aiChatPaused && aiCurrentQuestion) {
+    return `<div class="wiz__question">${esc(aiCurrentQuestion)}</div>
+      <div class="wiz__hint">${esc(aiCurrentHint)}</div>
+      <button class="wiz__nav-btn wiz__nav-btn--next" id="aiPauseExit" style="margin-top:24px;max-width:260px;align-self:center;flex:none;">Take a break</button>`;
+  }
+
   // AI question ready  - render based on type
   if (aiCurrentQuestion) {
     const current = aiUserAnswer || '';
@@ -3942,13 +4092,27 @@ function parseAiQuestion(response) {
       range: parsed.range || null,
       progress: (typeof parsed.progress === 'number' && isFinite(parsed.progress)) ? parsed.progress : null,
       act: (typeof parsed.act === 'number') ? parsed.act : null,
-      milestone: (typeof parsed.milestone === 'string') ? parsed.milestone : ''
+      milestone: (typeof parsed.milestone === 'string') ? parsed.milestone : '',
+      safety_stop: parsed.safety_stop === true
     };
+  }
+  // v1355: an invalid choice list never stalls the interview (the lab stopped
+  // on these). Too many options: keep the first four. One or none: ask as
+  // text. The question itself is always kept.
+  function normalizeChoices(r) {
+    if (r.type === 'choices' && !r.ready && !r.safety_stop) {
+      const opts = (r.options || []).map(o => String(o || '').trim()).filter(Boolean);
+      if (opts.length > 4) r.options = opts.slice(0, 4);
+      else if (opts.length < 2) { r.type = 'text'; r.options = []; }
+      else r.options = opts;
+    }
+    if (r.ready || r.safety_stop) { r.type = 'text'; r.options = []; }
+    return r;
   }
 
   // Try direct parse
   try {
-    return buildResult(JSON.parse(jsonStr));
+    return normalizeChoices(buildResult(JSON.parse(jsonStr)));
   } catch (e) {}
 
   // Try extracting JSON object from anywhere in the response
@@ -3963,7 +4127,7 @@ function parseAiQuestion(response) {
         if (depth === 0) { end = i + 1; break; }
       }
       if (end > 0) {
-        return buildResult(JSON.parse(str.substring(0, end)));
+        return normalizeChoices(buildResult(JSON.parse(str.substring(0, end))));
       }
     } catch (e2) {}
   }
@@ -4112,13 +4276,32 @@ async function sendAiAnswer() {
         try { window._clarityFirstLight = true; } catch (eFL) {}
       }
     } catch (eEsc) {}
-    let response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(_turnModel));
-    let parsed = parseAiQuestion(response);
+    // v1355: the interview turn goes to Luna unless this is the Opus descent
+    // turn (quality 'deep'), which stays on Anthropic exactly as before.
+    let useLuna = lunaActive() && _turnModel === ANTHROPIC_MODEL_CLARITY;
+    let response, parsed, _lunaHist = null;
+    if (useLuna) {
+      const hist = lunaHistoryForNextTurn();
+      const lunaOpts = clarityDiscoveryOptions(_turnModel);
+      if (hist) lunaOpts.lunaHistory = hist;
+      const lunaMsgs = hist ? [{ role: 'user', content: text }] : lunaTranscript();
+      try {
+        const r = await lunaTurn(lunaMsgs, lunaOpts);
+        response = r.text; parsed = r.parsed; _lunaHist = r.history;
+      } catch (e) {
+        if (!(e && e.lunaUnsupported)) throw e;
+        useLuna = false;   // older backend: this turn runs the Sonnet way
+      }
+    }
+    if (!useLuna) {
+      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(_turnModel));
+      parsed = parseAiQuestion(response);
+    }
 
     // JSON-envelope repair (v578): if the model answered in prose (no JSON found),
     // ONE corrective retry asking it to resend the same content as JSON. This is
     // the hard guarantee; the per-turn note above is the soft one.
-    if (parsed && parsed._fallback) {
+    if (!useLuna && parsed && parsed._fallback) {
       try {
         const fixMsgs = apiMessages.concat([
           { role: 'assistant', content: response },
@@ -4137,7 +4320,7 @@ async function sendAiAnswer() {
       // Exact match or very similar (first 60 chars match)
       return pq === newQ || (newQ.length > 20 && pq.length > 20 && pq.slice(0, 60) === newQ.slice(0, 60));
     });
-    if (isDuplicate) {
+    if (isDuplicate && !useLuna) {
       // Retry with explicit instruction
       const retryMsg = { role: 'user', content: '[System: You just repeated a question you already asked. Ask a completely DIFFERENT question that moves the conversation forward. Do NOT repeat any previous question.]' };
       apiMessages.push({ role: 'assistant', content: response });
@@ -4147,7 +4330,7 @@ async function sendAiAnswer() {
     }
 
     // Store assistant response with full question state for back navigation
-    aiChatMessages.push({
+    const _entry = {
       role: 'assistant', content: parsed.question || response,
       _type: parsed.type || 'text',
       _hint: parsed.hint || '',
@@ -4156,7 +4339,12 @@ async function sendAiAnswer() {
       _progress: typeof parsed.progress === 'number' ? parsed.progress : null,
       _milestone: parsed.milestone || '',
       _act: parsed.act || null
-    });
+    };
+    aiChatMessages.push(_entry);
+    if (_lunaHist) _lunaHistByEntry.set(_entry, _lunaHist);
+    // v1355: safety_stop pauses the interview (rendered as a rest, never an
+    // error); the model's own supportive text is what the person reads.
+    if (parsed.safety_stop) aiChatPaused = true;
 
     if (typeof parsed.progress === 'number') {
       aiChatProgress = Math.max(aiChatProgress || 0, parsed.progress);
@@ -4172,7 +4360,11 @@ async function sendAiAnswer() {
     // 1) Dynamic Opus escalation: a long conversation still not converging means
     //    a genuinely tough person. Give the rest of their questions Opus too.
     //    Conservative trigger so only the real tail escalates.
-    if (!clarityEscalated && ((_userTurns >= 8 && aiChatProgress < 55) || _userTurns >= 14)) {
+    // v1355: while the interview runs on Luna, the long-conversation escalation
+    // to Opus is OFF (it would make the tail 20x the price of the rest). The
+    // single descent turn stays on Opus. Flip CLARITY_LUNA_ESCALATION to bring
+    // the old rule back.
+    if (!clarityEscalated && (!lunaActive() || CLARITY_LUNA_ESCALATION) && ((_userTurns >= 8 && aiChatProgress < 55) || _userTurns >= 14)) {
       clarityEscalated = true;
     }
     // 2) Hard turn cap. 100 leaves enormous room for people who genuinely need a
@@ -4207,8 +4399,22 @@ async function sendAiAnswer() {
   } catch (err) {
     aiChatLoading = false;
     aiChatError = err.message;
-    // Remove the failed user message
+    // Remove the failed user message, and hand their words back to the box so
+    // a failed turn never costs them what they typed (v1355). The question they
+    // were answering comes back too; Try Again then shows exactly where they
+    // were, answer prefilled.
     aiChatMessages.pop();
+    aiUserAnswer = text;
+    try {
+      const la = [...aiChatMessages].reverse().find(m => m.role === 'assistant');
+      if (la) {
+        aiCurrentQuestion = la.content;
+        aiCurrentHint = la._hint || '';
+        aiCurrentType = la._type || 'text';
+        aiCurrentOptions = Array.isArray(la._options) ? la._options : [];
+        aiCurrentRange = la._range || null;
+      }
+    } catch (e) {}
     refreshAiChatUI();
   }
 }
@@ -4233,8 +4439,28 @@ async function rephraseAiQuestion() {
     // Add hidden rephrase request (not saved to conversation)
     apiMessages.push({ role: 'user', content: '[I don\'t understand this question. Please rephrase it completely differently using simpler, clearer language. Keep the same question TYPE (if it was "choices" use "choices" again with different/clearer options, if "text" keep "text", if "range" keep "range"). Do NOT ask a brand new question  - rephrase the SAME intent so I can actually answer it. Respond with ONLY a JSON object.]' });
 
-    const response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(clarityChatModel()));
-    const parsed = parseAiQuestion(response);
+    let response, parsed, _lunaHist = null;
+    let useLuna = lunaActive() && clarityChatModel() === ANTHROPIC_MODEL_CLARITY;
+    if (useLuna) {
+      // v1355: the rephrase happens INSIDE Luna's own conversation, so the
+      // history it carries is the question the person actually answers.
+      const hist = lunaHistoryForNextTurn();
+      const lunaOpts = clarityDiscoveryOptions(clarityChatModel());
+      if (hist) lunaOpts.lunaHistory = hist;
+      const ask = { role: 'user', content: 'I do not understand that question. Please ask the same thing again in different, simpler words. Same intent, same answer format, and if it had choices, give clearer ones.' };
+      const lunaMsgs = hist ? [ask] : lunaTranscript().concat([ask]);
+      try {
+        const r = await lunaTurn(lunaMsgs, lunaOpts);
+        response = r.text; parsed = r.parsed; _lunaHist = r.history;
+      } catch (e) {
+        if (!(e && e.lunaUnsupported)) throw e;
+        useLuna = false;
+      }
+    }
+    if (!useLuna) {
+      response = await callClaude(apiMessages, AI_DISCOVERY_SYSTEM_PROMPT, clarityDiscoveryOptions(clarityChatModel()));
+      parsed = parseAiQuestion(response);
+    }
 
     // Update current question with rephrased version
     aiCurrentQuestion = parsed.question;
@@ -4244,10 +4470,16 @@ async function rephraseAiQuestion() {
     aiCurrentRange = parsed.range || null;
     aiUserAnswer = '';
 
-    // Replace last assistant message in history with rephrased version
+    // Replace last assistant message in history with rephrased version (the
+    // whole reply, so a rebuilt transcript shows what the person actually saw)
     for (let i = aiChatMessages.length - 1; i >= 0; i--) {
       if (aiChatMessages[i].role === 'assistant') {
-        aiChatMessages[i].content = parsed.question;
+        const m = aiChatMessages[i];
+        m.content = parsed.question;
+        m._hint = parsed.hint || '';
+        m._type = parsed.type || 'text';
+        m._options = parsed.options || [];
+        if (_lunaHist) _lunaHistByEntry.set(m, _lunaHist);
         break;
       }
     }
@@ -4512,13 +4744,27 @@ async function autoStartAiChat() {
 
   try {
     const context = buildContextMessage();
-    const response = await callClaude(
-      [{ role: 'user', content: context + '\n\n' + buildFirstQuestionInstruction() }],
-      AI_DISCOVERY_SYSTEM_PROMPT,
-      clarityDiscoveryOptions(ANTHROPIC_MODEL_CLARITY)
-    );
-
-    const parsed = parseAiQuestion(response);
+    const _luna = lunaActive();
+    const _opts = clarityDiscoveryOptions(ANTHROPIC_MODEL_CLARITY);
+    let response, parsed, _lunaHist = null;
+    let _legacy = !_luna;
+    if (_luna) {
+      try {
+        const r = await lunaTurn([{ role: 'user', content: lunaOpener(buildLunaContext()) }], _opts);
+        response = r.text; parsed = r.parsed; _lunaHist = r.history;
+      } catch (e) {
+        if (!(e && e.lunaUnsupported)) throw e;
+        _legacy = true;   // older backend: this turn runs the Sonnet way
+      }
+    }
+    if (_legacy) {
+      response = await callClaude(
+        [{ role: 'user', content: context + '\n\n' + buildFirstQuestionInstruction() }],
+        AI_DISCOVERY_SYSTEM_PROMPT,
+        clarityDiscoveryOptions(ANTHROPIC_MODEL_CLARITY)
+      );
+      parsed = parseAiQuestion(response);
+    }
     aiCurrentQuestion = parsed.question;
     aiCurrentHint = parsed.hint;
     aiCurrentType = parsed.type || 'text';
@@ -4532,6 +4778,8 @@ async function autoStartAiChat() {
       _options: parsed.options || [],
       _range: parsed.range || null
     }];
+    if (_lunaHist) _lunaHistByEntry.set(aiChatMessages[0], _lunaHist);
+    if (parsed.safety_stop) aiChatPaused = true;
     aiChatLoading = false;
     refreshAiChatUI();
   } catch (err) {
@@ -6722,3 +6970,15 @@ window.actionBrainLiveRun = async function (which) {
   console.log('LIVE RUN DONE. Copy everything above.');
   return results;
 };
+
+// v1355: the paused interview's one control. Delegated so it survives every
+// re-render of the chat body.
+try {
+  document.addEventListener('click', (e) => {
+    const b = e.target && e.target.closest && e.target.closest('#aiPauseExit');
+    if (!b) return;
+    e.preventDefault();
+    aiChatPaused = false;
+    try { exitToModules('clarity'); } catch (x) {}
+  });
+} catch (e) {}
