@@ -163,4 +163,8 @@ body:not(.has-custom-layout) #commandCenter .cc-welcome > div:nth-child(3) {
   body:not(.has-custom-layout) #commandCenter .cc-welcome .cc-primary {
     width: 100%; min-height: 48px;
   }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter:has(.cc-welcome) {
+    position: relative;
+    top: clamp(0px, calc((100svh - 650px) * .3), 56px);
+  }
 }
