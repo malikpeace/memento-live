@@ -9144,8 +9144,9 @@ function _mfCardMenuOpen(x, y) {
   m.id = 'cardMenu';
   m.className = 'card-menu';
   m.setAttribute('role', 'menu');
+  // Customize is always the first item; a locked account lands on the paywall
   m.innerHTML =
-    (unlocked ? '<button type="button" class="card-menu__it" role="menuitem" data-act="customize">Customize Memento</button>' : '') +
+    '<button type="button" class="card-menu__it" role="menuitem" data-act="customize">Customize Memento</button>' +
     '<button type="button" class="card-menu__it" role="menuitem" data-act="open">Open Memento</button>';
   document.body.appendChild(m);
   // keep it on screen
@@ -9163,8 +9164,10 @@ function _mfCardMenuOpen(x, y) {
     _mfCardMenuClose();
     setTimeout(() => {
       try {
-        if (act === 'customize') _mfOpenCustomize();
-        else if (act === 'open') openMementoFull();
+        if (act === 'customize') {
+          if (unlocked) _mfOpenCustomize();
+          else if (typeof ClarityPaywall !== 'undefined' && ClarityPaywall.show) ClarityPaywall.show({ source: 'card-menu' });
+        } else if (act === 'open') openMementoFull();
       } catch (e) {}
     }, 60);
   });
