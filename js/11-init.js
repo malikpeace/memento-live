@@ -179,7 +179,9 @@ function bindHomeElastic() {
     const page = document.getElementById('homePage1');
     if (!page || page.__elastic) return;
     page.__elastic = true;
-    const head = document.getElementById('dashGreetingMobile');
+    // Transform the greeting itself, never its parent. A transformed parent
+    // becomes the containing block for its fixed child and makes it jump.
+    const head = document.getElementById('mgreetHello');
     const card = document.getElementById('dayCard');
     const cc = document.getElementById('commandCenter');
     if (!card || !cc) return;
@@ -206,18 +208,19 @@ function bindHomeElastic() {
     // composited blurred layer is a matrix change, not a repaint, so this
     // costs far less than the backdrop-blur re-sampling that v1311 removed.
     const veil = document.querySelector('.ambient__aurora .aur-veil');
-    const PARTS = [[head, 0.25], [card, 0.58], [veil, 0.58], [cc, 1.25]];
+    const PARTS = [[head, 0.58], [card, 0.58], [veil, 0.58], [cc, 0.58]];
     // v1313 (Malik: "I don't really want a limit to it, but as they continue
     // to scroll add more friction"). No cap. give = K*dy / (1 + dy/D)
     // approaches K*D and never arrives, so the pull keeps giving as far as
     // the finger goes while every pixel costs more than the one before it.
     const K = 0.92, D = 340;
     let y0 = null, x0 = null, axis = null, cur = 0, want = 0, frame = 0;
+    let settleTimer = 0;
     const paint = () => {
       frame = 0;
       cur = want;
       for (let i = 0; i < PARTS.length; i++) {
-        const el = PARTS[i][0];
+        const el = i === 0 ? document.getElementById('mgreetHello') : PARTS[i][0];
         if (!el) continue;
         el.style.transform = want ? 'translate3d(0,' + (want * PARTS[i][1]).toFixed(2) + 'px,0)' : '';
       }
@@ -237,6 +240,8 @@ function bindHomeElastic() {
       return false;
     };
     const settle = () => {
+      clearTimeout(settleTimer);
+      PARTS[0][0] = document.getElementById('mgreetHello');
       // the spring runs on the compositor, then every inline style is wiped
       // so nothing is left promoted between gestures
       const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -247,13 +252,16 @@ function bindHomeElastic() {
       });
       want = 0; cur = 0;
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
-      setTimeout(() => {
+      settleTimer = setTimeout(() => {
         PARTS.forEach(([el]) => { if (el) { el.style.transition = ''; el.style.transform = ''; } });
         try { document.body.classList.remove('home-pulling'); } catch (e) {}
       }, reduced ? 20 : 480);
     };
     page.addEventListener('touchstart', (e) => {
+      if (e.target.closest('button, input, textarea, a, [role="button"]')) return;
       if (e.touches.length !== 1 || blocked()) { y0 = null; return; }
+      clearTimeout(settleTimer);
+      PARTS[0][0] = document.getElementById('mgreetHello');
       y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; axis = null;
       PARTS.forEach(([el]) => { if (el) el.style.transition = ''; });
     }, { passive: true });
@@ -271,8 +279,9 @@ function bindHomeElastic() {
       }
       const sign = dy < 0 ? -1 : 1;
       const mag = Math.abs(dy);
+      if (e.cancelable) e.preventDefault();
       schedule((K * mag / (1 + mag / D)) * sign);
-    }, { passive: true });
+    }, { passive: false });
     const release = () => {
       if (y0 === null && !cur && !want) return;
       y0 = null; axis = null;
