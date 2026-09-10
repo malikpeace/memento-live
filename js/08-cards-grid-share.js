@@ -6100,6 +6100,7 @@ function bindCommandCenter(cc) {
       // finger moves the top card 1:1 out of the way, and committing sends it
       // off while the one beneath rises into place. No fade-and-replace.
       let under = null, underPillar = null;
+      let underDirection = 1;
       const preEls = {};   // pillar -> prebuilt under-card, made at touch-down
       const nextPillar = (dir) => {
         const list = ccPillarList();
@@ -6181,6 +6182,7 @@ function bindCommandCenter(cc) {
         } catch (e) {}
       };
       const armDeck = (dir) => {
+        underDirection = dir < 0 ? 1 : -1;
         const want = nextPillar(dir);
         if (under && underPillar === want) return;
         if (under) under.style.display = 'none';
@@ -6200,7 +6202,9 @@ function bindCommandCenter(cc) {
           under.style.opacity = '1';
           under.style.display = '';
           void under.offsetWidth;
-          under.style.transition = '';
+          // Finger tracking must not inherit either face's CSS easing.
+          // Different transition durations make the two faces intersect.
+          under.style.transition = 'none';
         }
       };
       const disarmDeck = () => {
@@ -6269,8 +6273,9 @@ function bindCommandCenter(cc) {
         card.style.transform = 'translateX(0)';
         card.style.opacity = '1';
         if (under) {
-          under.style.transition = 'transform .22s ease-out, opacity .22s ease-in';
-          under.style.opacity = '0';
+          under.style.transition = 'transform .22s ease-out';
+          under.style.transform = 'translateX(' + (underDirection * 100) + '%)';
+          under.style.opacity = '1';
         }
         setTimeout(() => {
           card.style.transition = ''; card.style.opacity = ''; card.style.transform = ''; card.dataset.swiping = '';
@@ -6293,7 +6298,9 @@ function bindCommandCenter(cc) {
           nav.style.setProperty('--pillar-index', from + (to - from) * p2);
         }
         if (document.body.classList.contains('calm-motion') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const direction = dx < 0 ? -1 : 1;
+        const direction = dx === 0 ? -underDirection : (dx < 0 ? -1 : 1);
+        card.style.transition = 'none';
+        under.style.transition = 'none';
         card.style.transform = 'translateX(' + (direction * p2 * 100) + '%)';
         under.style.transform = 'translateX(' + (-direction * (1 - p2) * 100) + '%)';
         under.style.opacity = '1';
