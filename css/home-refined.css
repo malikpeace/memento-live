@@ -142,3 +142,25 @@ body:not(.has-custom-layout) #commandCenter.cc-deck-live { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   #commandCenter .cc-card--in-r, #commandCenter .cc-card--in-l { animation: none; }
 }
+
+/* Before Clarity, keep the blank Memento and its first step together. */
+body:not(.has-custom-layout) #commandCenter .cc-welcome > div:first-child { display: none; }
+body:not(.has-custom-layout) #commandCenter .cc-welcome > div:nth-child(2) {
+  font-size: 28px !important; line-height: 1.2; letter-spacing: -.025em;
+  margin-bottom: 12px !important;
+}
+body:not(.has-custom-layout) #commandCenter .cc-welcome > div:nth-child(3) {
+  color: rgba(var(--ink), .76) !important; font-size: 15px !important;
+  line-height: 1.55 !important; margin-bottom: 22px !important;
+}
+@media (max-width: 1023.98px) and (orientation: portrait), (max-width: 1023.98px) and (min-height: 600px) {
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1:has(.cc-welcome) {
+    justify-content: center; gap: 24px; padding-top: 92px;
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1:has(.cc-welcome) > #dayCard {
+    flex: 0 0 auto; height: clamp(200px, 32svh, 280px); min-height: 0 !important;
+  }
+  body:not(.has-custom-layout) #commandCenter .cc-welcome .cc-primary {
+    width: 100%; min-height: 48px;
+  }
+}
