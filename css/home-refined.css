@@ -127,6 +127,19 @@ body.calm-motion .cc-pillar-nav::after { transition: none; }
   body:not(.has-custom-layout) #commandCenter .a-how { font-size: 16px; line-height: 1.55; }
 }
 
+/* Larger phone card, still bounded by the room above the real controls. */
+@media (max-width: 599.98px) and (orientation: portrait) {
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1:not(:has(.cc-welcome)) {
+    padding-top: 132px;
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    width: var(--evo-card-w, min(220px, calc(100cqh * 320 / 452))) !important;
+  }
+  body.card-square:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    width: var(--evo-card-w, min(230px, 100cqh)) !important;
+  }
+}
+
 /* Short landscape screens need two columns and honest vertical scrolling,
    rather than squeezing the real controls under the card. */
 @media (max-width: 1023.98px) and (orientation: landscape) and (max-height: 599.98px) {
