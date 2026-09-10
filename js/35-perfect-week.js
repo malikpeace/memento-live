@@ -214,9 +214,14 @@ const PerfectWeek = (() => {
       const d = data();
       if (!d || !active()) return;
       const k = todayKey();
+      d.days = d.days || {};
       d.days[k] = d.days[k] || {};
       d.days[k].conds = d.days[k].conds || {};
+      d.days[k].condEditAt = d.days[k].condEditAt || {};
       d.days[k].conds[id] = !d.days[k].conds[id];
+      // Stamp this checkbox, including unchecks. An unrelated checkbox edit
+      // on another device must never overwrite it during sync.
+      d.days[k].condEditAt[id] = Math.max(Date.now(), (Number(d.days[k].condEditAt[id]) || 0) + 1);
       persistNow();
       if (typeof renderAll === 'function') renderAll();
     } catch (e) {}

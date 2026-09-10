@@ -2674,7 +2674,15 @@
 
     // The honest line for a failure, in their language, never a code. The
     // reading law applies here as much as anywhere else.
-    function errorLine(msg) {
+    function errorLine(msg, details) {
+      if (details && details.code === 'ai_rate_limit') {
+        return { line: details.limitPeriod === 'month' ? 'Your AI allowance is used up for now.' : 'Give it a little time.',
+          sub: String(msg || '').slice(0, 240), pause: true };
+      }
+      if (details && details.code === 'plan_safety_failed') {
+        return { line: 'This plan did not pass the safety checks.',
+          sub: 'Your answers are saved. No plan has been applied.', pause: true };
+      }
       var m2 = String(msg || '').toLowerCase();
       if (m2.indexOf('sign in') > -1) {
         return { line: 'You are signed out.', sub: 'Sign back in, then try this again. Nothing you answered is lost.' };
@@ -2685,7 +2693,12 @@
       if (m2.indexOf('timeout') > -1 || m2.indexOf('timed out') > -1 || m2.indexOf('abort') > -1) {
         return { line: 'That took too long.', sub: 'The connection gave out before the plan came back. Your answers are saved.' };
       }
-      return { line: 'That did not come back.', sub: 'Something went wrong on the way. Your answers are saved, so this only costs you the tap.' };
+      return { line: 'That did not come back.', sub: 'Something went wrong on the way. Your answers are saved.' };
+    }
+
+    function showError(msg, details) {
+      var e = errorLine(msg, details);
+      endState(e.line, e.sub, e.pause ? 'Back for now' : 'Try again', e.pause ? destroy : retry);
     }
 
     // ---- REAL MODE: run the brain -------------------------------------------
@@ -2702,8 +2715,7 @@
       var p;
       try { p = gen(opts.generateOptions || {}); } catch (err) {
         running = false;
-        var e0 = errorLine(err && err.message);
-        return endState(e0.line, e0.sub, 'Try again', retry);
+        return showError(err && err.message, err);
       }
       p.then(function (report) {
         running = false;
@@ -2719,8 +2731,7 @@
           });
         }
         if (!report || (!report.ok && !report.needsClarity)) {
-          var e1 = errorLine((report && report.error) || '');
-          return endState(e1.line, e1.sub, 'Try again', retry);
+          return showError((report && report.error) || '', report);
         }
         if (report.needsClarity) {
           // Rule 14 of the creed: the model refused BEFORE writing a plan, so
@@ -2777,8 +2788,7 @@
         });
       }, function (err) {
         running = false;
-        var e2 = errorLine(err && err.message);
-        endState(e2.line, e2.sub, 'Try again', retry);
+        showError(err && err.message, err);
       });
     }
     function retry() {

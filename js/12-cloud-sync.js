@@ -496,6 +496,45 @@ const CloudSync = (function () {
     return retiredAt > 0 && artifactTime(value, fallbackStamp) <= retiredAt;
   }
 
+  function protocolWeekKey(week) {
+    return week && week.startedAt && week.startDay
+      ? String(week.starHash || 'legacy') + '|' + week.startedAt + '|' + week.startDay : '';
+  }
+
+  function mergeProtocolWeek(a, b, aStamp, bStamp) {
+    if (!a) return b;
+    if (!b) return a;
+    if (!protocolWeekKey(a) || protocolWeekKey(a) !== protocolWeekKey(b)) {
+      return Number(a.startedAt) > Number(b.startedAt) ? a : b;
+    }
+    // Finishing a week is durable. A late checkbox cannot reopen it.
+    const newerA = Number(a.completedAt || 0) !== Number(b.completedAt || 0)
+      ? Number(a.completedAt || 0) > Number(b.completedAt || 0)
+      : aStamp !== bStamp ? aStamp > bStamp : stableStringify(a) > stableStringify(b);
+    const out = JSON.parse(JSON.stringify(newerA ? a : b));
+    out.days = {};
+    const ad = a.days || {}, bd = b.days || {};
+    Array.from(new Set(Object.keys(ad).concat(Object.keys(bd)))).sort().forEach((day) => {
+      const left = ad[day] || {}, right = bd[day] || {};
+      const row = Object.assign({}, newerA ? right : left, newerA ? left : right);
+      row.conds = {}; row.condEditAt = {};
+      const ac = left.conds || {}, bc = right.conds || {};
+      Array.from(new Set(Object.keys(ac).concat(Object.keys(bc)))).sort().forEach((id) => {
+        const inA = Object.prototype.hasOwnProperty.call(ac, id);
+        const inB = Object.prototype.hasOwnProperty.call(bc, id);
+        const at = Number((left.condEditAt || {})[id]) || Number(aStamp) || Number(a.startedAt) || 0;
+        const bt = Number((right.condEditAt || {})[id]) || Number(bStamp) || Number(b.startedAt) || 0;
+        // An explicit false is an uncheck, never a missing entry. Ties choose
+        // false on both devices so the merge converges without resurrection.
+        row.conds[id] = !inB ? ac[id] === true : !inA ? bc[id] === true
+          : at === bt ? ac[id] === true && bc[id] === true : at > bt ? ac[id] === true : bc[id] === true;
+        row.condEditAt[id] = !inB ? at : !inA ? bt : Math.max(at, bt);
+      });
+      out.days[day] = row;
+    });
+    return out;
+  }
+
   function buildMergedState(local, cloud) {
     const lm = (local.meta && local.meta.moduleEditAt) || {};
     const cm = (cloud.meta && cloud.meta.moduleEditAt) || {};
@@ -520,6 +559,31 @@ const CloudSync = (function () {
       merged.meta.moduleEditAt[k] = Math.max(lm[k] || 0, cm[k] || 0);
     });
     merged.meta.lastEditAt = Math.max(lGlobal, cGlobal);
+    // Protocol checkboxes merge individually within the same week. Archives
+    // union by week, and a newly started week cannot lose to an old check-in.
+    if (local.perfectWeek && cloud.perfectWeek) {
+      merged.perfectWeek = mergeProtocolWeek(local.perfectWeek, cloud.perfectWeek,
+        moduleStamp(lm, 'perfectWeek'), moduleStamp(cm, 'perfectWeek'));
+    }
+    if (Array.isArray(local.perfectWeekLog) || Array.isArray(cloud.perfectWeekLog)) {
+      const weeks = new Map();
+      const add = (week, stamp) => {
+        const key = protocolWeekKey(week);
+        if (!key) return;
+        const old = weeks.get(key);
+        weeks.set(key, { week: old ? mergeProtocolWeek(old.week, week, old.stamp, stamp) : week,
+          stamp: Math.max(old ? old.stamp : 0, stamp || 0) });
+      };
+      (local.perfectWeekLog || []).forEach((w) => add(w, moduleStamp(lm, 'perfectWeekLog')));
+      (cloud.perfectWeekLog || []).forEach((w) => add(w, moduleStamp(cm, 'perfectWeekLog')));
+      // Catch late edits to a week another device already archived.
+      if (weeks.has(protocolWeekKey(local.perfectWeek))) add(local.perfectWeek, moduleStamp(lm, 'perfectWeek'));
+      if (weeks.has(protocolWeekKey(cloud.perfectWeek))) add(cloud.perfectWeek, moduleStamp(cm, 'perfectWeek'));
+      merged.perfectWeekLog = Array.from(weeks.values()).map((x) => x.week)
+        .filter((w) => protocolWeekKey(w) !== protocolWeekKey(merged.perfectWeek))
+        .sort((a, b) => Number(b.startedAt) - Number(a.startedAt) || protocolWeekKey(a).localeCompare(protocolWeekKey(b)))
+        .slice(0, 12);
+    }
     // Append-only data unions, so newest-module-wins can never drop the other
     // device's notes, proof, check-ins, or streak history.
     try { merged.reflection = mergeReflection(local.reflection, cloud.reflection, moduleStamp(lm, 'reflection') >= moduleStamp(cm, 'reflection')); } catch (e) {}

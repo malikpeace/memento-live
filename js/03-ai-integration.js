@@ -47,6 +47,20 @@ function aiRateLimitMessage(rawBody) {
   return 'You\u2019re moving a little too quickly. Try again shortly.';
 }
 
+// Carry only public allowance details through generation to the Action screen.
+function aiRateLimitError(rawBody) {
+  const err = new Error(aiRateLimitMessage(rawBody));
+  err.code = 'ai_rate_limit';
+  err.limitPeriod = 'short';
+  try {
+    const parsed = typeof rawBody === 'string' ? JSON.parse(rawBody) : rawBody;
+    if (parsed && parsed.error && parsed.error.type === 'rate_limit_error') {
+      err.limitPeriod = parsed.error.limit_period === 'month' ? 'month' : 'short';
+    }
+  } catch (e) {}
+  return err;
+}
+
 // AI conversation state
 let aiChatMessages = [];
 let aiChatReady = false;
@@ -1614,7 +1628,7 @@ async function actionBackgroundResult(messages, systemPrompt, options, onProgres
     const body = await response.text();
     if (response.status === 409) throw new Error('Another Action plan is already finishing. Reopen Memento in a moment.');
     if (response.status === 403) throw new Error('Paid Memento access is required for this step.');
-    if (response.status === 429) throw new Error(aiRateLimitMessage(body));
+    if (response.status === 429) throw aiRateLimitError(body);
     throw new Error('API error (' + response.status + '): ' + body.substring(0, 160));
   }
 
@@ -3145,7 +3159,7 @@ async function callClaude(messages, systemPrompt, options = {}) {
       if (useProxy && response.status === 404) throw new Error('The AI service is temporarily unavailable. Try again in a moment.');
       if (paidAction && response.status === 403) throw new Error('Paid Memento access is required for this step.');
       if (response.status === 401) throw new Error('The AI service rejected the request. Try again in a moment.');
-      if (response.status === 429) throw new Error(aiRateLimitMessage(errorBody));
+      if (response.status === 429) throw aiRateLimitError(errorBody);
       if (response.status === 529) throw new Error('API is overloaded. Please try again shortly.');
       throw new Error('API error (' + response.status + '): ' + errorBody.substring(0, 200));
     }
@@ -6118,7 +6132,7 @@ function actionPlanArithmeticCheck(plan, inputs) {
    a screen time floor, and beginner training volume. */
 function actionPlanSafetyCheck(plan, inputs) {
   const failures = [];
-  const bucket = String((plan && plan.bucket) || (inputs && inputs.bucket) || '');
+  const bucket = String((inputs && inputs.bucket) || (plan && plan.bucket) || '');
   const hay = [
     inputs && inputs.refine && inputs.refine.text,
     inputs && inputs.transcript && inputs.transcript.text
@@ -6336,7 +6350,7 @@ async function actionPlanFix(plan, failures, inputs, meta) {
    review is REPAIRED, never regenerated: the mechanical rounding repair
    runs first (it runs on every plan), then at most ONE fixer call carrying
    the exact failures, then the mechanical repair once more if the fixed
-   plan still shows a math lint failure. The customer always gets a plan.
+   plan still shows a math lint failure. Unresolved safety failures block delivery.
    The only ask left is the model's own pre-plan refusal (creed rule 14),
    which carries 1 to 3 questions. */
 const ACTION_PLAN_MODEL = 'claude-opus-5';
@@ -6459,6 +6473,10 @@ async function actionPlanGenerate(options) {
       attemptRow.error = err && err.message ? err.message : String(err);
       report.attempts.push(attemptRow);
       report.error = attemptRow.error;
+      if (err && err.code === 'ai_rate_limit') {
+        report.code = err.code;
+        report.limitPeriod = err.limitPeriod;
+      }
       report.ms = Date.now() - started;
       return report;
     }
@@ -6550,8 +6568,8 @@ async function actionPlanGenerate(options) {
   }
 
   // THE FIXER (one call, never a loop). It repairs wording and aligns
-  // numbers; it never invents. The plan ships after this no matter what:
-  // a fixer that cannot be reached or read ships the repaired original.
+  // numbers; it never invents. Cosmetic failures can retain the original.
+  // Safety failures must be cleared before either version can be delivered.
   report.failures = allFailures;
   let shipped = plan;
   try {
@@ -6560,6 +6578,7 @@ async function actionPlanGenerate(options) {
     report.fixerModel = fixEcho.model || '';
     if (fixedPlan) {
       fixedPlan.star = plan.star;   // the star is untouchable, enforced here too
+      fixedPlan.bucket = plan.bucket;
       report.fixed = true;
       const lint2 = actionPlanClientCheck(fixedPlan, inputs);
       report.fixerFailures = lint2.failures;   // what remained before the recompute
@@ -6585,8 +6604,26 @@ async function actionPlanGenerate(options) {
     report.fixerFailures = allFailures;
     report.finalClientFailures = client.failures;
   }
-  report.ok = true;
-  report.plan = shipped;
+  const hasSafetyFailure = (failures) => (failures || []).some((f) => f && f.rule === 'safety');
+  let safetyUnresolved = hasSafetyFailure(report.finalClientFailures);
+  // Mechanical checks cannot clear a safety concern raised by the judge.
+  // Recheck once only when the fixer returned a replacement for that concern.
+  if (hasSafetyFailure(judge.failures)) {
+    safetyUnresolved = true;
+    if (report.fixed && !hasSafetyFailure(report.finalClientFailures)) {
+      try {
+        report.safetyReview = await actionPlanJudge(shipped, inputs, {});
+        safetyUnresolved = report.safetyReview.verdict !== 'pass';
+      } catch (err) { /* The safety concern remains unresolved. */ }
+    }
+  }
+  if (safetyUnresolved) {
+    report.code = 'plan_safety_failed';
+    report.error = 'This plan did not pass the safety checks. Your answers are saved. No plan has been applied.';
+  } else {
+    report.ok = true;
+    report.plan = shipped;
+  }
   report.ms = Date.now() - started;
   return report;
 }
