@@ -3166,9 +3166,11 @@
         ? 'The date you gave.'
         : 'From your numbers' + (fin.basis ? ': ' + fin.basis : '') + '. An estimate, until you make it yours.')));
       finWrap.appendChild(finSub);
-      var finList = el('div', 'afl-nn__list');
-      var keepB = btn('afl-nn__a', 'Keep ' + dateLabel(fin.date));
-      var ownB = btn('afl-nn__a', 'Pick my own');
+      // v1369: two real buttons side by side, the chosen one solid (Malik:
+      // the ruled rows were easy to miss). Selected = white and simple.
+      var finList = el('div', 'afl-fin__opts');
+      var keepB = btn('afl-fin__opt', 'Keep ' + dateLabel(fin.date));
+      var ownB = btn('afl-fin__opt', 'Pick my own');
       keepB.setAttribute('role', 'radio');
       ownB.setAttribute('role', 'radio');
       var finCost = el('p', 'afl-fin__cost');

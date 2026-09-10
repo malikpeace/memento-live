@@ -6170,8 +6170,21 @@ html.theme-light .afl-cd__d:not(.is-on) { color: rgba(var(--ink), 0.70); }
 /* THE FINISH LINE (v1349). Same ruled rows as the non-negotiables; the cost
    line is body copy at the page's own alpha, never dimmed. The picker is the
    phone's own, parked out of sight for the one tap it lives for. */
-/* the section below brings its own top rule; a bottom rule here doubled it */
-.afl-fin .afl-nn__a:last-child { box-shadow: inset 0 1px 0 rgba(var(--ink), 0.12); }
+/* v1369: two real buttons, side by side. The chosen one is solid; the other
+   is the app's quiet fill. No borders. Selected = white and simple. */
+.afl-fin__opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0 0; }
+.afl-fin__opt {
+  min-height: 58px; padding: 12px 14px; border: 0; border-radius: 14px;
+  font-family: inherit; font-size: 17px; font-weight: 600; line-height: 1.25; letter-spacing: -0.012em;
+  color: rgba(var(--ink), 0.92); background: rgba(var(--ink), 0.07);
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.08); cursor: pointer;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.afl-fin__opt:active { transform: scale(0.98); }
+.afl-fin__opt:focus-visible { outline: 2px solid rgba(var(--ink), 0.55); outline-offset: 2px; }
+.afl-fin__opt.is-on { background: var(--solid-bg); color: var(--solid-fg); box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .afl-fin__opt { transition: none; } }
 .afl-fin__cost { margin: 12px 0 0; font-size: 16.3px; line-height: 1.5; color: rgba(var(--ink), 0.92); text-wrap: pretty; }
 .afl-fin__picker {
   position: fixed; left: 50%; bottom: 24%; width: 1px; height: 1px;
