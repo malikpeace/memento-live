@@ -7073,7 +7073,15 @@ html.theme-light #commandCenter .cc-card { background: rgba(255, 255, 255, 0.62)
   .ambient__aurora em:nth-of-type(5) { left: 44%; bottom: 2%;  width: 22vh; height: 8vh; }
   .ambient__aurora em:nth-of-type(6) { left: 70%; bottom: 1%;  width: 24vh; height: 9vh; }
   .ambient__aurora .aur-base { top: 62%; }
-  /* the veil is already card-anchored; on desktop it just softens further */
+  /* the veil is card-anchored (js/11 syncVeilAnchor, on desktop too since
+     v1356); if a measurement is ever missing, the fallback is card-shaped,
+     never the phone's full-width sheet */
+  .ambient__aurora .aur-veil {
+    left: calc(var(--veil-cx, 33vw) - var(--veil-w, 26vw) * 0.62);
+    width: calc(var(--veil-w, 26vw) * 1.24);
+    top: calc(var(--veil-top, 66vh) + 6px);
+    filter: none;
+  }
   .ambient__aurora .aur-veil b { filter: blur(22px); }
 }
 /* The desktop editorial panel is the same box in a different frame, so it

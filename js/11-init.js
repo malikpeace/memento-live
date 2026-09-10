@@ -72,6 +72,33 @@ try {
         bottom, subtract exactly the overflow.
    Step 2 only ever corrects an overflow, and because nothing else rewrites
    the value afterwards, it settles once and stays. */
+// v1306/v1309/v1356: the veil pours from the CARD, so it follows the card's
+// measured bottom, centre and width on EVERY width (the phone flexes the card,
+// the desktop parks it left). Runs on the same passes as syncHomeViewport and,
+// on desktop only, on a settled window resize.
+function syncVeilAnchor() {
+  try {
+    const root = document.documentElement;
+    const cw = document.querySelector('#dayCard .daycard-wrap');
+    if (!cw) return;
+    const r2 = cw.getBoundingClientRect();
+    const cb = Math.round(r2.bottom);
+    if (cb > 100 && cb < window.innerHeight) root.style.setProperty('--veil-top', cb + 'px');
+    if (r2.width > 40) {
+      root.style.setProperty('--veil-cx', Math.round(r2.left + r2.width / 2) + 'px');
+      root.style.setProperty('--veil-w', Math.round(r2.width) + 'px');
+    }
+  } catch (e) {}
+}
+try {
+  let _veilRz = null;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 1024) return;   // phones and tablets keep the v1095 no-resize rule
+    clearTimeout(_veilRz);
+    _veilRz = setTimeout(syncVeilAnchor, 180);
+  });
+} catch (e) {}
+
 function syncHomeViewport() {
   try {
     // v1106: measure through the tablet range too. The guard used to stop at
@@ -79,7 +106,12 @@ function syncHomeViewport() {
     // wrote (75 while the real chrome was 124) and the column ran 49px past
     // the bottom of the screen. Desktop still opts out: it uses the bento
     // grid, not this column.
-    if (window.innerWidth >= 1024) return;
+    // v1356 (Malik's desktop screenshot: "the bottom is way too high"): the
+    // veil anchor below was added INSIDE this function after this early
+    // return, so on desktop it never ran and the veil fell back to its phone
+    // defaults (a 94vw sheet with its top edge at 57vh): the seam across the
+    // screen. Desktop measures the veil now and still opts out of the column.
+    if (window.innerWidth >= 1024) { syncVeilAnchor(); return; }
     const root = document.documentElement;
     // v1095, per Codex: ONE stable height, read at launch and on orientation
     // change only. No visualViewport listener, no resize listener, no
@@ -121,21 +153,7 @@ function syncHomeViewport() {
     // every device (the card flexes), so on his phone the veil began inside
     // the translucent card face. The veil now anchors to the card's real
     // measured bottom; re-measured on the same settle/foreground passes.
-    try {
-      const cw = document.querySelector('#dayCard .daycard-wrap');
-      if (cw) {
-        const r2 = cw.getBoundingClientRect();
-        const cb = Math.round(r2.bottom);
-        if (cb > 100 && cb < window.innerHeight) root.style.setProperty('--veil-top', cb + 'px');
-        // v1309: the veil pours from the CARD, so it follows the card's own
-        // width and centre. On the phone that is barely a change; on desktop
-        // (card on the left) a full-width sheet was meaningless.
-        if (r2.width > 40) {
-          root.style.setProperty('--veil-cx', Math.round(r2.left + r2.width / 2) + 'px');
-          root.style.setProperty('--veil-w', Math.round(r2.width) + 'px');
-        }
-      }
-    } catch (e) {}
+    syncVeilAnchor();
     const p1e = document.getElementById('homePage1');
     if (window.innerWidth < 768) {
       root.style.removeProperty('--p1-top');
