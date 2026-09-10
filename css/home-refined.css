@@ -68,9 +68,29 @@ body:not(.has-custom-layout) #commandCenter.cc-deck-live { overflow: hidden; }
 body:not(.has-custom-layout) #commandCenter .cc-card > .cc-inv { display: none !important; }
 body:not(.has-custom-layout) #commandCenter .cc-hold-complete__fill {
   display: block !important;
-  background: var(--solid-fg);
-  opacity: .18;
+  background: #fff;
+  opacity: 1;
+  z-index: 3;
+  mix-blend-mode: difference;
+  pointer-events: none;
 }
+/* Each moving face clips its own text, not just the combined deck. */
+body:not(.has-custom-layout) #commandCenter .cc-card--pillars {
+  overflow: hidden !important;
+  clip-path: inset(0);
+  contain: paint;
+}
+.cc-pillar-nav::after {
+  content: ''; position: absolute; bottom: -1px; left: 0;
+  height: 2px; width: calc(100% / var(--pillar-count, 3));
+  background: var(--text-hi); pointer-events: none;
+  transform: translateX(calc(var(--pillar-index, 0) * 100%));
+  transition: transform 240ms cubic-bezier(.22, 1, .36, 1);
+}
+.cc-pillar-nav.is-dragging::after { transition: none; }
+.cc-pillar-nav button[aria-pressed="true"] { border-bottom-color: transparent; }
+@media (prefers-reduced-motion: reduce) { .cc-pillar-nav::after { transition: none; } }
+body.calm-motion .cc-pillar-nav::after { transition: none; }
 
 @media (max-width: 1023.98px) and (orientation: portrait), (max-width: 1023.98px) and (min-height: 600px) {
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 {

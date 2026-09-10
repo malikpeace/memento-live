@@ -5744,9 +5744,18 @@ function ccGoPillar(cc, pillar) {
     // from the direction you travelled, the way the lab did it: a short slide
     // and fade on the incoming card, never a hard swap.
     const dir = (list.indexOf(pillar) > list.indexOf(_ccPillar)) ? 1 : -1;
+    const previousIndex = list.indexOf(_ccPillar);
     _ccPillar = pillar;
     cc.innerHTML = renderCommandCenter();
     bindCommandCenter(cc);
+    const nav = cc.querySelector('.cc-pillar-nav');
+    if (nav) {
+      nav.classList.add('is-dragging');
+      nav.style.setProperty('--pillar-index', previousIndex);
+      void nav.offsetWidth;
+      nav.classList.remove('is-dragging');
+      nav.style.setProperty('--pillar-index', list.indexOf(pillar));
+    }
     try {
       const reduced = document.body.classList.contains('calm-motion') || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       const card = cc.querySelector('.cc-card');
@@ -5828,7 +5837,7 @@ function ccBindDeckStrip(cc, dn) {
     // now drives the SAME physical deck as swiping the box: one dot-gap of
     // finger equals one full card of travel, 1:1, committing the moment the
     // finger reaches the next dot and springing home if it lets go early.
-    const width = () => 140; // one dot-gap = one full slide
+    const width = () => cc.__deck?.card()?.offsetWidth || 140;
     try { if (cc.__deck) cc.__deck.prebuild(); } catch (z) {}
     let lastX = e.clientX;
     const step = (x) => {
@@ -6006,6 +6015,8 @@ function bindCommandCenter(cc) {
       if (pillars.length > 1) {
         const nav = document.createElement('nav');
         nav.className = 'cc-pillar-nav';
+        nav.style.setProperty('--pillar-count', pillars.length);
+        nav.style.setProperty('--pillar-index', Math.max(0, pillars.indexOf(_ccPillar)));
         nav.setAttribute('aria-label', 'Home sections');
         const names = { action: 'Action', clarity: 'Clarity', consistency: 'Consistency', week: 'Protocol' };
         pillars.forEach(p => {
@@ -6221,11 +6232,13 @@ function bindCommandCenter(cc) {
       // card swipe AND the dot scrub (v1300), so both feel like one machine.
       // How many px of finger equal a complete slide. The dot scrub
       // passes exactly this for one dot-gap, so both inputs share the curve.
-      const FADE_TRAVEL = 140;
       const deckCommit = (dx) => {
         if (!under) return false;
         const reduced = document.body.classList.contains('calm-motion') || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         _ccPillar = underPillar;
+        const nav = cc.querySelector('.cc-pillar-nav');
+        nav?.classList.remove('is-dragging');
+        nav?.style.setProperty('--pillar-index', ccPillarList().indexOf(_ccPillar));
         if (reduced) {
           disarmDeck();
           try { cc.innerHTML = renderCommandCenter(); bindCommandCenter(cc); } catch (e2) {}
@@ -6248,6 +6261,9 @@ function bindCommandCenter(cc) {
       };
       // CANCEL: settle back before accepting another gesture.
       const deckCancel = () => {
+        const nav = cc.querySelector('.cc-pillar-nav');
+        nav?.classList.remove('is-dragging');
+        nav?.style.setProperty('--pillar-index', ccPillarList().indexOf(_ccPillar));
         cc.__deckBusy = true;
         card.style.transition = 'transform .22s ease-out';
         card.style.transform = 'translateX(0)';
@@ -6269,7 +6285,13 @@ function bindCommandCenter(cc) {
         // face underneath there is nothing to reveal, so fading the top one
         // would just delete the box. Never fade into nothing.
         if (!under) { card.style.opacity = ''; card.style.transform = ''; return; }
-        const p2 = Math.min(1, Math.abs(dx) / FADE_TRAVEL);
+        const p2 = Math.min(1, Math.abs(dx) / Math.max(1, card.offsetWidth));
+        const nav = cc.querySelector('.cc-pillar-nav');
+        if (nav) {
+          const list = ccPillarList(), from = list.indexOf(_ccPillar), to = list.indexOf(underPillar);
+          nav.classList.add('is-dragging');
+          nav.style.setProperty('--pillar-index', from + (to - from) * p2);
+        }
         if (document.body.classList.contains('calm-motion') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const direction = dx < 0 ? -1 : 1;
         card.style.transform = 'translateX(' + (direction * p2 * 100) + '%)';
