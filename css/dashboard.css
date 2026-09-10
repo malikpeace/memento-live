@@ -6917,9 +6917,15 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
   left: calc(var(--veil-cx, 50vw) - var(--veil-w, 76vw) * 0.62);
   width: calc(var(--veil-w, 76vw) * 1.24);
   right: auto;
-  top: calc(var(--veil-top, 57vh) + 6px); bottom: -4%;
-  -webkit-mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
-          mask: radial-gradient(44% 118% at 50% 2%, #000 22%, transparent 96%);
+  /* v1356 (Malik's zoom: a hard line and a slab under the card): the veil
+     now starts INSIDE the card's glow and its mask fades on every edge by
+     construction: the radial for the shape, intersected with a vertical
+     ramp so the top edge can never be a line (the edge-safety law). */
+  top: calc(var(--veil-top, 57vh) - 26px); bottom: -4%;
+  -webkit-mask: radial-gradient(42% 118% at 50% 2%, #000 18%, transparent 92%), linear-gradient(to bottom, transparent 0, #000 16%);
+          mask: radial-gradient(42% 118% at 50% 2%, #000 18%, transparent 92%), linear-gradient(to bottom, transparent 0, #000 16%);
+  -webkit-mask-composite: source-in;
+          mask-composite: intersect;
   /* v1306 (Malik: "not like it's slowly wedging down as it goes"): the sheet
      is tipped in perspective, top edge pinned, so it leaves the card narrow
      and WIDENS as it falls, the way poured light spreads. */
@@ -7079,7 +7085,7 @@ html.theme-light #commandCenter .cc-card { background: rgba(255, 255, 255, 0.62)
   .ambient__aurora .aur-veil {
     left: calc(var(--veil-cx, 33vw) - var(--veil-w, 26vw) * 0.62);
     width: calc(var(--veil-w, 26vw) * 1.24);
-    top: calc(var(--veil-top, 66vh) + 6px);
+    top: calc(var(--veil-top, 66vh) - 26px);
     filter: none;
   }
   .ambient__aurora .aur-veil b { filter: blur(22px); }
