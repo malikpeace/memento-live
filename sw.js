@@ -20,7 +20,7 @@ const PRECACHE = [
   './css/vivere.css', './css/notes.css', './css/onboarding.css', './css/clarity.css',
   './css/action.css', './css/daycard-living.css',
   './css/clarity-paywall.css', './css/appearance-picker.css', './css/journey.css',
-  './css/descent.css', './css/install.css',
+  './css/descent.css', './css/install.css', './css/home-refined.css',
   './js/00-error-reporting.js', './js/00-backup-security.js',
   './js/01-state-foundation.js', './js/02-clarity-experience.js', './js/03-ai-integration.js',
   './js/04-templates-proof.js', './js/05-vivere.js', './js/06-consistency-mori.js',

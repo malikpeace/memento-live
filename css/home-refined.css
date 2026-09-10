@@ -1,0 +1,144 @@
+/* Refined home: real content and controls, no new data or alternate renderer.
+   Custom layouts and expanded Memento views retain their own geometry. */
+body:not(.has-custom-layout) .app.dash-v2 #commandCenter .cc-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 18px 0 0 !important;
+  zoom: 1 !important;
+}
+body:not(.has-custom-layout) #commandCenter .cc-card--pillars {
+  height: auto !important; min-height: var(--cc-deck-h, 240px);
+}
+.cc-pillar-nav { display: none; }
+/* Dim the ambient field, not the Memento's own luminous border. */
+body:not(.has-custom-layout):not(.mf-open):not(.mfe-open):has(.app.dash-v2) #ambientBg {
+  filter: opacity(.5);
+}
+.home-goal {
+  display: block; margin: 9px 0 0; max-width: 48ch;
+  font-size: 14px; line-height: 1.45; font-weight: 400;
+  letter-spacing: 0; color: rgba(var(--ink), .68);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mgreet-hello .home-goal { max-width: calc(100vw - 48px); margin-inline: auto; }
+body:not(.has-custom-layout) .app.dash-v2 #commandCenter > .cc-pillar-nav {
+  display: flex; align-items: center; gap: 0; flex: none;
+  position: relative; z-index: 2; min-height: 44px;
+  border-bottom: 1px solid rgba(var(--ink), .12);
+}
+.cc-pillar-nav button {
+  flex: 1 1 0; min-width: 0; text-align: center;
+  appearance: none; background: none; border: 0; border-bottom: 2px solid transparent;
+  border-radius: 0; padding: 12px 0; min-height: 44px;
+  font: inherit; font-size: 13px; font-weight: 560;
+  color: var(--text-lo); cursor: pointer;
+}
+.cc-pillar-nav button[aria-pressed="true"] { color: var(--text-hi); border-bottom-color: currentColor; }
+.cc-pillar-nav button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+/* Hierarchy comes from size, weight and spacing, not unreadably faint copy. */
+body:not(.has-custom-layout) #commandCenter .cc-pillar-nav button:not([aria-pressed="true"]) {
+  color: rgba(var(--ink), .68);
+}
+body:not(.has-custom-layout) #commandCenter .cc-sync-k {
+  display: none;
+  font-size: 11px; font-weight: 600; letter-spacing: .09em;
+  color: rgba(var(--ink), .62);
+}
+body:not(.has-custom-layout) #commandCenter :is(.a-move, .c-star) {
+  text-wrap: pretty; overflow-wrap: break-word;
+}
+body:not(.has-custom-layout) #commandCenter .a-how {
+  margin-top: 14px; font-weight: 400; color: rgba(var(--ink), .76);
+  max-width: 54ch;
+}
+body:not(.has-custom-layout) #commandCenter > .cc-dots--deck i { visibility: hidden; }
+body:not(.has-custom-layout) #commandCenter > .cc-dots--deck { margin: 0; min-height: 44px; pointer-events: none; }
+body:not(.has-custom-layout) #commandCenter .cc-strip-m { width: 44px; height: 44px; background: none; box-shadow: none; pointer-events: auto; }
+body:not(.has-custom-layout) #commandCenter.cc-deck-live { overflow: hidden; }
+
+@media (max-width: 1023.98px) and (orientation: portrait), (max-width: 1023.98px) and (min-height: 600px) {
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+    padding: 116px 12px calc(16px + var(--safe-b, 0px));
+    gap: 22px;
+    min-height: 650px;
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 > #dayCard {
+    margin: 0 !important; padding: 0 !important; flex: 1 1 auto;
+    min-height: 220px !important;
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    width: var(--evo-card-w, min(180px, calc(100cqh * 320 / 452))) !important;
+  }
+  body.card-square:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    width: var(--evo-card-w, min(190px, 100cqh)) !important; aspect-ratio: 1 !important;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile .mgreet-hello {
+    position: fixed; left: 0; right: auto; width: 100vw;
+    top: calc(var(--safe-t, 0px) + 60px); text-align: center;
+    font-size: 22px; line-height: 1.25; font-weight: 600; text-shadow: none;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+    width: 100%; max-width: 520px; align-self: center; margin: 0;
+  }
+  body:not(.has-custom-layout) #commandCenter .cc-pillar-nav { gap: 0; }
+  body:not(.has-custom-layout) #commandCenter .a-move { font-size: 28px; line-height: 1.2; letter-spacing: -.03em; }
+  body:not(.has-custom-layout) #commandCenter .a-how { font-size: 15px; line-height: 1.55; }
+}
+
+/* Short landscape screens need two columns and honest vertical scrolling,
+   rather than squeezing the real controls under the card. */
+@media (max-width: 1023.98px) and (orientation: landscape) and (max-height: 599.98px) {
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 {
+    display: grid; grid-template-columns: minmax(0, 1fr) 180px;
+    grid-template-areas: "content memento";
+    gap: 36px; height: auto; min-height: calc(100svh - 16px);
+    padding: 56px max(24px, var(--safe-r, 0px)) 16px max(24px, var(--safe-l, 0px));
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 > #dayCard {
+    grid-area: memento; height: 260px; min-width: 0; width: 180px; margin: 0 !important; padding: 0 !important;
+  }
+  body:not(.has-custom-layout):not(.mf-open):not(.mfe-open) .app.dash-v2 #homePage1 #dayCard .daycard-theme-living .daycard-living-stage {
+    width: var(--evo-card-w, 160px) !important;
+  }
+  body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
+    grid-area: content; width: 100%; min-width: 0; max-width: none; padding: 0; margin: 0;
+  }
+  body:not(.has-custom-layout) #commandCenter .cc-card--pillars { min-height: 0; }
+  body:not(.has-custom-layout) #commandCenter .cc-card--pillars > .v { height: auto; min-height: 0; }
+  body:not(.has-custom-layout) #commandCenter .cc-card--pillars .a-btn { margin-top: 20px !important; }
+}
+
+@media (min-width: 1024px) {
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 {
+    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+    grid-template-rows: auto minmax(40px, 1fr) auto auto auto minmax(40px, 1fr);
+    grid-template-areas: "dhead dhead" ". ." "greeting dcard" "content dcard" "dheat dheat" ". .";
+    column-gap: 90px;
+  }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMissionWrap { display: contents; }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #deskMission { display: none; }
+  body:not(.has-custom-layout) .app.dash-v2 #deskGreeting {
+    grid-area: greeting; margin: 0 0 22px; font-size: 24px; font-weight: 600;
+  }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #commandCenter {
+    display: flex !important; flex-direction: column; grid-area: content;
+    width: 100%; min-width: 0; margin: 0; align-self: start;
+    padding: 0;
+  }
+  body:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard {
+    --card-h: clamp(300px, 38vh, 360px); --card-w: calc(var(--card-h) * .744);
+  }
+  body.card-square:is(.ns-bloom, .evo2, .evo-pending, .pre-clarity):not(.has-custom-layout) .app.dash-v2 #dayCard { --card-w: var(--card-h); }
+  body:not(.has-custom-layout) #commandCenter .a-move { font-size: clamp(32px, 3.5vw, 48px); line-height: 1.1; letter-spacing: -.04em; }
+  body:not(.has-custom-layout) #commandCenter .a-how { font-size: 16px; line-height: 1.55; }
+  body:not(.has-custom-layout) #commandCenter .a-btn { align-self: flex-start; width: auto; min-width: 240px; padding-inline: 28px; }
+  body:not(.has-custom-layout) #commandCenter .cc-card--pillars { height: auto !important; min-height: var(--cc-deck-h, 280px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #commandCenter .cc-card--in-r, #commandCenter .cc-card--in-l { animation: none; }
+}

@@ -1344,6 +1344,10 @@ function ccGreetingLine(first) {
   } catch (e) { return 'Hello.'; }
 }
 
+function ccGreetingGoalHtml() {
+  const goal = String(state.clarity?.answers?.neutronStar || '').trim();
+  return goal ? '<span class="home-goal" title="' + esc(goal) + '">' + esc(goal) + '</span>' : '';
+}
 function renderGreeting() {
   const now = new Date();
   // v1042 (Malik): no time-of-day greeting anywhere. This function now only
@@ -1406,7 +1410,7 @@ function renderGreeting() {
     const first = ((state.profile && state.profile.name || '').trim().split(/\s+/)[0]) || '';
     const line2 = ccGreetingLine(first);
     mg.innerHTML = '<button class="wbar__settings' + cornerCls + '" id="wbarSettings" type="button" aria-label="Settings">' + cornerInner + '</button>'
-      + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + '</div>';
+      + '<div class="mgreet-hello" id="mgreetHello">' + esc(line2) + ccGreetingGoalHtml() + '</div>';
     const _ws = document.getElementById('wbarSettings');
     if (_ws) {
       _ws.addEventListener('click', function () { try { if (typeof TabBar !== 'undefined' && TabBar.switchTo) TabBar.switchTo('profile'); } catch (e) {} });
@@ -5485,7 +5489,7 @@ function renderDeskMission() {
         // v1324: same shared words as the phone (first name only there; the
         // desktop header keeps the full trimmed name it always used).
         const name = (state.profile && state.profile.name || '').trim();
-        g.textContent = ccGreetingLine(name);
+        g.innerHTML = esc(ccGreetingLine(name)) + ccGreetingGoalHtml();
       }
     } catch (e) {}
     const pa = (state.action && state.action.primaryAction) || {};
@@ -5693,6 +5697,7 @@ function renderDeskMission() {
    ========================================================================== */
 function ccGoPillar(cc, pillar) {
   try {
+    if (cc.__deckBusy) return;
     if (pillar === _ccPillar) return;
     const list = ccPillarList();
     if (list.indexOf(pillar) === -1) return;
@@ -5704,7 +5709,7 @@ function ccGoPillar(cc, pillar) {
     cc.innerHTML = renderCommandCenter();
     bindCommandCenter(cc);
     try {
-      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reduced = document.body.classList.contains('calm-motion') || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
       const card = cc.querySelector('.cc-card');
       if (card && !reduced) {
         card.classList.add(dir > 0 ? 'cc-card--in-r' : 'cc-card--in-l');
@@ -5784,7 +5789,7 @@ function ccBindDeckStrip(cc, dn) {
     // now drives the SAME physical deck as swiping the box: one dot-gap of
     // finger equals one full card of travel, 1:1, committing the moment the
     // finger reaches the next dot and springing home if it lets go early.
-    const width = () => 140; // one dot-gap = one full crossfade (FADE_TRAVEL)
+    const width = () => 140; // one dot-gap = one full slide
     try { if (cc.__deck) cc.__deck.prebuild(); } catch (z) {}
     let lastX = e.clientX;
     const step = (x) => {
@@ -5951,8 +5956,34 @@ function bindCommandCenter(cc) {
   // keeps authoring them in place.
   try {
     if (cc && cc.id === 'commandCenter') {
+      cc.querySelector(':scope > .cc-pillar-nav')?.remove();
       const dn = cc.querySelector('.cc-card .cc-dots');
       if (dn) { dn.classList.add('cc-dots--deck'); cc.appendChild(dn); ccBindDeckStrip(cc, dn); }
+      cc.querySelector(':scope > .cc-dots--deck')?.removeAttribute('aria-hidden');
+      // The names stay put while the real face slides. Keep the original
+      // strip/search machinery underneath; availability still comes from
+      // the app, including Protocol and pre-Clarity states.
+      const pillars = ccPillarList();
+      if (pillars.length > 1) {
+        const nav = document.createElement('nav');
+        nav.className = 'cc-pillar-nav';
+        nav.setAttribute('aria-label', 'Home sections');
+        const names = { action: 'Action', clarity: 'Clarity', consistency: 'Consistency', week: 'Protocol' };
+        pillars.forEach(p => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.pillar = p;
+          button.textContent = names[p] || p;
+          button.setAttribute('aria-pressed', String(p === _ccPillar));
+          button.addEventListener('click', () => {
+            const keyboard = button.matches(':focus-visible');
+            ccGoPillar(cc, p);
+            if (keyboard) cc.querySelector('[data-pillar="' + p + '"]')?.focus({ preventScroll: true });
+          });
+          nav.appendChild(button);
+        });
+        cc.insertBefore(nav, cc.firstChild);
+      }
     }
   } catch (e) {}
 
@@ -5996,6 +6027,7 @@ function bindCommandCenter(cc) {
       let x0 = null, y0 = null, axis = null;
       const THRESH = 12, COMMIT = 56;
       card.addEventListener('pointerdown', (e) => {
+        if (cc.__deckBusy) return;
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         // v1056 (Malik): pre-Clarity there is ONE face ("Find your neutron
         // star") and nothing to swipe to, so the card must not even follow
@@ -6067,9 +6099,8 @@ function bindCommandCenter(cc) {
           // said "nothing moved" while his eyes correctly saw the incoming
           // card grow on every single swipe. Depth now comes from the offset
           // and the shadow only. Cards slide at exactly their real size.
-          // v1301 (Malik: "no longer swipe like a stack, simply just fade").
-          // The incoming face sits exactly in place and FADES in as the
-          // current one fades out; nothing slides, nothing rises.
+          // Previews rest hidden until a drag places the adjacent face one
+          // width away. The slide never scales either face.
           u.style.transform = 'none';
           u.style.opacity = '0';
           u.style.zIndex = '0';
@@ -6115,8 +6146,8 @@ function bindCommandCenter(cc) {
           Object.keys(preEls).forEach((k) => { if (preEls[k] !== under) preEls[k].style.display = 'none'; });
           // rest pose, in case a direction reversal re-reveals it mid-gesture
           under.style.transition = 'none';
-          under.style.transform = 'none';
-          under.style.opacity = '0';
+          under.style.transform = 'translateX(' + (dir < 0 ? 100 : -100) + '%)';
+          under.style.opacity = '1';
           under.style.display = '';
           void under.offsetWidth;
           under.style.transition = '';
@@ -6149,12 +6180,12 @@ function bindCommandCenter(cc) {
       // COMMIT: the top card leaves the way it was moving, the one beneath
       // rises to full size, then the real render takes over. Shared by the
       // card swipe AND the dot scrub (v1300), so both feel like one machine.
-      // How many px of finger equal a complete crossfade. The dot scrub
+      // How many px of finger equal a complete slide. The dot scrub
       // passes exactly this for one dot-gap, so both inputs share the curve.
       const FADE_TRAVEL = 140;
       const deckCommit = (dx) => {
         if (!under) return false;
-        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reduced = document.body.classList.contains('calm-motion') || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         _ccPillar = underPillar;
         if (reduced) {
           disarmDeck();
@@ -6162,9 +6193,10 @@ function bindCommandCenter(cc) {
           return true;
         }
         cc.__deckBusy = true;
-        card.style.transition = 'opacity .2s ease-in';
-        card.style.opacity = '0';
-        under.style.transition = 'opacity .2s ease-out';
+        card.style.transition = 'transform .2s ease-out';
+        card.style.transform = 'translateX(' + (dx < 0 ? -100 : 100) + '%)';
+        under.style.transition = 'transform .2s ease-out';
+        under.style.transform = 'translateX(0)';
         under.style.opacity = '1';
         setTimeout(() => {
           disarmDeck();
@@ -6175,29 +6207,35 @@ function bindCommandCenter(cc) {
         }, 230);
         return true;
       };
-      // CANCEL: fade back to where you were.
+      // CANCEL: settle back before accepting another gesture.
       const deckCancel = () => {
-        card.style.transition = 'opacity .22s ease-out';
+        cc.__deckBusy = true;
+        card.style.transition = 'transform .22s ease-out';
+        card.style.transform = 'translateX(0)';
         card.style.opacity = '1';
         if (under) {
-          under.style.transition = 'opacity .22s ease-in';
+          under.style.transition = 'transform .22s ease-out, opacity .22s ease-in';
           under.style.opacity = '0';
         }
         setTimeout(() => {
-          card.style.transition = ''; card.style.opacity = ''; card.dataset.swiping = '';
+          card.style.transition = ''; card.style.opacity = ''; card.style.transform = ''; card.dataset.swiping = '';
           disarmDeck();
+          cc.__deckBusy = false;
         }, 250);
       };
-      // 1:1 crossfade under the finger, shared with the scrub (v1301).
+      // Slide the content only; navigation and the Memento remain still.
       const deckDrag = (dx) => {
         if (dx !== 0) armDeck(dx);
         // v1307 (Malik: "when swiping fast they can disappear"): with no
         // face underneath there is nothing to reveal, so fading the top one
         // would just delete the box. Never fade into nothing.
-        if (!under) { card.style.opacity = ''; return; }
+        if (!under) { card.style.opacity = ''; card.style.transform = ''; return; }
         const p2 = Math.min(1, Math.abs(dx) / FADE_TRAVEL);
-        card.style.opacity = (1 - p2).toFixed(3);
-        under.style.opacity = p2.toFixed(3);
+        if (document.body.classList.contains('calm-motion') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const direction = dx < 0 ? -1 : 1;
+        card.style.transform = 'translateX(' + (direction * p2 * 100) + '%)';
+        under.style.transform = 'translateX(' + (-direction * (1 - p2) * 100) + '%)';
+        under.style.opacity = '1';
       };
       // v1300 (Malik: the dot strip must FEEL like the deck): the scrub in
       // ccBindDeckStrip drives this same machinery, so a finger on the dots
@@ -6232,8 +6270,9 @@ function bindCommandCenter(cc) {
         const dx = (e && e.clientX != null) ? e.clientX - x0 : 0;
         const wasX = axis === 'x';
         x0 = null; y0 = null; axis = null;
-        if (wasX && Math.abs(dx) >= COMMIT && deckCommit(dx)) return;
-        deckCancel();
+        if (e?.type !== 'pointercancel' && wasX && Math.abs(dx) >= COMMIT && deckCommit(dx)) return;
+        if (wasX) deckCancel();
+        else disarmDeck();
       };
       card.addEventListener('pointerup', finish);
       card.addEventListener('pointercancel', finish);
