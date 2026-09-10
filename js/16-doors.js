@@ -210,6 +210,22 @@
 
   function finishTransition(slug, before, target, opts) {
     return Promise.resolve(target.open(opts)).then(function () {
+      // v1370 (Malik, from his phone: Build my plan did nothing). A surface's
+      // own gate may open a DIFFERENT door instead of itself: Action, for a
+      // free person, opens the paywall. That is the landing, not a stray.
+      // Healing it away closed the paywall the instant it opened and the tap
+      // read as dead. Adopt the redirect; a surface that opened nothing
+      // (a non-door beat such as First 7 Days, or nothing to show) simply
+      // leaves the transition where it was, without throwing.
+      if (slug !== 'home' && !active(target)) {
+        var landed = activeSlugs();
+        if (landed.length === 1 && landed[0] !== slug && resolve(landed[0])) {
+          slug = landed[0];
+          target = resolve(slug);
+        } else if (!landed.length) {
+          return before;
+        }
+      }
       return assertOneRoot(slug).then(function () {
         if (slug !== 'home' && !active(target)) {
           throw new Error('Doors: target surface did not become active: ' + slug);
