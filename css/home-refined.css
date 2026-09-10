@@ -18,13 +18,18 @@ body:not(.has-custom-layout) #commandCenter .cc-card--pillars {
 body:not(.has-custom-layout):not(.mf-open):not(.mfe-open):has(.app.dash-v2) #ambientBg {
   filter: opacity(.5);
 }
-.home-goal {
-  display: block; margin: 9px 0 0; max-width: 48ch;
+.home-encouragement {
+  display: flex; align-items: center; gap: 8px; margin: 2px 0 0; max-width: 48ch;
+  appearance: none; background: none; border: 0; padding: 6px 0; min-height: 44px;
+  font-family: inherit; text-align: inherit; cursor: pointer;
   font-size: 14px; line-height: 1.45; font-weight: 400;
   letter-spacing: 0; color: rgba(var(--ink), .68);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  white-space: normal;
 }
-.mgreet-hello .home-goal { max-width: calc(100vw - 48px); margin-inline: auto; }
+.home-encouragement:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 4px; }
+.mgreet-hello .home-encouragement { max-width: calc(100vw - 48px); margin-inline: auto; justify-content: center; }
+body:not(.has-custom-layout) .dash-header__brand-date { display: none; }
+body:not(.has-custom-layout) .dash-header__brand-name { font-size: 11px; letter-spacing: .18em; font-weight: 600; }
 body:not(.has-custom-layout) .app.dash-v2 #commandCenter > .cc-pillar-nav {
   display: flex; align-items: center; gap: 0; flex: none;
   position: relative; z-index: 2; min-height: 44px;
@@ -79,7 +84,7 @@ body:not(.has-custom-layout) #commandCenter.cc-deck-live { overflow: hidden; }
   body:not(.has-custom-layout) .app.dash-v2 #dashGreetingMobile .mgreet-hello {
     position: fixed; left: 0; right: auto; width: 100vw;
     top: calc(var(--safe-t, 0px) + 60px); text-align: center;
-    font-size: 22px; line-height: 1.25; font-weight: 600; text-shadow: none;
+    font-size: 22px; line-height: 1.25; font-weight: 500; text-shadow: none;
   }
   body:not(.has-custom-layout) .app.dash-v2 #homePage1 > #commandCenter {
     width: 100%; max-width: 520px; align-self: center; margin: 0;

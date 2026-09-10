@@ -1325,29 +1325,68 @@ const MoreSpace = {
 
 // v1324 (Malik): the greeting words, ONE source for the home (both call sites
 // below) and the day counter, so they can never disagree. His calibration:
-// "Welcome to Memento" pre-star, capitalized time words, a bare "Up late?"
+// A short welcome pre-star, time-aware words, a bare "Up late?"
 // past midnight (no name, the wink IS the greeting), and a date-seeded
 // "Hello" roughly one day in five so it stays alive without ever being
 // random mid-session (same trick as the comeback sentence).
 function ccGreetingLine(first) {
   try {
     const hasStar = !!(state.clarity && state.clarity.completed && state.clarity.answers && state.clarity.answers.neutronStar);
-    if (!hasStar) return first ? ('Welcome to Memento, ' + first + '.') : 'Welcome to Memento.';
+    if (!hasStar) return first ? ('Welcome, ' + first + '.') : 'Welcome.';
     const h = new Date().getHours();
     if (h < 5) return 'Up late?';
     let seed = 0;
     const k = (typeof getTodayISO === 'function' ? getTodayISO() : '') + ':hello';
     for (let i = 0; i < k.length; i++) seed = (seed * 31 + k.charCodeAt(i)) >>> 0;
     const word = (seed % 5) === 0 ? 'Hello'
-      : (h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening');
+      : (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening');
     return first ? (word + ', ' + first + '.') : (word + '.');
   } catch (e) { return 'Hello.'; }
 }
 
-function ccGreetingGoalHtml() {
-  const goal = String(state.clarity?.answers?.neutronStar || '').trim();
-  return goal ? '<span class="home-goal" title="' + esc(goal) + '">' + esc(goal) + '</span>' : '';
+const HOME_ENCOURAGEMENT = [
+  "You don't need to figure everything out today.",
+  'A small step still counts.',
+  "Start where you are. We'll work from there.",
+  "It's okay to start again.",
+  'Give yourself a little time to get going.',
+  "You can make today a little easier on yourself."
+];
+function homeEncouragementDay(now = new Date()) {
+  return Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
 }
+let homeEncouragementDate = homeEncouragementDay();
+let homeEncouragementIndex = homeEncouragementDate % HOME_ENCOURAGEMENT.length;
+function refreshDailyEncouragement() {
+  const day = homeEncouragementDay();
+  if (day === homeEncouragementDate) return;
+  homeEncouragementDate = day;
+  homeEncouragementIndex = day % HOME_ENCOURAGEMENT.length;
+  document.querySelectorAll('.home-encouragement-text').forEach(function (el) {
+    el.textContent = HOME_ENCOURAGEMENT[homeEncouragementIndex];
+  });
+}
+document.addEventListener('visibilitychange', refreshDailyEncouragement);
+window.addEventListener('focus', refreshDailyEncouragement);
+// Local date check only. No network, AI, or automatic animation.
+setInterval(refreshDailyEncouragement, 60000);
+function ccGreetingGoalHtml() {
+  refreshDailyEncouragement();
+  return '<button type="button" class="home-encouragement" aria-label="Show another encouraging message">'
+    + '<span class="home-encouragement-text" aria-live="polite">' + esc(HOME_ENCOURAGEMENT[homeEncouragementIndex]) + '</span>'
+    + '</button>';
+}
+document.addEventListener('click', function (event) {
+  if (!event.target.closest?.('.home-encouragement')) return;
+  refreshDailyEncouragement();
+  homeEncouragementIndex = (homeEncouragementIndex + 1) % HOME_ENCOURAGEMENT.length;
+  document.querySelectorAll('.home-encouragement-text').forEach(function (el) {
+    el.textContent = HOME_ENCOURAGEMENT[homeEncouragementIndex];
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && el.animate) {
+      el.animate([{ opacity: .3 }, { opacity: 1 }], { duration: 180 });
+    }
+  });
+});
 function renderGreeting() {
   const now = new Date();
   // v1042 (Malik): no time-of-day greeting anywhere. This function now only
