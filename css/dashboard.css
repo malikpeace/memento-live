@@ -7244,3 +7244,25 @@ body:has(.tab-panel.is-shown) .ambient__aurora {
   opacity: 0;
   transition: opacity 0.28s ease;
 }
+
+/* v1357: the desktop right-click menu on the Memento. Glass, no border,
+   44px rows, the app's radii. Fades in and out; never a snap. */
+.card-menu {
+  position: fixed; z-index: 1200; min-width: 208px; padding: 6px;
+  border-radius: 12px;
+  background: rgba(18, 22, 28, 0.62);
+  -webkit-backdrop-filter: blur(28px) saturate(1.35);
+  backdrop-filter: blur(28px) saturate(1.35);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0; transform: translateY(4px) scale(0.98); transform-origin: top left;
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.card-menu.is-in { opacity: 1; transform: none; }
+.card-menu__it {
+  display: flex; align-items: center; width: 100%; min-height: 44px; padding: 0 14px;
+  border: 0; border-radius: 8px; background: transparent; text-align: left;
+  font: inherit; font-size: 15px; font-weight: 600; color: var(--text-hi, #f3f4f6); cursor: pointer;
+}
+.card-menu__it:hover, .card-menu__it:focus-visible { background: rgba(255, 255, 255, 0.08); outline: none; }
+html.theme-light .card-menu { background: rgba(255, 255, 255, 0.72); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+html.theme-light .card-menu__it:hover, html.theme-light .card-menu__it:focus-visible { background: rgba(0, 0, 0, 0.06); }

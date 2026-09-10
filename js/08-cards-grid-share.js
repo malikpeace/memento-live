@@ -9085,6 +9085,9 @@ function _mfBindCardTap() {
   const cancelHold = () => { if (holdT) { clearTimeout(holdT); holdT = null; } };
   document.addEventListener('pointerdown', (e) => {
     onCard = !!(e.target && e.target.closest && e.target.closest('#dayCard'));
+    // v1357: only the primary button is a tap or a hold. A right click on
+    // desktop belongs to the card menu below, never to open/close.
+    if (onCard && typeof e.button === 'number' && e.button !== 0) { onCard = false; cancelHold(); return; }
     if (!onCard) return;
     tx = e.clientX; ty = e.clientY; t0 = Date.now(); moved = false; held = false;
     // the HOME hold opens the customise sheet (inside the record the sheet's
@@ -9124,6 +9127,74 @@ function _mfBindCardTap() {
   document.addEventListener('pointercancel', () => { cancelHold(); onCard = false; moved = true; held = false; }, true);
 }
 try { document.addEventListener('DOMContentLoaded', () => { try { _mfBindCardTap(); } catch (e) {} }); _mfBindCardTap(); } catch (e) {}
+
+// v1357 (Malik): RIGHT CLICK ON THE MEMENTO, desktop only. A small glass
+// menu at the cursor: Customize Memento (the full-screen editor, paid) and
+// Open Memento (the record). Phones keep the hold; there is no right click.
+function _mfCardMenuClose() {
+  const m = document.getElementById('cardMenu');
+  if (!m) return;
+  m.classList.remove('is-in');
+  setTimeout(() => { try { m.remove(); } catch (e) {} }, 160);
+}
+function _mfCardMenuOpen(x, y) {
+  _mfCardMenuClose();
+  const unlocked = _customizeUnlocked();
+  const m = document.createElement('div');
+  m.id = 'cardMenu';
+  m.className = 'card-menu';
+  m.setAttribute('role', 'menu');
+  m.innerHTML =
+    (unlocked ? '<button type="button" class="card-menu__it" role="menuitem" data-act="customize">Customize Memento</button>' : '') +
+    '<button type="button" class="card-menu__it" role="menuitem" data-act="open">Open Memento</button>';
+  document.body.appendChild(m);
+  // keep it on screen
+  const r = m.getBoundingClientRect();
+  const left = Math.min(x, window.innerWidth - r.width - 12);
+  const top = Math.min(y, window.innerHeight - r.height - 12);
+  m.style.left = Math.max(12, left) + 'px';
+  m.style.top = Math.max(12, top) + 'px';
+  void m.offsetWidth;
+  m.classList.add('is-in');
+  m.addEventListener('click', (e) => {
+    const b = e.target && e.target.closest && e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.getAttribute('data-act');
+    _mfCardMenuClose();
+    setTimeout(() => {
+      try {
+        if (act === 'customize') _mfOpenCustomize();
+        else if (act === 'open') openMementoFull();
+      } catch (e) {}
+    }, 60);
+  });
+  const off = (e) => {
+    if (e && e.type === 'keydown' && e.key !== 'Escape') return;
+    if (e && e.type === 'pointerdown' && e.target && e.target.closest && e.target.closest('#cardMenu')) return;
+    _mfCardMenuClose();
+    document.removeEventListener('pointerdown', off, true);
+    document.removeEventListener('keydown', off, true);
+    window.removeEventListener('scroll', off, true);
+    window.removeEventListener('resize', off);
+  };
+  setTimeout(() => {
+    document.addEventListener('pointerdown', off, true);
+    document.addEventListener('keydown', off, true);
+    window.addEventListener('scroll', off, true);
+    window.addEventListener('resize', off);
+  }, 0);
+}
+try {
+  document.addEventListener('contextmenu', (e) => {
+    if (window.innerWidth < 1024) return;
+    const onCard = !!(e.target && e.target.closest && e.target.closest('#dayCard'));
+    if (!onCard) return;
+    try { if (MementoView.isActive()) return; } catch (x) {}
+    if (_mfCinemaUp()) return;
+    e.preventDefault();
+    _mfCardMenuOpen(e.clientX, e.clientY);
+  });
+} catch (e) {}
 
 // The old entry point is now a one-liner into the controller, so every caller
 // (home tap, router, deep link) goes through the same state machine.
