@@ -2036,8 +2036,6 @@ const CreatorTools = {
         <button class="creator-box__btn" id="creatorJumpDay1">Day 1 moment</button>
         <button class="creator-box__btn" id="creatorJumpAction">Action module</button>
         <button class="creator-box__btn" id="creatorRestartAction">Restart Action</button>
-        <button class="creator-box__btn" id="creatorJumpMori">Mori moment</button>
-        <button class="creator-box__btn" id="creatorJumpVivere">Vivere moment</button>
         <button class="creator-box__btn" id="creatorJumpWoven">Woven card</button>
         <button class="creator-box__btn" id="creatorExitStyle">Exit: ✕</button>
         <div class="creator-box__divider">Comeback stress test (safe demo)</div>
@@ -2362,8 +2360,6 @@ const CreatorTools = {
     bind('creatorJumpDay1', () => this.jumpDay1());
     bind('creatorJumpAction', () => this.jumpAction());
     bind('creatorRestartAction', () => this.restartAction());
-    bind('creatorJumpMori', () => this.jumpMori());
-    bind('creatorJumpVivere', () => this.jumpVivere());
     bind('creatorJumpWoven', () => this.jumpWoven());
     document.querySelectorAll('[data-comeback-gap]').forEach((button) => {
       button.addEventListener('click', () => this.jumpComebackScenario(Number(button.dataset.comebackGap)));
@@ -3010,8 +3006,6 @@ const CreatorTools = {
   },
 
   // The Deeper Room moments, straight in (gates bypassed for preview).
-  jumpMori() { this._closeAll(); try { DeeperRoom.openMori({ force: true }); } catch (e) {} },
-  jumpVivere() { this._closeAll(); try { DeeperRoom.openVivere({ force: true }); } catch (e) {} },
   // The end-state card with BOTH weaves already in it, no cinema: stamps the
   // flags, rebuilds the card, lands on home. Toggles OFF on second press.
   jumpWoven() {

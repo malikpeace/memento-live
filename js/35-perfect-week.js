@@ -407,8 +407,11 @@ const PerfectWeek = (() => {
     const baseline = [];
     for (let i = 0; i < 7; i++) baseline.push(i < base);
     let title, subline;
-    if (ended === 'perfect') { title = 'The Perfect Week.'; subline = 'Seven for seven. That is rare air.'; }
-    else if (ended === 'completed') { title = 'You completed your week.'; subline = st.done + ' of 7 days. You proved you CAN.'; }
+    // v1375 (Malik): the ending is a moment, not a report. First week or not
+    // decides the line; the page wears the week's colour.
+    const firstWeek = !d.rerun && !(Array.isArray(state.perfectWeekLog) && state.perfectWeekLog.length);
+    if (ended === 'perfect') { title = firstWeek ? 'Your first Perfect Week!' : 'The Perfect Week!'; subline = 'Seven for seven. That is rare air.'; }
+    else if (ended === 'completed') { title = firstWeek ? 'You completed your first week!' : 'You completed your week!'; subline = st.done + ' of 7 days. You proved you CAN.'; }
     else {
       title = st.done + ' out of 7.';
       if (st.done === 0) subline = 'The week fought back hard. The next one starts whenever you say.';
@@ -416,14 +419,14 @@ const PerfectWeek = (() => {
       else subline = 'The week fought back. You still showed up ' + st.done + (st.done === 1 ? ' time' : ' times') + ', and that counts.';
     }
     const el = document.createElement('div');
-    el.className = 'pwk';
+    el.className = 'pwk pwk--ended pwk--' + ended;
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-label', 'Your Perfect Week Protocol, finished');
     el.innerHTML =
       '<div class="pwk__col pwk__col--center">' +
-        '<div class="pwk__mark">' + markSvg(16) + '</div>' +
-        '<h1 class="pwk__title">' + title + '</h1>' +
-        '<p class="pwk__creed">' + subline + '</p>' +
+        '<div class="pwk__mark pwm__mark">' + markSvg(22) + '</div>' +
+        '<h1 class="pwk__title pwm__title">' + title + '</h1>' +
+        '<p class="pwk__creed pwm__creed">' + subline + '</p>' +
         '<div class="pwm__cmp">' +
           '<div class="pwm__row"><span class="pwm__lbl">Last week</span>' + strip(baseline) + '</div>' +
           '<div class="pwm__row pwm__row--now"><span class="pwm__lbl">Your Protocol week</span>' + strip(st.marks) + '</div>' +
@@ -437,8 +440,8 @@ const PerfectWeek = (() => {
           ['Different', 'Stronger', 'Honestly, tired'].map((w) =>
             '<button type="button" class="pwk__opt" data-f="' + w + '">' + w + '</button>').join('') +
         '</div>' +
-        '<div class="pwk__q" style="margin-top:18px">What did you get done this week? <span class="pwk__opt-note">optional</span></div>' +
-        '<input type="text" class="pwk__input" id="pwmDid" maxlength="90" placeholder="In your words" autocomplete="off">' +
+        '<div class="pwk__q" style="margin-top:22px">What did you get done this week? <span class="pwk__opt-note">optional</span></div>' +
+        '<input type="text" class="pwk__input" id="pwmDid" maxlength="90" placeholder="In your words" autocomplete="off" enterkeyhint="done">' +
         '<div class="pwk__nav">' +
           (ended === 'under' && !d.rerun ? '<button type="button" class="pwk__skip" id="pwmRerun">Run it back</button>' : '') +
           '<button type="button" class="pwk__go" id="pwmKeep">Keep the rhythm</button>' +

@@ -439,3 +439,44 @@
   .pwk .afl-ld__m { animation: none; opacity: 0.35; }
   .pwk__chips { opacity: 1; transform: none; transition: none; }
 }
+
+/* v1375: THE ENDING IS A MOMENT (Malik: "something more exciting", and the
+   field at the bottom "half assed"). The week's colour lands on the mark and
+   the title; the blocks arrive in order; the answer field is the app's own
+   glass field, no border, same radius language as every other control. */
+.pwk--ended .pwm__mark { color: var(--color-consistency, #3fd94e); margin-bottom: 18px; }
+.pwk--under .pwm__mark { color: rgba(var(--ink), 0.7); }
+.pwk--ended .pwm__title { font-size: 31px; line-height: 1.12; letter-spacing: -0.022em; text-wrap: balance; }
+.pwk--ended .pwm__creed { font-size: 16.5px; margin-bottom: 22px; }
+.pwk--ended.pwk--in .pwm__mark,
+.pwk--ended.pwk--in .pwm__title,
+.pwk--ended.pwk--in .pwm__creed,
+.pwk--ended.pwk--in .pwm__cmp,
+.pwk--ended.pwk--in .pwm__stats,
+.pwk--ended.pwk--in .pwk__q,
+.pwk--ended.pwk--in .pwk__row,
+.pwk--ended.pwk--in .pwk__input,
+.pwk--ended.pwk--in .pwk__nav { animation: pwmIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pwk--ended.pwk--in .pwm__title { animation-delay: 0.06s; }
+.pwk--ended.pwk--in .pwm__creed { animation-delay: 0.12s; }
+.pwk--ended.pwk--in .pwm__cmp { animation-delay: 0.2s; }
+.pwk--ended.pwk--in .pwm__stats { animation-delay: 0.28s; }
+.pwk--ended.pwk--in .pwk__q, .pwk--ended.pwk--in .pwk__row, .pwk--ended.pwk--in .pwk__input { animation-delay: 0.36s; }
+.pwk--ended.pwk--in .pwk__nav { animation-delay: 0.44s; }
+@keyframes pwmIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.pwk__input {
+  display: block; width: 100%; margin-top: 10px; min-height: 54px; padding: 15px 16px;
+  border: 0; border-radius: 14px; outline: none; -webkit-appearance: none; appearance: none;
+  background: var(--kfill-06, rgba(var(--ink), 0.06));
+  box-shadow: inset 0 1px 0 rgba(var(--ink), 0.08);
+  font-family: var(--font); font-size: 16.5px; font-weight: 500; line-height: 1.3;
+  color: rgba(var(--ink), 0.95); caret-color: var(--color-consistency, #3fd94e);
+  transition: box-shadow var(--t-fast, 150ms) ease, background var(--t-fast, 150ms) ease;
+}
+.pwk__input::placeholder { color: rgba(var(--ink), 0.42); }
+.pwk__input:focus { background: var(--kfill-08, rgba(var(--ink), 0.08)); box-shadow: inset 0 0 0 1.5px rgba(var(--ink), 0.28); }
+@media (prefers-reduced-motion: reduce) {
+  .pwk--ended.pwk--in .pwm__mark, .pwk--ended.pwk--in .pwm__title, .pwk--ended.pwk--in .pwm__creed,
+  .pwk--ended.pwk--in .pwm__cmp, .pwk--ended.pwk--in .pwm__stats, .pwk--ended.pwk--in .pwk__q,
+  .pwk--ended.pwk--in .pwk__row, .pwk--ended.pwk--in .pwk__input, .pwk--ended.pwk--in .pwk__nav { animation: none; }
+}

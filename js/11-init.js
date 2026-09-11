@@ -488,7 +488,6 @@ ActionExperience.init();
 CreatorTools.init();
 WelcomeIntro.init();
 TabBar.init();
-setTimeout(function(){ try { if (typeof DeeperRoom !== 'undefined') DeeperRoom.init(); } catch (e) {} }, 0);
 try { if (typeof GrabberTrial !== 'undefined') GrabberTrial.init(); } catch (e) {}
 Sidebar.init();
 DragDrop.init();
