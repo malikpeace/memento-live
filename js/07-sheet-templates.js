@@ -202,110 +202,6 @@ const SHEET_TEMPLATES = {
       });
     }
   },
-  // ---- Universal Capture Inbox (v19 Daily Cockpit). One frictionless place to
-  // dump anything on your mind, then triage each item into the right module
-  // (Action / Reflection / Memory / Friction / Proof / Project). Offline-safe;
-  // routing writes the same record shapes the modules create natively. ----
-  inbox: {
-    // v25: the Inbox is the quiet Updates center. Grace days, records, the
-    // weekly card, and comebacks land here as a calm, day-grouped digest.
-    // User captures moved to Notes (the "Captures" folder); quick capture
-    // lives on the FAB and the palette, writing straight into that folder.
-    _ensureStyles() {
-      if (document.getElementById('updStyles')) return;
-      const s = document.createElement('style');
-      s.id = 'updStyles';
-      s.textContent = `
-      .upd-screen{max-width:660px;margin:0 auto;
-        --upd-hi:rgba(var(--ink),0.95);--upd-t1:rgba(var(--ink),0.86);--upd-t2:rgba(var(--ink),0.55);--upd-t3:rgba(var(--ink),0.34);
-        --upd-card:rgba(var(--ink),0.025);}
-      .upd-day{margin:20px 2px 9px;font-size:0.64rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--upd-t3);}
-      .upd-list{display:flex;flex-direction:column;gap:9px;}
-      .upd-item{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--hairline);border-radius:calc(10px * var(--rx, 1));background:var(--upd-card);padding:12px 14px;}
-      .upd-item__dot{flex:none;width:6px;height:6px;border-radius:50%;background:var(--color-consistency);margin-top:7px;opacity:0;transition:opacity 0.4s ease;}
-      .upd-item--unread .upd-item__dot{opacity:1;}
-      .upd-item--weekly{border-color:rgba(var(--success-rgb),0.22);background:rgba(var(--success-rgb),0.03);}
-      .upd-item__body{flex:1;min-width:0;}
-      .upd-item__title{font-size:0.9rem;font-weight:600;color:var(--upd-hi);line-height:1.35;}
-      .upd-item__text{display:block;font-size:0.82rem;color:var(--upd-t2);line-height:1.45;margin-top:2px;}
-      .upd-item__time{flex:none;font-size:0.7rem;color:var(--upd-t3);margin-top:2px;font-variant-numeric:tabular-nums;}
-      .upd-empty{margin-top:24px;border:1px dashed rgba(var(--ink),0.14);border-radius:calc(10px * var(--rx, 1));padding:30px 22px;text-align:center;}
-      .upd-empty__t{font-size:1rem;font-weight:650;color:var(--upd-hi);margin-bottom:7px;}
-      .upd-empty__s{font-size:0.84rem;color:var(--upd-t2);line-height:1.5;}
-      .upd-foot{margin-top:22px;font-size:0.7rem;color:var(--upd-t3);text-align:center;}
-      `;
-      document.head.appendChild(s);
-    },
-    _relTime(ts) {
-      try {
-        const d = Date.now() - ts;
-        if (d < 60000) return 'now';
-        if (d < 3600000) return Math.floor(d / 60000) + 'm';
-        if (d < 86400000) return Math.floor(d / 3600000) + 'h';
-        return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-      } catch (e) { return ''; }
-    },
-    render() {
-      this._ensureStyles();
-      if (!Array.isArray(state.updates)) state.updates = [];
-      // Auto-archive: anything older than 30 days quietly leaves the room.
-      const cutoff = Date.now() - 30 * 86400000;
-      const before = state.updates.length;
-      state.updates = state.updates.filter(u => u && u.ts >= cutoff);
-      if (state.updates.length !== before) { try { persistState(); } catch (e) {} }
-      const items = state.updates.slice().reverse();
-      let h = '<div class="upd-screen">';
-      if (!items.length) {
-        h += '<div class="upd-empty"><div class="upd-empty__t">Quiet here.</div><div class="upd-empty__s">Grace days, new records, and your weekly card will land in this room. Nothing here ever demands anything of you.</div></div>';
-      } else {
-        const dayLabel = (ts) => {
-          const k = localISO(new Date(ts));
-          if (k === getTodayISO()) return 'Today';
-          const y = new Date(); y.setDate(y.getDate() - 1);
-          if (k === localISO(y)) return 'Yesterday';
-          return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-        };
-        let lastDay = null;
-        items.forEach((u) => {
-          const dl = dayLabel(u.ts);
-          if (dl !== lastDay) {
-            if (lastDay !== null) h += '</div>';
-            h += '<div class="upd-day">' + esc(dl) + '</div><div class="upd-list">';
-            lastDay = dl;
-          }
-          h += '<div class="upd-item upd-item--' + esc(u.type || 'info') + (u.read ? '' : ' upd-item--unread') + '">' +
-            '<span class="upd-item__dot" aria-hidden="true"></span>' +
-            '<span class="upd-item__body"><span class="upd-item__title">' + esc(u.title) + '</span>' +
-            (u.text ? '<span class="upd-item__text">' + esc(u.text) + '</span>' : '') + '</span>' +
-            '<span class="upd-item__time">' + esc(this._relTime(u.ts)) + '</span>' +
-          '</div>';
-        });
-        if (lastDay !== null) h += '</div>';
-        h += '<div class="upd-foot">Updates keep for 30 days, then leave on their own.</div>';
-      }
-      h += '</div>';
-      return h;
-    },
-    bind() { /* read-only digest: nothing to wire */ },
-    afterOpen(body) {
-      // Seeing the room is reading it: hold the unread dots for a beat so the
-      // user catches which ones were new, then quietly mark everything read.
-      try {
-        const had = (state.updates || []).some(u => u && !u.read);
-        if (!had) return;
-        setTimeout(() => {
-          try {
-            (state.updates || []).forEach(u => { if (u) u.read = true; });
-            persistState();
-            body.querySelectorAll('.upd-item--unread').forEach(el => el.classList.remove('upd-item--unread'));
-            try { if (typeof updateCaptureFab === 'function') updateCaptureFab(); } catch (e) {}
-            try { if (typeof Sidebar !== 'undefined' && Sidebar.refresh) Sidebar.refresh(); } catch (e) {}
-          } catch (e) {}
-        }, 1600);
-      } catch (e) {}
-    }
-  },
-
   // reorder modules, show/hide them, toggle 2 sizes, and save named presets. The
   // top command center stays locked (it lives outside the grid). Changes apply
   // live and persist; "Reset to default" restores the hand-tuned layout. ----
@@ -502,7 +398,6 @@ const SHEET_TEMPLATES = {
       reflection: { label: 'Notes', nav: 'reflection' },
       memory: { label: 'Memory', nav: 'vivere' },
       friction: { label: 'Friction', nav: 'distraction' },
-      inbox: { label: 'Updates', nav: 'inbox' },
       person: { label: 'Person', nav: 'vivere' }
     },
     _ensureStyles() {
@@ -543,7 +438,6 @@ const SHEET_TEMPLATES = {
         ((state.reflection && state.reflection.entries) || []).forEach(e => { if (e && e.text) items.push({ type: 'reflection', title: e.text, sub: e.date || '', nav: 'reflection' }); });
         ((state.vivere && state.vivere.memories) || []).forEach(m => { if (m && m.text) items.push({ type: 'memory', title: m.text, sub: m.category || 'Lived moment', nav: 'vivere' }); });
         ((state.distraction && state.distraction.logs) || []).forEach(l => { if (l && (l.note || l.category)) items.push({ type: 'friction', title: l.note || l.category, sub: l.category || '', nav: 'distraction' }); });
-        ((state.updates) || []).forEach(it => { if (it && it.title) items.push({ type: 'inbox', title: it.title, sub: 'Updates', nav: 'inbox' }); });
         ((state.people) || []).forEach(p => { if (p && p.name) items.push({ type: 'person', title: p.name, sub: 'Person', nav: 'vivere' }); });
       } catch (_) {}
       return items;

@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1376';
+window.MEMENTO_JS_BUILD = 'v1377';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1612,23 +1612,6 @@ function localISO(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 function getTodayISO() { return localISO(new Date()); }
-// === Updates center (the new Inbox) ================================
-// Quiet, append-only app notifications: grace days banked or spent, records,
-// the weekly card, comebacks. Capped at 120; entries older than 30 days are
-// pruned when the Updates sheet renders. Never a red badge, only a quiet dot.
-function pushUpdate(type, title, text) {
-  try {
-    if (!Array.isArray(state.updates)) state.updates = [];
-    state.updates.push({
-      id: 'up_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      type: type || 'info', title: String(title || ''), text: String(text || ''),
-      ts: Date.now(), read: false
-    });
-    if (state.updates.length > 120) state.updates = state.updates.slice(-120);
-    persistState();
-  } catch (e) {}
-}
-
 // Day key (LOCAL) for any stored date value. Full ISO timestamps (how
 // completionHistory records entries) convert through the local clock; bare
 // YYYY-MM-DD strings pass through untouched. Comparing a UTC-sliced day
@@ -2799,12 +2782,6 @@ const Sheet = {
     // refresh the live command center when leaving the projects surface.
     if (_wasWidget === 'projects') {
       try { const ccEl = document.getElementById('commandCenter'); if (ccEl) { ccEl.innerHTML = renderCommandCenter(); bindCommandCenter(ccEl); } } catch (e) {}
-    }
-    // v19: triaging from the Inbox can write into many modules (reflection,
-    // friction, memory, projects, proof), so refresh the whole dashboard.
-    if (_wasWidget === 'inbox') {
-      try { renderAll(); } catch (e) {}
-      try { updateCaptureFab(); } catch (e) {}
     }
     // v19: Customize Dashboard changes the grid structure; rebuild it on close.
     if (_wasWidget === 'layout') {

@@ -3711,7 +3711,6 @@ const Sidebar = {
         add('reflection', cmd('New note', 'Notes', () => { if (state.reflection) state.reflection.activeNoteId = null; openExp(() => Sheet.open('reflection')); }));
         add(null, cmd('Start a deep work block', 'Deep Work', () => openExp(() => Sheet.open('deepwork'))));
         add(null, cmd('Capture a thought', 'Saves to Notes', () => { this.close(); setTimeout(() => { try { if (typeof showQuickCapture === 'function') showQuickCapture(); } catch (_) {} }, 120); }));
-        add(null, cmd('Open Updates', 'Grace days, records, your weekly card', () => openExp(() => Sheet.open('inbox'))));
         add(null, cmd('Open Clarity', 'Your goal', () => openExp(() => { if (typeof ClarityExperience !== 'undefined') ClarityExperience.open(); })));
         // merge 3.1: Action opens the NEW flow (js/30). ActionFlow.start runs
         // the same gate the old door ran and picks the resume screen itself.
