@@ -9409,6 +9409,23 @@ function setLivingCardVars(wrap) {
   wrap.style.setProperty('--mix', Math.max(mixPair, mixSolo).toFixed(3));
   // lit gates everything outside the card (aura, bloom, reflection) by fill
   wrap.style.setProperty('--lit', (Math.max(L.clar, L.act, L.cons) / 100).toFixed(3));
+  // v1373 (Malik: "why is the card glowing white if they haven't gotten their
+  // action yet"): the house card's halo follows the light it has EARNED.
+  // Clarity alone glows cyan; the platinum white belongs to a discovered
+  // move; a week of showing up tints it green. A material skin keeps its own
+  // colour-matched halo (set on the root by js/08), so the wrap stays quiet.
+  try {
+    if (typeof activeCardSkin === 'function' && activeCardSkin()) {
+      wrap.style.removeProperty('--halo-rgb');
+    } else {
+      const lift = (r, g, b, k) => [r, g, b].map((v) => Math.round(v + (255 - v) * k)).join(' ');
+      let halo;
+      if (L.act >= 50) halo = '225 238 250';                 // platinum: the move is discovered
+      else if (L.cons > L.clar * 0.6) halo = lift(63, 217, 78, 0.3);   // consistency green
+      else halo = lift(58, 217, 245, 0.25);                  // Clarity cyan
+      wrap.style.setProperty('--halo-rgb', halo);
+    }
+  } catch (e) {}
   // v931: the Action reward's platinum wash drives the card's CENTRE bright and
   // it STAYS bright, so the adaptive M has to flip for good, not just during the
   // evolution cinema the way v917 handled. A discrete class, not a computed
