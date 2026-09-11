@@ -4111,16 +4111,31 @@ function actionDoneToday() {
 // which the daily action was completed. Buckets by local day via isoToLocalDay
 // (never new Date(date + 'T00:00:00'): the stored value is a full ISO timestamp,
 // so that concat parses to Invalid Date and silently zeroed the action pillar).
+// v1371 (Malik: "if I just get a new star, the card should reset"): the light
+// belongs to THIS star. The day it was lit is the floor for every earned
+// level; moves toward a retired star stay in the ledger (Consistency, the
+// record) but they no longer colour the card. null = no star, no cut.
+function starLitDayNum() {
+  try {
+    const at = state.clarity && state.clarity.ignitedAt;
+    if (!at) return null;
+    const day = (typeof isoToLocalDay === 'function') ? isoToLocalDay(new Date(at).toISOString()) : new Date(at).toISOString().slice(0, 10);
+    const n = Math.floor(Date.parse(day + 'T00:00:00Z') / 86400000);
+    return isNaN(n) ? null : n;
+  } catch (e) { return null; }
+}
 function actionLocalDaysInWindow(win) {
   try {
     const h = (state.action && Array.isArray(state.action.completionHistory)) ? state.action.completionHistory : [];
     const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
+    const lit = starLitDayNum();
     const days = {};
     h.forEach((e) => {
       if (!e || !e.date) return;
       const day = (typeof isoToLocalDay === 'function') ? isoToLocalDay(e.date) : String(e.date).slice(0, 10);
       if (!day) return;
       const dNum = Math.floor(Date.parse(day + 'T00:00:00Z') / 86400000);
+      if (lit != null && dNum < lit) return;
       const diff = todayNum - dNum;
       if (diff >= 0 && diff < win) days[day] = 1;
     });
@@ -9354,8 +9369,23 @@ function livingCardLevels() {
   } catch (e) {}
   let cons = 0;
   try {
-    const cs = consistencyStats();
-    if (cs && typeof cs.pct30 === 'number' && cs.pct30 > 0) cons = Math.min(100, Math.round(Math.sqrt(cs.pct30 / 100) * 100));
+    // v1371: the 30-day fill, counted from the day THIS star was lit. Same
+    // days Consistency counts (main action done), same sqrt curve; only the
+    // floor moved. Before the star's day the card has nothing to be green about.
+    const counts = buildConsistencyData();
+    const todayNum = Math.floor(Date.parse(getTodayISO() + 'T00:00:00Z') / 86400000);
+    const lit = starLitDayNum();
+    let last30 = 0;
+    Object.keys(counts).forEach((k) => {
+      if (!consistencyDayHasMainAction(counts[k])) return;
+      const n = Math.floor(Date.parse(k + 'T00:00:00Z') / 86400000);
+      if (isNaN(n)) return;
+      if (lit != null && n < lit) return;
+      const diff = todayNum - n;
+      if (diff >= 0 && diff <= 29) last30 += 1;
+    });
+    const pct30 = Math.round((last30 / 30) * 100);
+    if (pct30 > 0) cons = Math.min(100, Math.round(Math.sqrt(pct30 / 100) * 100));
   } catch (e) {}
   return { clar, act, cons };
 }

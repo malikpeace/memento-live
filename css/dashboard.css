@@ -6941,27 +6941,28 @@ html.theme-light .cc-fan__opt.is-armed, html.theme-light .cc-fan__opt:active { b
      quarter of the pixels it used to rasterise, every frame. */
   left: 0; right: 0; top: -230px; bottom: 0; filter: blur(9px);
   background: repeating-linear-gradient(to bottom,
-    rgb(var(--aur-1, 58 217 245) / 0.04) 0px,
-    rgb(var(--aur-1, 58 217 245) / 0.4) 76px,
-    rgba(255, 255, 255, 0.28) 110px,
-    rgb(var(--aur-2, 63 217 78) / 0.34) 146px,
-    rgb(var(--aur-1, 58 217 245) / 0.04) 214px);
+    rgb(var(--aur-1, 58 217 245) / 0.02) 0px,
+    rgb(var(--aur-1, 58 217 245) / 0.22) 76px,
+    rgba(255, 255, 255, 0.16) 110px,
+    rgb(var(--aur-2, 63 217 78) / 0.18) 146px,
+    rgb(var(--aur-1, 58 217 245) / 0.02) 214px);
 }
-/* the deep base under the coals */
+/* the deep base under the coals. v1371 (Malik): the whole shedding at
+   roughly half strength; the room is dark, the Memento carries the colour. */
 .ambient__aurora .aur-base {
   left: -14%; right: -14%; top: 56%; bottom: -6%;
-  background: radial-gradient(130% 70% at 50% 114%, rgb(var(--aur-3, 128 150 255) / 0.26), transparent 74%);
+  background: radial-gradient(130% 70% at 50% 114%, rgb(var(--aur-3, 128 150 255) / 0.14), transparent 74%);
   -webkit-mask: radial-gradient(150% 140% at 50% 128%, #000 40%, transparent 88%);
           mask: radial-gradient(150% 140% at 50% 128%, #000 40%, transparent 88%);
 }
 /* the coals: small, separate, each its own size, hue and clock */
 .ambient__aurora em { border-radius: 50%; filter: blur(30px); }
-.ambient__aurora em:nth-of-type(1) { left: 0%;  bottom: -6%; width: 52%; height: 22%; background: rgb(var(--aur-1, 58 217 245) / 0.44); }
-.ambient__aurora em:nth-of-type(2) { left: 36%; bottom: -8%; width: 46%; height: 20%; background: rgb(var(--aur-2, 63 217 78) / 0.4); }
-.ambient__aurora em:nth-of-type(3) { left: 62%; bottom: -4%; width: 40%; height: 17%; background: rgb(var(--aur-3, 128 150 255) / 0.34); }
-.ambient__aurora em:nth-of-type(4) { left: -8%; bottom: 1%;  width: 34%; height: 14%; background: rgb(var(--aur-2, 63 217 78) / 0.3); }
-.ambient__aurora em:nth-of-type(5) { left: 22%; bottom: 3%;  width: 30%; height: 11%; background: rgba(255, 255, 255, 0.16); }
-.ambient__aurora em:nth-of-type(6) { left: 74%; bottom: 2%;  width: 32%; height: 12%; background: rgb(var(--aur-1, 58 217 245) / 0.28); }
+.ambient__aurora em:nth-of-type(1) { left: 0%;  bottom: -6%; width: 52%; height: 22%; background: rgb(var(--aur-1, 58 217 245) / 0.24); }
+.ambient__aurora em:nth-of-type(2) { left: 36%; bottom: -8%; width: 46%; height: 20%; background: rgb(var(--aur-2, 63 217 78) / 0.2); }
+.ambient__aurora em:nth-of-type(3) { left: 62%; bottom: -4%; width: 40%; height: 17%; background: rgb(var(--aur-3, 128 150 255) / 0.18); }
+.ambient__aurora em:nth-of-type(4) { left: -8%; bottom: 1%;  width: 34%; height: 14%; background: rgb(var(--aur-2, 63 217 78) / 0.15); }
+.ambient__aurora em:nth-of-type(5) { left: 22%; bottom: 3%;  width: 30%; height: 11%; background: rgba(255, 255, 255, 0.09); }
+.ambient__aurora em:nth-of-type(6) { left: 74%; bottom: 2%;  width: 32%; height: 12%; background: rgb(var(--aur-1, 58 217 245) / 0.15); }
 /* animations run ONLY once the star exists (hidden animations still run,
    the v1288 lesson, so nothing may animate behind opacity:0) */
 body.ns-bloom .ambient__aurora { opacity: 1; }
