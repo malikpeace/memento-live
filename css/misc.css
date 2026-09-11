@@ -374,7 +374,6 @@ html.theme-light .tab-bar__do-check { color: rgba(22, 140, 32, 0.95); }
 }
 /* Per-module ambient color. */
 .sheet--exp[data-module="streak"]   { --sheet-exp-c1: rgba(var(--success-rgb), 0.50);  --sheet-exp-c2: rgba(28, 160, 39, 0.36); }
-.sheet--exp[data-module="mori"]     { --sheet-exp-c1: rgba(150, 150, 165, 0.36); --sheet-exp-c2: rgba(90, 105, 150, 0.30); }
 .sheet--exp[data-module="deepwork"] { --sheet-exp-c1: rgba(255, 159, 10, 0.46);  --sheet-exp-c2: rgba(255, 110, 30, 0.32); }
 .sheet--exp[data-module="vivere"]   { --sheet-exp-c1: rgba(201, 162, 75, 0.34);  --sheet-exp-c2: rgba(123, 196, 127, 0.26); }
 .sheet--exp[data-module="yearbook"] { --sheet-exp-c1: rgba(201, 162, 75, 0.30);  --sheet-exp-c2: rgba(123, 196, 127, 0.22); }

@@ -101,7 +101,6 @@ const MODULE_INTROS = {
   action: { icon: ICONS.action, color: 'var(--color-action)', quote: "Now that your Neutron Star is clear, Action finds the highest-leverage moves to actually move toward it.", cta: "Let's Go" },
   streak: { icon: ICONS.streak, color: 'var(--color-consistency)', quote: "Clarity and action mean nothing if you only show up once. Consistency is the whole game. This is where you prove it to yourself, one day at a time.", cta: "Let's Go" },
   flow: { icon: ICONS.flow, color: 'var(--color-flow)', quote: "Life will throw roadblocks. These tools help pave the way.", cta: "Let's Go" },
-  mori: { icon: ICONS.mori, color: 'var(--color-mori)', quote: "Time is the only resource you can't earn back. Seeing what's left changes how you spend it.", cta: "Let's Go" },
   vivere: { icon: ICONS.vivere, color: 'var(--color-vivere)', quote: "Mori reminds you the time is finite. Vivere reminds you what it is for. Even on a hard day, notice one moment worth keeping.", cta: "Let's Go" },
   lifestats: { icon: ICONS.lifestats, color: 'var(--color-lifestats)', quote: "Your energy is the fuel behind showing up. Notice it, and your consistency starts to make sense.", cta: "Let's Go" },
   deepwork: { icon: ICONS.deepwork, color: 'var(--color-deepwork)', quote: "Put your phone down. Eliminate distractions. Do the work that matters.", cta: "Let's Go" },

@@ -3716,7 +3716,6 @@ const Sidebar = {
         // the same gate the old door ran and picks the resume screen itself.
         add('action', cmd('Open Action', 'Your plan', () => openExp(() => { if (window.ActionFlow) ActionFlow.start(); else if (typeof ActionExperience !== 'undefined') ActionExperience.open(); })));
         add('streak', cmd('Open Consistency', 'Your streak', () => openExp(() => Sheet.open('streak'))));
-        add(null, cmd('Open Memento Mori', 'Time left', () => openExp(() => Sheet.open('mori'))));
         if (!(typeof VIVERE_PARKED !== 'undefined' && VIVERE_PARKED)) add('vivere', cmd('Open Memento Vivere', 'Vision board', () => openExp(() => Sheet.open('vivere'))));
         add(null, cmd('Open Energy', 'Your fuel', () => openExp(() => Sheet.open('lifestats'))));
         add('action', cmd('Open Projects', 'Milestones toward the goal', () => openExp(() => Sheet.open('projects'))));
@@ -3767,7 +3766,6 @@ const Sidebar = {
         'open clarity': 'purpose mission direction neutron star why goal',
         'open action': 'today task plan path do next step',
         'open consistency': 'streak habits heatmap chain daily',
-        'open memento mori': 'death weeks life countdown mortality time left',
         'open energy': 'lifestats sleep stats health body fuel',
         'open projects': 'milestones goals roadmap',
         'plan time blocks': 'planner calendar schedule timebox agenda shape day',
@@ -3870,7 +3868,7 @@ const Sidebar = {
           // v1300 (Malik: "recommendations already there", Raycast-style): an
           // empty palette leads with the places, ready to tap. Built from
           // _commands() so the unlock gating still holds.
-          const WANT = ['Open Clarity', 'Open Action', 'Open Consistency', 'New note', 'Open Memento Mori', 'Open Settings'];
+          const WANT = ['Open Clarity', 'Open Action', 'Open Consistency', 'New note', 'Open Settings'];
           const all = this._commands();
           items = WANT.map(t => all.find(c => c.title === t)).filter(Boolean).map(c => Object.assign({}, c, { group: 'Go to' }));
         } else {

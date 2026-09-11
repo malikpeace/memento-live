@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1377';
+window.MEMENTO_JS_BUILD = 'v1378';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -197,7 +197,6 @@ const DEFAULT_STATE = {
     { key: 'action', size: 'full' },
     { key: 'streak', size: 'half' },
     { key: 'photo', size: 'half' },
-    { key: 'mori', size: 'half' },
     { key: 'checkin', size: 'half' },
     { key: 'vivere', size: 'half' },
     { key: 'reflection', size: 'full' }
@@ -1806,7 +1805,7 @@ function migrateState() {
   if (state.widgetOrder.length && typeof state.widgetOrder[0] === 'string') {
     state.widgetOrder = state.widgetOrder.map(key => ({
       key,
-      size: (key === 'clarity' || key === 'action' || key === 'mori') ? 'full' : 'half'
+      size: (key === 'clarity' || key === 'action') ? 'full' : 'half'
     }));
   }
   if (!state.introsSeen) {
@@ -1835,7 +1834,7 @@ function migrateState() {
   // v23: lifestats/deepwork/distraction are retired from the default grid but
   // remain ALLOWED (a user can pin them back from the More space); they are
   // simply never auto-appended for users who do not have them.
-  const CANONICAL_ORDER = ['clarity','action','streak','mori','checkin','vivere','reflection'];
+  const CANONICAL_ORDER = ['clarity','action','streak','checkin','vivere','reflection'];
   const RETIRED_WIDGETS = ['lifestats','deepwork','distraction'];
   const _CANON = {}; CANONICAL_ORDER.concat(RETIRED_WIDGETS).forEach(k => { _CANON[k] = true; });
   const _defSize = (key) => (key === 'clarity' || key === 'action' || key === 'reflection') ? 'full' : 'half';
@@ -1867,9 +1866,9 @@ function migrateState() {
       });
       let ciIdx = ord.findIndex(w => w.key === 'checkin');
       if (ciIdx === -1) { ord.push({ key: 'checkin', size: 'half' }); ciIdx = ord.length - 1; }
-      // Check-in sits right after Mori (pairs with it on the mobile subgrid).
+      // Check-in sits right after Consistency (v1378: Mori is gone).
       const ci = ord.splice(ciIdx, 1)[0];
-      const mIdx = ord.findIndex(w => w.key === 'mori');
+      const mIdx = ord.findIndex(w => w.key === 'streak');
       ord.splice(mIdx === -1 ? ord.length : mIdx + 1, 0, ci);
       if (state.clarity && state.clarity.completed) {
         if (!state.prefs || typeof state.prefs !== 'object') state.prefs = {};
@@ -2176,14 +2175,16 @@ function migrateState() {
   // Make sure the Vivere widget is in the order for users whose stored order
   // predates it (CANONICAL_ORDER re-derive above already covers most, this is a
   // belt-and-suspenders guard kept idempotent).
+  // v1378: the Mori tile is retired; scrub it from any stored order.
+  if (Array.isArray(state.widgetOrder)) state.widgetOrder = state.widgetOrder.filter(w => !(w && w.key === 'mori'));
   if (Array.isArray(state.widgetOrder) && !state.widgetOrder.find(w => w.key === 'vivere')) {
-    const mIdx = state.widgetOrder.findIndex(w => w.key === 'mori');
+    const mIdx = state.widgetOrder.findIndex(w => w.key === 'streak');
     state.widgetOrder.splice(mIdx === -1 ? state.widgetOrder.length : mIdx + 1, 0, { key: 'vivere', size: 'half' });
   }
   // v690 (Malik): the photo tile, one personal image on the dashboard. Sits
-  // beside Memento Mori (where the retired check-in tile used to be).
+  // beside Consistency (v1378: Mori is gone).
   if (Array.isArray(state.widgetOrder) && !state.widgetOrder.find(w => w.key === 'photo')) {
-    const mIdx2 = state.widgetOrder.findIndex(w => w.key === 'mori');
+    const mIdx2 = state.widgetOrder.findIndex(w => w.key === 'streak');
     state.widgetOrder.splice(mIdx2 === -1 ? state.widgetOrder.length : mIdx2, 0, { key: 'photo', size: 'half' });
   }
   if (state.introsSeen && state.introsSeen.vivere === undefined) state.introsSeen.vivere = false;
@@ -2543,7 +2544,6 @@ const WIDGET_DEFS = {
   action:    { label: 'Action', color: 'action', defaultSize: 'full', icon: ICONS.action },
   streak:    { label: 'Consistency', color: 'consistency', defaultSize: 'half', icon: ICONS.streak },
   flow:      { label: 'Flow', color: 'flow', defaultSize: 'half', icon: ICONS.flow },
-  mori:      { label: 'Memento Mori', color: 'mori', defaultSize: 'full', icon: ICONS.mori },
   vivere:    { label: 'Memento Vivere', color: 'vivere', defaultSize: 'half', icon: ICONS.vivere },
   lifestats: { label: 'Energy', color: 'lifestats', defaultSize: 'half', icon: ICONS.lifestats },
   checkin:   { label: 'Check-in', color: 'lifestats', defaultSize: 'half', icon: ICONS.checkin },
@@ -2609,14 +2609,6 @@ const Sheet = {
   // while a timer ran leaked the interval and could lose or mis-log a session.
   _teardownTimers() {
     try {
-      if (SHEET_TEMPLATES.mori && SHEET_TEMPLATES.mori.secondsInterval) {
-        clearInterval(SHEET_TEMPLATES.mori.secondsInterval);
-        SHEET_TEMPLATES.mori.secondsInterval = null;
-      }
-      if (SHEET_TEMPLATES.mori && SHEET_TEMPLATES.mori.dayBurnInterval) {
-        clearInterval(SHEET_TEMPLATES.mori.dayBurnInterval);
-        SHEET_TEMPLATES.mori.dayBurnInterval = null;
-      }
       if (SHEET_TEMPLATES.deepwork && (SHEET_TEMPLATES.deepwork._running || SHEET_TEMPLATES.deepwork._intervalId)) {
         const logged = SHEET_TEMPLATES.deepwork._commit();
         if (logged) { persistNow(); renderAll(); }
@@ -2667,7 +2659,7 @@ const Sheet = {
 
     // Full-screen "experience" modules (Streak, Memento Mori, Deep Work) fade in
     // over an ambient color-blurred background instead of sliding up as a drawer.
-    const EXP_MODULES = { streak: true, mori: true, deepwork: true, vivere: true, yearbook: true, reflection: true, lifestats: true, distraction: true, flow: true, inbox: true, projects: true, timeblocks: true, search: true, people: true, checkin: true };
+    const EXP_MODULES = { streak: true, deepwork: true, vivere: true, yearbook: true, reflection: true, lifestats: true, distraction: true, flow: true, inbox: true, projects: true, timeblocks: true, search: true, people: true, checkin: true };
     if (EXP_MODULES[widgetKey]) {
       this.el.classList.add('sheet--exp');
       this.el.setAttribute('data-module', widgetKey);

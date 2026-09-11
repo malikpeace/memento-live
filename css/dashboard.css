@@ -881,7 +881,6 @@ body.ns-bloom .widget--clarity {
   .widget-grid > [data-area="clarity"]    { grid-column: 1 / span 6; }
   .widget-grid > [data-area="action"]     { grid-column: 1 / span 6; }
   .widget-grid > [data-area="streak"]     { grid-column: 1 / span 3; }
-  .widget-grid > [data-area="mori"]       { grid-column: 4 / span 3; }
   /* v23: Check-in opens the row under streak/mori; Vivere flows in beside it.
      Notes goes full width now that the retired modules no longer flank it. */
   .widget-grid > [data-area="checkin"]    { grid-column: 1 / span 3; }
@@ -902,7 +901,6 @@ body.ns-bloom .widget--clarity {
   .widget-grid > [data-area="clarity"]    { grid-column: 1 / span 5;  grid-row: 1 / span 4; }
   .widget-grid > [data-area="action"]     { grid-column: 6 / span 4;  grid-row: 1 / span 2; }
   .widget-grid > [data-area="streak"]     { grid-column: 10 / span 3; grid-row: 1 / span 2; }
-  .widget-grid > [data-area="mori"]       { grid-column: 6 / span 2;  grid-row: 3 / span 2; }
   /* v23: Check-in takes the old Energy (lifestats) cell. */
   .widget-grid > [data-area="checkin"]    { grid-column: 8 / span 2;  grid-row: 3 / span 2; }
   .widget-grid > [data-area="reflection"] { grid-column: 10 / span 3; grid-row: 3 / span 3; }
@@ -997,7 +995,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
      centerpiece the mockup calls for instead of a wall of tiles. */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"],
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="reflection"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="vivere"],
@@ -1084,7 +1081,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency { display: block; grid-column: 1 / -1; grid-row: 5; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency { display: none; }
   /* Mori + Clarity row */
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"]    { grid-column: 1 / 7;  grid-row: 6; aspect-ratio: auto; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"] { grid-column: 7 / 13; grid-row: 6; aspect-ratio: auto; }
   /* Consistency + Check-in row (moved down out of the hero, now a normal pair) */
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"]  { grid-column: 1 / 7;  grid-row: 7; aspect-ratio: auto; }
@@ -1123,7 +1119,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dashConsistency,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #dailyMemento,
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 #hubConsistency,
-  body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="mori"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="clarity"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="streak"],
   body.ns-bloom:not(.has-custom-layout) .app.dash-v2 [data-area="checkin"],
@@ -1188,7 +1183,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   .widget-grid > [data-area="clarity"]    { grid-column: 1 / span 6; }
   .widget-grid > [data-area="action"]     { grid-column: span 3; }
   .widget-grid > [data-area="streak"]     { grid-column: span 3; }
-  .widget-grid > [data-area="mori"]       { grid-column: span 3; }
   .widget-grid > [data-area="checkin"]    { grid-column: span 3; }
   .widget-grid > [data-area="lifestats"]  { grid-column: span 3; }
   .widget-grid > [data-area="deepwork"]   { grid-column: span 3; }
@@ -1200,7 +1194,6 @@ body.ns-bloom .app.dash-v2 #commandCenter .cc-live { display: none; }
   .widget-grid > [data-area="resources"]  { grid-column: 1 / span 6; }
   .widget-grid > [data-area="action"],
   .widget-grid > [data-area="streak"],
-  .widget-grid > [data-area="mori"],
   .widget-grid > [data-area="checkin"],
   .widget-grid > [data-area="lifestats"],
   .widget-grid > [data-area="deepwork"],
@@ -2387,7 +2380,6 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 .widget--consistency,
 .widget--flow,
 .widget--lifestats,
-.widget--mori,
 .widget--deepwork,
 .widget--reflection,
 .widget--distraction {
@@ -2716,7 +2708,6 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 .widget--action .widget__label { color: var(--color-action); }
 .widget--consistency .widget__label { color: var(--color-consistency); }
 .widget--flow .widget__label { color: var(--color-flow); }
-.widget--mori .widget__label { color: var(--color-mori); }
 .widget--vivere .widget__label { color: var(--color-vivere); }
 .widget--lifestats .widget__label { color: var(--color-lifestats); }
 .widget--deepwork .widget__label { color: var(--color-deepwork); }
@@ -2742,7 +2733,6 @@ html.lowfx .cc-hero-body .ctraj { animation: none !important; }
 }
 .widget__big-num { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1; margin: 6px 0 2px; }
 .widget--consistency .widget__big-num { color: var(--color-consistency); }
-.widget--mori .widget__big-num { color: var(--color-mori); }
 .widget--vivere .widget__big-num { color: var(--color-vivere); }
 .widget__big-unit { font-size: 0.75rem; color: var(--text-2); font-weight: 500; }
 .widget__secondary { font-size: var(--fs-sm); color: var(--text-3); margin-top: 4px; }

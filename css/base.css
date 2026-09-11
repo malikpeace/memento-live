@@ -522,7 +522,6 @@ html.theme-light .sheet--exp[data-module="streak"] .sheet__exp-bg {
 html.theme-light .clarity-exp { background: rgba(238,240,243,0.72); }
 
 /* --- Atmospheric scenes: keep dark, restore the dark token set inside --- */
-html.theme-light .sheet--exp[data-module="mori"],
 html.theme-light .sheet--exp[data-module="deepwork"],
 html.theme-light #dwFocusOverlay,
 html.theme-light .ns-star-scene,

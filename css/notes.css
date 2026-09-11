@@ -584,7 +584,6 @@ body.lite .proof-flash { backdrop-filter: none; -webkit-backdrop-filter: none; }
 .sheet-btn--green { background: rgba(var(--success-rgb),0.15); color: var(--color-consistency); border: 1px solid rgba(var(--success-rgb),0.3); }
 .sheet-btn--flow { background: rgba(56,189,248,0.15); color: var(--color-flow); border: 1px solid rgba(56,189,248,0.3); }
 .sheet-btn--lifestats { background: rgba(45,212,191,0.15); color: var(--color-lifestats); border: 1px solid rgba(45,212,191,0.3); }
-.sheet-btn--mori { background: rgba(142,142,147,0.15); color: var(--color-mori); border: 1px solid rgba(142,142,147,0.3); }
 .sheet-btn--vivere { background: rgba(201,162,75,0.14); color: var(--color-vivere); border: 1px solid rgba(201,162,75,0.32); }
 .sheet-btn--vivere:active { background: rgba(201,162,75,0.22); }
 

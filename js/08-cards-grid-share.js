@@ -138,19 +138,6 @@ const RENDERERS = {
     } catch (e) {}
   },
 
-  mori(el) {
-    const c = el.querySelector('.widget__content');
-    const numEl = c.querySelector('.widget__big-num');
-    const unitEl = c.querySelector('.widget__big-unit');
-    if (state.mori.birthYear) {
-      const left = moriYearsRemaining(state.mori.birthYear, state.mori.lifeExpectancy);
-      numEl.textContent = Math.round(left * 365.25).toLocaleString();
-      if (unitEl) unitEl.textContent = 'days left';
-    } else {
-      numEl.textContent = '--';
-      if (unitEl) unitEl.textContent = 'Set your birth year';
-    }
-  },
 
   photo(el) {
     try {
@@ -440,9 +427,6 @@ function isBrandNewUser() {
     if ((state.prefs && state.prefs.unlockAll) || (state.dev && state.dev.previewAll)) return false;
     if (state.clarity && state.clarity.completed) return false;
     if (state.clarity && state.clarity.answers && state.clarity.answers.neutronStar) return false;
-    // Mori is a day-1 anchor outside the ladder: a user who set their birth
-    // year (or finished the life audit) has data and must see their card.
-    if (state.mori && (state.mori.birthYear || state.mori.auditDone)) return false;
     return !LADDER_ORDER.some(k => { try { return moduleHasData(k); } catch (e) { return false; } });
   } catch (e) { return false; }
 }
@@ -451,7 +435,7 @@ function isModuleUnlocked(key) {
     if (state.prefs && state.prefs.unlockAll) return true;
     if (state.dev && state.dev.previewAll) return true;
     // Day-1 anchors, plus 'energy' (legacy alias used by old callers).
-    if (key === 'clarity' || key === 'mori' || key === 'energy') return true;
+    if (key === 'clarity' || key === 'energy') return true;
     // Anything outside the ladder (retired modules, utility surfaces) is never
     // gated; it just lives in the More space instead of the dashboard.
     if (LADDER_ORDER.indexOf(key) === -1) return true;
@@ -749,11 +733,6 @@ function renderGrid() {
         inner += `<div class="widget__progress-sub">steps active</div>`;
         inner += `<div class="widget__progress-bar"><div class="widget__progress-fill" style="width:0%"></div></div>`;
         break;
-      case 'mori':
-        // v690 (Malik): ONE number. The weeks line + reminder were word salad.
-        inner += `<div class="widget__big-num" style="font-size:2rem;font-variant-numeric:tabular-nums">--</div>`;
-        inner += `<div class="widget__big-unit">days left</div>`;
-        break;
       case 'vivere':
         // Today's life practice at a glance. Filled by RENDERERS.vivere.
         inner += `<div class="widget__title" id="vivWidgetCat" style="font-size:0.72rem;color:var(--text-3);font-weight:600;">Today's practice</div>`;
@@ -938,7 +917,7 @@ const BENTO_MOBILE_SLOTS = [
 // then Action, Reflection, Vivere as full-width bars. A fresh user starts here;
 // dragging stores a personal order in state.ui.bentoOrder (mobile only) so the
 // desktop bento + custom layouts, which key off state.widgetOrder, are untouched.
-const BENTO_MOBILE_DEFAULT = ['mori', 'clarity', 'streak', 'checkin', 'action', 'reflection', 'vivere'];
+const BENTO_MOBILE_DEFAULT = ['clarity', 'streak', 'checkin', 'action', 'reflection', 'vivere'];
 function isMobileBento() {
   try {
     const mobile = window.matchMedia && window.matchMedia('(max-width: 767.98px)').matches;
@@ -1001,12 +980,11 @@ function bentoMobileReorder(sourceKey, targetKey) {
 // Unlocked cards open the module; after 3+ opens they offer "Pin to dashboard".
 // The footer carries the unlock-everything escape hatch while anything is locked.
 const MoreSpace = {
-  MODULES: ['streak', 'mori', 'vivere', 'checkin', 'reflection', 'lifestats', 'deepwork', 'distraction'],
+  MODULES: ['streak', 'vivere', 'checkin', 'reflection', 'lifestats', 'deepwork', 'distraction'],
   DESC: {
     clarity: 'Your north star. Revisit or recalibrate.',
     action: 'The one thing that moves you today.',
     streak: 'Your days, kept visible.',
-    mori: 'The clock that makes today matter.',
     vivere: 'A board for the life worth building.',
     checkin: 'A daily pulse on mood and energy.',
     reflection: 'A place to think.',
@@ -3426,7 +3404,6 @@ const ShareStudio = {
     if (this._today().action) out.push('today');
     const w = this._weekly();
     if (w.actions || w.streak || w.deepMin) out.push('weekly');
-    if (state.mori && state.mori.birthYear) out.push('mori');
     return out;
   },
 
@@ -3445,13 +3422,6 @@ const ShareStudio = {
       let t = "Today's one thing\n\n" + d.action;
       if (d.why) t += '\n\n' + d.why;
       return t + tag;
-    }
-    if (type === 'mori') {
-      const le = (state.mori && state.mori.lifeExpectancy) || 80;
-      const yl = (typeof moriYearsRemaining === 'function') ? moriYearsRemaining(state.mori.birthYear, le) : null;
-      const wl = yl != null ? Math.max(0, Math.round(yl * 52)) : 0;
-      const note = (state.prefs && state.prefs.anchorQuote) || (state.mori && state.mori.reminderText) || 'Make it count.';
-      return 'My life in weeks\n\n~' + wl.toLocaleString() + ' weeks left.\n\n' + note + tag;
     }
     const w = this._weekly();
     const deep = w.deepMin >= 60 ? (Math.round(w.deepMin / 6) / 10) + 'h' : w.deepMin + 'm';
@@ -3548,7 +3518,6 @@ const ShareStudio = {
     // --- Body per card type ---
     if (type === 'neutron') this._drawNeutron(ctx, W, H, M, FF);
     else if (type === 'today') this._drawToday(ctx, W, H, M, FF);
-    else if (type === 'mori') this._drawMori(ctx, W, H, M, FF);
     else this._drawWeekly(ctx, W, H, M, FF);
 
     // --- Footer: Memento wordmark + optional name ---
@@ -3680,56 +3649,6 @@ const ShareStudio = {
     });
   },
 
-  _drawMori(ctx, W, H, M, FF) {
-    const by = state.mori && state.mori.birthYear;
-    const le = (state.mori && state.mori.lifeExpectancy) || 80;
-    const yearsLeft = (typeof moriYearsRemaining === 'function') ? moriYearsRemaining(by, le) : null;
-    const totalWeeks = le * 52;
-    const weeksLeft = (yearsLeft != null) ? Math.max(0, Math.round(yearsLeft * 52)) : 0;
-    const weeksLived = Math.max(0, totalWeeks - weeksLeft);
-    // Big weeks-left number.
-    const y = M + 150;
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(var(--ink),0.97)';
-    ctx.font = '800 150px ' + FF;
-    ctx.fillText(weeksLeft.toLocaleString(), M, y);
-    ctx.fillStyle = this.PURPLE;
-    ctx.font = '700 34px ' + FF;
-    this._spacedText(ctx, 'WEEKS LEFT', M + 6, y + 46, 4);
-    // Life-in-weeks dot grid: lived (light), current (accent), remaining (faint).
-    const cols = 52;
-    const rows = le;
-    const gridTop = y + 110;
-    const gridBottom = H - M - 130;
-    const availH = Math.max(40, gridBottom - gridTop);
-    const availW = W - 2 * M;
-    const cellW = availW / cols;
-    const cellH = availH / rows;
-    const r = Math.max(1.4, Math.min(cellW, cellH) * 0.34);
-    for (let i = 0; i < rows; i++) {
-      for (let j = 0; j < cols; j++) {
-        const idx = i * cols + j;
-        const cx = M + j * cellW + cellW / 2;
-        const cy = gridTop + i * cellH + cellH / 2;
-        const isCurrent = (idx === weeksLived);
-        ctx.beginPath();
-        ctx.arc(cx, cy, isCurrent ? r * 1.6 : r, 0, Math.PI * 2);
-        if (idx < weeksLived) ctx.fillStyle = 'rgba(var(--ink),0.50)';
-        else if (isCurrent) ctx.fillStyle = this.PURPLE;
-        else ctx.fillStyle = 'rgba(var(--ink),0.11)';
-        ctx.fill();
-      }
-    }
-    // Anchor quote / reminder beneath the grid.
-    const note = (state.prefs && state.prefs.anchorQuote) || (state.mori && state.mori.reminderText) || 'Make it count.';
-    ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(var(--ink),0.72)';
-    ctx.font = '500 30px ' + FF;
-    const lines = this._wrap(ctx, note, W - 2 * M, 2);
-    let qy = gridBottom + 50;
-    lines.forEach(ln => { ctx.fillText(ln, M, qy); qy += 38; });
-  },
-
   // ---- Probe: does this canvas produce a non-blank PNG? (safety gate) ----
   _probeCanvas() {
     try {
@@ -3770,7 +3689,7 @@ const ShareStudio = {
     }
     if (types.indexOf(this.type) < 0) this.type = types[0];
 
-    const label = { neutron: 'Neutron Star', today: "Today's One Thing", weekly: 'Weekly Proof', mori: 'Life in Weeks' };
+    const label = { neutron: 'Neutron Star', today: "Today's One Thing", weekly: 'Weekly Proof' };
     const P = this.PURPLE;
 
     let h = '';
@@ -7549,7 +7468,6 @@ function renderDayCard() {
         (living ? '<span class="daycard-ns__liquid" aria-hidden="true">' + blobs + '</span>' : '') +
         '<span class="daycard-ns__iri" aria-hidden="true"></span>' +
         '<span class="daycard-ns__sheen" aria-hidden="true"></span>' +
-        ((state.meta && state.meta.moriMomentAt) ? '<span class="daycard-ns__mori" aria-hidden="true"></span>' : '') +
         ((state.meta && state.meta.vivereMomentAt) ? '<span class="daycard-ns__vivere" aria-hidden="true"></span>' : '') +
         (living ? '<span class="daycard-ns__burn" aria-hidden="true"></span>' : '') +
         /* v930 (Malik's playground picks): the Action REWARD. __plat is the

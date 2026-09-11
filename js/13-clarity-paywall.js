@@ -130,7 +130,6 @@ const ClarityPaywall = {
               chip('Refined clarity') +
               chip('One move a day') +
               chip('Consistency') +
-              chip('Memento Mori') +
               chip('Themes') +
               '<span class="cpw__chip cpw__chip--more">+ everything after</span>' +
             '</div>' +
