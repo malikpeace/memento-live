@@ -174,6 +174,149 @@
     } catch (e) { return ''; }
   }
 
+  // v1376 THE ENGINE'S INPUT. Everything the server's decision engine needs
+  // about the live goal, read fresh from state: the goal's shape (Clarity),
+  // the plan's verb and window (Action), the move text, and the facts that
+  // reset its clocks (last done day, the last 21 done days, streak,
+  // progress). Null when there is no goal to report. The server clamps it
+  // again and only ever moves facts forward.
+  function buildGoal() {
+    try {
+      var st = (typeof state !== 'undefined') ? state : null; if (!st) return null;
+      if (!(st.clarity && st.clarity.completed)) return null;
+      var a = st.action || {};
+      var pa = a.primaryAction || {};
+      var plan = st.actionPlan || null;
+      if (!(a.planGenerated && pa.title)) return null;
+      var hash = String((plan && plan.starHash) || '');
+      if (!hash) { try { var gp0 = (typeof ensureGoalTarget === 'function') ? ensureGoalTarget() : null; hash = String((gp0 && gp0.starHash) || ''); } catch (e) {} }
+      hash = hash.toLowerCase().replace(/[^0-9a-f]/g, '');
+      if (!hash) return null;
+      while (hash.length < 8) hash = '0' + hash;
+      var ans = (st.clarity && st.clarity.answers) || {};
+      var shape = (ans.goalShape && typeof ans.goalShape === 'object') ? ans.goalShape : {};
+      var shapes = ['quantity_up', 'quantity_down', 'frequency', 'maintenance', 'milestone', 'open'];
+      var type = shapes.indexOf(shape.type) >= 0 ? shape.type : 'open';
+      var verb = (plan && plan.verb === 'hold') ? 'hold' : 'do';
+      var win = (plan && ['morning', 'midday', 'evening'].indexOf(plan.sendWindow) >= 0) ? plan.sendWindow : (verb === 'hold' ? 'evening' : 'morning');
+      var tiers = pa.tiers || {};
+      var move = tiers[a.selectedTier] || tiers[pa.recommendedTier] || pa.howToStart || pa.title || '';
+      var tiny = tiers.tiny || '';
+      var targets = (plan && plan.targets) || {};
+      var target = (targets.target != null && isFinite(Number(targets.target))) ? Number(targets.target) : ((shape.target != null && isFinite(Number(shape.target))) ? Number(shape.target) : null);
+      var unit = String(targets.unit || shape.unit || '') || null;
+      var dl = (plan && plan.deadline) || shape.deadline || null;
+      if (!(typeof dl === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dl))) dl = null;
+      var dlText = String(shape.deadlineText || '').trim() || null;
+      if (dl && !dlText) { try { dlText = new Date(dl + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', day: 'numeric' }); } catch (e) {} }
+      var cad = Number(shape.cadence) || Number(plan && plan.sessionsPerWeek) || null;
+      if (cad != null && (cad < 1 || cad > 7)) cad = null;
+      var toDay = function (v) { try { return (typeof isoToLocalDay === 'function') ? isoToLocalDay(v) : String(v).slice(0, 10); } catch (e) { return null; } };
+      var start = plan && plan.landedAt ? toDay(new Date(plan.landedAt).toISOString()) : null;
+      if (!start) start = (typeof getTodayISO === 'function') ? getTodayISO() : new Date().toISOString().slice(0, 10);
+      var hist = Array.isArray(a.completionHistory) ? a.completionHistory : [];
+      var days = {}, latest = null;
+      var todayNum = Math.floor(Date.parse(((typeof getTodayISO === 'function') ? getTodayISO() : new Date().toISOString().slice(0, 10)) + 'T00:00:00Z') / 86400000);
+      hist.forEach(function (e) {
+        if (!e || !e.date) return;
+        var d = toDay(e.date); if (!d) return;
+        var n = Math.floor(Date.parse(d + 'T00:00:00Z') / 86400000);
+        if (!latest || d > latest) latest = d;
+        if (todayNum - n >= 0 && todayNum - n <= 20) days[d] = 1;
+      });
+      var gp = st.goalProgress || {};
+      var progress = (gp.current != null && isFinite(Number(gp.current))) ? Number(gp.current) : null;
+      var done = null;
+      try { var r = st.goalDone && st.goalDone[hash]; if (r) done = (typeof r.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.day)) ? r.day : (r.at ? toDay(new Date(r.at).toISOString()) : null); } catch (e) {}
+      return {
+        goal_hash: hash,
+        goal_shape: type,
+        verb: verb,
+        send_window: win,
+        has_natural_log: verb !== 'hold',
+        cadence_per_week: cad,
+        target: target,
+        unit: unit,
+        deadline_date: dl,
+        deadline_text: dlText,
+        noun: null,
+        why_clause: String(ans.coreWhy || '').trim().slice(0, 500) || null,
+        action_plan: move ? [String(move).slice(0, 280)] : [],
+        fallback_move: tiny ? String(tiny).slice(0, 280) : null,
+        star: String(ans.neutronStar || '').slice(0, 400),
+        start_date: start,
+        tz_offset_minutes: new Date().getTimezoneOffset(),
+        last_success_day: latest,
+        last_confirm_day: verb === 'hold' ? latest : null,
+        recent_session_days: Object.keys(days).sort(),
+        active_day_streak: Number((st.streak && st.streak.count) || 0),
+        progress: progress,
+        completion_day: done
+      };
+    } catch (e) { return null; }
+  }
+
+  // Sends the goal to push-tick. Signed-in only (the row belongs to the
+  // account); quiet when there is nothing to say. Debounced: a day close
+  // and the sync that follows it must not double-post.
+  var goalSyncTimer = null, lastGoalJson = '';
+  function syncGoal(force) {
+    try {
+      var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
+      if (!url || !anon || isDemo() || LOCAL) return Promise.resolve();
+      var token = remoteToken();
+      if (!token || token === anon) return Promise.resolve();
+      if (!hasVerifiedPaidAccess()) return Promise.resolve();
+      var device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : '';
+      if (!device) return Promise.resolve();
+      var goal = buildGoal();
+      if (!goal) return Promise.resolve();
+      var json = JSON.stringify(goal);
+      if (!force && json === lastGoalJson) return Promise.resolve();
+      return new Promise(function (resolve) {
+        clearTimeout(goalSyncTimer);
+        goalSyncTimer = setTimeout(function () {
+          fetch(fnUrl(), {
+            method: 'PUT',
+            headers: { apikey: anon, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', 'x-memento-device': device },
+            body: JSON.stringify({ goal: goal })
+          }).then(function (r) {
+            if (r.ok) lastGoalJson = json;
+            try { MementoPush._lastGoalSync = { at: Date.now(), status: r.status, ok: r.ok }; } catch (e) {}
+            if (!r.ok) return r.text().then(function (t) { try { MementoPush._lastGoalSync.body = String(t).slice(0, 200); } catch (e) {} });
+          }).catch(function (err) {
+            try { MementoPush._lastGoalSync = { at: Date.now(), error: String(err && err.message || err) }; } catch (e) {}
+          }).then(resolve, resolve);
+        }, force ? 0 : 600);
+      });
+    } catch (e) { return Promise.resolve(); }
+  }
+
+  // Owner only (the server checks the account): what the engine would send
+  // today, or that exact message pushed to this phone right now.
+  function ownerEngine(mode) {
+    if (isDemo() || LOCAL) return Promise.reject(new Error('Use the installed production app'));
+    var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
+    var token = remoteToken();
+    var device = '';
+    try { device = (typeof Analytics !== 'undefined' && Analytics.deviceId) ? Analytics.deviceId() : ''; } catch (e) {}
+    if (!url || !anon || !token || token === anon) return Promise.reject(new Error('Sign in first'));
+    if (!device) return Promise.reject(new Error('This phone has no device ID'));
+    var body = {}; body[mode === 'send' ? 'owner_send_now' : 'owner_preview'] = true;
+    return syncGoal(true).then(function () {
+      return fetch(fnUrl(), {
+        method: 'POST',
+        headers: { apikey: anon, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', 'x-memento-device': device },
+        body: JSON.stringify(body)
+      });
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (out) {
+        if (!response.ok) throw new Error(String(out && out.error || ('Failed (' + response.status + ')')));
+        return out;
+      });
+    });
+  }
+
   function rpcSync(sub) {
     try {
       var url = window.MEMENTO_SUPABASE_URL, anon = window.MEMENTO_SUPABASE_ANON;
@@ -214,6 +357,7 @@
         // server rows and this catch ate the evidence. Every attempt now
         // leaves a readable trace for the push-status dev sheet.
         try { MementoPush._lastSync = { at: Date.now(), status: r.status, ok: r.ok }; } catch (e2) {}
+        if (r.ok) { try { syncGoal(false); } catch (e4) {} }
         if (!r.ok) return r.text().then(function (t) { try { MementoPush._lastSync.body = String(t).slice(0, 200); } catch (e3) {} });
       }).catch(function (err) {
         try { MementoPush._lastSync = { at: Date.now(), error: String(err && err.message || err) }; } catch (e2) {}
@@ -761,6 +905,11 @@
     // js/13 calls this the moment a purchase verifies (notifications phase C).
     armPostPayment: armPostPayment,
     supported: supported,
+    // v1376: the engine's input, and the owner's proof
+    syncGoal: syncGoal,
+    _buildGoal: buildGoal,
+    _previewToday: function () { return ownerEngine('preview'); },
+    _sendEngineNow: function () { return ownerEngine('send'); },
     // probes / dev only
     _openDeepLink: openDeepLink,
     _progressAskDue: progressAskDue,

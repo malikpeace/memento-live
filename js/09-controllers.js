@@ -5014,9 +5014,23 @@ const TabBar = {
       return line('Notifications are blocked for Memento in your phone\u2019s Settings. Turn them on there and this comes alive.');
     }
     if (st.on) {
+      // v1376: the owner's proof that the engine is alive. Two quiet rows,
+      // only for the owner's account (the server checks the same thing).
+      let owner = '';
+      try {
+        const em = (typeof CloudSync !== 'undefined' && CloudSync.email) ? String(CloudSync.email() || '').toLowerCase() : '';
+        if (em && MEMENTO_OWNER_EMAILS.indexOf(em) >= 0) {
+          owner = '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Today\u2019s reminder</div>' +
+            '<div class="you-row__desc" id="notifPreviewOut" style="font-size:0.78rem;color:var(--text-3);">What the engine would send you today.</div></div>' +
+            '<button type="button" id="notifPreview" class="sheet-btn" style="flex:none;padding:9px 14px;background:var(--kfill-04);color:var(--text-2);">Preview</button></div>' +
+            '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Send it to this phone</div>' +
+            '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">The real message, right now, ignoring the hour.</div></div>' +
+            '<button type="button" id="notifSendNow" class="sheet-btn" style="flex:none;padding:9px 14px;background:var(--kfill-04);color:var(--text-2);">Send</button></div>';
+        }
+      } catch (e) {}
       return '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Reminders</div>' +
-        '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">A quiet check-in when your goal\u2019s number has gone still. Nothing else.</div></div>' +
-        '<button type="button" id="notifOff" class="sheet-btn" style="flex:none;padding:9px 14px;background:var(--kfill-04);color:var(--text-2);">Turn off</button></div>';
+        '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">One a day at most, only when it helps. Never at night.</div></div>' +
+        '<button type="button" id="notifOff" class="sheet-btn" style="flex:none;padding:9px 14px;background:var(--kfill-04);color:var(--text-2);">Turn off</button></div>' + owner;
     }
     return '<div class="you-row"><div class="you-row__main"><div class="you-row__label">Reminders</div>' +
       '<div class="you-row__desc" style="font-size:0.78rem;color:var(--text-3);">A quiet check-in when your goal\u2019s number has gone still. Nothing else.</div></div>' +
@@ -5036,6 +5050,28 @@ const TabBar = {
     if (off) off.addEventListener('click', () => {
       off.textContent = 'Turning off\u2026';
       window.MementoPush.disable().then(rerender).catch(rerender);
+    });
+    // v1376: owner proof rows
+    const out = document.getElementById('notifPreviewOut');
+    const say = (t) => { if (out) out.textContent = t; };
+    const fmt = (r) => {
+      if (!r || !r.goal) return 'No goal on the server yet. Open the app once with a plan, then try again.';
+      const g = r.goal, d = r.decision;
+      const when = d ? ('at ' + (d.hour > 12 ? (d.hour - 12) + 'pm' : d.hour === 12 ? '12pm' : d.hour + 'am')) : '';
+      const head = d ? ('\u201c' + d.title + ' \u00b7 ' + d.body + '\u201d ' + when) : 'Nothing due today (quiet day).';
+      return head + ' \u00b7 day ' + g.day + ', gap ' + g.gap + (g.slipping ? ', slipping' : '') + ', last done ' + (g.last_success_day || 'never') + (g.subscribed ? '' : ' \u00b7 this phone is not subscribed');
+    };
+    const pv = document.getElementById('notifPreview');
+    if (pv) pv.addEventListener('click', () => {
+      pv.textContent = '\u2026'; say('Asking the engine.');
+      window.MementoPush._previewToday().then((r) => { say(fmt(r)); pv.textContent = 'Preview'; })
+        .catch((e) => { say(String(e && e.message || 'Failed')); pv.textContent = 'Preview'; });
+    });
+    const sn = document.getElementById('notifSendNow');
+    if (sn) sn.addEventListener('click', () => {
+      sn.textContent = '\u2026'; say('Sending.');
+      window.MementoPush._sendEngineNow().then((r) => { say('Sent. ' + fmt(r)); sn.textContent = 'Send'; })
+        .catch((e) => { say(String(e && e.message || 'Failed')); sn.textContent = 'Send'; });
     });
   },
 
