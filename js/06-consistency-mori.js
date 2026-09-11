@@ -106,12 +106,6 @@ function _currentStreakFrom(counts, strict) {
   // only when the day before the gap is active (a 2+ day gap never bridges).
   // Pass strict=true for the raw chain (used where a true break must be detected).
   const active = new Set(Object.keys(counts).filter(k => consistencyDayHasMainAction(counts[k])).map(_dayNum));
-  // Grace days already spent are covered days forever: they keep the chain
-  // intact in both modes (a covered day is not a break, even for the raw chain).
-  try {
-    const used = {};   // v1137: grace days retired; nothing is 'covered' any more
-    Object.keys(used).forEach(k => active.add(_dayNum(k)));
-  } catch (e) {}
   const today = _dayNum(getTodayISO());
   let walk = active.has(today) ? today : today - 1;
   let n = 0, bridged = false;

@@ -7,7 +7,7 @@
    ONCE on mismatch. Kills the "phone silently runs old cached js under a new
    index" class (the SW's offline fallback can serve stale files on a bad
    connection; Malik hit this three times in one day). */
-window.MEMENTO_JS_BUILD = 'v1373';
+window.MEMENTO_JS_BUILD = 'v1374';
 /* ============================================
    STATE MANAGEMENT
    ============================================ */
@@ -1627,9 +1627,6 @@ function pushUpdate(type, title, text) {
     if (state.updates.length > 120) state.updates = state.updates.slice(-120);
     persistState();
   } catch (e) {}
-}
-function unreadUpdatesCount() {
-  try { return (state.updates || []).filter(u => u && !u.read).length; } catch (e) { return 0; }
 }
 
 // Day key (LOCAL) for any stored date value. Full ISO timestamps (how

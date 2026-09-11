@@ -123,23 +123,10 @@ function recalculateStreak() {
   // announced themselves in Updates ('Grace day banked', 'A grace day covered
   // Tuesday. Life happened. The chain holds.'). A missed day is a missed day;
   // the ledger says so. The never-miss-twice bridge below is NOT this: it is
-  // the streak's own definition, not a granted favour.
+  // the streak's own definition, not a granted favour. v1374: the leftover
+  // 'earn' block (which promised a cover that no longer existed) is gone too.
   const cur = _currentStreakFrom(counts);
   state.streak.count = cur;
-  // Earn: each new multiple of 7 in the current run banks one (cap 2). The
-  // milestone tracker resets when the run does, so every fresh 7-day climb
-  // earns again.
-  try {
-    const m = Math.floor(cur / 7);
-    if (m > (g.lastEarnMilestone || 0)) {
-      const before = g.bank || 0;
-      g.bank = Math.min(2, before + (m - (g.lastEarnMilestone || 0)));
-      if (g.bank > before && !DEMO_MODE) {
-        try { if (typeof pushUpdate === 'function') pushUpdate('grace', 'Grace day banked', 'Seven days kept. One missed day will be covered for you, automatically.'); } catch (_) {}
-      }
-    }
-    g.lastEarnMilestone = m;
-  } catch (_) {}
   // A completed main Action counts whether it came from a receipt or a manual
   // backfill. lastCheckDate feeds comeback-gap detection; reading only the
   // manual history would leave it stale for users who use the Action screen.

@@ -4156,12 +4156,6 @@ const COMEBACK_COACHING = {
   'Other':      { tier: 'tiny',  line: 'Whatever it was, it is behind you. Pick the smallest way back in and go.' }
 };
 
-// A fresh, unread weekly review (the Monday letter from maybeGenerateWeeklyCard)
-// exists. Used to surface it on Home instead of leaving it buried in Updates.
-function hasFreshWeeklyCard() {
-  try { return (state.updates || []).some(u => u && u.type === 'weekly' && !u.read); } catch (e) { return false; }
-}
-
 // v1051: which pillar the PHONE card is showing. Same rule as the desktop
 // fan: never persisted, so every launch lands on today's action.
 let _ccPillar = 'action';
@@ -6648,8 +6642,6 @@ function bindCommandCenter(cc) {
     if (rv) rv.addEventListener('click', () => { try { ProofTrail.open(); } catch (e) {} });
     const vivOpen = cc.querySelector('#ccVivereOpen');
     if (vivOpen) vivOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('vivere'); } catch (e) {} });
-    const wkOpen = cc.querySelector('[data-weekly-open]');
-    if (wkOpen) wkOpen.addEventListener('click', () => { try { if (typeof Sheet !== 'undefined' && Sheet.open) Sheet.open('inbox'); } catch (e) {} });
   } catch (e) {}
   // v1330 (Malik's law: the home's geometry NEVER moves once visible). The
   // deck var only rules the pillar faces; a transient render of a different

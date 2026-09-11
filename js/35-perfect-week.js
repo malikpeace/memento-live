@@ -320,10 +320,29 @@ const PerfectWeek = (() => {
   }
   // Called by js/08 after every home render. Debounced: the home paints a
   // few times on the way in; the intro rises once the room is still.
+  // v1374 (the retention audit): the day-7 payoff used to have exactly one
+  // caller, the cheat bar. Now it rises here, on the first still home after
+  // the week has passed, before any new offer can.
+  function homeStill() {
+    try {
+      if (/[?&]demo=/.test(location.search)) return false;
+      if (root || document.hidden) return false;
+      const h = String(location.hash || '').replace(/^#\/?/, '');
+      if (h && h !== 'home') return false;
+      if (document.querySelector('.afl, .pwk, .cn-dlgwrap, .action-intro, .cpw, #clarityPaywall')) return false;
+      const cover = document.getElementById('cloudRestoreScreen');
+      if (cover) {
+        const cs = getComputedStyle(cover);
+        if (cs.display !== 'none' && cs.visibility !== 'hidden' && parseFloat(cs.opacity) > 0.05) return false;
+      }
+      return true;
+    } catch (e) { return false; }
+  }
   function maybeOffer() {
     if (offerTimer) return;
     offerTimer = setTimeout(() => {
       offerTimer = null;
+      if (homeStill() && maybeMilestone()) return;
       if (offerable()) { try { Analytics.track('protocol_offered'); } catch (e) {} open(); }
     }, 900);
   }
